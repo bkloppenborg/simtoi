@@ -17,11 +17,12 @@ class CModel
 {
 protected:
 	// Datamembers
-	int n_model_parameters
+	int n_model_parameters;
 	bool is_analytic;
 
-	double position[3];
 	double rotation[3];
+
+	CPosition position;
 
 public:
 	CModel();
@@ -33,8 +34,6 @@ public:
 
 	int GetTotalParameters();
 	void SetParameters(float * params);
-
-	void
 
 
 };

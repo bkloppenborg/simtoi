@@ -20,12 +20,12 @@ CPositionXY::~CPositionXY()
 	// Do nothing
 }
 
-CPositionXY::SetParams(double * params)
+void CPositionXY::SetParams(double * params)
 {
 	// does nothing for now.
 }
 
-CPositionXY::GetXYZ(double & x, double & y, double & z)
+void CPositionXY::GetXYZ(double & x, double & y, double & z)
 {
 	x = 0;
 	y = 0;

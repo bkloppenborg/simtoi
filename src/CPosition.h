@@ -22,10 +22,10 @@ public:
 	virtual ~CPosition();
 
 	// A function to route and scale unit hypercube variables to object parameters.
-	virtual void SetParams(double * params);
+	virtual void SetParams(double * params) = 0;
 
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
-	virtual void GetXYZ(double & x, double & y, double & z);
+	virtual void GetXYZ(double & x, double & y, double & z) = 0;
 };
 
 #endif /* CPOSITION_H_ */

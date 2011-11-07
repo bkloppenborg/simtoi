@@ -15,6 +15,9 @@ class CPositionXY: public CPosition
 public:
 	CPositionXY();
 	virtual ~CPositionXY();
+
+	virtual void SetParams(double * params);
+	virtual void GetXYZ(double & x, double & y, double & z);
 };
 
 #endif /* CPOSITIONXY_H_ */
