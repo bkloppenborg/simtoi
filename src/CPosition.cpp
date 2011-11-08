@@ -28,7 +28,7 @@ void CPosition::init_params(int total_params)
 	for(int i = 0; i < total_params; i++)
 	{
 		params[i] = 0;
-		free_params[i] = false;
+		free_params[i] = true;
 	}
 }
 
