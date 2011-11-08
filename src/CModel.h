@@ -5,10 +5,13 @@
  *      Author: bkloppenborg
  *
  *  A Virtual base class for model objects.
+ *
  */
 
 #ifndef CMODEL_H_
 #define CMODEL_H_
+
+#include "CPosition.h"
 
 class CPosition;
 class GLFBO;
@@ -22,15 +25,15 @@ protected:
 
 	double rotation[3];
 
-	CPosition position;
+	CPosition * position;
 
 public:
 	CModel();
-	virtual ~CModel();
+	~CModel();
 
-	void Render();
-	void AppendFeature();
-	void DeleteFeature();
+	virtual void Render();
+	void AppendFeature(CFeature feature);
+	//void DeleteFeature();
 
 	int GetTotalParameters();
 	void SetParameters(float * params);

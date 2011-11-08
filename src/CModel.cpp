@@ -15,5 +15,6 @@ CModel::CModel()
 
 CModel::~CModel()
 {
-	// TODO Auto-generated destructor stub
+	// Free up memory.
+	delete position;
 }
