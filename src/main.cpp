@@ -63,7 +63,7 @@ void OpenGL_cleanup()
 	glDeleteFramebuffers(1, &fbo_texture);
 }
 
-void init(void)
+void OpenGL_init(void)
 {
     // ########
     // OpenGL initialization
@@ -156,21 +156,26 @@ void CheckOpenGLError(string function_name)
 // The main routine.
 int main(int argc, char *argv[])
 {
-	models = new CModelList();
-	models->Append(new CModelSphere());
+	// TODO: Read in user-specified parameter / model file.
 
+	models = new CModelList();
+
+	CModel * tmp = new CModelSphere();
+	tmp->SetPositionType(XY);
+	models->Append(tmp);
+
+	// Continue on with the rest of the code.
 	window_width = 512;
 	window_height = 512;
 
-
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_LUMINANCE | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(window_width,window_height);    //if I comment out this line,
+    glutInitWindowSize(window_width,window_height);
     glutInitWindowPosition(100,100);
-    glutCreateWindow(argv[0]);  //this line,
+    glutCreateWindow(argv[0]);
 
     // Now init OpenGL and register callbacks:
-    init();
+    OpenGL_init();
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);

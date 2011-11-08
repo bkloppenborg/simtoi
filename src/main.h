@@ -12,7 +12,6 @@
 
 using namespace std;
 
-void init(void);
 void display(void);
 void reshape(int w, int h);
 void keyboard(unsigned char key, int x, int y);
@@ -21,6 +20,7 @@ int main(int argc, char** argv);
 void CheckOpenGLError(string function_name);
 
 // OpenGL initialization routines:
+void OpenGL_init(void);
 void initFrameBuffer(void);
 void initFrameBufferDepthBuffer(void);
 void initFrameBufferTexture(void);

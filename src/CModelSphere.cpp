@@ -5,10 +5,6 @@
  *      Author: bkloppenborg
  */
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
-
 #include "CModelSphere.h"
 
 CModelSphere::CModelSphere()
@@ -37,7 +33,12 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glTranslatef(x, 0, 0);
+
+		// Call base-class rotation and translation functions.
+		this->Translate();
+		this->Rotate();
+
+		// Model defined drawing functions:
 		glutSolidSphere(radius, slices, slices);
 	glPopMatrix();
 

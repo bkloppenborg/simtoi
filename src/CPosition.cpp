@@ -17,3 +17,8 @@ CPosition::~CPosition()
 {
 	// TODO Auto-generated destructor stub
 }
+
+ePositionTypes CPosition::GetType()
+{
+	return this->type;
+}

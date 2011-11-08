@@ -13,12 +13,15 @@
 
 // Headers for OpenGL functions
 #include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
 
 #include "CPosition.h"
+#include "enumerations.h"
 
 class CPosition;
 class CFeature;
-class GLFBO;
+
 
 class CModel
 {
@@ -31,6 +34,10 @@ protected:
 
 	CPosition * position;
 
+protected:
+	void Rotate();
+	void Translate();
+
 public:
 	CModel();
 	~CModel();
@@ -42,6 +49,7 @@ public:
 
 	int GetTotalParameters();
 	void SetParameters(float * params);
+	void SetPositionType(ePositionTypes type);
 
 
 };
