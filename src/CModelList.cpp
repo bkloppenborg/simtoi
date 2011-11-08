@@ -44,7 +44,8 @@ void CModelList::Render(GLuint framebuffer_object, int width, int height)
 
     CModel * model;
     // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it) {
+    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    {
     	(*it)->Render(framebuffer_object, width, height);
     }
 
@@ -62,9 +63,17 @@ void CModelList::Render(GLuint framebuffer_object, int width, int height)
 }
 
 // This function sets the parameters for models prior to a GetData call.
-void CModelList::SetModelParams(double * params, int n_params)
+void CModelList::SetParameters(double * params, int n_params)
 {
+    CModel * model;
+    int n = 0;
 
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    {
+    	(*it)->SetParameters(params + n, n_params - n);
+    	n += (*it)->GetTotalFreeParameters();
+    }
 }
 
 void CModelList::GetData()

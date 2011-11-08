@@ -17,3 +17,8 @@ CFeature::~CFeature()
 {
 	// TODO Auto-generated destructor stub
 }
+
+int CFeature::GetNFreeParameters()
+{
+	return n_params_free;
+}

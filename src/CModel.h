@@ -21,34 +21,41 @@
 
 class CPosition;
 class CFeature;
+class CFeatureList;
 
 
 class CModel
 {
 protected:
 	// Datamembers
-	int n_model_parameters;
+	int n_free_parameters;
 	bool is_analytic;
 
 	double rotation[3];
 
 	CPosition * position;
+	CFeatureList * features;
 
 protected:
 	void Rotate();
 	void Translate();
+	virtual void SetModelParameters(double * params, int n_params) = 0;
 
 public:
 	CModel();
 	~CModel();
 
-	// Render function.  Assume the framebuffer has already been cleared.
-	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
-	void AppendFeature(CFeature feature);
+	void AppendFeature(CFeature * feature);
 	//void DeleteFeature();
 
-	int GetTotalParameters();
-	void SetParameters(float * params);
+	int GetTotalFreeParameters();
+	virtual int GetNModelFreeParameters() = 0;
+	int GetNPositionFreeParameters();
+	int GetNFeatureFreeParameters();
+
+	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
+
+	void SetParameters(double * params, int n_params);
 	void SetPositionType(ePositionTypes type);
 
 

@@ -9,7 +9,10 @@
 
 CModelSphere::CModelSphere()
 {
-	// TODO Auto-generated constructor stub
+	// Set the number of free parameters used in this object.
+	n_free_parameters = 1;
+
+	slices = 50;	// seems like a good number.
 
 }
 
@@ -18,11 +21,14 @@ CModelSphere::~CModelSphere()
 	// TODO Auto-generated destructor stub
 }
 
+int CModelSphere::GetNModelFreeParameters()
+{
+	return this->n_free_parameters;
+}
+
 void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 {
-	double radius = 3.0;
-	int slices = 50;
-	double x = 5.0;
+	// NOTE: When rendering assume that the framebuffer has already been cleared.
 
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -31,10 +37,13 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		// Note, load custom shaders here
 		// no shaders :-(
 
+		// All models should load the modelview and identity matrix after a glPushMatrix().
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
 		// Call base-class rotation and translation functions.
+		// NOTE: OpenGL applies these operations in a stack-like buffer so they are reversed
+		// compared to conventional application.
 		this->Translate();
 		this->Rotate();
 
@@ -44,4 +53,10 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 
 	// Return to the deafult framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void CModelSphere::SetModelParameters(double * params, int n_params)
+{
+	// TODO: Check that n_params > this->n_free_params, if not throw exception
+	radius = params[0];
 }

@@ -164,6 +164,9 @@ int main(int argc, char *argv[])
 	tmp->SetPositionType(XY);
 	models->Append(tmp);
 
+	double junk[5] = {3, 4, 5, 0, 0};
+	models->SetParameters(junk, 5);
+
 	// Continue on with the rest of the code.
 	window_width = 512;
 	window_height = 512;

@@ -6,13 +6,15 @@
  */
 
 #include "CPositionXY.h"
+#include "misc.h"	// needed for pull_params
 
 CPositionXY::CPositionXY()
 {
 	// Set the datamembers:
 	this->n_params_total = 2;
-	this->n_params_free = 0;
+	this->n_params_free = 2;
 
+	init_params(n_params_total);
 }
 
 CPositionXY::~CPositionXY()
@@ -20,15 +22,17 @@ CPositionXY::~CPositionXY()
 	// Do nothing
 }
 
-void CPositionXY::SetParams(double * params)
+void CPositionXY::SetParams(double * in_params, int n_params)
 {
-	// does nothing for now.
+	// TODO: Check that n_params > this->n_free_params, if not throw exception
+
+	pull_params(in_params, n_params, this->params, n_params_total, free_params);
 }
 
 void CPositionXY::GetXYZ(double & x, double & y, double & z)
 {
-	x = 0;
-	y = 0;
+	x = params[0];
+	y = params[1];
 
 	// By default
 	z = 0;

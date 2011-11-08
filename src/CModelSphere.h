@@ -12,11 +12,18 @@
 
 class CModelSphere: public CModel
 {
+protected:
+	double radius;
+	int slices;
+
 public:
 	CModelSphere();
 	virtual ~CModelSphere();
 
+	int GetNModelFreeParameters();
 	void Render(GLuint framebuffer_object, int width, int height);
+
+	void SetModelParameters(double * params, int n_params);
 };
 
 #endif /* CMODELSPHERE_H_ */

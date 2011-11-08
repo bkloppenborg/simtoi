@@ -22,6 +22,8 @@ public:
 	CFeature();
 	virtual ~CFeature();
 
+	int GetNFreeParameters();
+
 
 };
 

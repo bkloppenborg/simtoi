@@ -33,7 +33,7 @@ public:
 
 	void GetData();
 
-	void SetModelParams(double * params, int n_params);
+	void SetParameters(double * params, int n_params);
 
 };
 
