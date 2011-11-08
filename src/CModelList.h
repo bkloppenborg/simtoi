@@ -8,6 +8,8 @@
 #ifndef CMODELLIST_H_
 #define CMODELLIST_H_
 
+#include <GL/gl.h>
+
 #include <vector>
 #include "CModel.h"
 
@@ -27,7 +29,7 @@ public:
 
 	void Append(CModel* model);
 
-	void Render();
+	void Render(GLuint framebuffer_object, int width, int height);
 
 	void GetData();
 

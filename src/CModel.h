@@ -11,6 +11,9 @@
 #ifndef CMODEL_H_
 #define CMODEL_H_
 
+// Headers for OpenGL functions
+#include <GL/gl.h>
+
 #include "CPosition.h"
 
 class CPosition;
@@ -32,7 +35,8 @@ public:
 	CModel();
 	~CModel();
 
-	virtual void Render() = 0;
+	// Render function.  Assume the framebuffer has already been cleared.
+	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 	void AppendFeature(CFeature feature);
 	//void DeleteFeature();
 

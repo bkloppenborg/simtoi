@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/bkloppenborg/workspace/simtoi/src/CModel.h
+GL/gl.h
+-
+CPosition.h
+/home/bkloppenborg/workspace/simtoi/src/CPosition.h
+
+/home/bkloppenborg/workspace/simtoi/src/CModelList.h
+GL/gl.h
+-
+vector
+-
+CModel.h
+/home/bkloppenborg/workspace/simtoi/src/CModel.h
+
+/home/bkloppenborg/workspace/simtoi/src/CModelSphere.h
+CModel.h
+/home/bkloppenborg/workspace/simtoi/src/CModel.h
+
+/home/bkloppenborg/workspace/simtoi/src/CPosition.h
+
+/home/bkloppenborg/workspace/simtoi/src/main.cpp
+string
+-
+iostream
+-
+cstdio
+-
+CModelList.h
+/home/bkloppenborg/workspace/simtoi/src/CModelList.h
+CModelSphere.h
+/home/bkloppenborg/workspace/simtoi/src/CModelSphere.h
+
