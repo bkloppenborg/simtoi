@@ -14,6 +14,7 @@
 #include "CPosition.h"
 
 class CPosition;
+class CFeature;
 class GLFBO;
 
 class CModel
@@ -31,7 +32,7 @@ public:
 	CModel();
 	~CModel();
 
-	virtual void Render();
+	virtual void Render() = 0;
 	void AppendFeature(CFeature feature);
 	//void DeleteFeature();
 

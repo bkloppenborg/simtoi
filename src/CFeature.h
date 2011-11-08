@@ -8,7 +8,7 @@
 #ifndef CFEATURE_H_
 #define CFEATURE_H_
 
-#include <enumerations.h>
+#include "enumerations.h"
 
 class CFeature
 {
