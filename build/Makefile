@@ -108,6 +108,19 @@ simtoi/fast:
 	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/build
 .PHONY : simtoi/fast
 
+#=============================================================================
+# Target rules for targets named textio
+
+# Build rule for target.
+textio: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 textio
+.PHONY : textio
+
+# fast build rule for target.
+textio/fast:
+	$(MAKE) -f lib/textio/src/CMakeFiles/textio.dir/build.make lib/textio/src/CMakeFiles/textio.dir/build
+.PHONY : textio/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -117,6 +130,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... simtoi"
+	@echo "... textio"
 .PHONY : help
 
 
