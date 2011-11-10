@@ -20,6 +20,9 @@ CGLShader::~CGLShader()
 	glDeleteProgram(program);
 	glDeleteShader(shader_vertex);
 	glDeleteShader(shader_fragment);
+
+	// Now release object memory:
+	delete param_locations;
 }
 
 // Loads the shader from the source file, links
