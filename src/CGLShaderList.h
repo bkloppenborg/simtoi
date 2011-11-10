@@ -11,6 +11,7 @@
 #include <vector>
 #include "enumerations.h"
 #include "CGLShader.h"
+#include "CShader.h"
 
 
 class CGLShaderList
@@ -26,7 +27,7 @@ public:
 	~CGLShaderList();
 
 	void Append(CGLShader * feature);
-	CGLShader * GetShader(eGLShaders shader);
+	CShader * GetShader(eGLShaders shader);
 	CGLShader * FindShader(eGLShaders shader);
 
 protected:

@@ -17,6 +17,7 @@
 #include <GL/glut.h>
 
 #include "CPosition.h"
+#include "CShader.h"
 #include "enumerations.h"
 
 class CPosition;
@@ -35,6 +36,9 @@ protected:
 
 	CPosition * position;
 	CFeatureList * features;
+
+private:
+	CShader * shader;
 
 protected:
 	void Rotate();
@@ -57,6 +61,10 @@ public:
 
 	void SetParameters(double * params, int n_params);
 	void SetPositionType(ePositionTypes type);
+	void SetShader(CShader * shader);
+
+protected:
+	void UseShader();
 
 
 };

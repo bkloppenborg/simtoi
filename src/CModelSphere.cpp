@@ -41,6 +41,9 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
+		// Use the shader (this is valid to call even if a shader hasn't been assigned to this object).
+		UseShader();
+
 		// Call base-class rotation and translation functions.
 		// NOTE: OpenGL applies these operations in a stack-like buffer so they are reversed
 		// compared to conventional application.

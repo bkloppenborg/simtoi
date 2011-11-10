@@ -36,20 +36,20 @@ void CGLShaderList::Append(CGLShader * shader)
 	shaders.push_back(shader);
 }
 
-CGLShader * CGLShaderList::GetShader(eGLShaders shader)
+CShader * CGLShaderList::GetShader(eGLShaders shader)
 {
 	// First see if the shader is already loaded
 	CGLShader * tmp;
 	tmp = FindShader(shader);
 
 	if(tmp != NULL)
-		return tmp;
+		return new CShader(tmp, tmp->GetNParams());
 
 	// Otherwise load the shader, append it to the list of shaders and return the object.
 	tmp = LoadShader(shader);
 	Append(tmp);
 
-	return tmp;
+	return new CShader(tmp, tmp->GetNParams());
 }
 
 CGLShader * CGLShaderList::FindShader(eGLShaders shader)

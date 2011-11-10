@@ -40,6 +40,8 @@ public:
 	eGLShaders GetType();
 	void init_shader();
 
+	int GetNParams();
+
 	void UseShader(float * params, int in_params);
 
 };

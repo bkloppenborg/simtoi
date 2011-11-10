@@ -16,7 +16,7 @@ CModel::CModel()
 {
 	// Init the object to have no rotation in yaw, pitch, or roll.
 	rotation[0] = rotation[1] = rotation[2] = 0;
-
+	shader = NULL;
 	position = new CPositionXY();
 	features = new CFeatureList();
 }
@@ -72,6 +72,13 @@ void CModel::SetParameters(double * params, int n_params)
 	n += this->n_free_parameters;
 	position->SetParams(params + n, n_params - n);
 	n += position->GetNFreeParameters();
+
+	if(shader != NULL)
+	{
+		shader->SetParams(params + n, n_params - n);
+		n += shader->GetNFreeParams();
+	}
+
 	features->SetParams(params + n, n_params - n);
 }
 
@@ -86,4 +93,15 @@ void CModel::SetPositionType(ePositionTypes type)
 
 		// TODO: Implement additional position types.
 	}
+}
+
+void CModel::SetShader(CShader * shader)
+{
+	this->shader = shader;
+}
+
+void CModel::UseShader()
+{
+	if(this->shader != NULL)
+		shader->UseShader();
 }
