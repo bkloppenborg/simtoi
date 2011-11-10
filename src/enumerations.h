@@ -22,4 +22,11 @@ enum ePositionTypes
 	Orbit
 };
 
+// An enumeration of shaders
+// TODO: we need to have a simple way of mapping
+enum eGLShaders
+{
+	LD_Hesteroffer1997
+};
+
 #endif /* ENUMERATIONS_H_ */
