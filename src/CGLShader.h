@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 
+#include "enumerations.h"
+
 using namespace std;
 
 class CGLShader
@@ -29,10 +31,13 @@ protected:
 	int n_params;
 	vector<string> param_names;
 
+	eGLShaders type;
+
 public:
-	CGLShader();
+	CGLShader(eGLShaders type, string base_filename, int n_parameters, vector<string> parameter_names);
 	virtual ~CGLShader();
 
+	eGLShaders GetType();
 	void init_shader();
 
 	void UseShader(float * params, int in_params);

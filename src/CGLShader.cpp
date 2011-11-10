@@ -8,10 +8,12 @@
 #include "CGLShader.h"
 #include "ReadTextFile.h"
 
-CGLShader::CGLShader()
+CGLShader::CGLShader(eGLShaders type, string base_filename, int n_parameters, vector<string> parameter_names)
 {
-	// TODO Auto-generated constructor stub
-
+	this->type = type;
+	this->base_name = base_filename;
+	this->n_params = n_parameters;
+	this->param_names = parameter_names;
 }
 
 CGLShader::~CGLShader()
@@ -23,6 +25,11 @@ CGLShader::~CGLShader()
 
 	// Now release object memory:
 	delete param_locations;
+}
+
+eGLShaders CGLShader::GetType()
+{
+	return this->type;
 }
 
 // Loads the shader from the source file, links

@@ -23,7 +23,7 @@ enum ePositionTypes
 };
 
 // An enumeration of shaders
-// TODO: we need to have a simple way of mapping
+// TODO: we need to have a simple way of mapping the names to the enumerated values.
 enum eGLShaders
 {
 	LD_Hesteroffer1997
