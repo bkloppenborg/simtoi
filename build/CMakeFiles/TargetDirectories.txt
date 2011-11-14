@@ -1,2 +1,0 @@
-/home/bkloppenborg/workspace/simtoi/build/src/CMakeFiles/simtoi.dir
-/home/bkloppenborg/workspace/simtoi/build/lib/textio/src/CMakeFiles/textio.dir
