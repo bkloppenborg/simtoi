@@ -5,30 +5,81 @@ src/CMakeFiles/simtoi.dir/CFeature.cpp.o: ../src/CFeature.cpp
 src/CMakeFiles/simtoi.dir/CFeature.cpp.o: ../src/CFeature.h
 src/CMakeFiles/simtoi.dir/CFeature.cpp.o: ../src/enumerations.h
 
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o: ../src/CFeature.h
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o: ../src/CFeatureList.cpp
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o: ../src/CFeatureList.h
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o: ../src/enumerations.h
+
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../lib/textio/include/ReadTextFile.h
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../src/CGLShader.cpp
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../src/CGLShader.h
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../src/CGLShaderList.h
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../src/COpenGL.h
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../src/enumerations.h
+
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o: ../src/CGLShader.h
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o: ../src/CGLShaderList.cpp
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o: ../src/CGLShaderList.h
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o: ../src/enumerations.h
+
+src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CFeature.h
+src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CFeatureList.h
 src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CModel.cpp
 src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CModel.h
 src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CPosition.h
+src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CPositionXY.h
+src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/enumerations.h
 
 src/CMakeFiles/simtoi.dir/CModelList.cpp.o: ../src/CModel.h
 src/CMakeFiles/simtoi.dir/CModelList.cpp.o: ../src/CModelList.cpp
 src/CMakeFiles/simtoi.dir/CModelList.cpp.o: ../src/CModelList.h
 src/CMakeFiles/simtoi.dir/CModelList.cpp.o: ../src/CPosition.h
+src/CMakeFiles/simtoi.dir/CModelList.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/CModelList.cpp.o: ../src/enumerations.h
 
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: ../src/CModel.h
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: ../src/CModelSphere.cpp
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: ../src/CModelSphere.h
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: ../src/CPosition.h
+src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: ../src/enumerations.h
+
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: ../src/CGLShader.h
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: ../src/CGLShaderList.h
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: ../src/COpenGL.cpp
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: ../src/COpenGL.h
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: ../src/enumerations.h
 
 src/CMakeFiles/simtoi.dir/CPosition.cpp.o: ../src/CPosition.cpp
 src/CMakeFiles/simtoi.dir/CPosition.cpp.o: ../src/CPosition.h
+src/CMakeFiles/simtoi.dir/CPosition.cpp.o: ../src/enumerations.h
 
 src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o: ../src/CPosition.h
 src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o: ../src/CPositionXY.cpp
 src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o: ../src/CPositionXY.h
+src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o: ../src/enumerations.h
+src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o: ../src/misc.h
 
+src/CMakeFiles/simtoi.dir/CShader.cpp.o: ../src/CGLShader.h
+src/CMakeFiles/simtoi.dir/CShader.cpp.o: ../src/CShader.cpp
+src/CMakeFiles/simtoi.dir/CShader.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/CShader.cpp.o: ../src/enumerations.h
+
+src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/CGLShader.h
+src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/CGLShaderList.h
 src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/CModel.h
 src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/CModelList.h
 src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/CModelSphere.h
+src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/COpenGL.h
 src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/CPosition.h
+src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/CShader.h
+src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/enumerations.h
 src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/main.cpp
+src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/main.h
+
+src/CMakeFiles/simtoi.dir/misc.cpp.o: ../src/misc.cpp
 

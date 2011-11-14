@@ -1,4 +1,4 @@
-# Install script for directory: /home/bkloppenborg/workspace/simtoi/lib
+# Install script for directory: /home/bkloppenborg/workspace/simtoi/lib/textio
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,7 +34,7 @@ ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  INCLUDE("/home/bkloppenborg/workspace/simtoi/build/lib/textio/cmake_install.cmake")
+  INCLUDE("/home/bkloppenborg/workspace/simtoi/build/lib/textio/src/cmake_install.cmake")
 
 ENDIF(NOT CMAKE_INSTALL_LOCAL_ONLY)
 

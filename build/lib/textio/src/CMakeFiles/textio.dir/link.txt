@@ -1,0 +1,2 @@
+/usr/bin/ar cr libtextio.a  CMakeFiles/textio.dir/ReadTextFile.cpp.o
+/usr/bin/ranlib libtextio.a

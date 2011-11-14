@@ -12,6 +12,8 @@ SET(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/CMakeCXXCompiler.cmake"
   "CMakeFiles/CMakeSystem.cmake"
   "../lib/CMakeLists.txt"
+  "../lib/textio/CMakeLists.txt"
+  "../lib/textio/src/CMakeLists.txt"
   "../src/CMakeLists.txt"
   "/usr/share/cmake-2.8/Modules/CMakeCInformation.cmake"
   "/usr/share/cmake-2.8/Modules/CMakeCXXInformation.cmake"
@@ -42,9 +44,12 @@ SET(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "src/CMakeFiles/CMakeDirectoryInformation.cmake"
   "lib/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "lib/textio/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "lib/textio/src/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 SET(CMAKE_DEPEND_INFO_FILES
   "src/CMakeFiles/simtoi.dir/DependInfo.cmake"
+  "lib/textio/src/CMakeFiles/textio.dir/DependInfo.cmake"
   )

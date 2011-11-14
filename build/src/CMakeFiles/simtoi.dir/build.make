@@ -70,9 +70,57 @@ src/CMakeFiles/simtoi.dir/CModelList.cpp.o.provides: src/CMakeFiles/simtoi.dir/C
 src/CMakeFiles/simtoi.dir/CModelList.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/CModelList.cpp.o
 .PHONY : src/CMakeFiles/simtoi.dir/CModelList.cpp.o.provides.build
 
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o: ../src/COpenGL.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_2)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/COpenGL.cpp.o"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/COpenGL.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/COpenGL.cpp
+
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simtoi.dir/COpenGL.cpp.i"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/bkloppenborg/workspace/simtoi/src/COpenGL.cpp > CMakeFiles/simtoi.dir/COpenGL.cpp.i
+
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simtoi.dir/COpenGL.cpp.s"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/bkloppenborg/workspace/simtoi/src/COpenGL.cpp -o CMakeFiles/simtoi.dir/COpenGL.cpp.s
+
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.requires:
+.PHONY : src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.requires
+
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.provides: src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.provides
+
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/COpenGL.cpp.o
+.PHONY : src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.provides.build
+
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o: ../src/CGLShaderList.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CGLShaderList.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.cpp
+
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simtoi.dir/CGLShaderList.cpp.i"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.cpp > CMakeFiles/simtoi.dir/CGLShaderList.cpp.i
+
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simtoi.dir/CGLShaderList.cpp.s"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.cpp -o CMakeFiles/simtoi.dir/CGLShaderList.cpp.s
+
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.requires:
+.PHONY : src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.requires
+
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.provides: src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.provides
+
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o
+.PHONY : src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.provides.build
+
 src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
 src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o: ../src/CPositionXY.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_2)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_4)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o"
 	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CPositionXY.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CPositionXY.cpp
 
@@ -96,7 +144,7 @@ src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o.provides.build: src/CMakeFiles/simto
 
 src/CMakeFiles/simtoi.dir/CPosition.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
 src/CMakeFiles/simtoi.dir/CPosition.cpp.o: ../src/CPosition.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_5)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CPosition.cpp.o"
 	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CPosition.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CPosition.cpp
 
@@ -120,7 +168,7 @@ src/CMakeFiles/simtoi.dir/CPosition.cpp.o.provides.build: src/CMakeFiles/simtoi.
 
 src/CMakeFiles/simtoi.dir/CModel.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
 src/CMakeFiles/simtoi.dir/CModel.cpp.o: ../src/CModel.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CModel.cpp.o"
 	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CModel.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CModel.cpp
 
@@ -144,7 +192,7 @@ src/CMakeFiles/simtoi.dir/CModel.cpp.o.provides.build: src/CMakeFiles/simtoi.dir
 
 src/CMakeFiles/simtoi.dir/CFeature.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
 src/CMakeFiles/simtoi.dir/CFeature.cpp.o: ../src/CFeature.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_5)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_7)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CFeature.cpp.o"
 	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CFeature.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CFeature.cpp
 
@@ -168,7 +216,7 @@ src/CMakeFiles/simtoi.dir/CFeature.cpp.o.provides.build: src/CMakeFiles/simtoi.d
 
 src/CMakeFiles/simtoi.dir/main.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
 src/CMakeFiles/simtoi.dir/main.cpp.o: ../src/main.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_6)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_8)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/main.cpp.o"
 	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/main.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/main.cpp
 
@@ -190,9 +238,81 @@ src/CMakeFiles/simtoi.dir/main.cpp.o.provides: src/CMakeFiles/simtoi.dir/main.cp
 src/CMakeFiles/simtoi.dir/main.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/main.cpp.o
 .PHONY : src/CMakeFiles/simtoi.dir/main.cpp.o.provides.build
 
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o: ../src/CGLShader.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_9)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CGLShader.cpp.o"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CGLShader.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CGLShader.cpp
+
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simtoi.dir/CGLShader.cpp.i"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/bkloppenborg/workspace/simtoi/src/CGLShader.cpp > CMakeFiles/simtoi.dir/CGLShader.cpp.i
+
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simtoi.dir/CGLShader.cpp.s"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/bkloppenborg/workspace/simtoi/src/CGLShader.cpp -o CMakeFiles/simtoi.dir/CGLShader.cpp.s
+
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.requires:
+.PHONY : src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.requires
+
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.provides: src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.provides
+
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/CGLShader.cpp.o
+.PHONY : src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.provides.build
+
+src/CMakeFiles/simtoi.dir/misc.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
+src/CMakeFiles/simtoi.dir/misc.cpp.o: ../src/misc.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_10)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/misc.cpp.o"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/misc.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/misc.cpp
+
+src/CMakeFiles/simtoi.dir/misc.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simtoi.dir/misc.cpp.i"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/bkloppenborg/workspace/simtoi/src/misc.cpp > CMakeFiles/simtoi.dir/misc.cpp.i
+
+src/CMakeFiles/simtoi.dir/misc.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simtoi.dir/misc.cpp.s"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/bkloppenborg/workspace/simtoi/src/misc.cpp -o CMakeFiles/simtoi.dir/misc.cpp.s
+
+src/CMakeFiles/simtoi.dir/misc.cpp.o.requires:
+.PHONY : src/CMakeFiles/simtoi.dir/misc.cpp.o.requires
+
+src/CMakeFiles/simtoi.dir/misc.cpp.o.provides: src/CMakeFiles/simtoi.dir/misc.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/misc.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simtoi.dir/misc.cpp.o.provides
+
+src/CMakeFiles/simtoi.dir/misc.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/misc.cpp.o
+.PHONY : src/CMakeFiles/simtoi.dir/misc.cpp.o.provides.build
+
+src/CMakeFiles/simtoi.dir/CShader.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
+src/CMakeFiles/simtoi.dir/CShader.cpp.o: ../src/CShader.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_11)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CShader.cpp.o"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CShader.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CShader.cpp
+
+src/CMakeFiles/simtoi.dir/CShader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simtoi.dir/CShader.cpp.i"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/bkloppenborg/workspace/simtoi/src/CShader.cpp > CMakeFiles/simtoi.dir/CShader.cpp.i
+
+src/CMakeFiles/simtoi.dir/CShader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simtoi.dir/CShader.cpp.s"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/bkloppenborg/workspace/simtoi/src/CShader.cpp -o CMakeFiles/simtoi.dir/CShader.cpp.s
+
+src/CMakeFiles/simtoi.dir/CShader.cpp.o.requires:
+.PHONY : src/CMakeFiles/simtoi.dir/CShader.cpp.o.requires
+
+src/CMakeFiles/simtoi.dir/CShader.cpp.o.provides: src/CMakeFiles/simtoi.dir/CShader.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/CShader.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simtoi.dir/CShader.cpp.o.provides
+
+src/CMakeFiles/simtoi.dir/CShader.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/CShader.cpp.o
+.PHONY : src/CMakeFiles/simtoi.dir/CShader.cpp.o.provides.build
+
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o: ../src/CModelSphere.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_7)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_12)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o"
 	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CModelSphere.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CModelSphere.cpp
 
@@ -214,26 +334,63 @@ src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o.provides: src/CMakeFiles/simtoi.dir
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o
 .PHONY : src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o.provides.build
 
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o: src/CMakeFiles/simtoi.dir/flags.make
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o: ../src/CFeatureList.cpp
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles $(CMAKE_PROGRESS_13)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/simtoi.dir/CFeatureList.cpp.o -c /home/bkloppenborg/workspace/simtoi/src/CFeatureList.cpp
+
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/simtoi.dir/CFeatureList.cpp.i"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/bkloppenborg/workspace/simtoi/src/CFeatureList.cpp > CMakeFiles/simtoi.dir/CFeatureList.cpp.i
+
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/simtoi.dir/CFeatureList.cpp.s"
+	cd /home/bkloppenborg/workspace/simtoi/build/src && /usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/bkloppenborg/workspace/simtoi/src/CFeatureList.cpp -o CMakeFiles/simtoi.dir/CFeatureList.cpp.s
+
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.requires:
+.PHONY : src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.requires
+
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.provides: src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.requires
+	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.provides.build
+.PHONY : src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.provides
+
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.provides.build: src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o
+.PHONY : src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.provides.build
+
 # Object files for target simtoi
 simtoi_OBJECTS = \
 "CMakeFiles/simtoi.dir/CModelList.cpp.o" \
+"CMakeFiles/simtoi.dir/COpenGL.cpp.o" \
+"CMakeFiles/simtoi.dir/CGLShaderList.cpp.o" \
 "CMakeFiles/simtoi.dir/CPositionXY.cpp.o" \
 "CMakeFiles/simtoi.dir/CPosition.cpp.o" \
 "CMakeFiles/simtoi.dir/CModel.cpp.o" \
 "CMakeFiles/simtoi.dir/CFeature.cpp.o" \
 "CMakeFiles/simtoi.dir/main.cpp.o" \
-"CMakeFiles/simtoi.dir/CModelSphere.cpp.o"
+"CMakeFiles/simtoi.dir/CGLShader.cpp.o" \
+"CMakeFiles/simtoi.dir/misc.cpp.o" \
+"CMakeFiles/simtoi.dir/CShader.cpp.o" \
+"CMakeFiles/simtoi.dir/CModelSphere.cpp.o" \
+"CMakeFiles/simtoi.dir/CFeatureList.cpp.o"
 
 # External object files for target simtoi
 simtoi_EXTERNAL_OBJECTS =
 
 ../bin/simtoi: src/CMakeFiles/simtoi.dir/CModelList.cpp.o
+../bin/simtoi: src/CMakeFiles/simtoi.dir/COpenGL.cpp.o
+../bin/simtoi: src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o
 ../bin/simtoi: src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o
 ../bin/simtoi: src/CMakeFiles/simtoi.dir/CPosition.cpp.o
 ../bin/simtoi: src/CMakeFiles/simtoi.dir/CModel.cpp.o
 ../bin/simtoi: src/CMakeFiles/simtoi.dir/CFeature.cpp.o
 ../bin/simtoi: src/CMakeFiles/simtoi.dir/main.cpp.o
+../bin/simtoi: src/CMakeFiles/simtoi.dir/CGLShader.cpp.o
+../bin/simtoi: src/CMakeFiles/simtoi.dir/misc.cpp.o
+../bin/simtoi: src/CMakeFiles/simtoi.dir/CShader.cpp.o
 ../bin/simtoi: src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o
+../bin/simtoi: src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o
+../bin/simtoi: lib/textio/src/libtextio.a
 ../bin/simtoi: /usr/lib/libglut.so
 ../bin/simtoi: /usr/lib/libXmu.so
 ../bin/simtoi: /usr/lib/libXi.so
@@ -253,12 +410,18 @@ src/CMakeFiles/simtoi.dir/build: ../bin/simtoi
 .PHONY : src/CMakeFiles/simtoi.dir/build
 
 src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CModelList.cpp.o.requires
+src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/COpenGL.cpp.o.requires
+src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o.requires
 src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o.requires
 src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CPosition.cpp.o.requires
 src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CModel.cpp.o.requires
 src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CFeature.cpp.o.requires
 src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/main.cpp.o.requires
+src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CGLShader.cpp.o.requires
+src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/misc.cpp.o.requires
+src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CShader.cpp.o.requires
 src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o.requires
+src/CMakeFiles/simtoi.dir/requires: src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o.requires
 .PHONY : src/CMakeFiles/simtoi.dir/requires
 
 src/CMakeFiles/simtoi.dir/clean:

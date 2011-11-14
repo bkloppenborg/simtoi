@@ -5,30 +5,81 @@ src/CMakeFiles/simtoi.dir/CFeature.cpp.o
  /home/bkloppenborg/workspace/simtoi/src/CFeature.cpp
  /home/bkloppenborg/workspace/simtoi/src/CFeature.h
  /home/bkloppenborg/workspace/simtoi/src/enumerations.h
+src/CMakeFiles/simtoi.dir/CFeatureList.cpp.o
+ /home/bkloppenborg/workspace/simtoi/src/CFeature.h
+ /home/bkloppenborg/workspace/simtoi/src/CFeatureList.cpp
+ /home/bkloppenborg/workspace/simtoi/src/CFeatureList.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
+src/CMakeFiles/simtoi.dir/CGLShader.cpp.o
+ ../lib/textio/include/ReadTextFile.h
+ /home/bkloppenborg/workspace/simtoi/src/CGLShader.cpp
+ /home/bkloppenborg/workspace/simtoi/src/CGLShader.h
+ /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.h
+ /home/bkloppenborg/workspace/simtoi/src/COpenGL.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
+src/CMakeFiles/simtoi.dir/CGLShaderList.cpp.o
+ /home/bkloppenborg/workspace/simtoi/src/CGLShader.h
+ /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.cpp
+ /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
 src/CMakeFiles/simtoi.dir/CModel.cpp.o
+ /home/bkloppenborg/workspace/simtoi/src/CFeature.h
+ /home/bkloppenborg/workspace/simtoi/src/CFeatureList.h
  /home/bkloppenborg/workspace/simtoi/src/CModel.cpp
  /home/bkloppenborg/workspace/simtoi/src/CModel.h
  /home/bkloppenborg/workspace/simtoi/src/CPosition.h
+ /home/bkloppenborg/workspace/simtoi/src/CPositionXY.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
 src/CMakeFiles/simtoi.dir/CModelList.cpp.o
  /home/bkloppenborg/workspace/simtoi/src/CModel.h
  /home/bkloppenborg/workspace/simtoi/src/CModelList.cpp
  /home/bkloppenborg/workspace/simtoi/src/CModelList.h
  /home/bkloppenborg/workspace/simtoi/src/CPosition.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
 src/CMakeFiles/simtoi.dir/CModelSphere.cpp.o
  /home/bkloppenborg/workspace/simtoi/src/CModel.h
  /home/bkloppenborg/workspace/simtoi/src/CModelSphere.cpp
  /home/bkloppenborg/workspace/simtoi/src/CModelSphere.h
  /home/bkloppenborg/workspace/simtoi/src/CPosition.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
+src/CMakeFiles/simtoi.dir/COpenGL.cpp.o
+ /home/bkloppenborg/workspace/simtoi/src/CGLShader.h
+ /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.h
+ /home/bkloppenborg/workspace/simtoi/src/COpenGL.cpp
+ /home/bkloppenborg/workspace/simtoi/src/COpenGL.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
 src/CMakeFiles/simtoi.dir/CPosition.cpp.o
  /home/bkloppenborg/workspace/simtoi/src/CPosition.cpp
  /home/bkloppenborg/workspace/simtoi/src/CPosition.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
 src/CMakeFiles/simtoi.dir/CPositionXY.cpp.o
  /home/bkloppenborg/workspace/simtoi/src/CPosition.h
  /home/bkloppenborg/workspace/simtoi/src/CPositionXY.cpp
  /home/bkloppenborg/workspace/simtoi/src/CPositionXY.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
+ /home/bkloppenborg/workspace/simtoi/src/misc.h
+src/CMakeFiles/simtoi.dir/CShader.cpp.o
+ /home/bkloppenborg/workspace/simtoi/src/CGLShader.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.cpp
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
 src/CMakeFiles/simtoi.dir/main.cpp.o
+ /home/bkloppenborg/workspace/simtoi/src/CGLShader.h
+ /home/bkloppenborg/workspace/simtoi/src/CGLShaderList.h
  /home/bkloppenborg/workspace/simtoi/src/CModel.h
  /home/bkloppenborg/workspace/simtoi/src/CModelList.h
  /home/bkloppenborg/workspace/simtoi/src/CModelSphere.h
+ /home/bkloppenborg/workspace/simtoi/src/COpenGL.h
  /home/bkloppenborg/workspace/simtoi/src/CPosition.h
+ /home/bkloppenborg/workspace/simtoi/src/CShader.h
+ /home/bkloppenborg/workspace/simtoi/src/enumerations.h
  /home/bkloppenborg/workspace/simtoi/src/main.cpp
+ /home/bkloppenborg/workspace/simtoi/src/main.h
+src/CMakeFiles/simtoi.dir/misc.cpp.o
+ /home/bkloppenborg/workspace/simtoi/src/misc.cpp

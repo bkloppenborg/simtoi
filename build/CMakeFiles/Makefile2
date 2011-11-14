@@ -68,10 +68,10 @@ src/preinstall:
 # Target rules for target src/CMakeFiles/simtoi.dir
 
 # All Build rule for target.
-src/CMakeFiles/simtoi.dir/all:
+src/CMakeFiles/simtoi.dir/all: lib/textio/src/CMakeFiles/textio.dir/all
 	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/depend
 	$(MAKE) -f src/CMakeFiles/simtoi.dir/build.make src/CMakeFiles/simtoi.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles  1 2 3 4 5 6 7
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles  1 2 3 4 5 6 7 8 9 10 11 12 13
 	@echo "Built target simtoi"
 .PHONY : src/CMakeFiles/simtoi.dir/all
 
@@ -81,7 +81,7 @@ all: src/CMakeFiles/simtoi.dir/all
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/simtoi.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/bkloppenborg/workspace/simtoi/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bkloppenborg/workspace/simtoi/build/CMakeFiles 14
 	$(MAKE) -f CMakeFiles/Makefile2 src/CMakeFiles/simtoi.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/bkloppenborg/workspace/simtoi/build/CMakeFiles 0
 .PHONY : src/CMakeFiles/simtoi.dir/rule
@@ -103,16 +103,81 @@ clean: src/CMakeFiles/simtoi.dir/clean
 # Directory level rules for directory lib
 
 # Convenience name for "all" pass in the directory.
-lib/all:
+lib/all: lib/textio/all
 .PHONY : lib/all
 
 # Convenience name for "clean" pass in the directory.
-lib/clean:
+lib/clean: lib/textio/clean
 .PHONY : lib/clean
 
 # Convenience name for "preinstall" pass in the directory.
-lib/preinstall:
+lib/preinstall: lib/textio/preinstall
 .PHONY : lib/preinstall
+
+#=============================================================================
+# Directory level rules for directory lib/textio
+
+# Convenience name for "all" pass in the directory.
+lib/textio/all: lib/textio/src/all
+.PHONY : lib/textio/all
+
+# Convenience name for "clean" pass in the directory.
+lib/textio/clean: lib/textio/src/clean
+.PHONY : lib/textio/clean
+
+# Convenience name for "preinstall" pass in the directory.
+lib/textio/preinstall: lib/textio/src/preinstall
+.PHONY : lib/textio/preinstall
+
+#=============================================================================
+# Directory level rules for directory lib/textio/src
+
+# Convenience name for "all" pass in the directory.
+lib/textio/src/all: lib/textio/src/CMakeFiles/textio.dir/all
+.PHONY : lib/textio/src/all
+
+# Convenience name for "clean" pass in the directory.
+lib/textio/src/clean: lib/textio/src/CMakeFiles/textio.dir/clean
+.PHONY : lib/textio/src/clean
+
+# Convenience name for "preinstall" pass in the directory.
+lib/textio/src/preinstall:
+.PHONY : lib/textio/src/preinstall
+
+#=============================================================================
+# Target rules for target lib/textio/src/CMakeFiles/textio.dir
+
+# All Build rule for target.
+lib/textio/src/CMakeFiles/textio.dir/all:
+	$(MAKE) -f lib/textio/src/CMakeFiles/textio.dir/build.make lib/textio/src/CMakeFiles/textio.dir/depend
+	$(MAKE) -f lib/textio/src/CMakeFiles/textio.dir/build.make lib/textio/src/CMakeFiles/textio.dir/build
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/bkloppenborg/workspace/simtoi/build/CMakeFiles  14
+	@echo "Built target textio"
+.PHONY : lib/textio/src/CMakeFiles/textio.dir/all
+
+# Include target in all.
+all: lib/textio/src/CMakeFiles/textio.dir/all
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+lib/textio/src/CMakeFiles/textio.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bkloppenborg/workspace/simtoi/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 lib/textio/src/CMakeFiles/textio.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bkloppenborg/workspace/simtoi/build/CMakeFiles 0
+.PHONY : lib/textio/src/CMakeFiles/textio.dir/rule
+
+# Convenience name for target.
+textio: lib/textio/src/CMakeFiles/textio.dir/rule
+.PHONY : textio
+
+# clean rule for target.
+lib/textio/src/CMakeFiles/textio.dir/clean:
+	$(MAKE) -f lib/textio/src/CMakeFiles/textio.dir/build.make lib/textio/src/CMakeFiles/textio.dir/clean
+.PHONY : lib/textio/src/CMakeFiles/textio.dir/clean
+
+# clean rule for target.
+clean: lib/textio/src/CMakeFiles/textio.dir/clean
+.PHONY : clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
