@@ -8,6 +8,7 @@ find_package(OpenGL REQUIRED)
 
 # Add include directories and libs for compiled libraries.
 include_directories(${CMAKE_SOURCE_DIR}/lib/textio/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/src)
 
 # Enable prototype functions in OpenGL (even though some are no longer prototypes)
 set(CMAKE_CXX_FLAGS "-DGL_GLEXT_PROTOTYPES")
@@ -19,4 +20,4 @@ message(STATUS ${GLUT_glut_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
 # Link against GLUT, GLEW, OpenGL, and OpenCL
 file(GLOB SOURCE *.cpp)
 add_executable(simtoi ${SOURCE})
-target_link_libraries(simtoi textio ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})
+target_link_libraries(simtoi textio liboi ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY})

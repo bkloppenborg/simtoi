@@ -88,6 +88,8 @@ int main(int argc, char *argv[])
 	double junk[5] = {3, 0, 0, 0.9, 0};
 	models->SetParameters(junk, 5);
 
+	// Initialize OpenCL
+
 
     // Start the main loop:
     glutMainLoop();

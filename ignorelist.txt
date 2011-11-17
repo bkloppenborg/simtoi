@@ -1,6 +1,7 @@
 bin/*
 build/*
-lib/textio/*
+lib/textio/
+lib/liboi/
 .cproject
 .project
 .settings/
