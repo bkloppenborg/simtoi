@@ -9,7 +9,7 @@
 #include "COpenGL.h"
 #include "CGLShaderList.h"
 
-COpenGL::COpenGL(int window_width, int window_height, double scale)
+COpenGL::COpenGL(int window_width, int window_height, double scale, string shader_source_dir)
 {
 	// Init datamembers.
 	fbo = fbo_depth = fbo_texture = 0;
@@ -17,22 +17,33 @@ COpenGL::COpenGL(int window_width, int window_height, double scale)
 	this->window_height = window_height;
 	this->scale = scale;
 
+	this->shader_list = new CGLShaderList(shader_source_dir);
+
 }
 
 COpenGL::~COpenGL()
 {
+	delete this->shader_list;
+
    // Free OpenGL memory:
-	if(fbo != 0)
-		glDeleteRenderbuffers(1, &fbo);
-	if(fbo_depth != 0)
-		glDeleteFramebuffers(1, &fbo_depth);
-	if(fbo_texture != 0)
-		glDeleteFramebuffers(1, &fbo_texture);
+	if(fbo_depth) glDeleteRenderbuffers(1, &fbo_depth);
+	if(fbo_texture) glDeleteTextures(1, &fbo_texture);
+	if(fbo) glDeleteFramebuffers(1, &fbo);
+}
+
+GLuint COpenGL::GetFramebuffer()
+{
+	return fbo;
+}
+
+GLuint COpenGL::GetFramebufferTexture()
+{
+	return fbo_texture;
 }
 
 CShader * COpenGL::GetShader(eGLShaders shader)
 {
-	return shader_list.GetShader(shader);
+	return shader_list->GetShader(shader);
 }
 
 void COpenGL::init(int argc, char *argv[])
@@ -110,7 +121,16 @@ void COpenGL::initFrameBufferTexture(void)
     glGenTextures(1, &fbo_texture); // Generate one texture
     glBindTexture(GL_TEXTURE_2D, fbo_texture); // Bind the texture fbo_texture
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width, window_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, window_width, window_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, window_width, window_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
+    // These other formats might work, check that GL_BYTE is still correct for the higher precision.
+    // I don't think we'll ever need floating point numbers, but those are here too:
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, window_width, window_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, window_width, window_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, window_width, window_height, 0, GL_RED, CL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, window_width, window_height, 0, GL_RED, GL_FLOAT, NULL);
+
 
     // Setup the basic texture parameters
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

@@ -12,12 +12,10 @@
 #include <iostream>
 #include <cstdio>
 
-// OpenGL Headers:
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glut.h>
 
+// OpenGL, liboi headers
 #include "COpenGL.h"
+#include "CLibOI.h"
 
 #include "main.h"
 #include "CModelList.h"
@@ -30,8 +28,9 @@ int window_width = 128;
 int window_height = 128;
 CModelList * models;
 
-// OpenGL Globals:
-GLuint fbo, fbo_depth, fbo_texture;
+// OpenGL/OpenCL Globals:
+COpenGL * gl;
+CLibOI * ocl;
 
 // Prints out help describing the options on the command line
 void print_help()
@@ -45,6 +44,19 @@ void keyboard(unsigned char key, int x, int y)
 {
     if(key == 'q' || key == 'Q' || key == '\27')
         exit(0);
+
+    if(key == 'a')
+    {
+    	double junk[5] = {3, 0, 0, 0.9, 0};
+    	models->SetParameters(junk, 5);
+        glutPostRedisplay();
+    }
+
+    if(key == 'f')
+    {
+		float flux = ocl->TotalFlux(true);
+		printf("Total flux %f\n", flux);
+    }
 }
 
 void reshape (int w, int h)
@@ -54,9 +66,8 @@ void reshape (int w, int h)
 
 void display(void)
 {
-	models->Render(fbo, window_width, window_height);
+	models->Render(gl->GetFramebuffer(), window_width, window_height);
 }
-
 
 // The main routine.
 int main(int argc, char *argv[])
@@ -66,7 +77,7 @@ int main(int argc, char *argv[])
 	double scale = 0.05;
 
 	// Create a GL object, init and register callbacks:
-	COpenGL * gl = new COpenGL(window_width, window_height, scale);
+	gl = new COpenGL(window_width, window_height, scale, "/home/bkloppenborg/workspace/simtoi/src/shaders");
     gl->init(argc, argv);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
@@ -85,17 +96,19 @@ int main(int argc, char *argv[])
 	tmp->SetShader(shader);
 	models->Append(tmp);
 
-	double junk[5] = {3, 0, 0, 0.9, 0};
-	models->SetParameters(junk, 5);
-
 	// Initialize OpenCL
-
+	ocl = new CLibOI();
+	ocl->SetKernelSoucePath("/home/bkloppenborg/workspace/simtoi/lib/liboi/src/kernels");
+	ocl->Init(CL_DEVICE_TYPE_GPU, window_width, window_height, 1);
+	ocl->RegisterImage_GLTB(gl->GetFramebufferTexture());
 
     // Start the main loop:
     glutMainLoop();
 
 	// Clean up memory
+    delete ocl;
     delete models;
+    delete gl;
 
 	return 0;
 }

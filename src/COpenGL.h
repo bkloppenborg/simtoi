@@ -35,13 +35,20 @@ protected:
 	int window_height;
 	double scale;
 
-	CGLShaderList shader_list;
+	CGLShaderList * shader_list;
 
 public:
-	COpenGL(int window_width, int window_height, double scale);
+	COpenGL(int window_width, int window_height, double scale, string shader_source_dir);
 	~COpenGL();
 
-	CShader * GetShader(eGLShaders shader);
+	GLuint 		GetFramebuffer();
+	GLuint 		GetFramebufferTexture();
+	CShader * 	GetShader(eGLShaders shader);
+
+
+//	GLuint GetFramebuffer();
+//	GLuint GetTexturebuffer();
+//	void GetImageSize(int & width, int & height, int & depth);
 
 	void init(int argc, char *argv[]);
 
@@ -51,6 +58,7 @@ protected:
 	void initFrameBufferDepthBuffer(void);
 
 	void initFrameBufferTexture(void);
+
 };
 
 #endif /* COPENGL_H_ */

@@ -28,13 +28,14 @@ protected:
 	GLuint shader_fragment;
 	GLuint * param_locations;
 	string base_name;
+	string shader_dir;
 	int n_params;
 	vector<string> param_names;
 
 	eGLShaders type;
 
 public:
-	CGLShader(eGLShaders type, string base_filename, int n_parameters, vector<string> parameter_names);
+	CGLShader(eGLShaders type, string shader_dir, string base_filename, int n_parameters, vector<string> parameter_names);
 	virtual ~CGLShader();
 
 	eGLShaders GetType();

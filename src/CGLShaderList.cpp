@@ -10,9 +10,9 @@
 #include "CGLShaderList.h"
 #include "CGLShader.h"
 
-CGLShaderList::CGLShaderList()
+CGLShaderList::CGLShaderList(string shader_dir)
 {
-	// TODO Auto-generated constructor stub
+	this->shader_dir = shader_dir;
 
 }
 
@@ -79,7 +79,7 @@ CGLShader * CGLShaderList::LoadShader(eGLShaders shader)
 		base_name = "LD_Hestroffer1997";
 		n_params = 1;
 		param_names.push_back("alpha");
-		tmp = new CGLShader(shader, base_name, n_params, param_names);
+		tmp = new CGLShader(shader, shader_dir, base_name, n_params, param_names);
 	}
 
 	if(tmp != NULL)

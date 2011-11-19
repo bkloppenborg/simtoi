@@ -10,9 +10,10 @@
 #include "ReadTextFile.h"
 #include "COpenGL.h"
 
-CGLShader::CGLShader(eGLShaders type, string base_filename, int n_parameters, vector<string> parameter_names)
+CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, int n_parameters, vector<string> parameter_names)
 {
 	this->type = type;
+	this->shader_dir = shader_dir;
 	this->base_name = base_filename;
 	this->n_params = n_parameters;
 	this->param_names = parameter_names;
@@ -57,8 +58,8 @@ void CGLShader::init_shader()
     glAttachShader(program, shader_fragment);
 
     string source_v, source_f;
-    source_v = ReadFile("src/shaders/" + base_name + ".vert", "Could not read ../src/shaders/" + base_name + ".vert file!");
-    source_f = ReadFile("src/shaders/" + base_name + ".frag", "Could not read ../src/shaders/" + base_name + ".frag file!");
+    source_v = ReadFile(shader_dir + '/' + base_name + ".vert", "Could not read " + base_name + ".vert file!");
+    source_f = ReadFile(shader_dir + '/' + base_name + ".frag", "Could not read " + base_name + ".frag file!");
 
 	const GLchar * tmp_source_v;
 	const GLchar * tmp_source_f;

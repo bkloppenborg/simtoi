@@ -18,12 +18,13 @@ class CGLShaderList
 {
 protected:
 	vector<CGLShader*> shaders;
+	string shader_dir;
 
 private:
 	bool SortModelPredicate(CGLShader * A, CGLShader * B);
 
 public:
-	CGLShaderList();
+	CGLShaderList(string shader_dir);
 	~CGLShaderList();
 
 	void Append(CGLShader * feature);
