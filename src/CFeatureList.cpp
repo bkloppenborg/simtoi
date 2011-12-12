@@ -12,8 +12,6 @@
 
 #include "CFeatureList.h"
 
-
-
 using namespace std;
 
 CFeatureList::CFeatureList()

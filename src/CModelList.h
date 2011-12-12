@@ -8,10 +8,11 @@
 #ifndef CMODELLIST_H_
 #define CMODELLIST_H_
 
-#include <GL/gl.h>
-
 #include <vector>
+
+#include "COpenGL.h"
 #include "CModel.h"
+
 
 using namespace std;
 
@@ -29,9 +30,7 @@ public:
 
 	void Append(CModel* model);
 
-	void Render(GLuint framebuffer_object, int width, int height);
-
-	void GetData();
+	void Render(COpenGL * gl);
 
 	void SetParameters(double * params, int n_params);
 
