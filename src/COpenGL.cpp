@@ -31,19 +31,25 @@ COpenGL::~COpenGL()
 	if(fbo) glDeleteFramebuffers(1, &fbo);
 }
 
-GLuint COpenGL::GetFramebuffer()
+void COpenGL::BlitToScreen()
 {
-	return fbo;
-}
+	// Get exclusive access to OpenGL:
+	Lock();
 
-GLuint COpenGL::GetFramebufferTexture()
-{
-	return fbo_texture;
-}
+    // Bind back to the default buffer (just in case something didn't do it),
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-CShader * COpenGL::GetShader(eGLShaders shader)
-{
-	return shader_list->GetShader(shader);
+    // Blit the application-defined render buffer to the on-screen render buffer.
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
+    glBlitFramebuffer(0, 0, window_width, window_height, 0, 0, window_width, window_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+    // Tell OpenGL to finish operations then swap buffers to display the rendered model.
+    glFinish();
+    glutSwapBuffers();
+
+    // Unlock the OpenGL object.
+    Unlock();
 }
 
 void COpenGL::init(int argc, char *argv[])
@@ -53,6 +59,7 @@ void COpenGL::init(int argc, char *argv[])
     // ########
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_LUMINANCE | GLUT_DOUBLE | GLUT_DEPTH);
+    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
     glutInitWindowSize(window_width,window_height);
     glutInitWindowPosition(100,100);
     glutCreateWindow(argv[0]);

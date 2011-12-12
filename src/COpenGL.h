@@ -13,9 +13,11 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
+//#include <GL/glut.h>
 #include <string>
 
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include "CGLShaderList.h"
 
 class CShader;
@@ -34,6 +36,7 @@ protected:
 	int window_width;
 	int window_height;
 	double scale;
+	boost::interprocess::interprocess_mutex mutex;
 
 	CGLShaderList * shader_list;
 
@@ -41,16 +44,20 @@ public:
 	COpenGL(int window_width, int window_height, double scale, string shader_source_dir);
 	~COpenGL();
 
-	GLuint 		GetFramebuffer();
-	GLuint 		GetFramebufferTexture();
-	CShader * 	GetShader(eGLShaders shader);
+	void BlitToScreen();
 
+	// Inline a few functions
+	GLuint GetFramebuffer() { return fbo; };
+	GLuint GetFramebufferTexture() { return fbo_texture; };
+	CShader * GetShader(eGLShaders shader) { return shader_list->GetShader(shader); };
 
-//	GLuint GetFramebuffer();
-//	GLuint GetTexturebuffer();
-//	void GetImageSize(int & width, int & height, int & depth);
+	int GetWindowWidth() { return window_width; };
+	int GetWindowHeight() { return window_height; };
 
 	void init(int argc, char *argv[]);
+
+	void Lock() { mutex.lock(); };
+	void Unlock() {mutex.unlock(); };
 
 protected:
 	void initFrameBuffer(void);
