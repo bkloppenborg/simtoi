@@ -27,6 +27,21 @@ void CModelList::Append(CModel * model)
 	this->models.push_back(model);
 }
 
+/// This function gets the parameters for models after they have been set/scaled.
+/// also useful for determining initial, user-specified values in configuration files.
+void CModelList::GetParameters(float * params, int n_params)
+{
+    CModel * model;
+    int n = 0;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    {
+    	(*it)->GetParameters(params + n, n_params - n);
+    	n += (*it)->GetTotalFreeParameters();
+    }
+}
+
 // Render the image to the specified OpenGL framebuffer object.
 void CModelList::Render(COpenGL * gl)
 {
@@ -58,7 +73,7 @@ void CModelList::Render(COpenGL * gl)
 }
 
 // This function sets the parameters for models prior to a GetData call.
-void CModelList::SetParameters(double * params, int n_params)
+void CModelList::SetParameters(float * params, int n_params)
 {
     CModel * model;
     int n = 0;

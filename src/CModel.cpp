@@ -19,12 +19,18 @@ CModel::CModel()
 	shader = NULL;
 	position = new CPositionXY();
 	features = new CFeatureList();
+
+//	n_free_parameters = n_free_params;
+//	scale = float[n_free_parameters];
+//	scale_min = float[n_free_parameters];
 }
 
 CModel::~CModel()
 {
 	// Free up memory.
 	delete position;
+	delete scale;
+	delete scale_min;
 }
 
 int CModel::GetNPositionFreeParameters()
@@ -50,11 +56,31 @@ void CModel::Rotate()
 
 void CModel::Translate()
 {
-	double x, y, z;
+	float x, y, z;
 	position->GetXYZ(x, y, z);
 
 	// Call the translation routines.  Use the double-precision call.
 	glTranslated(x, y, z);
+}
+
+void CModel::GetParameters(float * params, int n_params)
+{
+	// Send parameter set command to the components of this model.
+	// We use pointer math to advance the position of the array passed to the functions
+	int n = 0;
+	GetModelParameters(params, n_params);
+	n += this->n_free_parameters;
+	position->GetParams(params + n, n_params - n);
+	n += position->GetNFreeParameters();
+
+	if(shader != NULL)
+	{
+		shader->GetParams(params + n, n_params - n);
+		n += shader->GetNFreeParams();
+	}
+
+	// TODO: Implement this function
+	//features->GetParams(params + n, n_params - n);
 }
 
 int CModel::GetTotalFreeParameters()
@@ -63,7 +89,7 @@ int CModel::GetTotalFreeParameters()
 	return this->GetNModelFreeParameters() + this->GetNPositionFreeParameters() + this->GetNFeatureFreeParameters();
 }
 
-void CModel::SetParameters(double * params, int n_params)
+void CModel::SetParameters(float * params, int n_params)
 {
 	// Send parameter set command to the components of this model.
 	// We use pointer math to advance the position of the array passed to the functions

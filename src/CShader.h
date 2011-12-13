@@ -21,9 +21,10 @@ public:
 	CShader(CGLShader * shader, int n_params);
 	virtual ~CShader();
 
+	void GetParams(float * params, int n_params);
 	int GetNFreeParams();
 
-	void SetParams(double * params, int n_params);
+	void SetParams(float * params, int n_params);
 	void UseShader();
 };
 

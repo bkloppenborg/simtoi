@@ -6,7 +6,6 @@
  */
 
 #include "CPositionXY.h"
-#include "misc.h"	// needed for pull_params
 
 CPositionXY::CPositionXY()
 {
@@ -22,14 +21,8 @@ CPositionXY::~CPositionXY()
 	// Do nothing
 }
 
-void CPositionXY::SetParams(double * in_params, int n_params)
-{
-	// TODO: Check that n_params > this->n_free_params, if not throw exception
 
-	pull_params(in_params, n_params, this->params, n_params_total, free_params);
-}
-
-void CPositionXY::GetXYZ(double & x, double & y, double & z)
+void CPositionXY::GetXYZ(float & x, float & y, float & z)
 {
 	x = params[0];
 	y = params[1];

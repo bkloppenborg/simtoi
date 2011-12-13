@@ -24,6 +24,14 @@ CShader::~CShader()
 	params = NULL;
 }
 
+// Gets the parameters.
+// Note, the input doubles are downcast to floats to be compatable with OpenGL function calls later.
+void CShader::GetParams(float * in_params, int n_params)
+{
+	for(int i = 0; i < this->n_params; i++)
+		in_params[i] = params[i];
+}
+
 int CShader::GetNFreeParams()
 {
 	return this->n_params;
@@ -31,7 +39,7 @@ int CShader::GetNFreeParams()
 
 // Sets the parameters.
 // Note, the input doubles are downcast to floats to be compatable with OpenGL function calls later.
-void CShader::SetParams(double * in_params, int n_params)
+void CShader::SetParams(float * in_params, int n_params)
 {
 	for(int i = 0; i < n_params; i++)
 		params[i] = (float) in_params[i];

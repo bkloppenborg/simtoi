@@ -30,9 +30,11 @@ public:
 
 	void Append(CModel* model);
 
+	void GetParameters(float * params, int n_params);
+
 	void Render(COpenGL * gl);
 
-	void SetParameters(double * params, int n_params);
+	void SetParameters(float * params, int n_params);
 
 };
 

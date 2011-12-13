@@ -21,7 +21,7 @@ protected:
 
 	ePositionTypes type;
 
-	double * params;
+	float * params;
 	bool * free_params;
 
 	void init_params(int total_params);
@@ -32,11 +32,15 @@ public:
 
 	int GetNFreeParameters();
 	ePositionTypes GetType();
+
+	// Gets the current position for the object, after the parameters have been set and scaling has been applied.
+	void GetParams(float * in_params, int n_params);
+
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
-	virtual void GetXYZ(double & x, double & y, double & z) = 0;
+	virtual void GetXYZ(float & x, float & y, float & z) = 0;
 
 	// A function to route and scale unit hypercube variables to object parameters.
-	virtual void SetParams(double * in_params, int n_params) = 0;
+	void SetParams(float * in_params, int n_params);
 
 
 };

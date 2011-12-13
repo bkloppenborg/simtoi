@@ -28,9 +28,12 @@ public:
 	~CFeatureList();
 
 	void Append(CFeature * feature);
+
+	// TODO: implement this function
+	//void GetParams(double * params, int n_params);
 	int GetNFreeParameters();
 
-	void SetParams(double * params, int n_params);
+	void SetParams(float * params, int n_params);
 
 };
 

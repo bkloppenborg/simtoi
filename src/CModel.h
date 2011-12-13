@@ -24,7 +24,6 @@ class CPosition;
 class CFeature;
 class CFeatureList;
 
-
 class CModel
 {
 protected:
@@ -37,13 +36,19 @@ protected:
 	CPosition * position;
 	CFeatureList * features;
 
+	double * scale;
+	double * scale_min;
+
 private:
 	CShader * shader;
 
 protected:
 	void Rotate();
 	void Translate();
-	virtual void SetModelParameters(double * params, int n_params) = 0;
+
+	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
+	virtual void SetModelParameters(float * params, int n_params) = 0;
+	virtual void GetModelParameters(float * params, int n_params) = 0;
 
 public:
 	CModel();
@@ -53,13 +58,14 @@ public:
 	//void DeleteFeature();
 
 	int GetTotalFreeParameters();
+	void GetParameters(float * params, int n_params);
 	virtual int GetNModelFreeParameters() = 0;
 	int GetNPositionFreeParameters();
 	int GetNFeatureFreeParameters();
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 
-	void SetParameters(double * params, int n_params);
+	void SetParameters(float * params, int n_params);
 	void SetPositionType(ePositionTypes type);
 	void SetShader(CShader * shader);
 

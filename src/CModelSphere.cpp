@@ -21,6 +21,12 @@ CModelSphere::~CModelSphere()
 	// TODO Auto-generated destructor stub
 }
 
+void CModelSphere::GetModelParameters(float * params, int n_params)
+{
+	// TODO: Implement scaling for radius parameter!
+	params[0] = radius;
+}
+
 int CModelSphere::GetNModelFreeParameters()
 {
 	return this->n_free_parameters;
@@ -58,7 +64,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void CModelSphere::SetModelParameters(double * params, int n_params)
+void CModelSphere::SetModelParameters(float * params, int n_params)
 {
 	// TODO: Check that n_params > this->n_free_params, if not throw exception
 	radius = params[0];

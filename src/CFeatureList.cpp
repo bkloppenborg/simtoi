@@ -47,7 +47,7 @@ int CFeatureList::GetNFreeParameters()
 
 
 // This function sets the parameters for models prior to a GetData call.
-void CFeatureList::SetParams(double * params, int n_params)
+void CFeatureList::SetParams(float * params, int n_params)
 {
 
 }

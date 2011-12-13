@@ -16,8 +16,7 @@ public:
 	CPositionXY();
 	virtual ~CPositionXY();
 
-	virtual void SetParams(double * in_params, int n_params);
-	virtual void GetXYZ(double & x, double & y, double & z);
+	virtual void GetXYZ(float & x, float & y, float & z);
 };
 
 #endif /* CPOSITIONXY_H_ */

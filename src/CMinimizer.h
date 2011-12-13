@@ -6,6 +6,11 @@
  *
  *  A generic wrapper class for minimization routines.  This class implements the
  *  basic thread synchronization tasks that are required to interop with SIMTOI.
+ *
+ *  TODO: I'm not fully convinced the scaling of the parameters should be here, but some
+ *  minimization programs, like MultiNest, expect the parameters to be on a uniform hypercube
+ *  so for now this is how it will be implemented.  Eventually, perhaps, the models could do
+ *  the scaling themselves?
  */
 
 #ifndef CMINIMIZER_H_
@@ -18,22 +23,21 @@ enum MinimizationType{
 	LogLike
 };
 
+class CModelList;
+class CLibOI;
+
 class CMinimizer
 {
+protected:
 	MinimizationType mType;
-	float * mParamBounds;
-	int mNParams;
 
 public:
-	CMinimizer(MinimizationType type);
+	CMinimizer(MinimizationType type, CModelList * models, CLibOI * ocl);
 	virtual ~CMinimizer();
 
-	// The minimization function to be called from SIMTOI.
-	virtual void Minimize(float err, float * params, int n_params) = 0;
-
-	void SetParamBounds(float * bounds, int n_params);
-
+public:
 	MinimizationType GetMinType() { return mType; };
+
 
 
 };
