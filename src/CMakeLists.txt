@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi CXX C Fortran)
 
-find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(OpenCL REQUIRED)
 include_directories(${OPENCL_INCLUDE_DIRS})
@@ -27,7 +26,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
 set(CMAKE_CXX_FLAGS "-DGL_GLEXT_PROTOTYPES")
 
 # Assemble all of the source to build simtoi.
-# Link against GLUT, GLEW, OpenGL, and OpenCL
+# Link against OpenGL, and OpenCL
 file(GLOB SOURCE *.cpp)
 add_executable(simtoi ${SOURCE})
-target_link_libraries(simtoi textio oi multinest ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARY} ${OPENCL_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(simtoi textio oi multinest ${OPENGL_LIBRARIES} ${OPENCL_LIBRARIES} ${Boost_LIBRARIES})

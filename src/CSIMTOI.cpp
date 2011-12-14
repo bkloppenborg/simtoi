@@ -50,7 +50,7 @@ float CSIMTOI::GetChi2(int data_num, int wl_num)
 
 int CSIMTOI::GetNFreeParameters()
 {
-	mModelList->GetNFreeParameters();
+	return mModelList->GetNFreeParameters();
 }
 
 float CSIMTOI::GetLogLike(int data_num, int wl_num)

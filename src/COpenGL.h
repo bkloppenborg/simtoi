@@ -13,8 +13,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/freeglut.h>
-//#include <GL/glut.h>
+
 #include <string>
 
 #include <boost/interprocess/sync/interprocess_mutex.hpp>

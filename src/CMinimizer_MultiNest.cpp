@@ -8,12 +8,13 @@
 #include "CMinimizer_MultiNest.h"
 #include "CSIMTOI.h"
 #include <float.h>
+#include <cstring>
 #include "multinest.h"
 
 CMinimizer_MultiNest::CMinimizer_MultiNest(CSIMTOI * simtoi)
 	:CMinimizer(simtoi)
 {
-	mOutput = "chains/multinest";
+	mOutput = "/home/bkloppenborg/workspace/simtoi/bin/chains/multinest";
 }
 
 CMinimizer_MultiNest::~CMinimizer_MultiNest()
@@ -76,7 +77,10 @@ int CMinimizer_MultiNest::ThreadFunc()
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	char * root = (char*) mOutput.c_str();	// root for output files
+	char root[100] = "/home/bkloppenborg/workspace/simtoi/bin/chains/multinest";
+	//char * root = (char*) mOutput.c_str();	// root for output files
+	for (int i = strlen(root); i < 100; i++) root[i] = ' ';
+
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
 	int resume = 0;					// resume from a previous job?

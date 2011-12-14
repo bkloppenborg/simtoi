@@ -39,6 +39,8 @@ int CModelList::GetNFreeParameters()
     {
     	n += (*it)->GetTotalFreeParameters();
     }
+
+    return n;
 }
 
 /// This function gets the parameters for models after they have been set/scaled.
