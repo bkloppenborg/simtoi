@@ -27,5 +27,4 @@ void pull_params(T * in_params, int n_in_params, T * out_params, int n_out_param
 
 }
 
-
 #endif /* MISC_H_ */

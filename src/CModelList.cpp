@@ -27,6 +27,20 @@ void CModelList::Append(CModel * model)
 	this->models.push_back(model);
 }
 
+/// Returns the total number of free parameters for all models
+int CModelList::GetNFreeParameters()
+{
+	// TODO: We could probably cache this and/or update it as models are added.
+    CModel * model;
+    int n = 0;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    {
+    	n += (*it)->GetTotalFreeParameters();
+    }
+}
+
 /// This function gets the parameters for models after they have been set/scaled.
 /// also useful for determining initial, user-specified values in configuration files.
 void CModelList::GetParameters(float * params, int n_params)

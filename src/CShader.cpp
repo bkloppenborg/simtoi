@@ -21,7 +21,7 @@ CShader::~CShader()
 	delete params;
 
 	// Set shader to null.  Don't delete it, the CGLShaderList takes care of that.
-	params = NULL;
+	shader = NULL;
 }
 
 // Gets the parameters.

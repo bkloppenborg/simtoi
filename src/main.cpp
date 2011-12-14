@@ -18,17 +18,20 @@
 #include <string>
 #include <iostream>
 #include <cstdio>
-
-#include "main.h"
-#include <boost/thread/thread.hpp>
-#include "CSIMTOI.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/freeglut.h>
+#include <boost/thread/thread.hpp>
+
+#include "main.h"
+#include "CSIMTOI.h"
+#include "CMinimizer.h"
+
 
 using namespace std;
 
 CSIMTOI * simtoi;
+CMinimizer * minimizer;
 
 /// Clean up OpenGL stuff.
 void cleanup()
@@ -74,17 +77,20 @@ void reshape (int w, int h)
 // The main routine.
 int main(int argc, char *argv[])
 {
-	simtoi = new CSIMTOI(argc, argv);
+	simtoi = CSIMTOI::GetInstance();
+	simtoi->Init(argc, argv);
 
 	// Setup the glut display, reshape, and keyboard functions.
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
 
-//	if(simtoi->IsReady())
-//		glutMainLoop();
-//	else:
-//		simtoi->PrintMissing():
+    // Init the minimization thread:
+    minimizer = CMinimizer::GetMinimizer("MultiNest", simtoi);
+    minimizer->Init();
+    minimizer->Run();
+
+	glutMainLoop();
 
 	delete simtoi;
 	return 0;

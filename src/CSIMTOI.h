@@ -21,8 +21,10 @@ using namespace std;
 
 class CSIMTOI
 {
-private:
-	// Globals
+protected:
+	static CSIMTOI TheInstance;
+
+protected:
 	int mWindow_width;
 	int mWindow_height;
 	float mScale;
@@ -39,24 +41,26 @@ private:
 	CModelList * mModelList;
 
 public:
-	CSIMTOI(int argc, char *argv[]);
+	CSIMTOI();
 	virtual ~CSIMTOI();
 
 	void BlitToScreen();
 
 	float GetChi2(int data_num, int wl_num);
+	int GetNFreeParameters();
 	float GetLogLike(int data_num, int wl_num);
 	void GetParameters(float * params, int size);
-protected:
+
 	void Init(int argc, char *argv[]);
 
-public:
 	void LoadConfiguration();
 	void LoadModels();
 
 	void Render();
 
 	void SetParameters(float * params, int n_params);
+
+	static CSIMTOI * GetInstance() { return &TheInstance; };
 };
 
 #endif /* CSIMTOI_H_ */

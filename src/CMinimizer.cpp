@@ -6,14 +6,35 @@
  */
 
 #include "CMinimizer.h"
-#include "CLibOI.h"
-#include "CModelList.h"
+#include "CMinimizer_MultiNest.h"
 
-CMinimizer::CMinimizer(MinimizationType type, CModelList * models, CLibOI * ocl)
+CMinimizer::CMinimizer(CSIMTOI * simtoi)
 {
+	mSIMTOI = simtoi;
 }
 
 CMinimizer::~CMinimizer()
+{
+
+}
+
+CMinimizer * CMinimizer::GetMinimizer(string name, CSIMTOI * simtoi)
+{
+	CMinimizer * tmp = NULL;
+
+	// Just match the string
+	if(name == "MultiNest")
+		tmp = new CMinimizer_MultiNest(simtoi);
+
+	return tmp;
+}
+
+void CMinimizer::Run()
+{
+	mThread = new boost::thread(boost::bind(&CMinimizer::ThreadFunc, this));
+}
+
+void CMinimizer::Stop()
 {
 
 }

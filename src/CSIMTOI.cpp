@@ -12,7 +12,7 @@
 #include "CModelList.h"
 #include "CModelSphere.h"
 
-CSIMTOI::CSIMTOI(int argc, char *argv[])
+CSIMTOI::CSIMTOI()
 {
 	// Init the class members with some bogus values:
 	mGL = NULL;
@@ -23,10 +23,6 @@ CSIMTOI::CSIMTOI(int argc, char *argv[])
 	mScale = 1;
 	mShaderSourceDir = "";
 	mKernelSourceDir = "";
-
-	// initialize
-	//ParseCommandLine(argc, argv);
-	Init(argc, argv);
 }
 
 CSIMTOI::~CSIMTOI()
@@ -36,6 +32,9 @@ CSIMTOI::~CSIMTOI()
 	if(mGL) delete mGL;
 	if(mModelList) delete mModelList;
 }
+
+/// Instance of the class.
+CSIMTOI CSIMTOI::TheInstance;
 
 /// Displays the current model to the user using GL_BACK and GL_FRONT buffers.
 void CSIMTOI::BlitToScreen()
@@ -47,6 +46,11 @@ float CSIMTOI::GetChi2(int data_num, int wl_num)
 {
 	mCL->CopyImageToBuffer(wl_num);
 	return mCL->ImageToChi2(data_num);
+}
+
+int CSIMTOI::GetNFreeParameters()
+{
+	mModelList->GetNFreeParameters();
 }
 
 float CSIMTOI::GetLogLike(int data_num, int wl_num)

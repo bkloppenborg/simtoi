@@ -20,7 +20,7 @@ CGLShaderList::~CGLShaderList()
 {
 	// Deallocate the shaders
 	for(int i = shaders.size() - 1; i > -1; i--)
-		delete shaders[i];
+		if(shaders[i]) delete shaders[i];
 }
 
 bool CGLShaderList::SortModelPredicate(CGLShader * A, CGLShader * B)

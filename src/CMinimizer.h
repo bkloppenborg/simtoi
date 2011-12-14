@@ -16,30 +16,33 @@
 #ifndef CMINIMIZER_H_
 #define CMINIMIZER_H_
 
-#include <boost/thread.hpp>
+#include <string>
+#include <boost/thread/thread.hpp>
 
-enum MinimizationType{
-	Chi2,
-	LogLike
-};
+using namespace std;
 
-class CModelList;
-class CLibOI;
+class CSIMTOI;
 
 class CMinimizer
 {
 protected:
-	MinimizationType mType;
+	boost::thread * mThread;
+	CSIMTOI * mSIMTOI;	// A pointer to SIMTOI methods.  Not allocated here so don't deallocate.
 
 public:
-	CMinimizer(MinimizationType type, CModelList * models, CLibOI * ocl);
+	CMinimizer(CSIMTOI * simtoi);
 	virtual ~CMinimizer();
 
 public:
-	MinimizationType GetMinType() { return mType; };
+	static CMinimizer * GetMinimizer(string name, CSIMTOI * simtoi);
 
+	virtual int Init() {};
 
+	void Run();
 
+	void Stop();
+
+	virtual int ThreadFunc() = 0;
 };
 
 #endif /* CMINIMIZER_H_ */

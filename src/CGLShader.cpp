@@ -25,9 +25,9 @@ CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, i
 CGLShader::~CGLShader()
 {
 	// Release OpenGL memory
-	glDeleteProgram(program);
-	glDeleteShader(shader_vertex);
-	glDeleteShader(shader_fragment);
+	if(program) glDeleteProgram(program);
+	if(shader_vertex) glDeleteShader(shader_vertex);
+	if(shader_fragment) glDeleteShader(shader_fragment);
 
 	// Now release object memory:
 	delete param_locations;
