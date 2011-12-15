@@ -3,6 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include "ui_CUI.h"
+#include "CGLWidget.h"
 
 class CUI : public QMainWindow
 {
