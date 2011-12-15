@@ -65,9 +65,6 @@ void CModelList::Render(COpenGL * gl)
 	int width = gl->GetWindowWidth();
 	int height = gl->GetWindowHeight();
 
-	// Get exclusive access to the OpenGL context
-	gl->Lock();
-
 	// First clear the buffer.
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
@@ -83,9 +80,6 @@ void CModelList::Render(COpenGL * gl)
     // Bind back to the default framebuffer and let OpenGL finish:
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glFinish();
-
-    // Release the lock on the OpenGL context.
-    gl->Unlock();
 }
 
 // This function sets the parameters for models prior to a GetData call.

@@ -17,7 +17,7 @@
 #define CMINIMIZER_H_
 
 #include <string>
-#include <boost/thread/thread.hpp>
+//#include <boost/thread/thread.hpp>
 
 using namespace std;
 
@@ -26,7 +26,7 @@ class CSIMTOI;
 class CMinimizer
 {
 protected:
-	boost::thread * mThread;
+	//boost::thread * mThread;
 	CSIMTOI * mSIMTOI;	// A pointer to SIMTOI methods.  Not allocated here so don't deallocate.
 
 public:

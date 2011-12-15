@@ -57,7 +57,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		this->Rotate();
 
 		// Model defined drawing functions:
-		glutSolidSphere(radius, slices, slices);
+		//glutSolidSphere(radius, slices, slices);
 	glPopMatrix();
 
 	// Return to the deafult framebuffer before leaving.

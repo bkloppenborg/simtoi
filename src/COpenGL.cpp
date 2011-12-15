@@ -33,9 +33,6 @@ COpenGL::~COpenGL()
 
 void COpenGL::BlitToScreen()
 {
-	// Get exclusive access to OpenGL:
-	Lock();
-
     // Bind back to the default buffer (just in case something didn't do it),
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -44,26 +41,13 @@ void COpenGL::BlitToScreen()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
     glBlitFramebuffer(0, 0, window_width, window_height, 0, 0, window_width, window_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-    // Tell OpenGL to finish operations then swap buffers to display the rendered model.
+    // Tell OmThread = new boost::thread(boost::bind(&CMinimizer::ThreadFunc, this));penGL to finish operations then swap buffers to display the rendered model.
     glFinish();
-    glutSwapBuffers();
-
-    // Unlock the OpenGL object.
-    Unlock();
+    //glutSwapBuffers();
 }
 
 void COpenGL::init(int argc, char *argv[])
 {
-    // ########
-    // Window Manager (GLUT) initialization
-    // ########
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_LUMINANCE | GLUT_DOUBLE | GLUT_DEPTH);
-    glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
-    glutInitWindowSize(window_width,window_height);
-    glutInitWindowPosition(100,100);
-    glutCreateWindow(argv[0]);
-
     // ########
     // OpenGL initialization
     // ########

@@ -13,10 +13,8 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-
 #include <string>
 
-#include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include "CGLShaderList.h"
 
 class CShader;
@@ -35,7 +33,6 @@ protected:
 	int window_width;
 	int window_height;
 	double scale;
-	boost::interprocess::interprocess_mutex mutex;
 
 	CGLShaderList * shader_list;
 
@@ -54,9 +51,6 @@ public:
 	int GetWindowHeight() { return window_height; };
 
 	void init(int argc, char *argv[]);
-
-	void Lock() { mutex.lock(); };
-	void Unlock() {mutex.unlock(); };
 
 protected:
 	void initFrameBuffer(void);

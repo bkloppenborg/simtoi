@@ -1,32 +1,27 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi CXX C Fortran)
 
+# OpenGL is required
 find_package(OpenGL REQUIRED)
-find_package(OpenCL REQUIRED)
-include_directories(${OPENCL_INCLUDE_DIRS})
 
-find_package(Boost COMPONENTS thread REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+# As is QT4, along with several macros:
+find_package(Qt4 COMPONENTS QtCore QtGui QtMain QtOpenGL REQUIRED)
+INCLUDE(${QT_USE_FILE})
+#ADD_DEFINITIONS(${QT_DEFINITIONS})
+file(GLOB simtoi_FORMS *.ui)
+file(GLOB simtoi_RESOURCES *.qrc)
+QT4_WRAP_CPP(simtoi_HEADERS_MOC main.h CUI.h)
+QT4_WRAP_UI(simtoi_FORMS_HEADERS ${simtoi_FORMS})
+#QT4_ADD_RESOURCES(simtoi_RESOURCES_RCC ${simtoi_RESOURCES})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
-# Add include directories and libs for compiled libraries.
-include_directories(${CMAKE_SOURCE_DIR}/lib/textio/include)
-include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/src)
-
-# TODO: Temporary inclusion for oifitslib and getoifits:
-# Temporary, required for oifitslib.  Don't forget to remove from below too!
-find_package(CFITSIO REQUIRED)
-include_directories(${CFITSIO_INCLUDE_DIRS})
-find_package(GTK2 REQUIRED)
-include_directories(${GTK2_INCLUDE_DIRS})
-include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/getoifits)
-include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/oifitslib)
-include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
+# include directories for the oilib:
+include_directories(${OI_INCLUDE_DIRS})
 
 # Enable prototype functions in OpenGL (even though some are no longer prototypes)
 set(CMAKE_CXX_FLAGS "-DGL_GLEXT_PROTOTYPES")
 
 # Assemble all of the source to build simtoi.
-# Link against OpenGL, and OpenCL
 file(GLOB SOURCE *.cpp)
-add_executable(simtoi ${SOURCE})
-target_link_libraries(simtoi textio oi multinest ${OPENGL_LIBRARIES} ${OPENCL_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(simtoi ${SOURCE} ${simtoi_HEADERS_MOC} ${simtoi_FORMS_HEADERS} ${simtoi_RESOURCES_RCC})
+target_link_libraries(simtoi textio oi multinest ${QT_LIBRARIES})

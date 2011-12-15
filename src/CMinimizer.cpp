@@ -31,7 +31,7 @@ CMinimizer * CMinimizer::GetMinimizer(string name, CSIMTOI * simtoi)
 
 void CMinimizer::Run()
 {
-	mThread = new boost::thread(boost::bind(&CMinimizer::ThreadFunc, this));
+	//mThread = new boost::thread(boost::bind(&CMinimizer::ThreadFunc, this));
 }
 
 void CMinimizer::Stop()

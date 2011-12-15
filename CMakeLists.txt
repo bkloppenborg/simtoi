@@ -9,8 +9,19 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG")
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
 
-# Add librariy subdirectories
+# Include textio
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/textio)
+include_directories(${CMAKE_SOURCE_DIR}/lib/textio/include)
+
+# Include liboi, getoifits, oifitslib
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/liboi)
+include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/src)
+include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/getoifits)
+include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/oifitslib)
+
+# Include multinest
+add_subdirectory(${CMAKE_SOURCE_DIR}/lib/multinest)
+include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
+
 add_subdirectory(src)
 
