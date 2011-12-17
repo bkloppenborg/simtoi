@@ -11,11 +11,17 @@
 
 using namespace std;
 
-CGLWidget::CGLWidget(QWidget *parent) : QGLWidget(parent) {
-    setMouseTracking(true);
+CGLWidget::CGLWidget(QWidget *parent) : QGLWidget(parent)
+{
+	// Enable mouse tracking
+    //setMouseTracking(true);
+
+	// Instruct QT that this thread will not be handling rendering
+	doneCurrent();
 }
 
-void CGLWidget::initializeGL() {
+void CGLWidget::initializeGL()
+{
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_COLOR_MATERIAL);
@@ -25,7 +31,8 @@ void CGLWidget::initializeGL() {
     glClearColor(0, 0, 0, 0);
 }
 
-void CGLWidget::resizeGL(int w, int h) {
+void CGLWidget::resizeGL(int w, int h)
+{
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -34,7 +41,8 @@ void CGLWidget::resizeGL(int w, int h) {
     glLoadIdentity();
 }
 
-void CGLWidget::paintGL() {
+void CGLWidget::paintGL()
+{
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1,0,0);
     glBegin(GL_POLYGON);
@@ -44,14 +52,17 @@ void CGLWidget::paintGL() {
     glEnd();
 }
 
-void CGLWidget::mousePressEvent(QMouseEvent *event) {
+void CGLWidget::mousePressEvent(QMouseEvent *event)
+{
 
 }
-void CGLWidget::mouseMoveEvent(QMouseEvent *event) {
+void CGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
     printf("%d, %d\n", event->x(), event->y());
 }
 
-void CGLWidget::keyPressEvent(QKeyEvent* event) {
+void CGLWidget::keyPressEvent(QKeyEvent* event)
+{
     switch(event->key()) {
     case Qt::Key_Escape:
         close();

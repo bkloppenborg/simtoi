@@ -6,10 +6,14 @@
  */
 
 #include "COpenGLThread.h"
-#include "CGlWidget.h"
 
-#include "COpenGL.h"
+#include <cstdio>
+
+#include "CGLWidget.h"
 #include "CModelList.h"
+#include "CGLShaderList.h"
+
+using namespace std;
 
 /// Instance of the class.
 COpenGLThread COpenGLThread::TheInstance;
@@ -26,9 +30,22 @@ COpenGLThread::~COpenGLThread()
 	delete this->shader_list;
 
    // Free OpenGL memory:
-	if(fbo_depth) glDeleteRenderbuffers(1, &fbo_depth);
-	if(fbo_texture) glDeleteTextures(1, &fbo_texture);
-	if(fbo) glDeleteFramebuffers(1, &fbo);
+	if(mFBO_depth) glDeleteRenderbuffers(1, &mFBO_depth);
+	if(mFBO_texture) glDeleteTextures(1, &mFBO_texture);
+	if(mFBO) glDeleteFramebuffers(1, &mFBO);
+}
+
+/// Static function for checking OpenGL errors:
+void COpenGLThread::CheckOpenGLError(string function_name)
+{
+    GLenum status = glGetError(); // Check that status of our generated frame buffer
+    // If the frame buffer does not report back as complete
+    if (status != 0)
+    {
+        string errstr =  (const char *) gluErrorString(status);
+        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
+        exit(0); // Exit the application
+    }
 }
 
 /// Copy the contents from the internal rendering framebuffer to GL_BACK
@@ -40,20 +57,27 @@ void COpenGLThread::BlitToScreen()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Blit the application-defined render buffer to the on-screen render buffer.
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, mGL->fbo);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
-    glBlitFramebuffer(0, 0, window_width, window_height, 0, 0, window_width, window_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glBlitFramebuffer(0, 0, mWindow_width, mWindow_height, 0, 0, mWindow_width, mWindow_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     glFinish();
-    glutSwapBuffers();
 }
 
+GLOperations COpenGLThread::GetNext()
+{
+
+}
+
+/// Gets the named shader.
 CShader * COpenGLThread::GetShader(eGLShaders shader)
 {
+	// TODO: implement this in a thread-safe fashion.
+	// Really this is only called during initialization and should be ok not being thread-friendly.
 	return shader_list->GetShader(shader);
 };
 
-void COpenGLThread::Init()
+void COpenGLThread::Init(int window_width, int window_height, double scale, string shader_source_dir)
 {
     // ########
     // OpenGL initialization
@@ -70,7 +94,7 @@ void COpenGLThread::Init()
     glLoadIdentity();
 
     // Note, the coordinates here are in object-space, not coordinate space.
-    double half_width = window_width * scale / 2;
+    double half_width = mWindow_width * scale / 2;
     glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
 
     // Init the off-screen frame buffer.
@@ -82,12 +106,12 @@ void COpenGLThread::InitFrameBuffer(void)
     InitFrameBufferDepthBuffer();
     InitFrameBufferTexture();
 
-    glGenFramebuffers(1, &fbo); // Generate one frame buffer and store the ID in fbo
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo); // Bind our frame buffer
+    glGenFramebuffers(1, &mFBO); // Generate one frame buffer and store the ID in mFBO
+    glBindFramebuffer(GL_FRAMEBUFFER, mFBO); // Bind our frame buffer
 
     // Attach the depth and texture buffer to the frame buffer
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_texture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo_depth);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFBO_texture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -105,10 +129,10 @@ void COpenGLThread::InitFrameBuffer(void)
 void COpenGLThread::InitFrameBufferDepthBuffer(void)
 {
 
-    glGenRenderbuffers(1, &fbo_depth); // Generate one render buffer and store the ID in fbo_depth
-    glBindRenderbuffer(GL_RENDERBUFFER, fbo_depth); // Bind the fbo_depth render buffer
+    glGenRenderbuffers(1, &mFBO_depth); // Generate one render buffer and store the ID in mFBO_depth
+    glBindRenderbuffer(GL_RENDERBUFFER, mFBO_depth); // Bind the mFBO_depth render buffer
 
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, window_width, window_height); // Set the render buffer storage to be a depth component, with a width and height of the window
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mWindow_width, mWindow_height); // Set the render buffer storage to be a depth component, with a width and height of the window
 
     CheckOpenGLError("initFrameBufferDepthBuffer");
 
@@ -117,18 +141,18 @@ void COpenGLThread::InitFrameBufferDepthBuffer(void)
 
 void COpenGLThread::InitFrameBufferTexture(void)
 {
-    glGenTextures(1, &fbo_texture); // Generate one texture
-    glBindTexture(GL_TEXTURE_2D, fbo_texture); // Bind the texture fbo_texture
+    glGenTextures(1, &mFBO_texture); // Generate one texture
+    glBindTexture(GL_TEXTURE_2D, mFBO_texture); // Bind the texture mFBOtexture
 
     // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, window_width, window_height, 0, GL_RED, GL_BYTE, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, window_width, window_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mWindow_width, mWindow_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWindow_width, mWindow_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
     // These other formats might work, check that GL_BYTE is still correct for the higher precision.
     // I don't think we'll ever need floating point numbers, but those are here too:
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, window_width, window_height, 0, GL_RED, GL_BYTE, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, window_width, window_height, 0, GL_RED, GL_BYTE, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, window_width, window_height, 0, GL_RED, CL_HALF_FLOAT, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, window_width, window_height, 0, GL_RED, GL_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWindow_width, mWindow_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWindow_width, mWindow_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, mWindow_width, mWindow_height, 0, GL_RED, CL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mWindow_width, mWindow_height, 0, GL_RED, GL_FLOAT, NULL);
 
 
     // Setup the basic texture parameters
@@ -141,9 +165,12 @@ void COpenGLThread::InitFrameBufferTexture(void)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+/// Render the models.
+/// Don't call this routine using a different thread unless you have control of the OpenGL context.
 void COpenGLThread::RenderModels()
 {
-	mModels->Render(mGL);
+	if(mModels != NULL)
+		mModels->Render(this);
 }
 
 void COpenGLThread::Stop()
@@ -154,11 +181,11 @@ void COpenGLThread::Stop()
 }
 
 // Main thread function.
-static int COpenGLThread::Thread()
+int COpenGLThread::Thread()
 {
 	// This is a consume-only thread.  It should NEVER enqueue any operations to the queue otherwise it will be deadlocked.
 	COpenGLThread * control = COpenGLThread::GetInstance();
-
+	GLOperations event;
 	CGLWidget * gl_widget;
 
 	// Instruct QT that this thread will handle all rendering operations:
@@ -171,18 +198,20 @@ static int COpenGLThread::Thread()
 	while(control->Run())
 	{
 		// Block until something is on the queue:
+		event = control->GetNext();
 
 		switch(event)
 		{
-		case Resize:
+		case GLOp_Resize:
 			// Does nothing.
 			break;
 
-		case BlitToScreen:
+		case GLOp_BlitToScreen:
 			control->BlitToScreen();
+			gl_widget->swapBuffers();
 			break;
 
-		case RenderModels:
+		case GLOp_RenderModels:
 			control->RenderModels();
 			break;
 
@@ -193,6 +222,8 @@ static int COpenGLThread::Thread()
 
 		// Let OpenGL finish processing commands before continuing.
 		glFinish();
+
+		// Now release the event
 
 	}
 }

@@ -10,3 +10,8 @@ CUI::~CUI()
 {
 
 }
+
+CGLWidget * CUI::GetGLWidget()
+{
+	return ui.wGLMain;
+}

@@ -8,7 +8,7 @@
 #include <cstdio>
 #include "CGLShader.h"
 #include "ReadTextFile.h"
-#include "COpenGL.h"
+#include "COpenGLThread.h"
 
 CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, int n_parameters, vector<string> parameter_names)
 {
@@ -49,7 +49,7 @@ void CGLShader::init_shader()
     // Load some shaders:
     program = glCreateProgram();
 
-    CheckOpenGLError("Could not create shader program.");
+    COpenGLThread::CheckOpenGLError("Could not create shader program.");
 
     shader_vertex = glCreateShader(GL_VERTEX_SHADER);
     shader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -86,13 +86,13 @@ void CGLShader::init_shader()
     	printf("%s\n", infolog);
     }
 
-    CheckOpenGLError("Could not link shader program.");
+    COpenGLThread::CheckOpenGLError("Could not link shader program.");
 
     // Now look up the locations of the parameters
     for(int i = 0; i < n_params; i++)
     {
     	param_locations[i] = glGetUniformLocation(program, param_names[i].c_str());
-        CheckOpenGLError("Could find variable in shader source.");
+    	COpenGLThread::CheckOpenGLError("Could find variable in shader source.");
     }
 
 

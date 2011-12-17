@@ -6,7 +6,7 @@
  */
 
 #include "CSIMTOI.h"
-#include "COpenGL.h"
+#include "COpenGLThread.h"
 #include "CLibOI.h"
 // TODO: Perhaps we can figure out how to remove the model headers from here?
 #include "CModelList.h"
@@ -15,7 +15,7 @@
 CSIMTOI::CSIMTOI()
 {
 	// Init the class members with some bogus values:
-	mGL = NULL;
+	mGL = COpenGLThread::GetInstance();
 	mCL = NULL;
 	mModelList = NULL;
 	mWindow_width = 1;
@@ -29,18 +29,11 @@ CSIMTOI::~CSIMTOI()
 {
 	// Free memory.
 	if(mCL) delete mCL;
-	if(mGL) delete mGL;
 	if(mModelList) delete mModelList;
 }
 
 /// Instance of the class.
 CSIMTOI CSIMTOI::TheInstance;
-
-/// Displays the current model to the user using GL_BACK and GL_FRONT buffers.
-void CSIMTOI::BlitToScreen()
-{
-	mGL->BlitToScreen();
-}
 
 float CSIMTOI::GetChi2(int data_num, int wl_num)
 {
@@ -81,8 +74,7 @@ void CSIMTOI::Init(int argc, char *argv[])
 
 	// Load the current program configuration, then initialize OpenGL
 	LoadConfiguration();
-	mGL = new COpenGL(mWindow_width, mWindow_height, mScale, mShaderSourceDir);
-	mGL->init(argc, argv);
+	mGL->Init(mWindow_width, mWindow_height, mScale, mShaderSourceDir);
 
 	// Create the model list, load models into memory:
 	mModelList = new CModelList();

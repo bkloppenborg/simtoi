@@ -6,6 +6,7 @@
  */
 
 #include "CModelList.h"
+#include "COpenGLThread.h"
 
 using namespace std;
 
@@ -59,7 +60,7 @@ void CModelList::GetParameters(float * params, int n_params)
 }
 
 // Render the image to the specified OpenGL framebuffer object.
-void CModelList::Render(COpenGL * gl)
+void CModelList::Render(COpenGLThread * gl)
 {
 	GLuint fbo = gl->GetFramebuffer();
 	int width = gl->GetWindowWidth();

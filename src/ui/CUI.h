@@ -9,12 +9,15 @@ class CUI : public QMainWindow
 {
     Q_OBJECT
 
+private:
+    Ui::CUIClass ui;
+
 public:
     CUI(QWidget *parent = 0);
     ~CUI();
 
-private:
-    Ui::CUIClass ui;
+    CGLWidget * GetGLWidget();
+
 };
 
 #endif // CUI_H

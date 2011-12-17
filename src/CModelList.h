@@ -9,10 +9,9 @@
 #define CMODELLIST_H_
 
 #include <vector>
-
-#include "COpenGL.h"
 #include "CModel.h"
 
+class COpenGLThread;
 
 using namespace std;
 
@@ -33,7 +32,7 @@ public:
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
 
-	void Render(COpenGL * gl);
+	void Render(COpenGLThread * gl);
 
 	void SetParameters(float * params, int n_params);
 
