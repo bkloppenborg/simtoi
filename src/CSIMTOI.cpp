@@ -15,7 +15,7 @@
 CSIMTOI::CSIMTOI()
 {
 	// Init the class members with some bogus values:
-	mGL = COpenGLThread::GetInstance();
+	mGL = NULL; //COpenGLThread::GetInstance();
 	mCL = NULL;
 	mModelList = NULL;
 	mWindow_width = 1;

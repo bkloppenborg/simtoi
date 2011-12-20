@@ -15,13 +15,10 @@
 
 using namespace std;
 
-/// Instance of the class.
-COpenGLThread COpenGLThread::TheInstance;
-
-COpenGLThread::COpenGLThread()
+COpenGLThread::COpenGLThread(CGLWidget * gl_widget)
 {
-	mRun = true;
-
+	// Set the OpenGL widget, make this thread the current rendering context
+	mGLWidget = gl_widget;
 }
 
 COpenGLThread::~COpenGLThread()
@@ -33,6 +30,9 @@ COpenGLThread::~COpenGLThread()
 	if(mFBO_depth) glDeleteRenderbuffers(1, &mFBO_depth);
 	if(mFBO_texture) glDeleteTextures(1, &mFBO_texture);
 	if(mFBO) glDeleteFramebuffers(1, &mFBO);
+
+	// Signal that we are done rendering.
+	mGLWidget->doneCurrent();
 }
 
 /// Static function for checking OpenGL errors:
@@ -44,14 +44,16 @@ void COpenGLThread::CheckOpenGLError(string function_name)
     {
         string errstr =  (const char *) gluErrorString(status);
         printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
-        exit(0); // Exit the application
     }
 }
 
 /// Copy the contents from the internal rendering framebuffer to GL_BACK
-/// then swap GL_FRONT and GL_BACK
+/// calling thread is responsible for swapping the buffers.
 void COpenGLThread::BlitToScreen()
 {
+	// Get exclusive access to OpenGL:
+	QMutexLocker locker(&mGLMutex);
+	mGLWidget->makeCurrent();
 
     // Bind back to the default buffer (just in case something didn't do it),
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -62,11 +64,8 @@ void COpenGLThread::BlitToScreen()
     glBlitFramebuffer(0, 0, mWindow_width, mWindow_height, 0, 0, mWindow_width, mWindow_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     glFinish();
-}
-
-GLOperations COpenGLThread::GetNext()
-{
-
+    mGLWidget->swapBuffers();
+    mGLWidget->doneCurrent();
 }
 
 /// Gets the named shader.
@@ -77,8 +76,21 @@ CShader * COpenGLThread::GetShader(eGLShaders shader)
 	return shader_list->GetShader(shader);
 };
 
+/// Initiales class memory, sets window width, height and the shader source directory
 void COpenGLThread::Init(int window_width, int window_height, double scale, string shader_source_dir)
 {
+	mWindow_width = window_width;
+	mWindow_height = window_height;
+	mScale = scale;
+	this->shader_list = new CGLShaderList(shader_source_dir);
+}
+
+void COpenGLThread::InitOpenGL()
+{
+	// Get exclusive access to OpenGL:
+	QMutexLocker locker(&mGLMutex);
+	mGLWidget->makeCurrent();
+
     // ########
     // OpenGL initialization
     // ########
@@ -94,11 +106,13 @@ void COpenGLThread::Init(int window_width, int window_height, double scale, stri
     glLoadIdentity();
 
     // Note, the coordinates here are in object-space, not coordinate space.
-    double half_width = mWindow_width * scale / 2;
+    double half_width = mWindow_width * mScale / 2;
     glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
 
     // Init the off-screen frame buffer.
     InitFrameBuffer();
+
+    mGLWidget->doneCurrent();
 }
 
 void COpenGLThread::InitFrameBuffer(void)
@@ -169,61 +183,25 @@ void COpenGLThread::InitFrameBufferTexture(void)
 /// Don't call this routine using a different thread unless you have control of the OpenGL context.
 void COpenGLThread::RenderModels()
 {
+	// Get exclusive control of the OpenGL context (unlocking is implicit when this function returns)
+	QMutexLocker locker(&mGLMutex);
+
 	if(mModels != NULL)
 		mModels->Render(this);
+
+	// Unlock the mutex and signal that rendering is completed
+	emit RenderComplete();
 }
 
-void COpenGLThread::Stop()
+/// Resize the window
+void COpenGLThread::Resize(int x, int y)
 {
-	mRun = false;
-
-	// Now add a shutdown command to the queue;
+	// Do nothing (for now).
 }
 
 // Main thread function.
-int COpenGLThread::Thread()
+void COpenGLThread::run()
 {
-	// This is a consume-only thread.  It should NEVER enqueue any operations to the queue otherwise it will be deadlocked.
-	COpenGLThread * control = COpenGLThread::GetInstance();
-	GLOperations event;
-	CGLWidget * gl_widget;
-
-	// Instruct QT that this thread will handle all rendering operations:
-	gl_widget->makeCurrent();
-
-	// Now do all of the initalization here:
-
-	bool run = true;
-
-	while(control->Run())
-	{
-		// Block until something is on the queue:
-		event = control->GetNext();
-
-		switch(event)
-		{
-		case GLOp_Resize:
-			// Does nothing.
-			break;
-
-		case GLOp_BlitToScreen:
-			control->BlitToScreen();
-			gl_widget->swapBuffers();
-			break;
-
-		case GLOp_RenderModels:
-			control->RenderModels();
-			break;
-
-		default:
-			// Do nothing.
-			break;
-		}
-
-		// Let OpenGL finish processing commands before continuing.
-		glFinish();
-
-		// Now release the event
-
-	}
+	// Start listening for events.
+	exec();
 }
