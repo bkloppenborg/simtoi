@@ -6,7 +6,7 @@
  */
 
 #include "CSIMTOI.h"
-#include "COpenGLThread.h"
+#include "COpenGL.h"
 #include "CLibOI.h"
 // TODO: Perhaps we can figure out how to remove the model headers from here?
 #include "CModelList.h"

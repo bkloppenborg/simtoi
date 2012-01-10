@@ -1,5 +1,5 @@
 /*
- * COpenGLThread.h
+ * COpenGL.h
  *
  *  Created on: Dec 15, 2011
  *      Author: bkloppenborg
@@ -11,30 +11,29 @@
 
  */
 
-#ifndef COPENGLTHREAD_H_
-#define COPENGLTHREAD_H_
+#ifndef COPENGL_H_
+#define COPENGL_H_
 
 #include <string>
-#include <QThread>
+#include <QObject>
 #include <QMutexLocker>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
-class COpenGL;
 class CModelList;
 class CGLShaderList;
 class CShader;
 class CGLWidget;
 
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include "CGLShader.h"
 
-class COpenGLThread : public QThread
+class COpenGL : public QObject
 {
 	Q_OBJECT
 
 public:
-	COpenGLThread(CGLWidget * gl_widget);
-	virtual ~COpenGLThread();
+	COpenGL(CGLWidget * gl_widget);
+	virtual ~COpenGL();
 
 protected:
 	QMutex mGLMutex;
@@ -83,4 +82,4 @@ public:
 	void run();
 };
 
-#endif /* COPENGLTHREAD_H_ */
+#endif /* COPENGL_H_ */

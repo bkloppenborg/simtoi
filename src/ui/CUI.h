@@ -5,18 +5,13 @@
 #include "ui_CUI.h"
 #include "CGLWidget.h"
 
-class CUI : public QMainWindow
+class CUI : public QMainWindow, public Ui::CUIClass
 {
     Q_OBJECT
 
-private:
-    Ui::CUIClass ui;
-
 public:
-    CUI(QWidget *parent = 0);
+    CUI();
     ~CUI();
-
-    CGLWidget * GetGLWidget();
 
 };
 

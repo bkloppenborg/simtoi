@@ -6,7 +6,7 @@
  */
 
 #include "CModelList.h"
-#include "COpenGLThread.h"
+#include "COpenGL.h"
 
 using namespace std;
 
@@ -60,7 +60,7 @@ void CModelList::GetParameters(float * params, int n_params)
 }
 
 // Render the image to the specified OpenGL framebuffer object.
-void CModelList::Render(COpenGLThread * gl)
+void CModelList::Render(COpenGL * gl)
 {
 	GLuint fbo = gl->GetFramebuffer();
 	int width = gl->GetWindowWidth();
@@ -71,12 +71,12 @@ void CModelList::Render(COpenGLThread * gl)
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
-    CModel * model;
-    // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
-    {
-    	(*it)->Render(fbo, width, height);
-    }
+//    CModel * model;
+//    // Now call render on all of the models:
+//    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+//    {
+//    	(*it)->Render(fbo, width, height);
+//    }
 
     // Bind back to the default framebuffer and let OpenGL finish:
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

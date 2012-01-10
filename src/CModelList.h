@@ -11,7 +11,7 @@
 #include <vector>
 #include "CModel.h"
 
-class COpenGLThread;
+class COpenGL;
 
 using namespace std;
 
@@ -32,7 +32,7 @@ public:
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
 
-	void Render(COpenGLThread * gl);
+	void Render(COpenGL * gl);
 
 	void SetParameters(float * params, int n_params);
 

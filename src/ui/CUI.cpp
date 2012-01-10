@@ -1,17 +1,18 @@
 #include "CUI.h"
 
-CUI::CUI(QWidget *parent)
-    : QMainWindow(parent)
+#include <QtGui/QPushButton>
+#include "COpenGL.h"
+
+CUI::CUI()
 {
-	ui.setupUi(this);
+	setupUi(this);
+
+	connect(btnRender, SIGNAL(clicked(void)), wGLMain->GetGL(), SLOT(RenderModels(void)));
+	connect(btnBlit, SIGNAL(clicked(void)), wGLMain->GetGL(), SLOT(BlitToScreen(void)));
+
 }
 
 CUI::~CUI()
 {
 
-}
-
-CGLWidget * CUI::GetGLWidget()
-{
-	return ui.wGLMain;
 }

@@ -1,11 +1,11 @@
 /*
- * COpenGLThread.cpp
+ * COpenGL.cpp
  *
  *  Created on: Dec 15, 2011
  *      Author: bkloppenborg
  */
 
-#include "COpenGLThread.h"
+#include "COpenGL.h"
 
 #include <cstdio>
 
@@ -15,13 +15,13 @@
 
 using namespace std;
 
-COpenGLThread::COpenGLThread(CGLWidget * gl_widget)
+COpenGL::COpenGL(CGLWidget * gl_widget)
 {
 	// Set the OpenGL widget, make this thread the current rendering context
 	mGLWidget = gl_widget;
 }
 
-COpenGLThread::~COpenGLThread()
+COpenGL::~COpenGL()
 {
 	// Delete the shader list.
 	delete this->shader_list;
@@ -36,7 +36,7 @@ COpenGLThread::~COpenGLThread()
 }
 
 /// Static function for checking OpenGL errors:
-void COpenGLThread::CheckOpenGLError(string function_name)
+void COpenGL::CheckOpenGLError(string function_name)
 {
     GLenum status = glGetError(); // Check that status of our generated frame buffer
     // If the frame buffer does not report back as complete
@@ -44,12 +44,13 @@ void COpenGLThread::CheckOpenGLError(string function_name)
     {
         string errstr =  (const char *) gluErrorString(status);
         printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
+        throw;
     }
 }
 
 /// Copy the contents from the internal rendering framebuffer to GL_BACK
 /// calling thread is responsible for swapping the buffers.
-void COpenGLThread::BlitToScreen()
+void COpenGL::BlitToScreen()
 {
 	// Get exclusive access to OpenGL:
 	QMutexLocker locker(&mGLMutex);
@@ -66,10 +67,11 @@ void COpenGLThread::BlitToScreen()
     glFinish();
     mGLWidget->swapBuffers();
     mGLWidget->doneCurrent();
+    printf("Blit called.\n");
 }
 
 /// Gets the named shader.
-CShader * COpenGLThread::GetShader(eGLShaders shader)
+CShader * COpenGL::GetShader(eGLShaders shader)
 {
 	// TODO: implement this in a thread-safe fashion.
 	// Really this is only called during initialization and should be ok not being thread-friendly.
@@ -77,7 +79,7 @@ CShader * COpenGLThread::GetShader(eGLShaders shader)
 };
 
 /// Initiales class memory, sets window width, height and the shader source directory
-void COpenGLThread::Init(int window_width, int window_height, double scale, string shader_source_dir)
+void COpenGL::Init(int window_width, int window_height, double scale, string shader_source_dir)
 {
 	mWindow_width = window_width;
 	mWindow_height = window_height;
@@ -85,7 +87,7 @@ void COpenGLThread::Init(int window_width, int window_height, double scale, stri
 	this->shader_list = new CGLShaderList(shader_source_dir);
 }
 
-void COpenGLThread::InitOpenGL()
+void COpenGL::InitOpenGL()
 {
 	// Get exclusive access to OpenGL:
 	QMutexLocker locker(&mGLMutex);
@@ -115,7 +117,7 @@ void COpenGLThread::InitOpenGL()
     mGLWidget->doneCurrent();
 }
 
-void COpenGLThread::InitFrameBuffer(void)
+void COpenGL::InitFrameBuffer(void)
 {
     InitFrameBufferDepthBuffer();
     InitFrameBufferTexture();
@@ -140,20 +142,22 @@ void COpenGLThread::InitFrameBuffer(void)
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
 }
 
-void COpenGLThread::InitFrameBufferDepthBuffer(void)
+/// Initializes the framebuffer's depth buffer.
+void COpenGL::InitFrameBufferDepthBuffer(void)
 {
 
     glGenRenderbuffers(1, &mFBO_depth); // Generate one render buffer and store the ID in mFBO_depth
+    CheckOpenGLError("initFrameBufferDepthBuffer1");
     glBindRenderbuffer(GL_RENDERBUFFER, mFBO_depth); // Bind the mFBO_depth render buffer
+    CheckOpenGLError("initFrameBufferDepthBuffer2");
 
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mWindow_width, mWindow_height); // Set the render buffer storage to be a depth component, with a width and height of the window
-
-    CheckOpenGLError("initFrameBufferDepthBuffer");
 
     glBindRenderbuffer(GL_RENDERBUFFER, 0); // Unbind the render buffer
 }
 
-void COpenGLThread::InitFrameBufferTexture(void)
+/// Initalizes the framebuffer's texture buffer.
+void COpenGL::InitFrameBufferTexture(void)
 {
     glGenTextures(1, &mFBO_texture); // Generate one texture
     glBindTexture(GL_TEXTURE_2D, mFBO_texture); // Bind the texture mFBOtexture
@@ -181,10 +185,11 @@ void COpenGLThread::InitFrameBufferTexture(void)
 
 /// Render the models.
 /// Don't call this routine using a different thread unless you have control of the OpenGL context.
-void COpenGLThread::RenderModels()
+void COpenGL::RenderModels()
 {
 	// Get exclusive control of the OpenGL context (unlocking is implicit when this function returns)
 	QMutexLocker locker(&mGLMutex);
+	printf("Render called.\n");
 
 	if(mModels != NULL)
 		mModels->Render(this);
@@ -194,14 +199,7 @@ void COpenGLThread::RenderModels()
 }
 
 /// Resize the window
-void COpenGLThread::Resize(int x, int y)
+void COpenGL::Resize(int x, int y)
 {
 	// Do nothing (for now).
-}
-
-// Main thread function.
-void COpenGLThread::run()
-{
-	// Start listening for events.
-	exec();
 }

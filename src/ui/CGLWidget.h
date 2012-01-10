@@ -9,18 +9,22 @@
 #define CGLWIDGET_H_
 
 #include <QtOpenGL/QGLWidget>
+#include <QThread>
 
-class COpenGLThread;
+class COpenGL;
 
 class CGLWidget : public QGLWidget {
 
     Q_OBJECT // must include this if you use Qt signals/slots
 
 protected:
-    COpenGLThread * mThread;
+    QThread * mGLThread;
+    COpenGL * mGL;
 
 public:
     CGLWidget(QWidget *parent = NULL);
+
+    COpenGL * GetGL() { return mGL; };
 
 signals:
     void initializeGL();
