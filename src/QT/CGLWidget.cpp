@@ -7,27 +7,33 @@ CGLWidget::CGLWidget(QWidget *parent)
     resize(320, 240);
     this->doneCurrent();
 }
-void CGLWidget::startRendering()
+
+void CGLWidget::closeEvent(QCloseEvent *evt)
 {
-    mGLT.start();
+    stopRendering();
+    QGLWidget::closeEvent(evt);
 }
-void CGLWidget::stopRendering()
+
+
+void CGLWidget::paintEvent(QPaintEvent *)
 {
-    mGLT.stop();
-    mGLT.wait();
+    // Handled by the mGLT (CGLThread).
 }
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
     mGLT.resizeViewport(evt->size());
 }
-void CGLWidget::paintEvent(QPaintEvent *)
+
+void CGLWidget::startRendering()
 {
-    // Handled by the GLThread.
+    mGLT.start();
 }
-void CGLWidget::closeEvent(QCloseEvent *evt)
+
+void CGLWidget::stopRendering()
 {
-    stopRendering();
-    QGLWidget::closeEvent(evt);
+    mGLT.stop();
+    mGLT.wait();
 }
+
 

@@ -15,13 +15,6 @@ CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget) {
     id = count++;
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " Created";
 }
-    
-void CGLThread::resizeViewport(const QSize &size){
-    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " resizeViewport";
-    w = size.width();
-    h = size.height();
-    doResize = true;
-}   
 
 /// Static function for checking OpenGL errors:
 void CGLThread::CheckOpenGLError(string function_name)
@@ -36,44 +29,7 @@ void CGLThread::CheckOpenGLError(string function_name)
     }
 }
 
-void CGLThread::run(){
-    qDebug() << id << ":run..";
-    
-    mGLWidget->makeCurrent();
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
-    glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
-    glDepthFunc(GL_LESS);				// The Type Of Depth Test To Do
-    glEnable(GL_DEPTH_TEST);			// Enables Depth Testing
-    glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();				// Reset The Projection Matrix
-    gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
-    glMatrixMode(GL_MODELVIEW);
-
-    while (doRendering) {
-        rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
-        qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
-        if (doResize) {
-            glViewport(0, 0, w, h);
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-            gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);
-            glMatrixMode(GL_MODELVIEW);
-            doResize = false;
-        }
-        // Rendering code goes here
-        glDrawTriangle();
-        mGLWidget->updateGL();
-        msleep(40);
-    }
-}
-
-void CGLThread::stop()   {
-    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
-    doRendering = false;
-}
-    
+/// Temporary function to test rendering.
 void CGLThread::glDrawTriangle() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
     glLoadIdentity();				// Reset The View
@@ -119,3 +75,51 @@ void CGLThread::glDrawTriangle() {
 
     glEnd();					// Done Drawing The Pyramid
 }
+
+void CGLThread::resizeViewport(const QSize &size){
+    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " resizeViewport";
+    w = size.width();
+    h = size.height();
+    doResize = true;
+}
+
+
+
+void CGLThread::run(){
+    qDebug() << id << ":run..";
+
+    mGLWidget->makeCurrent();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
+    glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
+    glDepthFunc(GL_LESS);				// The Type Of Depth Test To Do
+    glEnable(GL_DEPTH_TEST);			// Enables Depth Testing
+    glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();				// Reset The Projection Matrix
+    gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
+    glMatrixMode(GL_MODELVIEW);
+
+    while (doRendering) {
+        rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
+        qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
+        if (doResize) {
+            glViewport(0, 0, w, h);
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);
+            glMatrixMode(GL_MODELVIEW);
+            doResize = false;
+        }
+        // Rendering code goes here
+        glDrawTriangle();
+        mGLWidget->updateGL();
+        msleep(40);
+    }
+}
+
+void CGLThread::stop()   {
+    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
+    doRendering = false;
+}
+

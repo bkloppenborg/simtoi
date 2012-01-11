@@ -13,15 +13,7 @@ class CGLWidget;
 
 class CGLThread : public QThread {
     Q_OBJECT
-public:
-    CGLThread(CGLWidget * glWidget);
-
-    static void CheckOpenGLError(string function_name);
-    void resizeViewport(const QSize &size);  
-    void run();
-    void stop();
 private:
-    void glDrawTriangle();
     bool doRendering;
     bool doResize;
     int w;
@@ -30,6 +22,20 @@ private:
     CGLWidget * mGLWidget;
     int id;
     static int count;
+
+public:
+    CGLThread(CGLWidget * glWidget);
+
+    static void CheckOpenGLError(string function_name);
+
+private:
+    void glDrawTriangle();
+
+public:
+    void resizeViewport(const QSize &size);
+    void run();
+
+    void stop();
 };
     
 #endif
