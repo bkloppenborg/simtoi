@@ -1,6 +1,7 @@
 
 #include <QTime>
 #include <QtDebug>
+#include <QMutexLocker>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -9,11 +10,15 @@
 
 int CGLThread::count = 0;
 
-CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget) {
+CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget)
+{
     doRendering = true;
     doResize = false;
     id = count++;
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " Created";
+
+    mPermitResize = true;
+    mResizeInProgress = false;
 }
 
 /// Static function for checking OpenGL errors:
@@ -29,14 +34,34 @@ void CGLThread::CheckOpenGLError(string function_name)
     }
 }
 
-/// Temporary function to test rendering.
+/// Enqueue an operation for the CGLThread to process.
+void CGLThread::EnqueueOperation(GLT_Operations op)
+{
+	// Lock the queue, append the item, increment the semaphore.
+	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
+	mQueue.push(op);
+	mQueueSemaphore.release(1);
+}
+
+/// Get the next operation from the queue.  This is a blocking function.
+GLT_Operations CGLThread::GetNextOperation(void)
+{
+	// First try to get access to the semaphore.  This is a blocking call if the queue is empty.
+	mQueueSemaphore.acquire(1);
+	// Now lock the queue, pull off the top item, pop it from the queue, and return.
+	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
+	GLT_Operations tmp = mQueue.top();
+	mQueue.pop();
+	return tmp;
+}
+
 void CGLThread::glDrawTriangle() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
     glLoadIdentity();				// Reset The View
 
     glTranslatef(-1.5f,0.0f,-6.0f);
-  
-    glRotatef(rotAngle,0.0f,1.0f,0.0f);		// Rotate The Pyramid On The Y axis 
+
+    glRotatef(rotAngle,0.0f,1.0f,0.0f);		// Rotate The Pyramid On The Y axis
 
     // draw a pyramid (in smooth coloring mode)
     glBegin(GL_POLYGON);				// start drawing a pyramid
@@ -47,7 +72,7 @@ void CGLThread::glDrawTriangle() {
     glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
     glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
     glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
-    glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)	
+    glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)
 
     // right face of pyramid
     glColor3f(1.0f,0.0f,0.0f);			// Red
@@ -75,19 +100,31 @@ void CGLThread::glDrawTriangle() {
 
     glEnd();					// Done Drawing The Pyramid
 }
-
-void CGLThread::resizeViewport(const QSize &size){
-    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " resizeViewport";
-    w = size.width();
-    h = size.height();
-    doResize = true;
+    
+/// Resize the window.  Normally called from QT
+void CGLThread::resizeViewport(const QSize &size)
+{
+    resizeViewport(size.width(), size.height());
 }
 
+/// Resize the window.  Called from external applications.
+void CGLThread::resizeViewport(int width, int height)
+{
+	if(mPermitResize && ! mResizeInProgress)
+	{
+		mWidth = width;
+		mHeight = height;
+		mResizeInProgress = true;
+		// TODO: Remove
+		doResize = true;
+		EnqueueOperation(GLT_Resize);
+	}
+}   
 
-
-void CGLThread::run(){
+void CGLThread::run()
+{
     qDebug() << id << ":run..";
-
+    
     mGLWidget->makeCurrent();
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
     glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
@@ -97,19 +134,21 @@ void CGLThread::run(){
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();				// Reset The Projection Matrix
-    gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
+    gluPerspective(45.0f,(GLfloat)mWidth/(GLfloat)mHeight,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
     glMatrixMode(GL_MODELVIEW);
 
-    while (doRendering) {
+    while (doRendering)
+    {
         rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
         qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
         if (doResize) {
-            glViewport(0, 0, w, h);
+            glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);
+            gluPerspective(45.0f,(GLfloat)mWidth/(GLfloat)mHeight,0.1f,100.0f);
             glMatrixMode(GL_MODELVIEW);
             doResize = false;
+            mResizeInProgress = false;
         }
         // Rendering code goes here
         glDrawTriangle();
@@ -118,8 +157,8 @@ void CGLThread::run(){
     }
 }
 
-void CGLThread::stop()   {
+void CGLThread::stop()
+{
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
     doRendering = false;
 }
-

@@ -89,8 +89,26 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFIle">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew_Model"/>
+    <addaction name="actionOpen"/>
+   </widget>
+   <addaction name="menuFIle"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionNew_Model">
+   <property name="text">
+    <string>New Model</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open Model</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

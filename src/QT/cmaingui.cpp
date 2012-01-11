@@ -32,7 +32,8 @@ cmaingui::~cmaingui()
 void cmaingui::closeEvent(QCloseEvent *evt)
 {
 	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
-    for (int i = 0; i < int(windows.count()); ++i) {
+    for (int i = 0; i < int(windows.count()); ++i)
+    {
     	CGLWidget * tmp = (CGLWidget *)windows.at(i);
     	tmp->stopRendering();
     }
