@@ -36,7 +36,7 @@ public:
 public:
 	static CMinimizer * GetMinimizer(string name, CSIMTOI * simtoi);
 
-	virtual int Init() {};
+	virtual int Init() = 0;
 
 	void Run();
 

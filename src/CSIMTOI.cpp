@@ -6,7 +6,7 @@
  */
 
 #include "CSIMTOI.h"
-#include "COpenGL.h"
+#include "CGLThread.h"
 #include "CLibOI.h"
 // TODO: Perhaps we can figure out how to remove the model headers from here?
 #include "CModelList.h"
@@ -74,7 +74,7 @@ void CSIMTOI::Init(int argc, char *argv[])
 
 	// Load the current program configuration, then initialize OpenGL
 	LoadConfiguration();
-	mGL->Init(mWindow_width, mWindow_height, mScale, mShaderSourceDir);
+	//mGL->Init(mWindow_width, mWindow_height, mScale, mShaderSourceDir);
 
 	// Create the model list, load models into memory:
 	mModelList = new CModelList();
@@ -84,7 +84,7 @@ void CSIMTOI::Init(int argc, char *argv[])
 	mCL = new CLibOI();
 	mCL->SetKernelSourcePath(mKernelSourceDir);
 	mCL->Init(CL_DEVICE_TYPE_GPU, mWindow_width, mWindow_height, 1, mScale);
-	mCL->RegisterImage_GLTB(mGL->GetFramebufferTexture());
+	//mCL->RegisterImage_GLTB(mGL->GetFramebufferTexture());
 
 	// Load OIFITS data into memory
 	mCL->LoadData("/home/bkloppenborg/workspace/simtoi/bin/epsaur.oifits");
@@ -111,7 +111,7 @@ void CSIMTOI::LoadModels()
 {
     // TODO: Read this in from a text file.
 	CShader * shader;
-	shader = mGL->GetShader(LD_Hesteroffer1997);
+	//shader = mGL->GetShader(LD_Hesteroffer1997);
 	CModel * tmp = new CModelSphere();
 	tmp->SetPositionType(XY);
 	tmp->SetShader(shader);

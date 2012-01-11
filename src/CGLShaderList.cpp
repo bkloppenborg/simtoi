@@ -10,9 +10,9 @@
 #include "CGLShaderList.h"
 #include "CGLShader.h"
 
-CGLShaderList::CGLShaderList(string shader_dir)
+CGLShaderList::CGLShaderList(string shader_source_dir)
 {
-	this->shader_dir = shader_dir;
+	this->shader_dir = shader_source_dir;
 
 }
 

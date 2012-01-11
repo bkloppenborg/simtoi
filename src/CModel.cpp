@@ -16,7 +16,7 @@ CModel::CModel()
 {
 	// Init the object to have no rotation in yaw, pitch, or roll.
 	rotation[0] = rotation[1] = rotation[2] = 0;
-	shader = NULL;
+	mShader = NULL;
 	position = new CPositionXY();
 	features = new CFeatureList();
 
@@ -73,10 +73,10 @@ void CModel::GetParameters(float * params, int n_params)
 	position->GetParams(params + n, n_params - n);
 	n += position->GetNFreeParameters();
 
-	if(shader != NULL)
+	if(mShader != NULL)
 	{
-		shader->GetParams(params + n, n_params - n);
-		n += shader->GetNFreeParams();
+		mShader->GetParams(params + n, n_params - n);
+		n += mShader->GetNFreeParams();
 	}
 
 	// TODO: Implement this function
@@ -99,10 +99,10 @@ void CModel::SetParameters(float * params, int n_params)
 	position->SetParams(params + n, n_params - n);
 	n += position->GetNFreeParameters();
 
-	if(shader != NULL)
+	if(mShader != NULL)
 	{
-		shader->SetParams(params + n, n_params - n);
-		n += shader->GetNFreeParams();
+		mShader->SetParams(params + n, n_params - n);
+		n += mShader->GetNFreeParams();
 	}
 
 	features->SetParams(params + n, n_params - n);
@@ -123,11 +123,11 @@ void CModel::SetPositionType(ePositionTypes type)
 
 void CModel::SetShader(CShader * shader)
 {
-	this->shader = shader;
+	this->mShader = shader;
 }
 
 void CModel::UseShader()
 {
-	if(this->shader != NULL)
-		shader->UseShader();
+	if(this->mShader != NULL)
+		mShader->UseShader();
 }

@@ -40,7 +40,7 @@ protected:
 	double * scale_min;
 
 private:
-	CShader * shader;
+	CShader * mShader;
 
 protected:
 	void Rotate();

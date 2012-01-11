@@ -17,23 +17,23 @@
 #endif
 
 #include "main.h"
-#include "CUI.h"
+#include "cmaingui.h"
 
 using namespace std;
 
 // The main routine.
 int main(int argc, char *argv[])
 {
+	// Pass off to the GUI:
+    QApplication app(argc, argv);
 #ifdef Q_WS_X11
     XInitThreads();
+    // For QT 4.8 we'll need to use this line instead.
+    //app.setAttribute(Qt::AA_X11InitThreads, true);
 #endif
-	// Pass off to the GUI:
-    QApplication a(argc, argv);
-    // For QT 4.8 we'll need to enable this line:
-    //a.setAttribute(Qt::AA_X11InitThreads, true);
-    CUI w;
-    w.show();
-    return a.exec();
+    cmaingui main_window;
+    main_window.show();
+    return app.exec();
 }
 
 

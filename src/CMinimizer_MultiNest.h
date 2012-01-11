@@ -23,6 +23,7 @@ public:
 	virtual ~CMinimizer_MultiNest();
 
 	int ThreadFunc();
+	int Init() { return 0; };
 
 	// Functions for multinest:
 	static void log_likelihood(double *Cube, int *ndim, int *npars, double *lnew);

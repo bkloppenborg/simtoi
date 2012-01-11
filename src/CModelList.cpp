@@ -6,7 +6,7 @@
  */
 
 #include "CModelList.h"
-#include "COpenGL.h"
+#include "CGLThread.h"
 
 using namespace std;
 
@@ -32,7 +32,6 @@ void CModelList::Append(CModel * model)
 int CModelList::GetNFreeParameters()
 {
 	// TODO: We could probably cache this and/or update it as models are added.
-    CModel * model;
     int n = 0;
 
     // Now call render on all of the models:
@@ -48,7 +47,6 @@ int CModelList::GetNFreeParameters()
 /// also useful for determining initial, user-specified values in configuration files.
 void CModelList::GetParameters(float * params, int n_params)
 {
-    CModel * model;
     int n = 0;
 
     // Now call render on all of the models:
@@ -60,19 +58,18 @@ void CModelList::GetParameters(float * params, int n_params)
 }
 
 // Render the image to the specified OpenGL framebuffer object.
-void CModelList::Render(COpenGL * gl)
+void CModelList::Render(CGLThread * gl)
 {
-	GLuint fbo = gl->GetFramebuffer();
-	int width = gl->GetWindowWidth();
-	int height = gl->GetWindowHeight();
+	GLuint fbo = 0; //gl->GetFramebuffer();
+	//int width = gl->GetWindowWidth();
+	//int height = gl->GetWindowHeight();
 
 	// First clear the buffer.
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
-//    CModel * model;
-//    // Now call render on all of the models:
+    // Now call render on all of the models:
 //    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
 //    {
 //    	(*it)->Render(fbo, width, height);
@@ -86,7 +83,6 @@ void CModelList::Render(COpenGL * gl)
 // This function sets the parameters for models prior to a GetData call.
 void CModelList::SetParameters(float * params, int n_params)
 {
-    CModel * model;
     int n = 0;
 
     // Now call render on all of the models:
