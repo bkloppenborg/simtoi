@@ -9,7 +9,7 @@
 #include "CSIMTOI.h"
 #include <float.h>
 #include <cstring>
-//#include "multinest.h"
+#include "multinest.h"
 
 CMinimizer_MultiNest::CMinimizer_MultiNest(CSIMTOI * simtoi)
 	:CMinimizer(simtoi)
@@ -93,12 +93,12 @@ int CMinimizer_MultiNest::ThreadFunc()
 
 
 	// Run the nested sampling algorithm
-//	NESTRUN(&mmodal, &ceff, &nlive, &tol,
-//		&efr, &ndims, &nPar, &nClsPar,
-//		&maxModes, &updInt, &Ztol, root,
-//		&seed, pWrap, &fb, &resume,
-//		&outfile, &initMPI, &logZero,
-//		&this->log_likelihood,
-//		&this->dumper,
-//		&context);
+	NESTRUN(&mmodal, &ceff, &nlive, &tol,
+		&efr, &ndims, &nPar, &nClsPar,
+		&maxModes, &updInt, &Ztol, root,
+		&seed, pWrap, &fb, &resume,
+		&outfile, &initMPI, &logZero,
+		&this->log_likelihood,
+		&this->dumper,
+		&context);
 }

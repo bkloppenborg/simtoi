@@ -21,10 +21,9 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/QT ${CMAKE_CURRENT_BINARY_DIR}/Q
 add_subdirectory(QT)
 
 # include directories for the oilib:
-#include_directories(${OI_INCLUDE_DIRS})
+include_directories(${OI_INCLUDE_DIRS})
 
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp)
 add_executable(simtoi ${SOURCE})
-#target_link_libraries(simtoi QT_files textio oi multinest ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
-target_link_libraries(simtoi textio QT_files ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(simtoi QT_files textio oi multinest ${QT_LIBRARIES} ${OPENGL_LIBRARIES})

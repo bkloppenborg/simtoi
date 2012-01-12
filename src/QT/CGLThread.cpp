@@ -1,76 +1,146 @@
 
 #include <QTime>
 #include <QtDebug>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <cstdio>
+#include <QMutexLocker>
+#include <QGLFramebufferObject>
 
 #include "CGLThread.h"
 #include "CGLWidget.h"
 
-using namespace std;
-
 int CGLThread::count = 0;
 
-CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget) {
-    doRendering = true;
+CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget)
+{
+    mRun = true;
     doResize = false;
     id = count++;
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " Created";
+
+    mPermitResize = true;
+    mResizeInProgress = false;
+    mScale = 0.01;	// init to some non-zero value.
 }
-    
-void CGLThread::resizeViewport(const QSize &size){
-    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " resizeViewport";
-    w = size.width();
-    h = size.height();
-    doResize = true;
-}   
-void CGLThread::run(){
-    qDebug() << id << ":run..";
-    
-    mGLWidget->makeCurrent();
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
-    glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
-    glDepthFunc(GL_LESS);				// The Type Of Depth Test To Do
-    glEnable(GL_DEPTH_TEST);			// Enables Depth Testing
-    glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();				// Reset The Projection Matrix
-    gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
-    glMatrixMode(GL_MODELVIEW);
-
-    while (doRendering) {
-        rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
-        qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
-        if (doResize) {
-        	printf("%i %i\n", w, h);
-            glViewport(0, 0, w, h);
-            glMatrixMode(GL_PROJECTION);
-            glLoadIdentity();
-            gluPerspective(45.0f,(GLfloat)w/(GLfloat)h,0.1f,100.0f);
-            glMatrixMode(GL_MODELVIEW);
-            doResize = false;
-        }
-        // Rendering code goes here
-        glDrawTriangle();
-        mGLWidget->updateGL();
-        msleep(40);
+/// Static function for checking OpenGL errors:
+void CGLThread::CheckOpenGLError(string function_name)
+{
+    GLenum status = glGetError(); // Check that status of our generated frame buffer
+    // If the frame buffer does not report back as complete
+    if (status != 0)
+    {
+        string errstr =  (const char *) gluErrorString(status);
+        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
+        throw;
     }
 }
 
-void CGLThread::stop()   {
-    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
-    doRendering = false;
+/// Copies the off-screen framebuffer to the on-screen buffer.  To be called only by the thread.
+void CGLThread::BlitToScreen()
+{
+    // Bind back to the default buffer (just in case something didn't do it),
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Blit the application-defined render buffer to the on-screen render buffer.
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
+    glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+    glFinish();
+    mGLWidget->swapBuffers();
 }
-    
-void CGLThread::glDrawTriangle() {
+
+/// Enqueue an operation for the CGLThread to process.
+void CGLThread::EnqueueOperation(GLT_Operations op)
+{
+	// Lock the queue, append the item, increment the semaphore.
+	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
+	mQueue.push(op);
+	mQueueSemaphore.release();
+}
+
+/// Get the next operation from the queue.  This is a blocking function.
+GLT_Operations CGLThread::GetNextOperation(void)
+{
+	// First try to get access to the semaphore.  This is a blocking call if the queue is empty.
+	mQueueSemaphore.acquire();
+	// Now lock the queue, pull off the top item, pop it from the queue, and return.
+	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
+	GLT_Operations tmp = mQueue.top();
+	mQueue.pop();
+	return tmp;
+}
+
+void CGLThread::InitFrameBuffer(void)
+{
+    InitFrameBufferDepthBuffer();
+    InitFrameBufferTexture();
+
+    glGenFramebuffers(1, &mFBO); // Generate one frame buffer and store the ID in mFBO
+    glBindFramebuffer(GL_FRAMEBUFFER, mFBO); // Bind our frame buffer
+
+    // Attach the depth and texture buffer to the frame buffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFBO_texture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    // Check that status of our generated frame buffer
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        string errorstring = (char *) gluErrorString(status);
+        printf("Couldn't create frame buffer: %x %s\n", status, errorstring.c_str());
+        exit(0); // Exit the application
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
+}
+
+void CGLThread::InitFrameBufferDepthBuffer(void)
+{
+    glGenRenderbuffers(1, &mFBO_depth); // Generate one render buffer and store the ID in mFBO_depth
+    glBindRenderbuffer(GL_RENDERBUFFER, mFBO_depth); // Bind the mFBO_depth render buffer
+
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mWidth, mHeight); // Set the render buffer storage to be a depth component, with a width and height of the window
+
+    CheckOpenGLError("initFrameBufferDepthBuffer");
+
+    glBindRenderbuffer(GL_RENDERBUFFER, 0); // Unbind the render buffer
+}
+
+void CGLThread::InitFrameBufferTexture(void)
+{
+    glGenTextures(1, &mFBO_texture); // Generate one texture
+    glBindTexture(GL_TEXTURE_2D, mFBO_texture); // Bind the texture mFBOtexture
+
+    // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWindow_width, mWindow_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
+    // These other formats might work, check that GL_BYTE is still correct for the higher precision.
+    // I don't think we'll ever need floating point numbers, but those are here too:
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWindow_width, mWindow_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWindow_width, mWindow_height, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, mWindow_width, mWindow_height, 0, GL_RED, CL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mWindow_width, mWindow_height, 0, GL_RED, GL_FLOAT, NULL);
+
+
+    // Setup the basic texture parameters
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // Unbind the texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void CGLThread::glDrawTriangle()
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
     glLoadIdentity();				// Reset The View
 
     glTranslatef(-1.5f,0.0f,-6.0f);
-  
-    glRotatef(rotAngle,0.0f,1.0f,0.0f);		// Rotate The Pyramid On The Y axis 
+
+    glRotatef(rotAngle,0.0f,1.0f,0.0f);		// Rotate The Pyramid On The Y axis
 
     // draw a pyramid (in smooth coloring mode)
     glBegin(GL_POLYGON);				// start drawing a pyramid
@@ -81,7 +151,7 @@ void CGLThread::glDrawTriangle() {
     glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
     glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
     glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
-    glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)	
+    glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)
 
     // right face of pyramid
     glColor3f(1.0f,0.0f,0.0f);			// Red
@@ -108,4 +178,111 @@ void CGLThread::glDrawTriangle() {
     glVertex3f(-1.0f,-1.0f, 1.0f);		// Right Of Triangle (Left)
 
     glEnd();					// Done Drawing The Pyramid
+}
+
+/// Resets any OpenGL errors by looping.
+void CGLThread::ResetGLError()
+{
+    while (glGetError() != GL_NO_ERROR) {};
+}
+
+/// Resize the window.  Normally called from QT
+void CGLThread::resizeViewport(const QSize &size)
+{
+    resizeViewport(size.width(), size.height());
+}
+
+/// Resize the window.  Called from external applications.
+void CGLThread::resizeViewport(int width, int height)
+{
+	if(mPermitResize && ! mResizeInProgress)
+	{
+		mWidth = width;
+		mHeight = height;
+		mResizeInProgress = true;
+		// For SIMTOI, only permit a resize once.
+		EnqueueOperation(GLT_Resize);
+	}
+}   
+
+/// Run the thread.
+void CGLThread::run()
+{
+    // We're controlling the rendering now!
+    mGLWidget->makeCurrent();
+
+    // ########
+    // OpenGL initialization
+    // ########
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    // Set to flat (non-interpolated) shading:
+    glShadeModel(GL_FLAT);
+    glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
+    glDisable(GL_DITHER);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
+
+    // Now setup the projection system to be orthographic
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    // Note, the coordinates here are in object-space, not coordinate space.
+    double half_width = mWidth * mScale / 2;
+    glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
+
+    // Init the off-screen frame buffer.
+    InitFrameBuffer();
+
+    GLT_Operations op;
+
+    while (mRun)
+    {
+    	// Pull the next operation off of the queue.  This is a blocking call if the queue is empty.
+    	op = GetNextOperation();
+
+    	switch(op)
+    	{
+
+    	case GLT_BlitToScreen:
+    		// Blit the offscreen buffer to GL_BACK then swap GL_BACK to GL_FRONT
+    		BlitToScreen();
+    		break;
+
+
+    	case GLT_Resize:
+    		// Resize the rendering area
+            glViewport(0, 0, mWidth, mHeight);
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            half_width = mWidth * mScale / 2;
+            glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
+            mResizeInProgress = false;
+            break;
+
+    	case GLT_Redraw:
+			rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
+			qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
+			// Rendering code goes here
+			glDrawTriangle();
+			mGLWidget->swapBuffers();
+			break;
+
+    	case GLT_Stop:
+    		mRun = false;
+    		break;
+    	}
+    }
+}
+
+/// Sets the scale for the model.
+void CGLThread::SetScale(double scale)
+{
+	if(scale > 0)
+		mScale = scale;
+}
+
+/// Stop the thread.
+void CGLThread::stop()
+{
+    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
+    EnqueueOperation(GLT_Stop);
 }

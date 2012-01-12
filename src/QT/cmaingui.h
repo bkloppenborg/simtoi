@@ -21,6 +21,7 @@ protected:
 private slots:
     void addGLArea();
     void delGLArea();
+    void render();
 };
 
 #endif // CMAINGUI_H

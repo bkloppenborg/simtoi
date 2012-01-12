@@ -49,7 +49,7 @@ void CGLShader::init_shader()
     // Load some shaders:
     program = glCreateProgram();
 
-//    CGLThread::CheckOpenGLError("Could not create shader program.");
+    CGLThread::CheckOpenGLError("Could not create shader program.");
 
     shader_vertex = glCreateShader(GL_VERTEX_SHADER);
     shader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -86,13 +86,13 @@ void CGLShader::init_shader()
     	printf("%s\n", infolog);
     }
 
-//    CGLThread::CheckOpenGLError("Could not link shader program.");
+    CGLThread::CheckOpenGLError("Could not link shader program.");
 
     // Now look up the locations of the parameters
     for(int i = 0; i < n_params; i++)
     {
     	param_locations[i] = glGetUniformLocation(program, param_names[i].c_str());
-//    	CGLThread::CheckOpenGLError("Could find variable in shader source.");
+    	CGLThread::CheckOpenGLError("Could find variable in shader source.");
     }
 
 
