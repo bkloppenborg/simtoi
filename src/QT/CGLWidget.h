@@ -19,20 +19,12 @@ protected:
 public:
     CGLWidget(QWidget *parent);
 
-    void EnqueueOperation(GLT_Operations op);
-
-protected:
-    void closeEvent(QCloseEvent *evt);
-
-	void paintEvent(QPaintEvent * );
-
-    void resizeEvent(QResizeEvent *evt);
-
-public:
-    void SetScale(double scale);
     void startRendering();
     void stopRendering();
-
+protected:
+    void resizeEvent(QResizeEvent *evt);
+    void paintEvent(QPaintEvent * );
+    void closeEvent(QCloseEvent *evt);
 
 };
 
