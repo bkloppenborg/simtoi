@@ -60,8 +60,8 @@ protected:
 	GLuint mFBO_texture;
 	GLuint mFBO_depth;
 
+	bool mRun;
 
-    bool doRendering;
     bool doResize;
     float rotAngle;
     int id;

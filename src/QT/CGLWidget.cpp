@@ -4,30 +4,42 @@ CGLWidget::CGLWidget(QWidget *parent)
     : QGLWidget(parent), mGLT(this)
 { 
     setAutoBufferSwap(false);
-    resize(320, 240);
     this->doneCurrent();
 }
+
+void CGLWidget::EnqueueOperation(GLT_Operations op)
+{
+	mGLT.EnqueueOperation(op);
+}
+
+void CGLWidget::closeEvent(QCloseEvent *evt)
+{
+    stopRendering();
+    QGLWidget::closeEvent(evt);
+}
+void CGLWidget::paintEvent(QPaintEvent *)
+{
+    // Handled by the GLThread.
+}
+void CGLWidget::resizeEvent(QResizeEvent *evt)
+{
+    mGLT.resizeViewport(evt->size());
+}
+
+
 void CGLWidget::startRendering()
 {
     mGLT.start();
 }
+
 void CGLWidget::stopRendering()
 {
     mGLT.stop();
     mGLT.wait();
 }
 
-void CGLWidget::resizeEvent(QResizeEvent *evt)
+void CGLWidget::SetScale(double scale)
 {
-    mGLT.resizeViewport(evt->size());
-}
-void CGLWidget::paintEvent(QPaintEvent *)
-{
-    // Handled by the GLThread.
-}
-void CGLWidget::closeEvent(QCloseEvent *evt)
-{
-    stopRendering();
-    QGLWidget::closeEvent(evt);
+	mGLT.SetScale(scale);
 }
 

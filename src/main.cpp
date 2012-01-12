@@ -26,7 +26,9 @@ int main(int argc, char *argv[])
 {
 	// Pass off to the GUI:
     QApplication app(argc, argv);
+
 #ifdef Q_WS_X11
+    // X11 requires an explicit initialization for threading:
     XInitThreads();
     // For QT 4.8 we'll need to use this line instead.
     //app.setAttribute(Qt::AA_X11InitThreads, true);

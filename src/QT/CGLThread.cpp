@@ -11,7 +11,7 @@ int CGLThread::count = 0;
 
 CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget)
 {
-    doRendering = true;
+    mRun = true;
     doResize = false;
     id = count++;
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " Created";
@@ -55,14 +55,14 @@ void CGLThread::EnqueueOperation(GLT_Operations op)
 	// Lock the queue, append the item, increment the semaphore.
 	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
 	mQueue.push(op);
-	mQueueSemaphore.release(1);
+	mQueueSemaphore.release();
 }
 
 /// Get the next operation from the queue.  This is a blocking function.
 GLT_Operations CGLThread::GetNextOperation(void)
 {
 	// First try to get access to the semaphore.  This is a blocking call if the queue is empty.
-	mQueueSemaphore.acquire(1);
+	mQueueSemaphore.acquire();
 	// Now lock the queue, pull off the top item, pop it from the queue, and return.
 	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
 	GLT_Operations tmp = mQueue.top();
@@ -133,7 +133,8 @@ void CGLThread::InitFrameBufferTexture(void)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void CGLThread::glDrawTriangle() {
+void CGLThread::glDrawTriangle()
+{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
     glLoadIdentity();				// Reset The View
 
@@ -199,20 +200,16 @@ void CGLThread::resizeViewport(int width, int height)
 		mWidth = width;
 		mHeight = height;
 		mResizeInProgress = true;
-		// TODO: Remove
-		doResize = true;
+		// For SIMTOI, only permit a resize once.
 		EnqueueOperation(GLT_Resize);
 	}
 }   
 
+/// Run the thread.
 void CGLThread::run()
 {
-    qDebug() << id << ":run..";
     // We're controlling the rendering now!
     mGLWidget->makeCurrent();
-
-    // It is possible that there are some OpenGL errors lingering about, reset them.
-    ResetGLError();
 
     // ########
     // OpenGL initialization
@@ -235,35 +232,57 @@ void CGLThread::run()
     // Init the off-screen frame buffer.
     InitFrameBuffer();
 
-    while (doRendering)
+    GLT_Operations op;
+
+    while (mRun)
     {
-        rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
-        qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
-        if (doResize) {
+    	// Pull the next operation off of the queue.  This is a blocking call if the queue is empty.
+    	op = GetNextOperation();
+
+    	switch(op)
+    	{
+
+    	case GLT_BlitToScreen:
+    		// Blit the offscreen buffer to GL_BACK then swap GL_BACK to GL_FRONT
+    		BlitToScreen();
+    		break;
+
+
+    	case GLT_Resize:
+    		// Resize the rendering area
             glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(45.0f,(GLfloat)mWidth/(GLfloat)mHeight,0.1f,100.0f);
-            glMatrixMode(GL_MODELVIEW);
-            doResize = false;
+            half_width = mWidth * mScale / 2;
+            glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
             mResizeInProgress = false;
-        }
-        // Rendering code goes here
-        glDrawTriangle();
-        mGLWidget->swapBuffers();
-        //mGLWidget->updateGL();
-        msleep(40);
+            break;
+
+    	case GLT_Redraw:
+			rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
+			qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
+			// Rendering code goes here
+			glDrawTriangle();
+			mGLWidget->swapBuffers();
+			break;
+
+    	case GLT_Stop:
+    		mRun = false;
+    		break;
+    	}
     }
 }
 
+/// Sets the scale for the model.
 void CGLThread::SetScale(double scale)
 {
 	if(scale > 0)
 		mScale = scale;
 }
 
+/// Stop the thread.
 void CGLThread::stop()
 {
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
-    doRendering = false;
+    EnqueueOperation(GLT_Stop);
 }
