@@ -47,7 +47,9 @@ void cmaingui::addGLArea()
     CGLWidget *widget = new CGLWidget(ui.mdiArea);
     QMdiSubWindow *sw = ui.mdiArea->addSubWindow(widget);
     sw->setWindowTitle("Model Area");
+    // Init the size and scale of the model.
     sw->resize(ui.spinModelSize->value(), ui.spinModelSize->value());
+    widget->SetScale(ui.spinModelScale->value());
     sw->show();
     widget->startRendering();
 }

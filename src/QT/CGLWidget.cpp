@@ -3,7 +3,7 @@
 CGLWidget::CGLWidget(QWidget *parent)
     : QGLWidget(parent), mGLT(this)
 { 
-    setAutoBufferSwap(true);
+    setAutoBufferSwap(false);
     resize(320, 240);
     this->doneCurrent();
 }
