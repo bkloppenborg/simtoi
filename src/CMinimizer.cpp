@@ -6,7 +6,7 @@
  */
 
 #include "CMinimizer.h"
-#include "CMinimizer_MultiNest.h"
+//#include "CMinimizer_MultiNest.h"
 
 CMinimizer::CMinimizer(CSIMTOI * simtoi)
 {
@@ -23,8 +23,8 @@ CMinimizer * CMinimizer::GetMinimizer(string name, CSIMTOI * simtoi)
 	CMinimizer * tmp = NULL;
 
 	// Just match the string
-	if(name == "MultiNest")
-		tmp = new CMinimizer_MultiNest(simtoi);
+//	if(name == "MultiNest")
+//		tmp = new CMinimizer_MultiNest(simtoi);
 
 	return tmp;
 }

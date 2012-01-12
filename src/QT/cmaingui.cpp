@@ -21,7 +21,6 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
-	connect(ui.btnRender, SIGNAL(clicked(void)), this, SLOT(render(void)));
 }
 
 cmaingui::~cmaingui()

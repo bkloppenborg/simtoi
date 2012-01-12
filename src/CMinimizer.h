@@ -17,7 +17,6 @@
 #define CMINIMIZER_H_
 
 #include <string>
-//#include <boost/thread/thread.hpp>
 
 using namespace std;
 

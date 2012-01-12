@@ -208,68 +208,72 @@ void CGLThread::resizeViewport(int width, int height)
 /// Run the thread.
 void CGLThread::run()
 {
-    // We're controlling the rendering now!
+    qDebug() << id << ":run..";
+
     mGLWidget->makeCurrent();
-
     // ########
-    // OpenGL initialization
-    // ########
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    // Set to flat (non-interpolated) shading:
-    glShadeModel(GL_FLAT);
-    glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
-    glDisable(GL_DITHER);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
+     // OpenGL initialization
+     // ########
+     glClearColor(0.0, 0.0, 0.0, 0.0);
+     // Set to flat (non-interpolated) shading:
+     glShadeModel(GL_FLAT);
+     glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
+     glDisable(GL_DITHER);
+     glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
 
-    // Now setup the projection system to be orthographic
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+     // Now setup the projection system to be orthographic
+     glMatrixMode(GL_PROJECTION);
+     glLoadIdentity();
 
-    // Note, the coordinates here are in object-space, not coordinate space.
-    double half_width = mWidth * mScale / 2;
-    glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
+     // Note, the coordinates here are in object-space, not coordinate space.
+     double half_width = mWidth * mScale / 2;
+     glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
 
-    // Init the off-screen frame buffer.
-    InitFrameBuffer();
-
+    // Start the thread
+    mRun = true;
+    EnqueueOperation(GLT_Redraw);
     GLT_Operations op;
+
 
     while (mRun)
     {
-    	// Pull the next operation off of the queue.  This is a blocking call if the queue is empty.
-    	op = GetNextOperation();
+        rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
+        qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
+        op = GetNextOperation();
 
-    	switch(op)
-    	{
-
-    	case GLT_BlitToScreen:
-    		// Blit the offscreen buffer to GL_BACK then swap GL_BACK to GL_FRONT
-    		BlitToScreen();
-    		break;
-
-
-    	case GLT_Resize:
-    		// Resize the rendering area
+        switch(op)
+        {
+        case GLT_Resize:
+        // Resize cascades into a redraw.
             glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            half_width = mWidth * mScale / 2;
-            glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
-            mResizeInProgress = false;
+            gluPerspective(45.0f,(GLfloat)mWidth/(GLfloat)mHeight,0.1f,100.0f);
+            glMatrixMode(GL_MODELVIEW);
+
+        case GLT_Redraw:
+        	// Call the drawing functions
+            glDrawTriangle();
+            mGLWidget->updateGL();
+            mGLWidget->swapBuffers();
             break;
 
-    	case GLT_Redraw:
-			rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
-			qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
-			// Rendering code goes here
-			glDrawTriangle();
-			mGLWidget->swapBuffers();
-			break;
+        case GLT_Stop:
+#ifdef DEBUG
+            qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
+#endif //DEBUG
+            mRun = false;
+            break;
 
-    	case GLT_Stop:
-    		mRun = false;
-    		break;
-    	}
+        default:
+            break;
+
+        }
+
+        EnqueueOperation(GLT_Redraw);
+        msleep(40);
+
+
     }
 }
 
