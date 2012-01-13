@@ -102,6 +102,6 @@ void CGLShaderList::LoadShaders()
 	friendly_name = "LDL - Hesteroffer (1997)";
 	n_params = 1;
 	param_names.push_back("alpha");
-	tmp = new CGLShader(LD_Hesteroffer1997, shader_dir, base_name, friendly_name, n_params, param_names);
+	tmp = new CGLShader(SHDR_LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names);
 	this->Append(tmp);
 }

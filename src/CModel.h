@@ -17,8 +17,9 @@
 #include <string>
 
 #include "CPosition.h"
+#include "CGLShaderList.h"
 #include "CGLShaderWrapper.h"
-#include "enumerations.h"
+#include "CModelList.h"
 
 using namespace std;
 

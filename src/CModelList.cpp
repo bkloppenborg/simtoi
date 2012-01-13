@@ -5,7 +5,10 @@
  *      Author: bkloppenborg
  */
 
+#include "CModel.h"
 #include "CModelList.h"
+#include "CModelSphere.h"
+
 
 using namespace std;
 
@@ -40,6 +43,33 @@ int CModelList::GetNFreeParameters()
     }
 
     return n;
+}
+
+/// Returns a pair of model names, and their enumerated types
+vector< pair<string, eModels> > CModelList::GetList_AllModels(void)
+{
+	vector< pair<string, eModels> > tmp;
+	tmp.push_back(pair<string, eModels> ("Sphere", MDL_SPHERE));
+
+	return tmp;
+}
+
+/// Returns a new CModel of the specified type
+CModel * CModelList::GetNewModel(eModels model_id)
+{
+	CModel * model;
+	switch(model_id)
+	{
+	case MDL_SPHERE:
+		model = reinterpret_cast<CModel*>(new CModelSphere());
+		break;
+
+	default:
+		model = NULL;
+		break;
+	}
+
+	return model;
 }
 
 /// This function gets the parameters for models after they have been set/scaled.

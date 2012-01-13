@@ -11,12 +11,17 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include "enumerations.h"
 
 using namespace std;
 
 class CGLShader;
 class CGLShaderWrapper;
+
+/// Enumerated shader names
+enum eGLShaders
+{
+	SHDR_LD_HESTEROFFER1997
+};
 
 class CGLShaderList
 {

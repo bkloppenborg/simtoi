@@ -17,7 +17,8 @@
 #include <GL/glu.h>
 #include <string>
 #include <vector>
-#include "enumerations.h"
+
+#include "CGLShaderList.h"
 
 using namespace std;
 
