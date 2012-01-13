@@ -39,6 +39,8 @@ protected:
 	double * scale;
 	double * scale_min;
 
+	string mName;
+
 private:
 	CGLShaderWrapper * mShader;
 	eGLShaders mShaderID;

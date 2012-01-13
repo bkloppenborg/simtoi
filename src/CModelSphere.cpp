@@ -53,6 +53,7 @@ CModelSphere::CModelSphere()
 	n_free_parameters = 1;
 
 	slices = 50;	// seems like a good number.
+	mName = "Sphere";
 
 }
 
