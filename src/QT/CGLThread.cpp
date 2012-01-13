@@ -6,6 +6,7 @@
 
 #include "CGLThread.h"
 #include "CGLWidget.h"
+#include "CModel.h"
 #include "CModelList.h"
 #include "CGLShaderList.h"
 

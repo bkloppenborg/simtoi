@@ -89,13 +89,22 @@ void cmaingui::render()
 
 void cmaingui::SetupComboBoxes()
 {
+	const char * tmp_string;
 	// First get a list of the available models and enumerated types.  Append those to the combo box
 	CModelList tmp1 = CModelList();
+	vector< pair<eModels, string> > models = tmp1.GetList_AllModels();
+	eModels tmp_model_id;
+
+	for(vector<pair<eModels, string> >::iterator it = models.begin(); it != models.end(); ++it)
+	{
+		tmp_string = (*it).second.c_str();
+		tmp_model_id = (*it).first;
+		ui.cboModels->addItem(QString(tmp_string), QVariant(tmp_model_id));
+	}
 
 	// Now do the same for the shaders:
 	CGLShaderList tmp2 = CGLShaderList(mShaderSourceDir);
 	vector< pair<eGLShaders, string> > shaders = tmp2.GetShaderNames();
-	const char * tmp_string;
 	eGLShaders tmp_shader_id;
 
 	for(vector<pair<eGLShaders, string> >::iterator it = shaders.begin(); it != shaders.end(); ++it)

@@ -12,12 +12,11 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "enumerations.h"
+#include "CModelList.h"
+#include "CGLShaderList.h"
 
 class CGLWidget;
 class CModel;
-class CModelList;
-class CGLShaderList;
 class CGLShaderWrapper;
 
 using namespace std;

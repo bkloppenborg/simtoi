@@ -41,7 +41,7 @@ public:
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
 
-	vector< pair<string, eModels> > GetList_AllModels(void);
+	vector< pair<eModels, string> > GetList_AllModels(void);
 
 	CModel * GetNewModel(eModels);
 
