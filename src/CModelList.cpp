@@ -6,7 +6,6 @@
  */
 
 #include "CModelList.h"
-#include "CGLThread.h"
 
 using namespace std;
 
@@ -58,22 +57,18 @@ void CModelList::GetParameters(float * params, int n_params)
 }
 
 // Render the image to the specified OpenGL framebuffer object.
-void CModelList::Render(CGLThread * gl)
+void CModelList::Render(GLuint fbo, int width, int height)
 {
-	GLuint fbo = 0; //gl->GetFramebuffer();
-	//int width = gl->GetWindowWidth();
-	//int height = gl->GetWindowHeight();
-
 	// First clear the buffer.
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
     // Now call render on all of the models:
-//    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
-//    {
-//    	(*it)->Render(fbo, width, height);
-//    }
+    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    {
+    	(*it)->Render(fbo, width, height);
+    }
 
     // Bind back to the default framebuffer and let OpenGL finish:
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

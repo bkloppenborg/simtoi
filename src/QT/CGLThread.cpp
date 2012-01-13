@@ -6,19 +6,37 @@
 
 #include "CGLThread.h"
 #include "CGLWidget.h"
+#include "CModelList.h"
+#include "CGLShaderList.h"
 
 int CGLThread::count = 0;
 
-CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget)
+CGLThread::CGLThread(CGLWidget *glWidget, string shader_source_dir)
+	: QThread(), mGLWidget(glWidget)
 {
     mRun = true;
-    doResize = false;
-    id = count++;
-    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " Created";
 
     mPermitResize = true;
     mResizeInProgress = false;
     mScale = 0.01;	// init to some value > 0.
+
+    mModelList = new CModelList();
+    mShaderList = new CGLShaderList(shader_source_dir);
+}
+
+CGLThread::~CGLThread()
+{
+	delete mModelList;
+	delete mShaderList;
+}
+
+/// Adds a model to the list of models
+void CGLThread::AddModel(CModel * model)
+{
+	// Add the model to the list, then blit.
+	mModelList->Append(model);
+	EnqueueOperation(GLT_RenderModels);
+	EnqueueOperation(GLT_BlitToScreen);
 }
 
 /// Static function for checking OpenGL errors:
@@ -208,7 +226,9 @@ void CGLThread::resizeViewport(int width, int height)
 /// Run the thread.
 void CGLThread::run()
 {
-    qDebug() << id << ":run..";
+#ifdef DEBUG
+    printf("Starting Render Thread with ID %i\n", id);
+#endif // DEBUG
 
     mGLWidget->makeCurrent();
 	// ########
@@ -234,10 +254,13 @@ void CGLThread::run()
 
     // Start the thread
     mRun = true;
-    EnqueueOperation(GLT_Redraw);
+    EnqueueOperation(GLT_RenderModels);
+    EnqueueOperation(GLT_BlitToScreen);
     GLT_Operations op;
 
-    // Main thread loop:
+    // Main thread loop
+    // NOTE: If compiled with -D DEBUG_GL model rendering is skipped and a spinning pyramid is shown
+    //       at the maximum possible framerate.
     while (mRun)
     {
         op = GetNextOperation();
@@ -248,31 +271,38 @@ void CGLThread::run()
 			BlitToScreen();
 			mGLWidget->updateGL();
 			mGLWidget->swapBuffers();
+#ifdef DEBUG_GL
 			EnqueueOperation(GLT_Redraw);
+#endif //DEBUG_GL
 			break;
 
         case GLT_Resize:
-        // NOTE: Resize cascades into a redraw.
+        // NOTE: Resize cascades into a model render.
             glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
             gluPerspective(45.0f,(GLfloat)mWidth/(GLfloat)mHeight,0.1f,100.0f);
             glMatrixMode(GL_MODELVIEW);
 
-        case GLT_Redraw:
+        case GLT_RenderModels:
         	// Call the drawing functions
+#ifdef DEBUG_GL
+        	// Bind to the off-screen framebuffer, clear it.
             glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
             glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
-            // *** Temporary Code *** ///
             rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
             qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
             glDrawTriangle();
-            // *** Temporary Code *** ///
-
-            // Let the rendering complete, then blit to the screen
+            // Let the drawing operation complete.
             glFinish();
             EnqueueOperation(GLT_BlitToScreen);
+#else // DEBUG_GL
+
+            mModelList->Render(mFBO, mWidth, mHeight);
+
+#endif // DEBUG_GL
+            // Let the rendering complete, then blit to the screen
             break;
 
         case GLT_Stop:
@@ -286,8 +316,6 @@ void CGLThread::run()
             break;
 
         }
-
-        //msleep(40);
     }
 }
 

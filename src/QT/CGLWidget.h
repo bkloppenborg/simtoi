@@ -10,6 +10,9 @@
 
 #include "CGLThread.h"
 
+class CModelList;
+class CGLShaderList;
+
 class CGLWidget : public QGLWidget {
     Q_OBJECT
     
@@ -17,7 +20,7 @@ protected:
     CGLThread mGLT;
 
 public:
-    CGLWidget(QWidget *parent);
+    CGLWidget(QWidget *parent, string shader_source_dir);
 
     void EnqueueOperation(GLT_Operations op);
 
@@ -32,8 +35,6 @@ public:
     void SetScale(double scale);
     void startRendering();
     void stopRendering();
-
-
 };
 
 #endif

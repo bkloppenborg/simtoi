@@ -118,12 +118,6 @@ void CSIMTOI::LoadModels()
 	mModelList->Append(tmp);
 }
 
-/// Renders the model (all wavelengths) into the OpenGL framebuffer.
-void CSIMTOI::Render()
-{
-	mModelList->Render(mGL);
-}
-
 /// Sets the model parameters, converting from a uniform hypercube to physical units as required.
 void CSIMTOI::SetParameters(float * params, int n_params)
 {

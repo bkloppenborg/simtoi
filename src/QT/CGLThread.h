@@ -14,6 +14,9 @@
 #include <GL/glu.h>
 
 class CGLWidget;
+class CModelList;
+class CGLShaderList;
+class CModel;
 
 using namespace std;
 
@@ -22,7 +25,7 @@ enum GLT_Operations
 {
 	GLT_BlitToScreen,
 	GLT_Resize,
-	GLT_Redraw,
+	GLT_RenderModels,
 	GLT_Stop
 };
 
@@ -44,11 +47,14 @@ public:
 
 class CGLThread : public QThread {
     Q_OBJECT
+
 protected:
 	priority_queue<GLT_Operations, vector<GLT_Operations>, GLQueueComparision> mQueue;
     QMutex mQueueMutex;
     QSemaphore mQueueSemaphore;
     CGLWidget * mGLWidget;
+    CModelList * mModelList;
+    CGLShaderList * mShaderList;
     bool mPermitResize;
     bool mResizeInProgress;
     int mWidth;
@@ -68,11 +74,16 @@ protected:
     static int count;
 
 public:
-    CGLThread(CGLWidget * glWidget);
-    static void CheckOpenGLError(string function_name);
+    CGLThread(CGLWidget * glWidget, string shader_source_dir);
+    ~CGLThread();
+
+    void AddModel(CModel * model);
 
 protected:
     void BlitToScreen();
+public:
+    static void CheckOpenGLError(string function_name);
+
 public:
     void EnqueueOperation(GLT_Operations op);
     GLT_Operations GetNextOperation(void);

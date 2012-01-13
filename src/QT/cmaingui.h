@@ -2,7 +2,10 @@
 #define CMAINGUI_H
 
 #include <QtGui/QMainWindow>
+#include <string>
 #include "ui_cmaingui.h"
+
+using namespace std;
 
 class cmaingui : public QMainWindow
 {
@@ -17,6 +20,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *evt);
+    string mShaderSourceDir;
 
 private slots:
     void addGLArea();

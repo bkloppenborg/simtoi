@@ -11,8 +11,6 @@
 #include <vector>
 #include "CModel.h"
 
-class CGLThread;
-
 using namespace std;
 
 // A container for a list of models.
@@ -32,7 +30,7 @@ public:
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
 
-	void Render(CGLThread * gl);
+	void Render(GLuint fbo, int width, int height);
 
 	void SetParameters(float * params, int n_params);
 

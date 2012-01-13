@@ -21,6 +21,9 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
+
+	// TODO: Remove this, shouldn't be hard-coded!
+	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
 }
 
 cmaingui::~cmaingui()
@@ -44,7 +47,7 @@ void cmaingui::closeEvent(QCloseEvent *evt)
 void cmaingui::addGLArea()
 {
 	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
-    CGLWidget *widget = new CGLWidget(ui.mdiArea);
+    CGLWidget *widget = new CGLWidget(ui.mdiArea, mShaderSourceDir);
     QMdiSubWindow *sw = ui.mdiArea->addSubWindow(widget);
     sw->setWindowTitle("Model Area");
     // Init the size and scale of the model.
@@ -70,7 +73,6 @@ void cmaingui::render()
     CGLWidget *widget = (CGLWidget *) ui.mdiArea->activeSubWindow();
     if(widget)
     {
-    	widget->EnqueueOperation(GLT_Redraw);
-    	//widget->EnqueueOperation(GLT_BlitToScreen);
+    	widget->EnqueueOperation(GLT_RenderModels);
     }
 }
