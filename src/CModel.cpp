@@ -9,8 +9,8 @@
 // Header files for position objects.
 #include "CPosition.h"
 #include "CPositionXY.h"
-#include "CFeature.h"
-#include "CFeatureList.h"
+//#include "CFeature.h"
+//#include "CFeatureList.h"
 
 CModel::CModel()
 {
@@ -18,8 +18,12 @@ CModel::CModel()
 	rotation[0] = rotation[1] = rotation[2] = 0;
 	mShader = NULL;
 	position = new CPositionXY();
-	features = new CFeatureList();
+//	features = new CFeatureList();
 	mShaderLoaded = false;
+
+//	CFeatureList * features = NULL;
+	double * scale = NULL;
+	double * scale_min = NULL;
 
 //	n_free_parameters = n_free_params;
 //	scale = float[n_free_parameters];
@@ -41,7 +45,8 @@ int CModel::GetNPositionFreeParameters()
 
 int CModel::GetNFeatureFreeParameters()
 {
-	return features->GetNFreeParameters();
+	return 0;
+	//return features->GetNFreeParameters();
 }
 
 void CModel::Rotate()
@@ -106,7 +111,7 @@ void CModel::SetParameters(float * params, int n_params)
 		n += mShader->GetNFreeParams();
 	}
 
-	features->SetParams(params + n, n_params - n);
+	//features->SetParams(params + n, n_params - n);
 }
 
 void CModel::SetPositionType(ePositionTypes type)

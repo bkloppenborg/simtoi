@@ -7,9 +7,9 @@ CGLWidget::CGLWidget(QWidget *parent, string shader_source_dir)
     this->doneCurrent();
 }
 
-void CGLWidget::AppendModel(CModel * model)
+void CGLWidget::AddModel(eModels model, eGLShaders shader)
 {
-	mGLT.AppendModel(model);
+	mGLT.AddModel(model, shader);
 }
 
 void CGLWidget::EnqueueOperation(GLT_Operations op)

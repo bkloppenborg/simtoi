@@ -54,7 +54,8 @@ CModelSphere::CModelSphere()
 
 	slices = 50;	// seems like a good number.
 	mName = "Sphere";
-
+	mType = MDL_SPHERE;
+	radius = 1.0;
 }
 
 CModelSphere::~CModelSphere()
@@ -64,13 +65,9 @@ CModelSphere::~CModelSphere()
 
 /*!
     \brief Compute a lookup table of cos and sin values forming a cirle.
-
     It is the responsibility of the caller to free these tables
-
     The size of the table is (n+1) to form a connected loop
-
     The last entry is exactly the same as the first
-
     The sign of n can be flipped to get the reverse loop
 */
 void CModelSphere::CircleTable( double **sint, double **cost, const int n )
@@ -252,7 +249,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		this->Rotate();
 
 		// Model defined drawing functions:
-		//glutSolidSphere(radius, slices, slices);
+		DrawSphere(radius, slices, slices);
 	glPopMatrix();
 
 	// Return to the deafult framebuffer before leaving.

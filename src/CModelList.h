@@ -27,7 +27,7 @@ using namespace std;
 // A container for a list of models.
 class CModelList
 {
-	vector<CModel*> models;
+	vector<CModel*> mModels;
 
 private:
 	bool SortModelPredicate(CModel * A, CModel * B);
@@ -36,14 +36,13 @@ public:
 	CModelList();
 	~CModelList();
 
+	CModel * AddNewModel(eModels model_id);
 	void Append(CModel* model);
 
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
 
 	vector< pair<eModels, string> > GetList_AllModels(void);
-
-	CModel * GetNewModel(eModels);
 
 	void Render(GLuint fbo, int width, int height);
 

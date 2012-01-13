@@ -24,8 +24,8 @@
 using namespace std;
 
 class CPosition;
-class CFeature;
-class CFeatureList;
+//class CFeature;
+//class CFeatureList;
 class CGLShaderWrapper;
 
 class CModel
@@ -38,16 +38,16 @@ protected:
 	double rotation[3];
 
 	CPosition * position;
-	CFeatureList * features;
+//	CFeatureList * features;
 
 	double * scale;
 	double * scale_min;
 
 	string mName;
+	eModels mType;
 
 private:
 	CGLShaderWrapper * mShader;
-	eGLShaders mShaderID;
 	bool mShaderLoaded;
 
 protected:
@@ -66,18 +66,16 @@ public:
 	//void DeleteFeature();
 
 	int GetTotalFreeParameters();
+	eModels GetType(void) { return mType; };
 	void GetParameters(float * params, int n_params);
 	virtual int GetNModelFreeParameters() = 0;
 	int GetNPositionFreeParameters();
 	int GetNFeatureFreeParameters();
 
-	eGLShaders GetShader(void) { return mShaderID; };
-
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 
 	void SetParameters(float * params, int n_params);
 	void SetPositionType(ePositionTypes type);
-	void SetShader(eGLShaders shader) { mShaderID = shader; };
 	void SetShader(CGLShaderWrapper * shader);
 	bool ShaderLoaded(void) { return mShaderLoaded; };
 

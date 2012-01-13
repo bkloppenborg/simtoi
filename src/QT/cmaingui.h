@@ -25,6 +25,7 @@ protected:
 
 private slots:
     void addGLArea();
+    void addModel(void);
     void delGLArea();
     void render();
 };

@@ -1,8 +1,6 @@
 
 #include <QTime>
 #include <QtDebug>
-#include <QMutexLocker>
-#include <QGLFramebufferObject>
 
 #include "CGLThread.h"
 #include "CGLWidget.h"
@@ -31,15 +29,15 @@ CGLThread::~CGLThread()
 }
 
 /// Appends a model to the model list, importing shaders and features as necessary.
-void CGLThread::AppendModel(CModel * model)
+void CGLThread::AddModel(eModels model, eGLShaders shader)
 {
-	if(!model->ShaderLoaded())
-	{
-		CGLShaderWrapper * tmp = mShaderList->GetShader(model->GetShader());
-		model->SetShader(tmp);
-	}
+	// Create the model, load the shader.
+	CModel * tmp_model = mModelList->AddNewModel(model);
+	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
+	tmp_model->SetShader(tmp_shader);
 
-	mModelList->Append(model);
+	EnqueueOperation(GLT_RenderModels);
+
 }
 
 /// Static function for checking OpenGL errors:
@@ -74,8 +72,9 @@ void CGLThread::BlitToScreen()
 void CGLThread::EnqueueOperation(GLT_Operations op)
 {
 	// Lock the queue, append the item, increment the semaphore.
-	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
+	mQueueMutex.lock();
 	mQueue.push(op);
+	mQueueMutex.unlock();
 	mQueueSemaphore.release();
 }
 
@@ -85,9 +84,10 @@ GLT_Operations CGLThread::GetNextOperation(void)
 	// First try to get access to the semaphore.  This is a blocking call if the queue is empty.
 	mQueueSemaphore.acquire();
 	// Now lock the queue, pull off the top item, pop it from the queue, and return.
-	QMutexLocker locker(&mQueueMutex);  // automatically unlocks when locker goes out of scope.
+	mQueueMutex.lock();
 	GLT_Operations tmp = mQueue.top();
 	mQueue.pop();
+	mQueueMutex.unlock();
 	return tmp;
 }
 
@@ -285,12 +285,13 @@ void CGLThread::run()
             glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(45.0f,(GLfloat)mWidth/(GLfloat)mHeight,0.1f,100.0f);
+            half_width = mWidth * mScale / 2;
+			glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
             glMatrixMode(GL_MODELVIEW);
 
         case GLT_RenderModels:
         	// Call the drawing functions
-//#ifdef DEBUG_GL
+#ifdef DEBUG_GL
         	// Bind to the off-screen framebuffer, clear it.
             glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
             glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
@@ -300,11 +301,11 @@ void CGLThread::run()
             glDrawTriangle();
             // Let the drawing operation complete.
             glFinish();
-//#else // DEBUG_GL
+#else // DEBUG_GL
 
-            //mModelList->Render(mFBO, mWidth, mHeight);
+            mModelList->Render(mFBO, mWidth, mHeight);
 
-//#endif // DEBUG_GL
+#endif // DEBUG_GL
             // Let the rendering complete, then blit to the screen
 
      	case GLT_BlitToScreen:

@@ -5,6 +5,7 @@
 #include <QMdiSubWindow>
 #include <QVariant>
 #include <QString>
+#include <QMessageBox>
 #include <vector>
 #include <utility>
 
@@ -12,6 +13,9 @@
 #include "enumerations.h"
 #include "CGLShaderList.h"
 #include "CModelList.h"
+
+Q_DECLARE_METATYPE(eModels);
+Q_DECLARE_METATYPE(eGLShaders);
 
 cmaingui::cmaingui(QWidget *parent_widget)
     : QMainWindow(parent_widget)
@@ -31,6 +35,7 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
+	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(addModel(void)));
 
 	// TODO: Remove this, shouldn't be hard-coded!
 	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
@@ -56,7 +61,7 @@ void cmaingui::closeEvent(QCloseEvent *evt)
 
 void cmaingui::addGLArea()
 {
-	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
+	//QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
     CGLWidget *widget = new CGLWidget(ui.mdiArea, mShaderSourceDir);
     QMdiSubWindow *sw = ui.mdiArea->addSubWindow(widget);
     sw->setWindowTitle("Model Area");
@@ -66,6 +71,28 @@ void cmaingui::addGLArea()
     // Show it and start the rendering thread
     sw->show();
     widget->startRendering();
+}
+
+void cmaingui::addModel(void)
+{
+	QMdiSubWindow * window = ui.mdiArea->activeSubWindow();
+
+	if(window != NULL)
+	{
+		CGLWidget * widget = (CGLWidget*) window->widget();
+		QVariant tmp = ui.cboModels->itemData(ui.cboModels->currentIndex());
+		eModels model = tmp.value<eModels>();
+		tmp = ui.cboShaders->itemData(ui.cboShaders->currentIndex());
+		eGLShaders shader = tmp.value<eGLShaders>();
+
+		widget->AddModel(model, shader);
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Please select a window to which the model may be added.");
+		msgBox.exec();
+	}
 }
 
 void cmaingui::delGLArea()

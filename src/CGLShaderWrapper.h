@@ -15,9 +15,9 @@ class CGLShader;
 class CGLShaderWrapper
 {
 protected:
-	CGLShader * shader;
-	float * params;
-	int n_params;
+	CGLShader * mShader;
+	float * mParams;
+	int mNParams;
 
 public:
 	CGLShaderWrapper(CGLShader * shader, int n_params);

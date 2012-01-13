@@ -28,8 +28,8 @@ CSIMTOI::CSIMTOI()
 CSIMTOI::~CSIMTOI()
 {
 	// Free memory.
-	if(mCL) delete mCL;
-	if(mModelList) delete mModelList;
+	delete mCL;
+	delete mModelList;
 }
 
 /// Instance of the class.

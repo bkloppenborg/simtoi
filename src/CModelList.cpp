@@ -21,13 +21,13 @@ CModelList::CModelList()
 CModelList::~CModelList()
 {
 	// Deallocate the models
-	for(int i = models.size() - 1; i > -1; i--)
-		delete models[i];
+	for(int i = mModels.size() - 1; i > -1; i--)
+		delete mModels[i];
 }
 
 void CModelList::Append(CModel * model)
 {
-	this->models.push_back(model);
+	mModels.push_back(model);
 }
 
 /// Returns the total number of free parameters for all models
@@ -37,7 +37,7 @@ int CModelList::GetNFreeParameters()
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	n += (*it)->GetTotalFreeParameters();
     }
@@ -54,22 +54,23 @@ vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
 	return tmp;
 }
 
-/// Returns a new CModel of the specified type
-CModel * CModelList::GetNewModel(eModels model_id)
+/// Creates a new model, appends it to the model list and returns a pointer to it.
+CModel * CModelList::AddNewModel(eModels model_id)
 {
-	CModel * model;
+	CModel * tmp;
 	switch(model_id)
 	{
 	case MDL_SPHERE:
-		model = reinterpret_cast<CModel*>(new CModelSphere());
+		tmp = new CModelSphere();
 		break;
 
 	default:
-		model = NULL;
+		tmp = NULL;
 		break;
 	}
 
-	return model;
+	this->Append(tmp);
+	return mModels.back();
 }
 
 /// This function gets the parameters for models after they have been set/scaled.
@@ -79,7 +80,7 @@ void CModelList::GetParameters(float * params, int n_params)
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->GetParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
@@ -95,7 +96,7 @@ void CModelList::Render(GLuint fbo, int width, int height)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
     // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->Render(fbo, width, height);
     }
@@ -111,7 +112,7 @@ void CModelList::SetParameters(float * params, int n_params)
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = models.begin(); it != models.end(); ++it)
+    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->SetParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();

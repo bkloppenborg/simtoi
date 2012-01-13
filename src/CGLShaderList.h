@@ -20,6 +20,7 @@ class CGLShaderWrapper;
 /// Enumerated shader names
 enum eGLShaders
 {
+	SHDR_NONE,
 	SHDR_LD_HESTEROFFER1997
 };
 

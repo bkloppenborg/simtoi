@@ -42,6 +42,9 @@ void CGLShaderList::Append(CGLShader * shader)
 /// into a CGLShaderWrapper.
 CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 {
+	if(shader == SHDR_NONE)
+		return NULL;
+
 	// First see if the shader is already loaded
 	CGLShader * tmp;
 	tmp = FindShader(shader);
@@ -49,9 +52,7 @@ CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 	if(tmp != NULL)
 		return new CGLShaderWrapper(tmp, tmp->GetNParams());
 
-	// Otherwise throw an exception
-	printf("Could not find shader, aborting!");
-	throw;
+	return NULL;
 }
 
 /// Returns a vector of pair<eGLShaders, string> which identify the enumerated name and friendly name
@@ -60,6 +61,11 @@ vector< pair<eGLShaders, string> > CGLShaderList::GetShaderNames(void)
 {
 	vector< pair<eGLShaders, string> > list;
 	pair<eGLShaders, string> tmp;
+
+	// First setup a "no shader" option:
+	tmp.first = SHDR_NONE;
+	tmp.second = "None";
+	list.push_back(tmp);
 
 	// Iterate through the list and append the shader information
     for(vector<CGLShader*>::iterator it = shaders.begin(); it != shaders.end(); ++it)
