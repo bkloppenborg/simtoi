@@ -90,6 +90,13 @@ GLT_Operations CGLThread::GetNextOperation(void)
 	return tmp;
 }
 
+/// Returns a list of pairs of <eGlShader, string> corresponding to the (enumerated_name, friendly_name)
+/// of the shaders stored in this object.
+vector< pair<eGLShaders, string> > CGLThread::GetShaderNames(void)
+{
+	return mShaderList->GetShaderNames();
+}
+
 void CGLThread::InitFrameBuffer(void)
 {
     InitFrameBufferDepthBuffer();

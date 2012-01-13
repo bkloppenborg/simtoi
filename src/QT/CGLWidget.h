@@ -22,12 +22,13 @@ public:
     CGLWidget(QWidget *parent, string shader_source_dir);
 
     void AppendModel(CModel * model);
-
-    void EnqueueOperation(GLT_Operations op);
-
 protected:
     void closeEvent(QCloseEvent *evt);
+public:
+    void EnqueueOperation(GLT_Operations op);
+	vector< pair<eGLShaders, string> > GetShaderNames(void) { return mGLT.GetShaderNames(); };
 
+protected:
 	void paintEvent(QPaintEvent * );
 
     void resizeEvent(QResizeEvent *evt);

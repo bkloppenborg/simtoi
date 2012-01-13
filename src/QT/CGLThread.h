@@ -86,11 +86,10 @@ protected:
 public:
     static void CheckOpenGLError(string function_name);
 
-public:
     void EnqueueOperation(GLT_Operations op);
-    GLT_Operations GetNextOperation(void);
 
-	//CGLShaderWrapper * GetShader(eGLShaders shader);
+    GLT_Operations GetNextOperation(void);
+	vector< pair<eGLShaders, string> > GetShaderNames(void);
 
 protected:
     void InitFrameBuffer(void);

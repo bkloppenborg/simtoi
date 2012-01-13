@@ -11,8 +11,9 @@ class cmaingui : public QMainWindow
 {
     Q_OBJECT
 
-private:
+protected:
     Ui::cmainguiClass ui;
+    string mShaderSourceDir;
 
 public:
     cmaingui(QWidget *parent = 0);
@@ -20,7 +21,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *evt);
-    string mShaderSourceDir;
+    void SetupComboBoxes(void);
 
 private slots:
     void addGLArea();

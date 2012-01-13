@@ -3,21 +3,31 @@
 #include <QWidgetList>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QVariant>
+#include <QString>
+#include <vector>
+#include <utility>
 
 #include "CGLWidget.h"
+#include "enumerations.h"
+#include "CGLShaderList.h"
+#include "CModelList.h"
 
 cmaingui::cmaingui(QWidget *parent_widget)
     : QMainWindow(parent_widget)
 {
 	ui.setupUi(this);
 
-	// Set initial values:
+	// Set initial values for the spinboxes:
 	ui.spinModelScale->setRange(0.01, 1.0);
 	ui.spinModelScale->setSingleStep(0.05);
 	ui.spinModelScale->setValue(0.05);
 	ui.spinModelSize->setRange(64, 1024);
 	ui.spinModelSize->setSingleStep(64);
 	ui.spinModelSize->setValue(128);
+
+	// Set up the combo boxes:
+	SetupComboBoxes();
 
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
@@ -75,4 +85,24 @@ void cmaingui::render()
     {
     	widget->EnqueueOperation(GLT_RenderModels);
     }
+}
+
+void cmaingui::SetupComboBoxes()
+{
+	// First get a list of the available models and enumerated types.  Append those to the combo box
+	CModelList tmp1 = CModelList();
+
+	// Now do the same for the shaders:
+	CGLShaderList tmp2 = CGLShaderList(mShaderSourceDir);
+	vector< pair<eGLShaders, string> > shaders = tmp2.GetShaderNames();
+	const char * tmp_string;
+	eGLShaders tmp_shader_id;
+
+	for(vector<pair<eGLShaders, string> >::iterator it = shaders.begin(); it != shaders.end(); ++it)
+	{
+		tmp_string = (*it).second.c_str();
+		tmp_shader_id = (*it).first;
+		ui.cboShaders->addItem(QString(tmp_string), QVariant(tmp_shader_id));
+	}
+
 }
