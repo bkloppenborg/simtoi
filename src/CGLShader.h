@@ -24,26 +24,28 @@ using namespace std;
 class CGLShader
 {
 protected:
-	GLuint program;
-	GLuint shader_vertex;
-	GLuint shader_fragment;
-	GLuint * param_locations;
-	string base_name;
-	string shader_dir;
-	int n_params;
-	vector<string> param_names;
+	GLuint mProgram;
+	GLuint mShader_vertex;
+	GLuint mShader_fragment;
+	GLuint * mParam_locations;
+	string mBase_name;
+	string mShader_dir;
+	string mFriendlyName;
+	int mNParams;
+	vector<string> mParam_names;
 
-	eGLShaders type;
+	eGLShaders mType;
 	bool mShaderLoaded;
 
 public:
-	CGLShader(eGLShaders type, string shader_dir, string base_filename, int n_parameters, vector<string> parameter_names);
+	CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names);
 	virtual ~CGLShader();
 
-	eGLShaders GetType();
-	void Init();
+	eGLShaders GetType() { return mType; };
+	string GetName() { return mFriendlyName; };
+	int GetNParams() { return mNParams; }
 
-	int GetNParams();
+	void Init();
 
 	void UseShader(float * params, int in_params);
 

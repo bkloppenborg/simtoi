@@ -29,6 +29,7 @@ public:
 protected:
 	void Append(CGLShader * CGLShader);
 
+public:
 	CGLShaderWrapper * GetShader(eGLShaders shader);
 
 protected:

@@ -11,36 +11,27 @@
 #include "ReadTextFile.h"
 #include "CGLThread.h"
 
-CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, int n_parameters, vector<string> parameter_names)
+CGLShader::CGLShader(eGLShaders type, string mShader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names)
 {
-	this->type = type;
-	this->shader_dir = shader_dir;
-	this->base_name = base_filename;
-	this->n_params = n_parameters;
-	this->param_names = parameter_names;
-	param_locations = new GLuint[n_parameters];
+	mType = type;
+	mShader_dir = mShader_dir;
+	mBase_name = base_filename;
+	mFriendlyName = friendly_name;
+	mNParams = n_parameters;
+	mParam_names = parameter_names;
+	mParam_locations = new GLuint[n_parameters];
 	mShaderLoaded = false;
 }
 
 CGLShader::~CGLShader()
 {
 	// Release OpenGL memory
-	if(program) glDeleteProgram(program);
-	if(shader_vertex) glDeleteShader(shader_vertex);
-	if(shader_fragment) glDeleteShader(shader_fragment);
+	if(mProgram) glDeleteProgram(mProgram);
+	if(mShader_vertex) glDeleteShader(mShader_vertex);
+	if(mShader_fragment) glDeleteShader(mShader_fragment);
 
 	// Now release object memory:
-	delete param_locations;
-}
-
-int CGLShader::GetNParams()
-{
-	return this->n_params;
-}
-
-eGLShaders CGLShader::GetType()
-{
-	return this->type;
+	delete mParam_locations;
 }
 
 // Loads the shader from the source file and creates a binary for the current selected context.
@@ -50,48 +41,48 @@ void CGLShader::Init()
 	if(mShaderLoaded)
 		return;
 
-    // First load the program source.
+    // First load the mProgram source.
     string source_v, source_f;
 	const GLchar * tmp_source_v;
 	const GLchar * tmp_source_f;
-    source_v = ReadFile(shader_dir + '/' + base_name + ".vert", "Could not read " + base_name + ".vert file!");
-    source_f = ReadFile(shader_dir + '/' + base_name + ".frag", "Could not read " + base_name + ".frag file!");
+    source_v = ReadFile(mShader_dir + '/' + mBase_name + ".vert", "Could not read " + mBase_name + ".vert file!");
+    source_f = ReadFile(mShader_dir + '/' + mBase_name + ".frag", "Could not read " + mBase_name + ".frag file!");
 	tmp_source_v = (const GLchar *) source_v.c_str();
 	tmp_source_f = (const GLchar *) source_f.c_str();
 
-    // Now create the program with vertex and fragement shaders
-	program = glCreateProgram();
-    CGLThread::CheckOpenGLError("Could not create shader program.");
-    shader_vertex = glCreateShader(GL_VERTEX_SHADER);
-    shader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glAttachShader(program, shader_vertex);
-    glAttachShader(program, shader_fragment);
+    // Now create the mProgram with vertex and fragement shaders
+	mProgram = glCreateProgram();
+    CGLThread::CheckOpenGLError("Could not create shader mProgram.");
+    mShader_vertex = glCreateShader(GL_VERTEX_SHADER);
+    mShader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glAttachShader(mProgram, mShader_vertex);
+    glAttachShader(mProgram, mShader_fragment);
 
     // Now put the shader code into the object, compile and link.
-    glShaderSource(shader_vertex, 1, &tmp_source_v, NULL);
-    glShaderSource(shader_fragment, 1, &tmp_source_f, NULL);
+    glShaderSource(mShader_vertex, 1, &tmp_source_v, NULL);
+    glShaderSource(mShader_fragment, 1, &tmp_source_f, NULL);
 
-    glCompileShader(shader_vertex);
-    glCompileShader(shader_fragment);
-    glLinkProgram(program);
+    glCompileShader(mShader_vertex);
+    glCompileShader(mShader_fragment);
+    glLinkProgram(mProgram);
 
     GLint tmp;
-    glGetProgramiv(program, GL_LINK_STATUS, &tmp);
+    glGetProgramiv(mProgram, GL_LINK_STATUS, &tmp);
     if(tmp == GL_FALSE)
     {
     	char * infolog = (char*) malloc(501);
     	int length;
-    	printf("Could not build program!");
-    	glGetProgramInfoLog(program, 500, &length, infolog);
+    	printf("Could not build mProgram!");
+    	glGetProgramInfoLog(mProgram, 500, &length, infolog);
     	printf("%s\n", infolog);
     }
 
-    CGLThread::CheckOpenGLError("Could not link shader program.");
+    CGLThread::CheckOpenGLError("Could not link shader mProgram.");
 
     // Now look up the locations of the parameters
-    for(int i = 0; i < n_params; i++)
+    for(int i = 0; i < mNParams; i++)
     {
-    	param_locations[i] = glGetUniformLocation(program, param_names[i].c_str());
+    	mParam_locations[i] = glGetUniformLocation(mProgram, mParam_names[i].c_str());
     	CGLThread::CheckOpenGLError("Could find variable in shader source.");
     }
 
@@ -99,15 +90,15 @@ void CGLShader::Init()
     mShaderLoaded = true;
 }
 
-void CGLShader::UseShader(float * params, int in_params)
+void CGLShader::UseShader(float * params, int imNParams)
 {
-	//if(in_params != this->n_params)
+	//if(imNParams != this->mNParams)
 	// throw exception
 
-	// Tell OpenGL to use the program
-	glUseProgram(program);
+	// Tell OpenGL to use the mProgram
+	glUseProgram(mProgram);
 
 	// Set the parameters.
-	for(int i = 0; i < n_params; i++)
-		glUniform1fv(param_locations[i], 1, &params[i]);
+	for(int i = 0; i < mNParams; i++)
+		glUniform1fv(mParam_locations[i], 1, &params[i]);
 }

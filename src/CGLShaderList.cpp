@@ -54,6 +54,7 @@ CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 	throw;
 }
 
+/// Finds the specified shader.
 CGLShader * CGLShaderList::FindShader(eGLShaders shader)
 {
 	// There should be a small enough number of shaders that we can use find directly on the
@@ -72,14 +73,16 @@ void CGLShaderList::LoadShaders()
 {
 	// TODO: Convert this to reading in a configuration file.
 	string base_name;
+	string friendly_name;
 	int n_params;
 	vector<string> param_names;
 	CGLShader * tmp;
 
 	// Simple limb darkening.
 	base_name = "LD_Hestroffer1997";
+	friendly_name = "LDL - Hesteroffer (1997)";
 	n_params = 1;
 	param_names.push_back("alpha");
-	tmp = new CGLShader(LD_Hesteroffer1997, shader_dir, base_name, n_params, param_names);
+	tmp = new CGLShader(LD_Hesteroffer1997, shader_dir, base_name, friendly_name, n_params, param_names);
 	this->Append(tmp);
 }
