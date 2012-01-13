@@ -54,6 +54,25 @@ CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 	throw;
 }
 
+/// Returns a vector of pair<eGLShaders, string> which identify the enumerated name and friendly name
+/// of each shader in the list.
+vector< pair<eGLShaders, string> > CGLShaderList::GetShaderNames(void)
+{
+	vector< pair<eGLShaders, string> > list;
+	pair<eGLShaders, string> tmp;
+
+	// Iterate through the list and append the shader information
+    for(vector<CGLShader*>::iterator it = shaders.begin(); it != shaders.end(); ++it)
+    {
+    	tmp.first = (*it)->GetType();
+    	tmp.second = (*it)->GetName();
+
+    	list.push_back(tmp);
+    }
+
+    return list;
+}
+
 /// Finds the specified shader.
 CGLShader * CGLShaderList::FindShader(eGLShaders shader)
 {

@@ -14,10 +14,13 @@
 // Headers for OpenGL functions
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <string>
 
 #include "CPosition.h"
 #include "CGLShaderWrapper.h"
 #include "enumerations.h"
+
+using namespace std;
 
 class CPosition;
 class CFeature;

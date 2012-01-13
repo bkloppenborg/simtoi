@@ -9,11 +9,14 @@
 #define CGLSHADERLIST_H_
 
 #include <vector>
+#include <string>
+#include <utility>
 #include "enumerations.h"
+
+using namespace std;
 
 class CGLShader;
 class CGLShaderWrapper;
-
 
 class CGLShaderList
 {
@@ -31,6 +34,7 @@ protected:
 
 public:
 	CGLShaderWrapper * GetShader(eGLShaders shader);
+	vector< pair<eGLShaders, string> > GetShaderNames(void);
 
 protected:
 	CGLShader * FindShader(eGLShaders shader);
