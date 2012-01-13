@@ -6,6 +6,7 @@
  */
 
 #include <cstdio>
+#include <cstdlib>
 #include "CGLShader.h"
 #include "ReadTextFile.h"
 #include "CGLThread.h"
@@ -18,8 +19,7 @@ CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, i
 	this->n_params = n_parameters;
 	this->param_names = parameter_names;
 	param_locations = new GLuint[n_parameters];
-
-	init_shader();
+	mShaderLoaded = false;
 }
 
 CGLShader::~CGLShader()
@@ -43,29 +43,29 @@ eGLShaders CGLShader::GetType()
 	return this->type;
 }
 
-// Loads the shader from the source file, links
-void CGLShader::init_shader()
+// Loads the shader from the source file and creates a binary for the current selected context.
+void CGLShader::Init()
 {
-    // Load some shaders:
-    program = glCreateProgram();
+	// If the shader is loaded, immediately exit the function
+	if(mShaderLoaded)
+		return;
 
-    CGLThread::CheckOpenGLError("Could not create shader program.");
-
-    shader_vertex = glCreateShader(GL_VERTEX_SHADER);
-    shader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glAttachShader(program, shader_vertex);
-    glAttachShader(program, shader_fragment);
-
+    // First load the program source.
     string source_v, source_f;
-    source_v = ReadFile(shader_dir + '/' + base_name + ".vert", "Could not read " + base_name + ".vert file!");
-    source_f = ReadFile(shader_dir + '/' + base_name + ".frag", "Could not read " + base_name + ".frag file!");
-
 	const GLchar * tmp_source_v;
 	const GLchar * tmp_source_f;
-
+    source_v = ReadFile(shader_dir + '/' + base_name + ".vert", "Could not read " + base_name + ".vert file!");
+    source_f = ReadFile(shader_dir + '/' + base_name + ".frag", "Could not read " + base_name + ".frag file!");
 	tmp_source_v = (const GLchar *) source_v.c_str();
 	tmp_source_f = (const GLchar *) source_f.c_str();
+
+    // Now create the program with vertex and fragement shaders
+	program = glCreateProgram();
+    CGLThread::CheckOpenGLError("Could not create shader program.");
+    shader_vertex = glCreateShader(GL_VERTEX_SHADER);
+    shader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glAttachShader(program, shader_vertex);
+    glAttachShader(program, shader_fragment);
 
     // Now put the shader code into the object, compile and link.
     glShaderSource(shader_vertex, 1, &tmp_source_v, NULL);
@@ -95,7 +95,8 @@ void CGLShader::init_shader()
     	CGLThread::CheckOpenGLError("Could find variable in shader source.");
     }
 
-
+    // The shader has been loaded, compiled, and linked.
+    mShaderLoaded = true;
 }
 
 void CGLShader::UseShader(float * params, int in_params)

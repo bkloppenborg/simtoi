@@ -22,8 +22,9 @@ enum ePositionTypes
 	Orbit
 };
 
-// An enumeration of shaders
-// TODO: we need to have a simple way of mapping the names to the enumerated values.
+// A list of shaders
+// TODO: Move this information to an external file, potential organization:
+//       shader_name n_params param_1_name param_2_name ... param_n_name
 enum eGLShaders
 {
 	LD_Hesteroffer1997

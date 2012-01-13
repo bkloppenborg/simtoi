@@ -15,7 +15,6 @@ CGLThread::CGLThread(CGLWidget *glWidget, string shader_source_dir)
 	: QThread(), mGLWidget(glWidget)
 {
     mRun = true;
-
     mPermitResize = true;
     mResizeInProgress = false;
     mScale = 0.01;	// init to some value > 0.
@@ -28,15 +27,6 @@ CGLThread::~CGLThread()
 {
 	delete mModelList;
 	delete mShaderList;
-}
-
-/// Adds a model to the list of models
-void CGLThread::AddModel(CModel * model)
-{
-	// Add the model to the list, then blit.
-	mModelList->Append(model);
-	EnqueueOperation(GLT_RenderModels);
-	EnqueueOperation(GLT_BlitToScreen);
 }
 
 /// Static function for checking OpenGL errors:
@@ -213,11 +203,10 @@ void CGLThread::resizeViewport(const QSize &size)
 /// Resize the window.  Called from external applications.
 void CGLThread::resizeViewport(int width, int height)
 {
-	if(mPermitResize && ! mResizeInProgress)
+	if(mPermitResize)
 	{
 		mWidth = width;
 		mHeight = height;
-		mResizeInProgress = true;
 		// For SIMTOI, only permit a resize once.
 		EnqueueOperation(GLT_Resize);
 	}
@@ -265,19 +254,14 @@ void CGLThread::run()
     {
         op = GetNextOperation();
 
+        // NOTE: Resize and Render cascade.
         switch(op)
         {
-     	case GLT_BlitToScreen:
-			BlitToScreen();
-			mGLWidget->updateGL();
-			mGLWidget->swapBuffers();
-#ifdef DEBUG_GL
-			EnqueueOperation(GLT_Redraw);
-#endif //DEBUG_GL
-			break;
-
         case GLT_Resize:
-        // NOTE: Resize cascades into a model render.
+        	// Resize the screen.
+#ifdef DEBUG
+        	printf("Resizing...\n");
+#endif //DEBUG
             glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
@@ -286,7 +270,7 @@ void CGLThread::run()
 
         case GLT_RenderModels:
         	// Call the drawing functions
-#ifdef DEBUG_GL
+//#ifdef DEBUG_GL
         	// Bind to the off-screen framebuffer, clear it.
             glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
             glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
@@ -296,14 +280,21 @@ void CGLThread::run()
             glDrawTriangle();
             // Let the drawing operation complete.
             glFinish();
-            EnqueueOperation(GLT_BlitToScreen);
-#else // DEBUG_GL
+//#else // DEBUG_GL
 
-            mModelList->Render(mFBO, mWidth, mHeight);
+            //mModelList->Render(mFBO, mWidth, mHeight);
 
-#endif // DEBUG_GL
+//#endif // DEBUG_GL
             // Let the rendering complete, then blit to the screen
-            break;
+
+     	case GLT_BlitToScreen:
+			BlitToScreen();
+			mGLWidget->updateGL();
+			mGLWidget->swapBuffers();
+#ifdef DEBUG_GL
+			EnqueueOperation(GLT_Redraw);
+#endif //DEBUG_GL
+			break;
 
         case GLT_Stop:
 #ifdef DEBUG

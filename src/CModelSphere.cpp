@@ -40,6 +40,7 @@
 
 #include "CModelSphere.h"
 #include <cstdio>
+#include <cstdlib>
 #include <cassert>
 #include <cmath>
 #include <float.h>

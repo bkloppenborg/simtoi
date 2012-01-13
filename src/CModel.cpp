@@ -121,7 +121,7 @@ void CModel::SetPositionType(ePositionTypes type)
 	}
 }
 
-void CModel::SetShader(CShader * shader)
+void CModel::SetShader(CGLShaderWrapper * shader)
 {
 	this->mShader = shader;
 }

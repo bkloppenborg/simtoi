@@ -6,14 +6,16 @@
  */
 
 #include <algorithm>
-
-#include "CGLShaderList.h"
+#include <cstdio>
 #include "CGLShader.h"
+#include "CGLShaderList.h"
+#include "CGLShaderWrapper.h"
 
 CGLShaderList::CGLShaderList(string shader_source_dir)
 {
 	this->shader_dir = shader_source_dir;
 
+	LoadShaders();
 }
 
 CGLShaderList::~CGLShaderList()
@@ -36,20 +38,20 @@ void CGLShaderList::Append(CGLShader * shader)
 	shaders.push_back(shader);
 }
 
-CShader * CGLShaderList::GetShader(eGLShaders shader)
+/// Finds the specified shader in the list, returns the (compiled) version wrapped
+/// into a CGLShaderWrapper.
+CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 {
 	// First see if the shader is already loaded
 	CGLShader * tmp;
 	tmp = FindShader(shader);
 
 	if(tmp != NULL)
-		return new CShader(tmp, tmp->GetNParams());
+		return new CGLShaderWrapper(tmp, tmp->GetNParams());
 
-	// Otherwise load the shader, append it to the list of shaders and return the object.
-	tmp = LoadShader(shader);
-	Append(tmp);
-
-	return new CShader(tmp, tmp->GetNParams());
+	// Otherwise throw an exception
+	printf("Could not find shader, aborting!");
+	throw;
 }
 
 CGLShader * CGLShaderList::FindShader(eGLShaders shader)
@@ -65,25 +67,19 @@ CGLShader * CGLShaderList::FindShader(eGLShaders shader)
     return NULL;
 }
 
-// Loads a shader from source, returns it as a pointer.
-CGLShader * CGLShaderList::LoadShader(eGLShaders shader)
+/// Loads all avaliable shaders into memory
+void CGLShaderList::LoadShaders()
 {
-	CGLShader * tmp;
+	// TODO: Convert this to reading in a configuration file.
 	string base_name;
 	int n_params;
 	vector<string> param_names;
+	CGLShader * tmp;
 
-	// NOTE: If new shaders are added, they need to be specified here before they will work.
-	if(shader == LD_Hesteroffer1997)
-	{
-		base_name = "LD_Hestroffer1997";
-		n_params = 1;
-		param_names.push_back("alpha");
-		tmp = new CGLShader(shader, shader_dir, base_name, n_params, param_names);
-	}
-
-	if(tmp != NULL)
-		return tmp;
-
-	throw "Cannot load shader!";
+	// Simple limb darkening.
+	base_name = "LD_Hestroffer1997";
+	n_params = 1;
+	param_names.push_back("alpha");
+	tmp = new CGLShader(LD_Hesteroffer1997, shader_dir, base_name, n_params, param_names);
+	this->Append(tmp);
 }

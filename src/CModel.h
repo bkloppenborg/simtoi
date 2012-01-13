@@ -14,15 +14,15 @@
 // Headers for OpenGL functions
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <GL/glut.h>
 
 #include "CPosition.h"
-#include "CShader.h"
+#include "CGLShaderWrapper.h"
 #include "enumerations.h"
 
 class CPosition;
 class CFeature;
 class CFeatureList;
+class CGLShaderWrapper;
 
 class CModel
 {
@@ -40,7 +40,7 @@ protected:
 	double * scale_min;
 
 private:
-	CShader * mShader;
+	CGLShaderWrapper * mShader;
 
 protected:
 	void Rotate();
@@ -54,7 +54,7 @@ public:
 	CModel();
 	~CModel();
 
-	void AppendFeature(CFeature * feature);
+	//void AppendFeature(CFeature * feature);
 	//void DeleteFeature();
 
 	int GetTotalFreeParameters();
@@ -67,7 +67,7 @@ public:
 
 	void SetParameters(float * params, int n_params);
 	void SetPositionType(ePositionTypes type);
-	void SetShader(CShader * shader);
+	void SetShader(CGLShaderWrapper * shader);
 
 protected:
 	void UseShader();

@@ -110,7 +110,7 @@ void CSIMTOI::LoadConfiguration()
 void CSIMTOI::LoadModels()
 {
     // TODO: Read this in from a text file.
-	CShader * shader;
+	CGLShaderWrapper * shader;
 	//shader = mGL->GetShader(LD_Hesteroffer1997);
 	CModel * tmp = new CModelSphere();
 	tmp->SetPositionType(XY);

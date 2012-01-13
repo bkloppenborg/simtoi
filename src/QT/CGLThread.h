@@ -12,11 +12,12 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "enumerations.h"
 
 class CGLWidget;
 class CModelList;
 class CGLShaderList;
-class CModel;
+class CGLShaderWrapper;
 
 using namespace std;
 
@@ -77,8 +78,6 @@ public:
     CGLThread(CGLWidget * glWidget, string shader_source_dir);
     ~CGLThread();
 
-    void AddModel(CModel * model);
-
 protected:
     void BlitToScreen();
 public:
@@ -87,6 +86,8 @@ public:
 public:
     void EnqueueOperation(GLT_Operations op);
     GLT_Operations GetNextOperation(void);
+
+	//CGLShaderWrapper * GetShader(eGLShaders shader);
 
 protected:
     void InitFrameBuffer(void);
