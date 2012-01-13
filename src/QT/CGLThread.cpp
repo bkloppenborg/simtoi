@@ -18,7 +18,7 @@ CGLThread::CGLThread(CGLWidget *glWidget) : QThread(), mGLWidget(glWidget)
 
     mPermitResize = true;
     mResizeInProgress = false;
-    mScale = 0.01;	// init to some non-zero value.
+    mScale = 0.01;	// init to some value > 0.
 }
 
 /// Static function for checking OpenGL errors:
@@ -211,40 +211,48 @@ void CGLThread::run()
     qDebug() << id << ":run..";
 
     mGLWidget->makeCurrent();
-    // ########
-     // OpenGL initialization
-     // ########
-     glClearColor(0.0, 0.0, 0.0, 0.0);
-     // Set to flat (non-interpolated) shading:
-     glShadeModel(GL_FLAT);
-     glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
-     glDisable(GL_DITHER);
-     glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
+	// ########
+	// OpenGL initialization
+	// ########
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	// Set to flat (non-interpolated) shading:
+	glShadeModel(GL_FLAT);
+	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
+	glDisable(GL_DITHER);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
 
-     // Now setup the projection system to be orthographic
-     glMatrixMode(GL_PROJECTION);
-     glLoadIdentity();
+	// Now setup the projection system to be orthographic
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
-     // Note, the coordinates here are in object-space, not coordinate space.
-     double half_width = mWidth * mScale / 2;
-     glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
+	// Note, the coordinates here are in object-space, not coordinate space.
+	double half_width = mWidth * mScale / 2;
+	glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
+
+    // Init the off-screen frame buffer.
+    InitFrameBuffer();
 
     // Start the thread
     mRun = true;
     EnqueueOperation(GLT_Redraw);
     GLT_Operations op;
 
-
+    // Main thread loop:
     while (mRun)
     {
-        rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
-        qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
         op = GetNextOperation();
 
         switch(op)
         {
+     	case GLT_BlitToScreen:
+			BlitToScreen();
+			mGLWidget->updateGL();
+			mGLWidget->swapBuffers();
+			EnqueueOperation(GLT_Redraw);
+			break;
+
         case GLT_Resize:
-        // Resize cascades into a redraw.
+        // NOTE: Resize cascades into a redraw.
             glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
@@ -253,9 +261,18 @@ void CGLThread::run()
 
         case GLT_Redraw:
         	// Call the drawing functions
+            glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+            glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
+            // *** Temporary Code *** ///
+            rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
+            qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
             glDrawTriangle();
-            mGLWidget->updateGL();
-            mGLWidget->swapBuffers();
+            // *** Temporary Code *** ///
+
+            // Let the rendering complete, then blit to the screen
+            glFinish();
+            EnqueueOperation(GLT_BlitToScreen);
             break;
 
         case GLT_Stop:
@@ -270,10 +287,7 @@ void CGLThread::run()
 
         }
 
-        EnqueueOperation(GLT_Redraw);
-        msleep(40);
-
-
+        //msleep(40);
     }
 }
 
