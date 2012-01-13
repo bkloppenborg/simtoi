@@ -29,6 +29,18 @@ CGLThread::~CGLThread()
 	delete mShaderList;
 }
 
+/// Appends a model to the model list, importing shaders and features as necessary.
+void CGLThread::AppendModel(CModel * model)
+{
+	if(!model->ShaderLoaded())
+	{
+		CGLShaderWrapper * tmp = mShaderList->GetShader(model->GetShader());
+		model->SetShader(tmp);
+	}
+
+	mModelList->Append(model);
+}
+
 /// Static function for checking OpenGL errors:
 void CGLThread::CheckOpenGLError(string function_name)
 {

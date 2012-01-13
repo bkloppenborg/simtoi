@@ -41,6 +41,8 @@ protected:
 
 private:
 	CGLShaderWrapper * mShader;
+	eGLShaders mShaderID;
+	bool mShaderLoaded;
 
 protected:
 	void Rotate();
@@ -63,11 +65,15 @@ public:
 	int GetNPositionFreeParameters();
 	int GetNFeatureFreeParameters();
 
+	eGLShaders GetShader(void) { return mShaderID; };
+
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 
 	void SetParameters(float * params, int n_params);
 	void SetPositionType(ePositionTypes type);
+	void SetShader(eGLShaders shader) { mShaderID = shader; };
 	void SetShader(CGLShaderWrapper * shader);
+	bool ShaderLoaded(void) { return mShaderLoaded; };
 
 protected:
 	void UseShader();

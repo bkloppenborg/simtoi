@@ -19,6 +19,7 @@ CModel::CModel()
 	mShader = NULL;
 	position = new CPositionXY();
 	features = new CFeatureList();
+	mShaderLoaded = false;
 
 //	n_free_parameters = n_free_params;
 //	scale = float[n_free_parameters];

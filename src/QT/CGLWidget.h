@@ -10,8 +10,7 @@
 
 #include "CGLThread.h"
 
-class CModelList;
-class CGLShaderList;
+class CModel;
 
 class CGLWidget : public QGLWidget {
     Q_OBJECT
@@ -21,6 +20,8 @@ protected:
 
 public:
     CGLWidget(QWidget *parent, string shader_source_dir);
+
+    void AppendModel(CModel * model);
 
     void EnqueueOperation(GLT_Operations op);
 

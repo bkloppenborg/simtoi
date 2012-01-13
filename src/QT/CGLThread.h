@@ -15,6 +15,7 @@
 #include "enumerations.h"
 
 class CGLWidget;
+class CModel;
 class CModelList;
 class CGLShaderList;
 class CGLShaderWrapper;
@@ -30,7 +31,7 @@ enum GLT_Operations
 	GLT_Stop
 };
 
-/// A quick class for making priority queue comparisions.  Used in CGLThread
+/// A quick class for making priority queue comparisons.  Used for CGLThread, mQueue
 class GLQueueComparision
 {
 public:
@@ -77,6 +78,8 @@ protected:
 public:
     CGLThread(CGLWidget * glWidget, string shader_source_dir);
     ~CGLThread();
+
+    void AppendModel(CModel * model);
 
 protected:
     void BlitToScreen();
