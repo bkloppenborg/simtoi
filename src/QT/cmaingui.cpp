@@ -61,15 +61,22 @@ void cmaingui::closeEvent(QCloseEvent *evt)
 
 void cmaingui::addGLArea()
 {
-	//QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
+	// Create a new subwindow with a title and close button:
     CGLWidget *widget = new CGLWidget(ui.mdiArea, mShaderSourceDir);
-    QMdiSubWindow *sw = ui.mdiArea->addSubWindow(widget);
+    QMdiSubWindow *sw = ui.mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
     sw->setWindowTitle("Model Area");
-    // Init the size and scale of the model.
-    sw->resize(ui.spinModelSize->value(), ui.spinModelSize->value());
-    widget->SetScale(ui.spinModelScale->value());
-    // Show it and start the rendering thread
+
+    // TODO: This is approximately right for my machine, probably not ok on other OSes.
+    int frame_width = 8;
+    int frame_height = 28;
+    int model_width = ui.spinModelSize->value();
+    int model_height = ui.spinModelSize->value();
+    sw->setFixedSize(model_width + frame_width, model_height + frame_height);
+    //sw->resize(model_width + frame_width, model_height + frame_height);
     sw->show();
+
+    widget->resize(model_width, model_height);
+    widget->SetScale(ui.spinModelScale->value());
     widget->startRendering();
 }
 
