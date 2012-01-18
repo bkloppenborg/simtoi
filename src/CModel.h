@@ -38,10 +38,17 @@ protected:
 	double rotation[3];
 
 	CPosition * position;
-//	CFeatureList * features;
 
-	double * scale;
-	double * scale_min;
+	// Varaibles for parameter values
+	int mNParams;
+	float * mParams;
+	int mNFreeParams;
+	bool * mFreeParams;
+	float * mScales;
+	float * mScale_mins;
+	vector<string> mParamNames;
+
+//	CFeatureList * features;
 
 	string mName;
 	eModels mType;
@@ -55,11 +62,11 @@ protected:
 	void Translate();
 
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
-	virtual void SetModelParameters(float * params, int n_params) = 0;
-	virtual void GetModelParameters(float * params, int n_params) = 0;
+	void SetAllParameters(float * params, int n_params);
+	void GetAllParameters(float * params, int n_params);
 
 public:
-	CModel();
+	CModel(int n_params);
 	~CModel();
 
 	//void AppendFeature(CFeature * feature);
@@ -67,14 +74,18 @@ public:
 
 	int GetTotalFreeParameters();
 	eModels GetType(void) { return mType; };
-	void GetParameters(float * params, int n_params);
-	virtual int GetNModelFreeParameters() = 0;
+protected:
+	void GetParams(float * params, int n_params);
+public:
+	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();
 	int GetNFeatureFreeParameters();
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 
-	void SetParameters(float * params, int n_params);
+protected:
+	void SetParams(float * in_params, int n_params);
+public:
 	void SetPositionType(ePositionTypes type);
 	void SetShader(CGLShaderWrapper * shader);
 	bool ShaderLoaded(void) { return mShaderLoaded; };

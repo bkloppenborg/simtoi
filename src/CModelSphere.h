@@ -13,7 +13,6 @@
 class CModelSphere: public CModel
 {
 protected:
-	double radius;
 	int slices;
 
 public:

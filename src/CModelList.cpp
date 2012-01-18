@@ -82,7 +82,7 @@ void CModelList::GetParameters(float * params, int n_params)
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
-    	(*it)->GetParameters(params + n, n_params - n);
+    	(*it)->GetParams(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
     }
 }
@@ -114,7 +114,7 @@ void CModelList::SetParameters(float * params, int n_params)
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
-    	(*it)->SetParameters(params + n, n_params - n);
+    	(*it)->SetAllParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
     }
 }

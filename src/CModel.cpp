@@ -11,19 +11,27 @@
 #include "CPositionXY.h"
 //#include "CFeature.h"
 //#include "CFeatureList.h"
+#include "misc.h"	// needed for pull_params
 
-CModel::CModel()
+CModel::CModel(int n_params)
 {
 	// Init the object to have no rotation in yaw, pitch, or roll.
 	rotation[0] = rotation[1] = rotation[2] = 0;
 	mShader = NULL;
-	position = new CPositionXY();
-//	features = new CFeatureList();
+	position = NULL;
+
+	mNParams = n_params;
+	mScales = new float[mNParams];
+	mParams = new float[mNParams];
+	mNFreeParams = 0;
+	mFreeParams = new bool[mNParams];;
+	mScales = new float[mNParams];;
+	mScale_mins = new float[mNParams];;
 	mShaderLoaded = false;
 
 //	CFeatureList * features = NULL;
-	double * scale = NULL;
-	double * scale_min = NULL;
+//	double * scale = NULL;
+//	double * scale_min = NULL;
 
 //	n_free_parameters = n_free_params;
 //	scale = float[n_free_parameters];
@@ -34,8 +42,10 @@ CModel::~CModel()
 {
 	// Free up memory.
 	delete position;
-	delete scale;
-	delete scale_min;
+	delete mParams;
+	delete mFreeParams;
+	delete mScales;
+	delete mScale_mins;
 }
 
 int CModel::GetNPositionFreeParameters()
@@ -69,12 +79,20 @@ void CModel::Translate()
 	glTranslated(x, y, z);
 }
 
-void CModel::GetParameters(float * params, int n_params)
+/// Internal routine that reports the values of this object's parameters only.
+void CModel::GetParams(float * out_params, int n_params)
+{
+	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
+}
+
+/// Returns the values for all parameters in this model
+/// including the model, position, shader, and all features.
+void CModel::GetAllParameters(float * params, int n_params)
 {
 	// Send parameter set command to the components of this model.
 	// We use pointer math to advance the position of the array passed to the functions
 	int n = 0;
-	GetModelParameters(params, n_params);
+	GetParams(params, n_params);
 	n += this->n_free_parameters;
 	position->GetParams(params + n, n_params - n);
 	n += position->GetNFreeParameters();
@@ -95,35 +113,56 @@ int CModel::GetTotalFreeParameters()
 	return this->GetNModelFreeParameters() + this->GetNPositionFreeParameters() + this->GetNFeatureFreeParameters();
 }
 
-void CModel::SetParameters(float * params, int n_params)
+int CModel::GetNModelFreeParameters()
 {
-	// Send parameter set command to the components of this model.
-	// We use pointer math to advance the position of the array passed to the functions
-	int n = 0;
-	SetModelParameters(params, n_params);
-	n += this->n_free_parameters;
-	position->SetParams(params + n, n_params - n);
-	n += position->GetNFreeParameters();
-
-	if(mShader != NULL)
-	{
-		mShader->SetParams(params + n, n_params - n);
-		n += mShader->GetNFreeParams();
-	}
-
-	//features->SetParams(params + n, n_params - n);
+	return mNFreeParams;
 }
 
+/// Internal routine to set the parameters for this object.
+void CModel::SetParams(float * in_params, int n_params)
+{
+	pull_params(in_params, n_params, mParams, mNParams, mFreeParams);
+}
+
+
+/// Sets the parameters for this model, the position, shader, and all features.
+void CModel::SetAllParameters(float * in_params, int n_params)
+{
+	// Here we use pointer math to advance the position of the array passed to the functions
+	// that set the parameters.  First assign values to this model (use pull_params):
+	int n = 0;
+	SetParams(in_params, n_params);
+	n += mNFreeParams;
+	// Now set the values for the position object
+	position->SetParams(in_params + n, n_params - n);
+	n += position->GetNFreeParameters();
+	// Then the shader.
+	if(mShader != NULL)
+	{
+		mShader->SetParams(in_params + n, n_params - n);
+		n += mShader->GetNFreeParams();
+	}
+	// Lastly the features
+	//features->SetParams(in_params + n, n_params - n);
+}
+
+/// Assigns and initializes a position type.
 void CModel::SetPositionType(ePositionTypes type)
 {
-	if(position->GetType() != type)
+	// If the position is already set and is of the current type, break.
+	if(position != NULL && position->GetType() == type)
+		return;
+
+	// Otherwise assign the position.
+	switch(type)
 	{
-		delete position;
-
-		if(type == XY)
-			position = new CPositionXY();
-
-		// TODO: Implement additional position types.
+//	case Orbit:
+//		position = new PositionOrbit();
+//		break;
+	default:
+		// By default models use XY position.
+		position = new CPositionXY();
+		break;
 	}
 }
 

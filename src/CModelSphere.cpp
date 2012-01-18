@@ -48,14 +48,16 @@
 using namespace std;
 
 CModelSphere::CModelSphere()
+	: CModel(1)
 {
-	// Set the number of free parameters used in this object.
-	n_free_parameters = 1;
+	// CModel(1) because we have one free parameter.
 
 	slices = 50;	// seems like a good number.
 	mName = "Sphere";
 	mType = MDL_SPHERE;
-	radius = 1.0;
+
+	// Append the parameter names:
+	mParamNames.push_back("Radius");
 }
 
 CModelSphere::~CModelSphere()
@@ -213,28 +215,17 @@ void CModelSphere::DrawSphere( GLdouble radius, GLint slices, GLint stacks )
     free( cost2 );
 }
 
-void CModelSphere::GetModelParameters(float * params, int n_params)
-{
-	// TODO: Implement scaling for radius parameter!
-	params[0] = radius;
-}
-
-int CModelSphere::GetNModelFreeParameters()
-{
-	return this->n_free_parameters;
-}
 
 void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 {
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
+	// Rename a few variables for convenience:
+	float radius = mParams[0];
 
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	glPushMatrix();
-		// Note, load custom shaders here
-		// no shaders :-(
-
 		// All models should load the modelview and identity matrix after a glPushMatrix().
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -252,12 +243,6 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		DrawSphere(radius, slices, slices);
 	glPopMatrix();
 
-	// Return to the deafult framebuffer before leaving.
+	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void CModelSphere::SetModelParameters(float * params, int n_params)
-{
-	// TODO: Check that n_params > this->n_free_params, if not throw exception
-	radius = params[0];
 }
