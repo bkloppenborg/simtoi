@@ -11,8 +11,14 @@
 #define CMODELLIST_H_
 
 #include <vector>
+#include <string>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 class CModel;
+class CGLShaderWrapper;
+
+using namespace std;
 
 /// Enumerated Model Names.
 /// Note, when adding a new model, list it in this enum and add it to functions:
@@ -22,14 +28,11 @@ enum eModels
 	MDL_SPHERE
 };
 
-using namespace std;
-
 // A container for a list of models.
 class CModelList
 {
+protected:
 	vector<CModel*> mModels;
-
-private:
 	bool SortModelPredicate(CModel * A, CModel * B);
 
 public:
@@ -47,6 +50,7 @@ public:
 	void Render(GLuint fbo, int width, int height);
 
 	void SetParameters(float * params, int n_params);
+	void SetShader(int model_id, CGLShaderWrapper * shader);
 
 };
 

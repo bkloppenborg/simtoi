@@ -11,10 +11,10 @@
 #include "ReadTextFile.h"
 #include "CGLThread.h"
 
-CGLShader::CGLShader(eGLShaders type, string mShader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names)
+CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names)
 {
 	mType = type;
-	mShader_dir = mShader_dir;
+	mShader_dir = shader_dir;
 	mBase_name = base_filename;
 	mFriendlyName = friendly_name;
 	mNParams = n_parameters;
@@ -48,8 +48,8 @@ void CGLShader::Init()
     string source_v, source_f;
 	const GLchar * tmp_source_v;
 	const GLchar * tmp_source_f;
-    source_v = ReadFile(mShader_dir + '/' + mBase_name + ".vert", "Could not read " + mBase_name + ".vert file!");
-    source_f = ReadFile(mShader_dir + '/' + mBase_name + ".frag", "Could not read " + mBase_name + ".frag file!");
+    source_v = ReadFile(mShader_dir + '/' + mBase_name + ".vert", "Could not read " + mShader_dir + '/' + mBase_name + ".vert file!");
+    source_f = ReadFile(mShader_dir + '/' + mBase_name + ".frag", "Could not read " + mShader_dir + '/' + mBase_name + ".frag file!");
 	tmp_source_v = (const GLchar *) source_v.c_str();
 	tmp_source_f = (const GLchar *) source_f.c_str();
 

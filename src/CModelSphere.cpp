@@ -53,7 +53,7 @@ CModelSphere::CModelSphere()
 	// CModel(1) because we have one additional parameter for this model
 	// Remember, mParams[0] = yaw, mParams[1] = pitch, mParams[2] = roll.
 
-	slices = 50;	// seems like a good number.
+	mSlices = 50;	// seems like a good number.
 	mName = "Sphere";
 	mType = MDL_SPHERE;
 
@@ -223,6 +223,7 @@ void CModelSphere::DrawSphere( GLdouble radius, GLint slices, GLint stacks )
 void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 {
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
+
 	// Rename a few variables for convenience:
 	float radius = mParams[3];
 
@@ -240,11 +241,11 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		// Call base-class rotation and translation functions.
 		// NOTE: OpenGL applies these operations in a stack-like buffer so they are reversed
 		// compared to conventional application.
-		this->Translate();
-		this->Rotate();
+		Translate();
+		Rotate();
 
 		// Model defined drawing functions:
-		DrawSphere(radius, slices, slices);
+		DrawSphere(radius, mSlices, mSlices);
 	glPopMatrix();
 
 	// Return to the default framebuffer before leaving.

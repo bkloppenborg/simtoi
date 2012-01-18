@@ -5,10 +5,9 @@
  *      Author: bkloppenborg
  */
 
-#include "CModel.h"
 #include "CModelList.h"
+#include "CModel.h"
 #include "CModelSphere.h"
-
 
 using namespace std;
 
@@ -82,7 +81,7 @@ void CModelList::GetParameters(float * params, int n_params)
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
-    	(*it)->GetParams(params + n, n_params - n);
+    	(*it)->GetAllParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
     }
 }
@@ -117,4 +116,9 @@ void CModelList::SetParameters(float * params, int n_params)
     	(*it)->SetAllParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
     }
+}
+
+void CModelList::SetShader(int model_id, CGLShaderWrapper * shader)
+{
+	mModels[model_id]->SetShader(shader);
 }

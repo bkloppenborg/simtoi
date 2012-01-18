@@ -13,7 +13,7 @@
 class CModelSphere: public CModel
 {
 protected:
-	int slices;
+	int mSlices;
 
 public:
 	CModelSphere();

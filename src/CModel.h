@@ -44,7 +44,7 @@ protected:
 	float * mScale_mins;
 	vector<string> mParamNames;
 
-	CPosition * position;
+	CPosition * mPosition;
 
 //	CFeatureList * features;
 
@@ -58,6 +58,7 @@ protected:
 	void Rotate();
 	void Translate();
 
+public:
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
 	void SetAllParameters(float * params, int n_params);
 	void GetAllParameters(float * params, int n_params);

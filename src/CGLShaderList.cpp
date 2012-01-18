@@ -46,7 +46,7 @@ CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 		return NULL;
 
 	// First see if the shader is already loaded
-	CGLShader * tmp;
+	CGLShader * tmp = NULL;
 	tmp = FindShader(shader);
 
 	if(tmp != NULL)

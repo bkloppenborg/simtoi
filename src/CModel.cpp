@@ -34,6 +34,8 @@ CModel::CModel(int n_params)
 	mParamNames.push_back("Pitch");
 	mParamNames.push_back("Roll");
 
+	mPosition = NULL;
+
 //	CFeatureList * features = NULL;
 //	double * scale = NULL;
 //	double * scale_min = NULL;
@@ -46,7 +48,7 @@ CModel::CModel(int n_params)
 CModel::~CModel()
 {
 	// Free up memory.
-	delete position;
+	delete mPosition;
 	delete mParams;
 	delete mFreeParams;
 	delete mScales;
@@ -55,7 +57,7 @@ CModel::~CModel()
 
 int CModel::GetNPositionFreeParameters()
 {
-	return position->GetNFreeParameters();
+	return mPosition->GetNFreeParameters();
 }
 
 int CModel::GetNFeatureFreeParameters()
@@ -78,7 +80,7 @@ void CModel::Rotate()
 void CModel::Translate()
 {
 	float x, y, z;
-	position->GetXYZ(x, y, z);
+	mPosition->GetXYZ(x, y, z);
 
 	// Call the translation routines.  Use the double-precision call.
 	glTranslated(x, y, z);
@@ -99,8 +101,8 @@ void CModel::GetAllParameters(float * params, int n_params)
 	int n = 0;
 	GetParams(params, n_params);
 	n += this->mNFreeParams;
-	position->GetParams(params + n, n_params - n);
-	n += position->GetNFreeParameters();
+	mPosition->GetParams(params + n, n_params - n);
+	n += mPosition->GetNFreeParameters();
 
 	if(mShader != NULL)
 	{
@@ -139,8 +141,8 @@ void CModel::SetAllParameters(float * in_params, int n_params)
 	SetParams(in_params, n_params);
 	n += mNFreeParams;
 	// Now set the values for the position object
-	position->SetParams(in_params + n, n_params - n);
-	n += position->GetNFreeParameters();
+	mPosition->SetParams(in_params + n, n_params - n);
+	n += mPosition->GetNFreeParameters();
 	// Then the shader.
 	if(mShader != NULL)
 	{
@@ -155,7 +157,7 @@ void CModel::SetAllParameters(float * in_params, int n_params)
 void CModel::SetPositionType(ePositionTypes type)
 {
 	// If the position is already set and is of the current type, break.
-	if(position != NULL && position->GetType() == type)
+	if(mPosition != NULL && mPosition->GetType() == type)
 		return;
 
 	// Otherwise assign the position.
@@ -166,7 +168,7 @@ void CModel::SetPositionType(ePositionTypes type)
 //		break;
 	default:
 		// By default models use XY position.
-		position = new CPositionXY();
+		mPosition = new CPositionXY();
 		break;
 	}
 }
