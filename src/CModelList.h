@@ -33,7 +33,7 @@ class CModelList
 {
 protected:
 	vector<CModel*> mModels;
-	bool SortModelPredicate(CModel * A, CModel * B);
+//	bool SortModelPredicate(CModel * A, CModel * B);
 
 public:
 	CModelList();
