@@ -21,7 +21,7 @@ protected:
 public:
     CGLWidget(QWidget *parent, string shader_source_dir);
 
-    void AddModel(eModels model, eGLShaders shader);
+    void AddModel(eModels model);
 protected:
     void closeEvent(QCloseEvent *evt);
 public:

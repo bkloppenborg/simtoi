@@ -28,6 +28,7 @@ private slots:
     void addModel(void);
     void delGLArea();
     void render();
+    void model_clicked(const QModelIndex &index);
 };
 
 #endif // CMAINGUI_H

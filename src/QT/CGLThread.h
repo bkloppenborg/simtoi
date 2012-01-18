@@ -78,7 +78,7 @@ public:
     CGLThread(CGLWidget * glWidget, string shader_source_dir);
     ~CGLThread();
 
-    void AddModel(eModels model, eGLShaders shader);
+    void AddModel(eModels model);
 
 protected:
     void BlitToScreen();

@@ -17,61 +17,19 @@
    <widget class="QMdiArea" name="mdiArea">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>290</x>
       <y>10</y>
-      <width>541</width>
+      <width>501</width>
       <height>541</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QWidget" name="formLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>231</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <layout class="QFormLayout" name="formLayout_2">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-     </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Model:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Shader:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="cboModels"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cboShaders"/>
-     </item>
-     <item row="2" column="1">
-      <widget class="QPushButton" name="btnAddModel">
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>231</width>
+      <width>271</width>
       <height>71</height>
      </rect>
     </property>
@@ -100,6 +58,42 @@
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Size:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QTreeView" name="treeModels">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>271</width>
+      <height>411</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>510</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Delete</string>
        </property>
       </widget>
      </item>

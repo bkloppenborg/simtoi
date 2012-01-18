@@ -29,11 +29,14 @@ CGLThread::~CGLThread()
 }
 
 /// Appends a model to the model list, importing shaders and features as necessary.
-void CGLThread::AddModel(eModels model, eGLShaders shader)
+void CGLThread::AddModel(eModels model)
 {
 	// Create the model, load the shader.
 	CModel * tmp_model = mModelList->AddNewModel(model);
-	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
+
+	// Initialize with default (XY) position and no shader.
+	tmp_model->SetPositionType(XY);
+	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(SHDR_NONE);
 	tmp_model->SetShader(tmp_shader);
 
 	EnqueueOperation(GLT_RenderModels);
@@ -227,6 +230,7 @@ void CGLThread::resizeViewport(int width, int height)
 	{
 		mWidth = width;
 		mHeight = height;
+		printf("Resizing to %i %i\n.", mWidth, mHeight);
 		// For SIMTOI, only permit a resize once.
 		EnqueueOperation(GLT_Resize);
 	}
@@ -302,7 +306,7 @@ void CGLThread::run()
             // Let the drawing operation complete.
             glFinish();
 #else // DEBUG_GL
-
+            // Render the models
             mModelList->Render(mFBO, mWidth, mHeight);
 
 #endif // DEBUG_GL
