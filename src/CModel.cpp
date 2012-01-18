@@ -15,19 +15,24 @@
 
 CModel::CModel(int n_params)
 {
-	// Init the object to have no rotation in yaw, pitch, or roll.
-	rotation[0] = rotation[1] = rotation[2] = 0;
 	mShader = NULL;
-	position = NULL;
 
-	mNParams = n_params;
+	// Init the parameter storage location (+3 because yaw, pitch, and roll are included)
+	mNParams = n_params + 3;
 	mScales = new float[mNParams];
 	mParams = new float[mNParams];
-	mNFreeParams = 0;
+	mNFreeParams = 3;
 	mFreeParams = new bool[mNParams];;
 	mScales = new float[mNParams];;
 	mScale_mins = new float[mNParams];;
 	mShaderLoaded = false;
+
+	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
+	mParams[0] = mParams[1] = mParams[2] = 0;
+	mFreeParams[0] = mFreeParams[0] = mFreeParams[0] = false;
+	mParamNames.push_back("Yaw");
+	mParamNames.push_back("Pitch");
+	mParamNames.push_back("Roll");
 
 //	CFeatureList * features = NULL;
 //	double * scale = NULL;
@@ -65,9 +70,9 @@ void CModel::Rotate()
 	//  R_x(gamma) * R_y(beta) * R_z(alpha)
 	// where gamma = pitch, beta = roll, alpha = yaw.
 
-	glRotated(rotation[0], 1, 0, 0);
-	glRotated(rotation[1], 0, 1, 0);
-	glRotated(rotation[2], 0, 0, 1);
+	glRotated(mParams[0], 1, 0, 0);	// yaw
+	glRotated(mParams[1], 0, 1, 0); // pitch
+	glRotated(mParams[2], 0, 0, 1); // roll
 }
 
 void CModel::Translate()
@@ -93,7 +98,7 @@ void CModel::GetAllParameters(float * params, int n_params)
 	// We use pointer math to advance the position of the array passed to the functions
 	int n = 0;
 	GetParams(params, n_params);
-	n += this->n_free_parameters;
+	n += this->mNFreeParams;
 	position->GetParams(params + n, n_params - n);
 	n += position->GetNFreeParameters();
 

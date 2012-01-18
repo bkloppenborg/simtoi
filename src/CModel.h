@@ -32,12 +32,8 @@ class CModel
 {
 protected:
 	// Datamembers
-	int n_free_parameters;
-	bool is_analytic;
-
-	double rotation[3];
-
-	CPosition * position;
+//	bool is_analytic;
+	eModels mType;
 
 	// Varaibles for parameter values
 	int mNParams;
@@ -48,10 +44,11 @@ protected:
 	float * mScale_mins;
 	vector<string> mParamNames;
 
+	CPosition * position;
+
 //	CFeatureList * features;
 
 	string mName;
-	eModels mType;
 
 private:
 	CGLShaderWrapper * mShader;
