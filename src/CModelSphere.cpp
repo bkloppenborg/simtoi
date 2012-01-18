@@ -50,14 +50,18 @@ using namespace std;
 CModelSphere::CModelSphere()
 	: CModel(1)
 {
-	// CModel(1) because we have one free parameter.
+	// CModel(1) because we have one additional parameter for this model
+	// Remember, mParams[0] = yaw, mParams[1] = pitch, mParams[2] = roll.
 
 	slices = 50;	// seems like a good number.
 	mName = "Sphere";
 	mType = MDL_SPHERE;
 
-	// Append the parameter names:
+	// Initalize the parameters to some useful value:
 	mParamNames.push_back("Radius");
+	mParams[3] = 1.0;
+	mFreeParams[3] = false;
+
 }
 
 CModelSphere::~CModelSphere()
@@ -220,7 +224,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 {
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
 	// Rename a few variables for convenience:
-	float radius = mParams[0];
+	float radius = mParams[3];
 
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
