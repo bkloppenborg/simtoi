@@ -19,12 +19,7 @@ public:
 	CModelSphere();
 	virtual ~CModelSphere();
 
-	void GetModelParameters(float * params, int n_params);
-	int GetNModelFreeParameters();
-
 	void Render(GLuint framebuffer_object, int width, int height);
-
-	void SetModelParameters(float * params, int n_params);
 };
 
 #endif /* CMODELSPHERE_H_ */
