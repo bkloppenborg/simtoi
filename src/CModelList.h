@@ -25,7 +25,8 @@ using namespace std;
 ///       GetList_AllModels() and in GetNewModel().  We want to change this, see issue #50.
 enum eModels
 {
-	MDL_SPHERE
+	MDL_SPHERE,
+	MDL_CYLINDER
 };
 
 // A container for a list of models.

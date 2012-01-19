@@ -6,8 +6,10 @@
  */
 
 #include "CModelList.h"
+#include "CGLThread.h"
 #include "CModel.h"
 #include "CModelSphere.h"
+#include "CModelCylinder.h"
 
 using namespace std;
 
@@ -49,6 +51,7 @@ vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
 {
 	vector< pair<eModels, string> > tmp;
 	tmp.push_back(pair<eModels, string> (MDL_SPHERE, "Sphere"));
+	tmp.push_back(pair<eModels, string> (MDL_CYLINDER, "Cylinder"));
 
 	return tmp;
 }
@@ -59,12 +62,13 @@ CModel * CModelList::AddNewModel(eModels model_id)
 	CModel * tmp;
 	switch(model_id)
 	{
-	case MDL_SPHERE:
-		tmp = new CModelSphere();
+	case MDL_CYLINDER:
+		tmp = new CModelCylinder();
 		break;
 
+	case MDL_SPHERE:
 	default:
-		tmp = NULL;
+		tmp = new CModelSphere();
 		break;
 	}
 

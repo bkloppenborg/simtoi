@@ -3,6 +3,12 @@
  *
  *  Created on: Nov 7, 2011
  *      Author: bkloppenborg
+ *
+ *  Base class for all models implementing a common set of functions to get/set
+ *  parameters and use shaders.
+ *
+ *  NOTE: When deriving from this object the yaw, pitch, and roll occupy the first
+ *  three values in mParameters.
  */
 
 #include "CModel.h"
@@ -57,9 +63,9 @@ void CModel::Rotate()
 	//  R_x(gamma) * R_y(beta) * R_z(alpha)
 	// where gamma = pitch, beta = roll, alpha = yaw.
 
-	glRotated(mParams[0], 1, 0, 0);	// yaw
-	glRotated(mParams[1], 0, 1, 0); // pitch
-	glRotated(mParams[2], 0, 0, 1); // roll
+	glRotatef(mParams[0], 1, 0, 0);	// yaw
+	glRotatef(mParams[1], 0, 1, 0); // pitch
+	glRotatef(mParams[2], 0, 0, 1); // roll
 }
 
 void CModel::Translate()
@@ -68,7 +74,7 @@ void CModel::Translate()
 	mPosition->GetXYZ(x, y, z);
 
 	// Call the translation routines.  Use the double-precision call.
-	glTranslated(x, y, z);
+	glTranslatef(x, y, z);
 }
 
 /// Returns the values for all parameters in this model

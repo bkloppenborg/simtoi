@@ -20,6 +20,7 @@
 #include "CGLShaderList.h"
 #include "CGLShaderWrapper.h"
 #include "CModelList.h"
+#include "CGLThread.h"
 
 using namespace std;
 
