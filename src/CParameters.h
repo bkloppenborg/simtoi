@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 
 using namespace std;
 
@@ -37,6 +38,7 @@ protected:
 public:
 	void GetParams(float * params, int n_params);
 	vector<string> GetParamNames();
+	vector< pair<int, string> > GetParamIDsNames();
 	string GetParamName(int i);
 	int GetNFreeParams(void) { return mNFreeParams; };
 

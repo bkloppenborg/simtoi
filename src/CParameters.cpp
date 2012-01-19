@@ -53,9 +53,21 @@ void CParameters::GetParams(float * out_params, int n_params)
 	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
 }
 
+/// Returns all of the parameter names as a vector of strints
 vector<string> CParameters::GetParamNames()
 {
 	return mParamNames;
+}
+
+/// Returns all of the parameters as a vector of pairs in (id, name) format
+vector< pair<int, string> > CParameters::GetParamIDsNames()
+{
+	vector< pair<int, string> > tmp;
+
+	for(int i = 0; i < mNParams; i++)
+		tmp.push_back(pair<int, string> (i, mParamNames[i]));
+
+	return tmp;
 }
 
 string CParameters::GetParamName(int i)
