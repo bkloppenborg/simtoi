@@ -22,11 +22,15 @@ CModel::CModel(int n_params)
 	mShaderLoaded = false;
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
-	mParams[0] = mParams[1] = mParams[2] = 0;
-	mFreeParams[0] = mFreeParams[1] = mFreeParams[2] = false;
 	mParamNames.push_back("Yaw");
+	SetParam(0, 0);
+	SetFree(0, false);
 	mParamNames.push_back("Pitch");
+	SetParam(1, 0);
+	SetFree(1, false);
 	mParamNames.push_back("Roll");
+	SetParam(2, 0);
+	SetFree(2, false);
 }
 
 CModel::~CModel()
@@ -142,11 +146,11 @@ void CModel::SetPositionType(ePositionTypes type)
 
 void CModel::SetShader(CGLShaderWrapper * shader)
 {
-	this->mShader = shader;
+	mShader = shader;
 }
 
 void CModel::UseShader()
 {
-	if(this->mShader != NULL)
+	if(mShader != NULL)
 		mShader->UseShader();
 }

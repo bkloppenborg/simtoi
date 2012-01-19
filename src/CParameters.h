@@ -42,7 +42,9 @@ public:
 	string GetParamName(int i);
 	int GetNFreeParams(void) { return mNFreeParams; };
 
+	void SetAllFree(bool is_free);
 	void SetFree(int param_num, bool is_free);
+	void SetParam(int n_param, float value);
 	void SetParams(float * in_params, int n_params);
 };
 

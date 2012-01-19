@@ -76,6 +76,15 @@ string CParameters::GetParamName(int i)
 		return mParamNames[i];
 }
 
+/// Toggles the state of all variables to free (is_free = true) or fixed (is_free = false)
+void CParameters::SetAllFree(bool is_free)
+{
+	for(int i = 0; i < mNParams; i++)
+		mFreeParams[i] = is_free;
+
+	CountFree();
+}
+
 /// Sets the specified parameter as free (is_free = true) or fixed (is_free = false)
 void CParameters::SetFree(int param_num, bool is_free)
 {
@@ -84,6 +93,14 @@ void CParameters::SetFree(int param_num, bool is_free)
 
 	// Update the number of free parameters
 	CountFree();
+}
+
+/// Sets the specified parameter to the indicated value.
+/// Note, scaling is not applied.
+void CParameters::SetParam(int n_param, float value)
+{
+	if(n_param < mNParams)
+		mParams[n_param] = value;
 }
 
 /// Sets the values for the parameters for this object scaling them as necessary.

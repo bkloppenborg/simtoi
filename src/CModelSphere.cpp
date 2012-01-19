@@ -57,10 +57,10 @@ CModelSphere::CModelSphere()
 	mName = "Sphere";
 	mType = MDL_SPHERE;
 
-	// Initalize the parameters to some useful value:
+	// Set the radius to some useful value, make it free.
 	mParamNames.push_back("Radius");
-	mParams[3] = 1.0;
-	mFreeParams[3] = true;
+	SetParam(3, 1.0);
+	SetFree(3, true);
 
 }
 
