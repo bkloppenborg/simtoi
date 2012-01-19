@@ -18,7 +18,7 @@
 CPositionOrbit::CPositionOrbit()
 	: CPosition(7)
 {
-	mType = POSITION_Orbit;
+	mType = POSITION_ORBIT;
 	mTime = 0;
 
 	mParamNames.push_back("Omega");

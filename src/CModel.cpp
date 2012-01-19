@@ -125,7 +125,7 @@ void CModel::SetPositionType(ePositionTypes type)
 	// Otherwise assign the position.
 	switch(type)
 	{
-	case POSITION_Orbit:
+	case POSITION_ORBIT:
 		mPosition = new CPositionOrbit();
 		break;
 
@@ -135,6 +135,12 @@ void CModel::SetPositionType(ePositionTypes type)
 		mPosition = new CPositionXY();
 		break;
 	}
+}
+
+void CModel::SetTime(double time)
+{
+	if(mPosition->GetType() == POSITION_ORBIT)
+		mPosition->SetTime(time);
 }
 
 void CModel::SetShader(CGLShaderWrapper * shader)

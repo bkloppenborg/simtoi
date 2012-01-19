@@ -18,7 +18,7 @@ enum ePositionTypes
 {
 	POSITION_XY,
 	POSITION_XYZ,
-	POSITION_Orbit
+	POSITION_ORBIT
 };
 
 class CPosition : public CParameters
