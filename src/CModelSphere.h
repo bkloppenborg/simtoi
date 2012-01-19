@@ -19,10 +19,6 @@ public:
 	CModelSphere();
 	virtual ~CModelSphere();
 
-	// CircleTable and DrawSphere come from OpenGLUT library.
-	static void CircleTable( double **sint, double **cost, const int n );
-	void DrawSphere( GLdouble radius, GLint slices, GLint stacks );
-
 	void GetModelParameters(float * params, int n_params);
 	int GetNModelFreeParameters();
 
