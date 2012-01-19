@@ -9,6 +9,7 @@
 // Header files for position objects.
 #include "CPosition.h"
 #include "CPositionXY.h"
+#include "CPositionOrbit.h"
 //#include "CFeature.h"
 //#include "CFeatureList.h"
 
@@ -134,9 +135,11 @@ void CModel::SetPositionType(ePositionTypes type)
 	// Otherwise assign the position.
 	switch(type)
 	{
-//	case Orbit:
-//		position = new PositionOrbit();
-//		break;
+	case POSITION_Orbit:
+		mPosition = new CPositionOrbit();
+		break;
+
+	case POSITION_XY:
 	default:
 		// By default models use XY position.
 		mPosition = new CPositionXY();

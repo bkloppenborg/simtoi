@@ -10,7 +10,13 @@
 CPositionXY::CPositionXY()
 	: CPosition(2)
 {
+	mType = POSITION_XY;
 
+	// Init the position variables, set them to be fixed.
+	mParamNames.push_back("X");
+	mParamNames.push_back("Y");
+
+	SetAllFree(false);
 }
 
 CPositionXY::~CPositionXY()

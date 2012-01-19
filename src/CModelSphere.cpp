@@ -61,7 +61,6 @@ CModelSphere::CModelSphere()
 	mParamNames.push_back("Radius");
 	SetParam(3, 1.0);
 	SetFree(3, true);
-
 }
 
 CModelSphere::~CModelSphere()

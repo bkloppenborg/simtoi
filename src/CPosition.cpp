@@ -11,7 +11,7 @@
 CPosition::CPosition(int n_parameters)
 	: CParameters(n_parameters)
 {
-
+	// Do nothing.
 }
 
 CPosition::~CPosition()

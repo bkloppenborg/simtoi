@@ -16,10 +16,4 @@ enum eFeatureTypes
 	SurfaceFeature
 };
 
-enum ePositionTypes
-{
-	XY,
-	Orbit
-};
-
 #endif /* ENUMERATIONS_H_ */

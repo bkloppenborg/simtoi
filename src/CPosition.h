@@ -14,6 +14,12 @@
 #include "CParameters.h"
 #include "enumerations.h"
 
+enum ePositionTypes
+{
+	POSITION_XY,
+	POSITION_Orbit
+};
+
 class CPosition : public CParameters
 {
 protected:
