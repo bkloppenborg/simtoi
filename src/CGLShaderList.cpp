@@ -49,10 +49,15 @@ CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 	CGLShader * tmp = NULL;
 	tmp = FindShader(shader);
 
+	CGLShaderWrapper * wrapper = NULL;
 	if(tmp != NULL)
-		return new CGLShaderWrapper(tmp, tmp->GetNParams());
+	{
+		// Create the wrapper, init all data members to be free.
+		wrapper = new CGLShaderWrapper(tmp, tmp->GetNParams());
+		wrapper->SetAllFree(true);
+	}
 
-	return NULL;
+	return wrapper;
 }
 
 /// Returns a vector of pair<eGLShaders, string> which identify the enumerated name and friendly name

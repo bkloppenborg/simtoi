@@ -95,6 +95,9 @@ void CGLShader::Init()
 
 void CGLShader::UseShader(float * params, int imNParams)
 {
+	if(!mShaderLoaded)
+		Init();
+
 	//if(imNParams != this->mNParams)
 	// throw exception
 

@@ -15,7 +15,7 @@ CGLShaderWrapper::CGLShaderWrapper(CGLShader * shader, int n_params)
 	mShader = shader;
 
 	// Tell the shader to compile
-	shader->Init();
+	//shader->Init();
 }
 
 CGLShaderWrapper::~CGLShaderWrapper()
