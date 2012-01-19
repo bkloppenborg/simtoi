@@ -4,7 +4,7 @@
  *  Created on: Jan 19, 2012
  *      Author: bkloppenborg
  *
- *  A basic class for drawing a cylinder (cylindrical wall plus ends).
+ *  A basic class for drawing a solid cylinder (ends plus walls).
  */
 
 #ifndef CMODELCYLINDER_H_

@@ -20,14 +20,12 @@ CModelCylinder::CModelCylinder()
 	mType = MDL_CYLINDER;
 
 	// Set the radius to some useful value, make it free.
-	SetParam(0, 50);
-	SetParam(1, 50);
 	mParamNames.push_back("Radius");
 	SetParam(3, 3.0);
-	SetFree(3, false);
+	SetFree(3, true);
 	mParamNames.push_back("Height");
-	SetParam(4, 1.0);
-	SetFree(4, false);
+	SetParam(4, 0.5);
+	SetFree(4, true);
 }
 
 CModelCylinder::~CModelCylinder()
@@ -68,25 +66,31 @@ void CModelCylinder::Render(GLuint framebuffer_object, int width, int height)
 		GLUquadricObj * bottom = gluNewQuadric();
 
 		// First draw the top:
-		//glTranslatef(0, 0, height/2);
-//		gluQuadricDrawStyle(top, GLU_FILL);
-//		gluQuadricNormals(top, GLU_SMOOTH);
-//		gluQuadricOrientation(top, GLU_OUTSIDE);
-//		gluDisk(top, 0, cyl_radius, mSlices, mStacks);
+		glPushMatrix();
+		glTranslatef(0.0, 0.0, cyl_height/2);
+		gluQuadricDrawStyle(top, GLU_FILL);
+		gluQuadricNormals(top, GLU_SMOOTH);
+		gluQuadricOrientation(top, GLU_OUTSIDE);
+		gluDisk(top, 0, cyl_radius, mSlices, mStacks);
+		glPopMatrix();
 
 		// Now the sides
-		//glTranslatef(0, 0, -height/2);
+		glPushMatrix();
+		glTranslatef(0.0, 0.0, -cyl_height/2);
 		gluQuadricDrawStyle(cylinder, GLU_FILL);
 		gluQuadricNormals(cylinder, GLU_SMOOTH);
 		gluQuadricOrientation(cylinder, GLU_OUTSIDE);
 		gluCylinder(cylinder, cyl_radius, cyl_radius, cyl_height,  mSlices, mStacks);
+		glPopMatrix();
 
+		glPushMatrix();
 		// Lastly the bottom:
-		//glTranslatef(0, 0, -height/2);
-//		gluQuadricDrawStyle(bottom, GLU_FILL);
-//		gluQuadricNormals(bottom, GLU_SMOOTH);
-//		gluQuadricOrientation(bottom, GLU_OUTSIDE);
-//		gluDisk(bottom, 0, cyl_radius, mSlices, mStacks);
+		glTranslatef(0.0, 0.0, -cyl_height/2);
+		gluQuadricDrawStyle(bottom, GLU_FILL);
+		gluQuadricNormals(bottom, GLU_SMOOTH);
+		gluQuadricOrientation(bottom, GLU_OUTSIDE);
+		gluDisk(bottom, 0, cyl_radius, mSlices, mStacks);
+		glPopMatrix();
 
 		gluDeleteQuadric(top);
 		gluDeleteQuadric(cylinder);
