@@ -65,9 +65,10 @@ public:
 	int GetTotalFreeParameters();
 	eModels GetType(void) { return mType; };
 
-	int GetNModelFreeParameters();
-	int GetNPositionFreeParameters();
-	int GetNFeatureFreeParameters();
+	int GetNFeatureFreeParameters() { return 0; };
+	int GetNModelFreeParameters() { return mNFreeParams; };
+	int GetNPositionFreeParameters() { return mPosition->GetNFreeParams(); };
+	int GetNShaderFreeParameters() { return mShader->GetNFreeParams(); };
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 

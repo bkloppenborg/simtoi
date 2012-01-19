@@ -46,37 +46,6 @@ CModel::~CModel()
 	delete mPosition;
 }
 
-int CModel::GetNPositionFreeParameters()
-{
-	return mPosition->GetNFreeParams();
-}
-
-int CModel::GetNFeatureFreeParameters()
-{
-	return 0;
-	//return features->GetNFreeParameters();
-}
-
-void CModel::Rotate()
-{
-	// Rotations are implemented in the standard way, namely
-	//  R_x(gamma) * R_y(beta) * R_z(alpha)
-	// where gamma = pitch, beta = roll, alpha = yaw.
-
-	glRotatef(mParams[0], 1, 0, 0);	// yaw
-	glRotatef(mParams[1], 0, 1, 0); // pitch
-	glRotatef(mParams[2], 0, 0, 1); // roll
-}
-
-void CModel::Translate()
-{
-	float x, y, z;
-	mPosition->GetXYZ(x, y, z);
-
-	// Call the translation routines.  Use the double-precision call.
-	glTranslatef(x, y, z);
-}
-
 /// Returns the values for all parameters in this model
 /// including the model, position, shader, and all features.
 void CModel::GetAllParameters(float * params, int n_params)
@@ -102,12 +71,27 @@ void CModel::GetAllParameters(float * params, int n_params)
 int CModel::GetTotalFreeParameters()
 {
 	// Sum up the free parameters from the model, position, and features
-	return this->GetNModelFreeParameters() + this->GetNPositionFreeParameters() + this->GetNFeatureFreeParameters();
+	return this->GetNModelFreeParameters() + this->GetNPositionFreeParameters() + this->GetNShaderFreeParameters() + this->GetNFeatureFreeParameters();
 }
 
-int CModel::GetNModelFreeParameters()
+void CModel::Rotate()
 {
-	return mNFreeParams;
+	// Rotations are implemented in the standard way, namely
+	//  R_x(gamma) * R_y(beta) * R_z(alpha)
+	// where gamma = pitch, beta = roll, alpha = yaw.
+
+	glRotatef(mParams[0], 1, 0, 0);	// yaw
+	glRotatef(mParams[1], 0, 1, 0); // pitch
+	glRotatef(mParams[2], 0, 0, 1); // roll
+}
+
+void CModel::Translate()
+{
+	float x, y, z;
+	mPosition->GetXYZ(x, y, z);
+
+	// Call the translation routines.  Use the double-precision call.
+	glTranslatef(x, y, z);
 }
 
 /// Sets the parameters for this model, the position, shader, and all features.
