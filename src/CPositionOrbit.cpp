@@ -19,6 +19,7 @@ CPositionOrbit::CPositionOrbit()
 	: CPosition(7)
 {
 	mType = POSITION_Orbit;
+	mTime = 0;
 
 	mParamNames.push_back("Omega");
 	mParamNames.push_back("Inc");
@@ -57,10 +58,8 @@ double CPositionOrbit::ComputeE(double M, double e)
     as it has been shown to converge for all e, and faster than the Newton-Raphson
     method used below.
 
-    TODO: Possibly try memoization of of E given M, e.  Should help speed things up
-    a little.
-
-    TODO: Tweak this value, along with the tolerance
+    TODO: Possibly try memoization of of E given (M, e).  Should help speed things up
+    a little, especially if M and e are held constant.
     */
 
     int i = 0;
