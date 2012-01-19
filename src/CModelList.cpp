@@ -106,6 +106,7 @@ void CModelList::Render(GLuint fbo, int width, int height)
 
     // Bind back to the default framebuffer and let OpenGL finish:
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glFlush();
     glFinish();
 }
 

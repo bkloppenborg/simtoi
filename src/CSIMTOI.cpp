@@ -64,22 +64,6 @@ void CSIMTOI::GetParameters(float * params, int size)
 /// Initialize SIMTOI
 void CSIMTOI::Init(int argc, char *argv[])
 {
-	// Because the program is OpenGL + OpenCL we must init this way:
-	// 1. Load modeling info (window size, scale)
-	// 2. init OpenGL
-	// 3. Load the model parameters, init the models.
-	// 4. init OpenCL
-	// 5.  Load OIFITS data
-	// 6.  Init OpenCL Memory and routines
-
-	// Load the current program configuration, then initialize OpenGL
-	LoadConfiguration();
-	//mGL->Init(mWindow_width, mWindow_height, mScale, mShaderSourceDir);
-
-	// Create the model list, load models into memory:
-	mModelList = new CModelList();
-	LoadModels();
-
 	// Create the OpenCL Object, initialize
 	mCL = new CLibOI();
 	mCL->SetKernelSourcePath(mKernelSourceDir);
@@ -92,34 +76,4 @@ void CSIMTOI::Init(int argc, char *argv[])
 	// Now init memory and routines
 	mCL->InitMemory();
 	mCL->InitRoutines();
-}
-
-/// Loads current global parameters
-void CSIMTOI::LoadConfiguration()
-{
-	// TODO: Read in the width, height, and scale from command line and/or config file
-	mWindow_width = 128;
-	mWindow_height = 128;
-	mScale = 0.05;
-	// TODO: We should determine the path to these dynamically, perhaps use paths relative to the
-	// current executable inside of a try/catch block?
-	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders";
-	mKernelSourceDir = "/home/bkloppenborg/workspace/simtoi/lib/liboi/src/kernels";
-}
-
-void CSIMTOI::LoadModels()
-{
-    // TODO: Read this in from a text file.
-	CGLShaderWrapper * shader;
-	//shader = mGL->GetShader(LD_Hesteroffer1997);
-	CModel * tmp = new CModelSphere();
-	tmp->SetPositionType(XY);
-	tmp->SetShader(shader);
-	mModelList->Append(tmp);
-}
-
-/// Sets the model parameters, converting from a uniform hypercube to physical units as required.
-void CSIMTOI::SetParameters(float * params, int n_params)
-{
-	mModelList->SetParameters(params, n_params);
 }
