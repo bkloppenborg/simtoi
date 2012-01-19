@@ -42,9 +42,6 @@ void CGLShaderList::Append(CGLShader * shader)
 /// into a CGLShaderWrapper.
 CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 {
-	if(shader == SHDR_NONE)
-		return NULL;
-
 	// First see if the shader is already loaded
 	CGLShader * tmp = NULL;
 	tmp = FindShader(shader);
@@ -66,11 +63,6 @@ vector< pair<eGLShaders, string> > CGLShaderList::GetShaderNames(void)
 {
 	vector< pair<eGLShaders, string> > list;
 	pair<eGLShaders, string> tmp;
-
-	// First setup a "no shader" option:
-	tmp.first = SHDR_NONE;
-	tmp.second = "None";
-	list.push_back(tmp);
 
 	// Iterate through the list and append the shader information
     for(vector<CGLShader*>::iterator it = shaders.begin(); it != shaders.end(); ++it)
@@ -107,6 +99,13 @@ void CGLShaderList::LoadShaders()
 	int n_params;
 	vector<string> param_names;
 	CGLShader * tmp;
+
+	// Default do-nothing Shader
+	base_name = "Default";
+	friendly_name = "Default (None)";
+	n_params = 0;
+	tmp = new CGLShader(SHDR_NONE, shader_dir, base_name, friendly_name, n_params, param_names);
+	this->Append(tmp);
 
 	// Simple limb darkening.
 	base_name = "LD_Hestroffer1997";
