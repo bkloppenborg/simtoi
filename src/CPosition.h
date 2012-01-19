@@ -11,38 +11,22 @@
 #ifndef CPOSITION_H_
 #define CPOSITION_H_
 
+#include "CParameters.h"
 #include "enumerations.h"
 
-class CPosition
+class CPosition : public CParameters
 {
 protected:
-	int n_params_total;
-	int n_params_free;
-
-	ePositionTypes type;
-
-	float * params;
-	bool * free_params;
-
-	void init_params(int total_params);
+	ePositionTypes mType;
 
 public:
-	CPosition();
+	CPosition(int n_parameters);
 	virtual ~CPosition();
 
-	int GetNFreeParameters();
-	ePositionTypes GetType();
-
-	// Gets the current position for the object, after the parameters have been set and scaling has been applied.
-	void GetParams(float * in_params, int n_params);
+	ePositionTypes GetType() { return mType; };
 
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
 	virtual void GetXYZ(float & x, float & y, float & z) = 0;
-
-	// A function to route and scale unit hypercube variables to object parameters.
-	void SetParams(float * in_params, int n_params);
-
-
 };
 
 #endif /* CPOSITION_H_ */

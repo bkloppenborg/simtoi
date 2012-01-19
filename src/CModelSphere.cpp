@@ -60,7 +60,7 @@ CModelSphere::CModelSphere()
 	// Initalize the parameters to some useful value:
 	mParamNames.push_back("Radius");
 	mParams[3] = 1.0;
-	mFreeParams[3] = false;
+	mFreeParams[3] = true;
 
 }
 

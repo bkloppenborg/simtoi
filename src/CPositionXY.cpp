@@ -8,12 +8,9 @@
 #include "CPositionXY.h"
 
 CPositionXY::CPositionXY()
+	: CPosition(2)
 {
-	// Set the datamembers:
-	this->n_params_total = 2;
-	this->n_params_free = 2;
 
-	init_params(n_params_total);
 }
 
 CPositionXY::~CPositionXY()
@@ -24,8 +21,8 @@ CPositionXY::~CPositionXY()
 
 void CPositionXY::GetXYZ(float & x, float & y, float & z)
 {
-	x = params[0];
-	y = params[1];
+	x = mParams[0];
+	y = mParams[1];
 
 	// By default
 	z = 0;

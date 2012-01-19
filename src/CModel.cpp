@@ -11,53 +11,33 @@
 #include "CPositionXY.h"
 //#include "CFeature.h"
 //#include "CFeatureList.h"
-#include "misc.h"	// needed for pull_params
 
 CModel::CModel(int n_params)
+	: CParameters(n_params + 3)
 {
-	mShader = NULL;
+	mPosition = NULL;
 
-	// Init the parameter storage location (+3 because yaw, pitch, and roll are included)
-	mNParams = n_params + 3;
-	mScales = new float[mNParams];
-	mParams = new float[mNParams];
-	mNFreeParams = 3;
-	mFreeParams = new bool[mNParams];;
-	mScales = new float[mNParams];;
-	mScale_mins = new float[mNParams];;
+	// Shader storage location, boolean if it is loaded:
+	mShader = NULL;
 	mShaderLoaded = false;
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
 	mParams[0] = mParams[1] = mParams[2] = 0;
-	mFreeParams[0] = mFreeParams[0] = mFreeParams[0] = false;
+	mFreeParams[0] = mFreeParams[1] = mFreeParams[2] = false;
 	mParamNames.push_back("Yaw");
 	mParamNames.push_back("Pitch");
 	mParamNames.push_back("Roll");
-
-	mPosition = NULL;
-
-//	CFeatureList * features = NULL;
-//	double * scale = NULL;
-//	double * scale_min = NULL;
-
-//	n_free_parameters = n_free_params;
-//	scale = float[n_free_parameters];
-//	scale_min = float[n_free_parameters];
 }
 
 CModel::~CModel()
 {
 	// Free up memory.
 	delete mPosition;
-	delete mParams;
-	delete mFreeParams;
-	delete mScales;
-	delete mScale_mins;
 }
 
 int CModel::GetNPositionFreeParameters()
 {
-	return mPosition->GetNFreeParameters();
+	return mPosition->GetNFreeParams();
 }
 
 int CModel::GetNFeatureFreeParameters()
@@ -86,12 +66,6 @@ void CModel::Translate()
 	glTranslated(x, y, z);
 }
 
-/// Internal routine that reports the values of this object's parameters only.
-void CModel::GetParams(float * out_params, int n_params)
-{
-	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
-}
-
 /// Returns the values for all parameters in this model
 /// including the model, position, shader, and all features.
 void CModel::GetAllParameters(float * params, int n_params)
@@ -102,7 +76,7 @@ void CModel::GetAllParameters(float * params, int n_params)
 	GetParams(params, n_params);
 	n += this->mNFreeParams;
 	mPosition->GetParams(params + n, n_params - n);
-	n += mPosition->GetNFreeParameters();
+	n += mPosition->GetNFreeParams();
 
 	if(mShader != NULL)
 	{
@@ -125,13 +99,6 @@ int CModel::GetNModelFreeParameters()
 	return mNFreeParams;
 }
 
-/// Internal routine to set the parameters for this object.
-void CModel::SetParams(float * in_params, int n_params)
-{
-	pull_params(in_params, n_params, mParams, mNParams, mFreeParams);
-}
-
-
 /// Sets the parameters for this model, the position, shader, and all features.
 void CModel::SetAllParameters(float * in_params, int n_params)
 {
@@ -142,7 +109,7 @@ void CModel::SetAllParameters(float * in_params, int n_params)
 	n += mNFreeParams;
 	// Now set the values for the position object
 	mPosition->SetParams(in_params + n, n_params - n);
-	n += mPosition->GetNFreeParameters();
+	n += mPosition->GetNFreeParams();
 	// Then the shader.
 	if(mShader != NULL)
 	{

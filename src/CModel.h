@@ -14,8 +14,8 @@
 // Headers for OpenGL functions
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <string>
 
+#include "CParameters.h"
 #include "CPosition.h"
 #include "CGLShaderList.h"
 #include "CGLShaderWrapper.h"
@@ -28,21 +28,12 @@ class CPosition;
 //class CFeatureList;
 class CGLShaderWrapper;
 
-class CModel
+class CModel : public CParameters
 {
 protected:
 	// Datamembers
 //	bool is_analytic;
 	eModels mType;
-
-	// Varaibles for parameter values
-	int mNParams;
-	float * mParams;
-	int mNFreeParams;
-	bool * mFreeParams;
-	float * mScales;
-	float * mScale_mins;
-	vector<string> mParamNames;
 
 	CPosition * mPosition;
 
@@ -72,17 +63,13 @@ public:
 
 	int GetTotalFreeParameters();
 	eModels GetType(void) { return mType; };
-protected:
-	void GetParams(float * params, int n_params);
-public:
+
 	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();
 	int GetNFeatureFreeParameters();
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 
-protected:
-	void SetParams(float * in_params, int n_params);
 public:
 	void SetPositionType(ePositionTypes type);
 	void SetShader(CGLShaderWrapper * shader);

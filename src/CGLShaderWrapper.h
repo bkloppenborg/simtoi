@@ -10,23 +10,19 @@
 #ifndef CGLSHADERWRAPPER_H_
 #define CGLSHADERWRAPPER_H_
 
+#include "CParameters.h"
+
 class CGLShader;
 
-class CGLShaderWrapper
+class CGLShaderWrapper : public CParameters
 {
 protected:
 	CGLShader * mShader;
-	float * mParams;
-	int mNParams;
 
 public:
 	CGLShaderWrapper(CGLShader * shader, int n_params);
 	virtual ~CGLShaderWrapper();
 
-	void GetParams(float * params, int n_params);
-	int GetNFreeParams();
-
-	void SetParams(float * params, int n_params);
 	void UseShader();
 };
 
