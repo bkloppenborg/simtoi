@@ -34,7 +34,9 @@ protected:
     void resizeEvent(QResizeEvent *evt);
 
 public:
+    void SetParameters(float * params, int n_params);
     void SetScale(double scale);
+    void SetShader(int model_id, eGLShaders shader);
     void startRendering();
     void stopRendering();
 };

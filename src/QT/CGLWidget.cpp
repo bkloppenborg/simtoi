@@ -43,8 +43,18 @@ void CGLWidget::stopRendering()
     mGLT.wait();
 }
 
+void CGLWidget::SetParameters(float * params, int n_params)
+{
+	mGLT.SetParameters(params, n_params);
+}
+
 void CGLWidget::SetScale(double scale)
 {
 	mGLT.SetScale(scale);
+}
+
+void CGLWidget::SetShader(int model_id, eGLShaders shader)
+{
+	mGLT.SetShader(model_id, shader);
 }
 

@@ -83,46 +83,58 @@ void cmaingui::addGLArea()
     widget->SetScale(ui.spinModelScale->value());
     widget->startRendering();
 
+    // TODO: Remove later.  Add a sphere:
+    widget->AddModel(MDL_SPHERE);
+    widget->SetShader(0, SHDR_LD_HESTEROFFER1997);
+    widget->AddModel(MDL_CYLINDER);
+    float * tmp = new float[4];
+    tmp[0] = 2.0;
+    tmp[1] = 0.9;
+    tmp[2] = 3.0;
+    tmp[3] = 0.5;
+    widget->SetParameters(tmp, 4);
+
+
 
     // Just messing around...
 
-	QStandardItemModel * model = new QStandardItemModel();
-	QStringList labels = QStringList();
-	labels << "Name" << "Enabled" << "Value";
-	//model->setHorizontalHeaderLabels(labels);
-	for(int r=0; r<5; r++)
-	{
-		QList<QStandardItem *>  items;
-		QStandardItem *item;
-
-		// Add icon to Column1
-		item = new QStandardItem(QString("Row %0").arg(r));
-		items << item;
-
-		// Next item
-		item = new QStandardItem;
-		item->setEditable(true);
-		item->setData(QVariant((bool)true), Qt::DisplayRole);
-		items << item;
-
-		// Next item
-		item = new QStandardItem;
-		item->setEditable(true);
-		item->setData(QVariant((int)1), Qt::DisplayRole);
-		items << item;
-
-		// Next item
-		item = new QStandardItem;
-		item->setEditable( true );
-		item->setData(QVariant((double)2.34), Qt::DisplayRole);
-		items << item;
-
-		// add row in columns
-		model->appendRow( items );
-	}
-
-	ui.treeModels->setModel(model);
-	ui.treeModels->setHeaderHidden(true);
+//	QStandardItemModel * model = new QStandardItemModel();
+//	QStringList labels = QStringList();
+//	labels << "Name" << "Enabled" << "Value";
+//	//model->setHorizontalHeaderLabels(labels);
+//	for(int r=0; r<5; r++)
+//	{
+//		QList<QStandardItem *>  items;
+//		QStandardItem *item;
+//
+//		// Add icon to Column1
+//		item = new QStandardItem(QString("Row %0").arg(r));
+//		items << item;
+//
+//		// Next item
+//		item = new QStandardItem;
+//		item->setEditable(true);
+//		item->setData(QVariant((bool)true), Qt::DisplayRole);
+//		items << item;
+//
+//		// Next item
+//		item = new QStandardItem;
+//		item->setEditable(true);
+//		item->setData(QVariant((int)1), Qt::DisplayRole);
+//		items << item;
+//
+//		// Next item
+//		item = new QStandardItem;
+//		item->setEditable( true );
+//		item->setData(QVariant((double)2.34), Qt::DisplayRole);
+//		items << item;
+//
+//		// add row in columns
+//		model->appendRow( items );
+//	}
+//
+//	ui.treeModels->setModel(model);
+//	ui.treeModels->setHeaderHidden(true);
 
 }
 

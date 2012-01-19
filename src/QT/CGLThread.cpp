@@ -7,6 +7,7 @@
 #include "CModel.h"
 #include "CModelList.h"
 #include "CGLShaderList.h"
+#include "CPosition.h"
 
 int CGLThread::count = 0;
 
@@ -35,12 +36,11 @@ void CGLThread::AddModel(eModels model)
 	CModel * tmp_model = mModelList->AddNewModel(model);
 
 	// Initialize with default (XY) position and no shader.
-	tmp_model->SetPositionType(XY);
+	tmp_model->SetPositionType(POSITION_XY);
 	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(SHDR_NONE);
 	tmp_model->SetShader(tmp_shader);
 
 	EnqueueOperation(GLT_RenderModels);
-
 }
 
 /// Static function for checking OpenGL errors:
@@ -64,11 +64,13 @@ void CGLThread::BlitToScreen()
 
     // Blit the application-defined render buffer to the on-screen render buffer.
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
+	/// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
+    //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
     glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     glFinish();
     mGLWidget->swapBuffers();
+	CGLThread::CheckOpenGLError("CGLThread::BlitToScreen()");
 }
 
 /// Enqueue an operation for the CGLThread to process.
@@ -268,8 +270,10 @@ void CGLThread::run()
     // Start the thread
     mRun = true;
     EnqueueOperation(GLT_RenderModels);
-    EnqueueOperation(GLT_BlitToScreen);
+    //EnqueueOperation(GLT_BlitToScreen);
     GLT_Operations op;
+
+	CGLThread::CheckOpenGLError("Error occured during GL Thread Initialization.");
 
     // Main thread loop
     // NOTE: If compiled with -D DEBUG_GL model rendering is skipped and a spinning pyramid is shown
@@ -292,6 +296,7 @@ void CGLThread::run()
             half_width = mWidth * mScale / 2;
 			glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
             glMatrixMode(GL_MODELVIEW);
+        	CGLThread::CheckOpenGLError("CGLThread GLT_Resize");
 
         case GLT_RenderModels:
         	// Call the drawing functions
@@ -307,6 +312,7 @@ void CGLThread::run()
             glFinish();
 #else // DEBUG_GL
             // Render the models
+        	CGLThread::CheckOpenGLError("CGLThread GLT_RenderModels");
             mModelList->Render(mFBO, mWidth, mHeight);
 
 #endif // DEBUG_GL
@@ -314,11 +320,10 @@ void CGLThread::run()
 
      	case GLT_BlitToScreen:
 			BlitToScreen();
-			mGLWidget->updateGL();
-			mGLWidget->swapBuffers();
 #ifdef DEBUG_GL
 			EnqueueOperation(GLT_Redraw);
 #endif //DEBUG_GL
+        	CGLThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
 			break;
 
         case GLT_Stop:
@@ -336,10 +341,23 @@ void CGLThread::run()
 }
 
 /// Sets the scale for the model.
+void CGLThread::SetParameters(float * params, int n_params)
+{
+	mModelList->SetParameters(params, n_params);
+	EnqueueOperation(GLT_RenderModels);
+}
+
+/// Sets the scale for the model.
 void CGLThread::SetScale(double scale)
 {
 	if(scale > 0)
 		mScale = scale;
+}
+
+void CGLThread::SetShader(int model_id, eGLShaders shader)
+{
+	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
+	mModelList->SetShader(model_id, tmp_shader);
 }
 
 /// Stop the thread.

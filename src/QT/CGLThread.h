@@ -104,7 +104,9 @@ public:
     void resizeViewport(int width, int height);
     void run();
 
+    void SetParameters(float * params, int n_params);
     void SetScale(double scale);
+    void SetShader(int model_id, eGLShaders shader);
     void stop();
 
 };
