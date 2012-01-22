@@ -15,36 +15,14 @@ using namespace std;
 
 CModelList::CModelList()
 {
-	// TODO Auto-generated constructor stub
 
 }
 
 CModelList::~CModelList()
 {
-	// Deallocate the models
-	for(int i = mModels.size() - 1; i > -1; i--)
-		delete mModels[i];
+
 }
 
-void CModelList::Append(CModel * model)
-{
-	mModels.push_back(model);
-}
-
-/// Returns the total number of free parameters for all models
-int CModelList::GetNFreeParameters()
-{
-	// TODO: We could probably cache this and/or update it as models are added.
-    int n = 0;
-
-    // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
-    {
-    	n += (*it)->GetTotalFreeParameters();
-    }
-
-    return n;
-}
 
 /// Returns a pair of model names, and their enumerated types
 vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
@@ -73,21 +51,7 @@ CModel * CModelList::AddNewModel(eModels model_id)
 	}
 
 	this->Append(tmp);
-	return mModels.back();
-}
-
-/// This function gets the parameters for models after they have been set/scaled.
-/// also useful for determining initial, user-specified values in configuration files.
-void CModelList::GetParameters(float * params, int n_params)
-{
-    int n = 0;
-
-    // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
-    {
-    	(*it)->GetAllParameters(params + n, n_params - n);
-    	n += (*it)->GetTotalFreeParameters();
-    }
+	return mList.back();
 }
 
 // Render the image to the specified OpenGL framebuffer object.
@@ -99,7 +63,7 @@ void CModelList::Render(GLuint fbo, int width, int height)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
     // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
     {
     	(*it)->Render(fbo, width, height);
     }
@@ -110,20 +74,7 @@ void CModelList::Render(GLuint fbo, int width, int height)
     glFinish();
 }
 
-// This function sets the parameters for models prior to a GetData call.
-void CModelList::SetParameters(float * params, int n_params)
-{
-    int n = 0;
-
-    // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = mModels.begin(); it != mModels.end(); ++it)
-    {
-    	(*it)->SetAllParameters(params + n, n_params - n);
-    	n += (*it)->GetTotalFreeParameters();
-    }
-}
-
 void CModelList::SetShader(int model_id, CGLShaderWrapper * shader)
 {
-	mModels[model_id]->SetShader(shader);
+	mList[model_id]->SetShader(shader);
 }

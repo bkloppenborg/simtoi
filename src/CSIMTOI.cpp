@@ -41,10 +41,6 @@ float CSIMTOI::GetChi2(int data_num, int wl_num)
 	return mCL->ImageToChi2(data_num);
 }
 
-int CSIMTOI::GetNFreeParameters()
-{
-	return mModelList->GetNFreeParameters();
-}
 
 float CSIMTOI::GetLogLike(int data_num, int wl_num)
 {
@@ -54,12 +50,6 @@ float CSIMTOI::GetLogLike(int data_num, int wl_num)
 	return 0;
 }
 
-/// Gets the current model parameters, scaled to physical units.
-/// Returns the first 'size' of them in params.
-void CSIMTOI::GetParameters(float * params, int size)
-{
-	mModelList->GetParameters(params, size);
-}
 
 /// Initialize SIMTOI
 void CSIMTOI::Init(int argc, char *argv[])

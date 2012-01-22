@@ -10,30 +10,23 @@
 #ifndef CMODELLIST_H_
 #define CMODELLIST_H_
 
-#include <vector>
 #include <string>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "CVectorList.h"
+#include "enumerations.h"
 
 class CModel;
+
 class CGLShaderWrapper;
 
 using namespace std;
 
-/// Enumerated Model Names.
-/// Note, when adding a new model, list it in this enum and add it to functions:
-///       GetList_AllModels() and in GetNewModel().  We want to change this, see issue #50.
-enum eModels
-{
-	MDL_SPHERE,
-	MDL_CYLINDER
-};
-
 // A container for a list of models.
-class CModelList
+class CModelList : public CVectorList<CModel*>
 {
 protected:
-	vector<CModel*> mModels;
+	//vector<CModel*> mModels;
 //	bool SortModelPredicate(CModel * A, CModel * B);
 
 public:
@@ -41,7 +34,7 @@ public:
 	~CModelList();
 
 	CModel * AddNewModel(eModels model_id);
-	void Append(CModel* model);
+//	void Append(CModel* model);
 
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
@@ -50,7 +43,7 @@ public:
 
 	void Render(GLuint fbo, int width, int height);
 
-	void SetParameters(float * params, int n_params);
+//	void SetParameters(float * params, int n_params);
 	void SetShader(int model_id, CGLShaderWrapper * shader);
 
 };

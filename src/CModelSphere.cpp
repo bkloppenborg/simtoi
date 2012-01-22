@@ -20,6 +20,7 @@ CModelSphere::CModelSphere()
 {
 	// CModel(1) because we have one additional parameter for this model
 	// Remember, mParams[0] = yaw, mParams[1] = pitch, mParams[2] = roll.
+	// and mParams[3] = color
 
 	mSlices = 50;	// seems like a good number.
 	mName = "Sphere";
@@ -27,8 +28,8 @@ CModelSphere::CModelSphere()
 
 	// Set the radius to some useful value, make it free.
 	mParamNames.push_back("Radius");
-	SetParam(3, 1.0);
-	SetFree(3, true);
+	SetParam(mBaseParams + 1, 1.0);
+	SetFree(mBaseParams + 1, true);
 }
 
 CModelSphere::~CModelSphere()
@@ -41,7 +42,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
 
 	// Rename a few variables for convenience:
-	float radius = mParams[3];
+	float radius = mParams[mBaseParams + 1];
 
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -50,6 +51,9 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		// All models should load the modelview and identity matrix after a glPushMatrix().
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
+
+		// Load the color:
+		Color();
 
 		// Use the shader (this is valid to call even if a shader hasn't been assigned to this object).
 		UseShader();

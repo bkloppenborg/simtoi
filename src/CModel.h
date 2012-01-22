@@ -19,8 +19,8 @@
 #include "CPosition.h"
 #include "CGLShaderList.h"
 #include "CGLShaderWrapper.h"
-#include "CModelList.h"
 #include "CGLThread.h"
+#include "enumerations.h"
 
 using namespace std;
 
@@ -34,19 +34,19 @@ class CModel : public CParameters
 protected:
 	// Datamembers
 //	bool is_analytic;
+	int mBaseParams;
+
 	eModels mType;
 
 	CPosition * mPosition;
 
 //	CFeatureList * features;
 
-	string mName;
-
-private:
 	CGLShaderWrapper * mShader;
 	bool mShaderLoaded;
 
 protected:
+	void Color();
 	void Rotate();
 	void Translate();
 
@@ -62,13 +62,14 @@ public:
 	//void AppendFeature(CFeature * feature);
 	//void DeleteFeature();
 
-	int GetTotalFreeParameters();
-	eModels GetType(void) { return mType; };
-
 	int GetNFeatureFreeParameters() { return 0; };
 	int GetNModelFreeParameters() { return mNFreeParams; };
 	int GetNPositionFreeParameters() { return mPosition->GetNFreeParams(); };
 	int GetNShaderFreeParameters() { return mShader->GetNFreeParams(); };
+	CPosition * GetPosition(void) { return mPosition; };
+	CGLShaderWrapper * GetShader(void) { return mShader; };
+	int GetTotalFreeParameters();
+	eModels GetType(void) { return mType; };
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 

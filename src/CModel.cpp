@@ -20,9 +20,11 @@
 //#include "CFeatureList.h"
 
 CModel::CModel(int n_params)
-	: CParameters(n_params + 3)
+	: CParameters(4 + n_params)
 {
 	mPosition = NULL;
+
+	mBaseParams = 3;	// Number of base params, less one (zero indexed).
 
 	// Shader storage location, boolean if it is loaded:
 	mShader = NULL;
@@ -38,6 +40,9 @@ CModel::CModel(int n_params)
 	mParamNames.push_back("Roll");
 	SetParam(2, 0);
 	SetFree(2, false);
+	mParamNames.push_back("Color");
+	SetParam(3, 1.0);
+	SetFree(3, false);
 }
 
 CModel::~CModel()
@@ -45,6 +50,7 @@ CModel::~CModel()
 	// Free up memory.
 	delete mPosition;
 }
+
 
 /// Returns the values for all parameters in this model
 /// including the model, position, shader, and all features.
@@ -72,6 +78,11 @@ int CModel::GetTotalFreeParameters()
 {
 	// Sum up the free parameters from the model, position, and features
 	return this->GetNModelFreeParameters() + this->GetNPositionFreeParameters() + this->GetNShaderFreeParameters() + this->GetNFeatureFreeParameters();
+}
+
+void CModel::Color()
+{
+	glColor3f(mParams[3], 0.0, 0.0);
 }
 
 void CModel::Rotate()
@@ -139,8 +150,12 @@ void CModel::SetPositionType(ePositionTypes type)
 
 void CModel::SetTime(double time)
 {
+	CPositionOrbit * tmp;
 	if(mPosition->GetType() == POSITION_ORBIT)
-		mPosition->SetTime(time);
+	{
+		tmp = reinterpret_cast<CPositionOrbit*>(mPosition);
+		tmp->SetTime(time);
+	}
 }
 
 void CModel::SetShader(CGLShaderWrapper * shader)

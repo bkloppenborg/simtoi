@@ -10,13 +10,14 @@
 
 CParameters::CParameters(int n_params)
 {
-	// Init the parameter storage location (+3 because yaw, pitch, and roll are included)
+	// Init the parameter storage location
 	mNParams = n_params;
 	mNFreeParams = 0;
 	mParams = new float[mNParams];
 	mFreeParams = new bool[mNParams];
 	mScales = new float[mNParams];
 	mScales_min = new float[mNParams];
+	mName = "";
 
 	// Init parameter values.
 	for(int i = 0; i < mNParams; i++)
@@ -74,6 +75,12 @@ string CParameters::GetParamName(int i)
 {
 	if(i < mParamNames.size())
 		return mParamNames[i];
+}
+
+bool CParameters::IsFree(int param_num)
+{
+	if(param_num < mNParams)
+		return mFreeParams[param_num];
 }
 
 /// Toggles the state of all variables to free (is_free = true) or fixed (is_free = false)

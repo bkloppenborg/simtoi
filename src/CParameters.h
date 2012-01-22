@@ -28,6 +28,8 @@ protected:
 	float * mScales_min;
 	vector<string> mParamNames;
 
+	string mName;
+
 public:
 	CParameters(int n_params);
 	virtual ~CParameters();
@@ -39,8 +41,11 @@ public:
 	void GetParams(float * params, int n_params);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
-	string GetParamName(int i);
+	string GetParamName(int param_num);
 	int GetNFreeParams(void) { return mNFreeParams; };
+	int GetNParams(void) { return mNParams; };
+
+	bool IsFree(int param_num);
 
 	void SetAllFree(bool is_free);
 	void SetFree(int param_num, bool is_free);
