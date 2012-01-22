@@ -38,17 +38,20 @@ protected:
 	void CountFree(void);
 
 public:
+	string GetName(void) { return mName; };
+	int GetNFreeParams(void) { return mNFreeParams; };
+	int GetNParams(void) { return mNParams; };
 	void GetParams(float * params, int n_params);
+	float GetParam(int i);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
 	string GetParamName(int param_num);
-	int GetNFreeParams(void) { return mNFreeParams; };
-	int GetNParams(void) { return mNParams; };
 
 	bool IsFree(int param_num);
 
 	void SetAllFree(bool is_free);
 	void SetFree(int param_num, bool is_free);
+	void SetName(string name) { mName = name; };
 	void SetParam(int n_param, float value);
 	void SetParams(float * in_params, int n_params);
 };

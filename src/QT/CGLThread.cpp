@@ -43,19 +43,6 @@ void CGLThread::AddModel(eModels model)
 	EnqueueOperation(GLT_RenderModels);
 }
 
-/// Static function for checking OpenGL errors:
-void CGLThread::CheckOpenGLError(string function_name)
-{
-    GLenum status = glGetError(); // Check that status of our generated frame buffer
-    // If the frame buffer does not report back as complete
-    if (status != 0)
-    {
-        string errstr =  (const char *) gluErrorString(status);
-        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
-        throw;
-    }
-}
-
 /// Copies the off-screen framebuffer to the on-screen buffer.  To be called only by the thread.
 void CGLThread::BlitToScreen()
 {
@@ -71,6 +58,19 @@ void CGLThread::BlitToScreen()
     glFinish();
     mGLWidget->swapBuffers();
 	CGLThread::CheckOpenGLError("CGLThread::BlitToScreen()");
+}
+
+/// Static function for checking OpenGL errors:
+void CGLThread::CheckOpenGLError(string function_name)
+{
+    GLenum status = glGetError(); // Check that status of our generated frame buffer
+    // If the frame buffer does not report back as complete
+    if (status != 0)
+    {
+        string errstr =  (const char *) gluErrorString(status);
+        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
+        throw;
+    }
 }
 
 /// Enqueue an operation for the CGLThread to process.

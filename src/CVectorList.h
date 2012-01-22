@@ -32,10 +32,9 @@ public:
 		mList.push_back(item);
 	}
 
-	/// Returns the ith item in the list.
-	T operator [] (int i)
+	int size(void)
 	{
-		return mList[i];
+		return mList.size();
 	}
 };
 

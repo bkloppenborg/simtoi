@@ -48,6 +48,15 @@ void CParameters::CountFree(void)
 	}
 }
 
+/// Gets the vale of the specified parameter, returns -1 if outside of bounds:
+float CParameters::GetParam(int param_n)
+{
+	if(param_n < mNParams)
+		return mParams[param_n];
+
+	return -1;
+}
+
 /// Gets the values of the (scaled) parameters for this object.
 void CParameters::GetParams(float * out_params, int n_params)
 {

@@ -12,6 +12,7 @@ CPositionXYZ::CPositionXYZ()
 	: CPosition(3)
 {
 	mType = POSITION_XYZ;
+	mName = "XYZ";
 
 	// Init the position variables, set them to be fixed.
 	mParamNames.push_back("X");

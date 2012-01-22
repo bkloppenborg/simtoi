@@ -8,14 +8,13 @@
 #include <QMessageBox>
 #include <QTreeView>
 #include <QStringList>
-#include <QStandardItem>
-#include <QStandardItemModel>
 #include <vector>
 #include <utility>
 
 #include "CGLWidget.h"
 #include "enumerations.h"
 #include "CGLShaderList.h"
+#include "CModel.h"
 #include "CModelList.h"
 
 Q_DECLARE_METATYPE(eModels);
@@ -97,44 +96,48 @@ void cmaingui::addGLArea()
 
 
     // Just messing around...
+	QStandardItemModel * TreeModel = new QStandardItemModel();
+	QStringList labels = QStringList();
+	labels << "Name" << "Free" << "Value";
+	TreeModel->setColumnCount(3);
+	TreeModel->setHorizontalHeaderLabels(labels);
+	CModelList * model_list = widget->GetModelList();
 
-//	QStandardItemModel * model = new QStandardItemModel();
-//	QStringList labels = QStringList();
-//	labels << "Name" << "Enabled" << "Value";
-//	//model->setHorizontalHeaderLabels(labels);
-//	for(int r=0; r<5; r++)
-//	{
-//		QList<QStandardItem *>  items;
-//		QStandardItem *item;
-//
-//		// Add icon to Column1
-//		item = new QStandardItem(QString("Row %0").arg(r));
-//		items << item;
-//
-//		// Next item
-//		item = new QStandardItem;
-//		item->setEditable(true);
-//		item->setData(QVariant((bool)true), Qt::DisplayRole);
-//		items << item;
-//
-//		// Next item
-//		item = new QStandardItem;
-//		item->setEditable(true);
-//		item->setData(QVariant((int)1), Qt::DisplayRole);
-//		items << item;
-//
-//		// Next item
-//		item = new QStandardItem;
-//		item->setEditable( true );
-//		item->setData(QVariant((double)2.34), Qt::DisplayRole);
-//		items << item;
-//
-//		// add row in columns
-//		model->appendRow( items );
-//	}
-//
-//	ui.treeModels->setModel(model);
-//	ui.treeModels->setHeaderHidden(true);
+	QList<QStandardItem *> items;
+	QStandardItem * item;
+	QStandardItem * parent;
+	CModel * model;
+	CPosition * position;
+	CGLShaderWrapper * shader;
+
+	for(int i = 0; i < model_list->size(); i++)
+	{
+
+		// First pull out the model parameters
+		model = model_list->GetModel(i);
+		items = LoadParametersHeader(QString("Model:"), model);
+		parent = items[0];
+		TreeModel->appendRow(items);
+		LoadParameters(parent, model);
+
+		// Now for the Position Parameters
+		position = model->GetPosition();
+		items = LoadParametersHeader(QString("Position"), position);
+		item = items[0];
+		parent->appendRow(items);
+		LoadParameters(item, position);
+
+		// Lastly for the shader:
+		shader = model->GetShader();
+		items = LoadParametersHeader(QString("Shader"), shader);
+		item = items[0];
+		parent->appendRow(items);
+		LoadParameters(item, shader);
+
+	}
+
+	ui.treeModels->setModel(TreeModel);
+	ui.treeModels->setHeaderHidden(false);
 
 }
 
@@ -168,6 +171,51 @@ void cmaingui::delGLArea()
         widget->stopRendering();
         delete widget;
     }
+}
+
+void cmaingui::LoadParameters(QStandardItem * parent, CParameters * parameters)
+{
+	for(int j = 0; j < parameters->GetNParams(); j++)
+	{
+		QList<QStandardItem *> items;
+		QStandardItem * item;
+
+		// First the name
+		item = new QStandardItem(QString::fromStdString(parameters->GetParamName(j)));
+		items << item;
+
+		// Now the checkbox
+		item = new QStandardItem;
+		item->setEditable(true);
+		item->setCheckable(true);
+		if(parameters->IsFree(j))
+			item->setCheckState(Qt::Checked);
+		else
+			item->setCheckState(Qt::Unchecked);
+		items << item;
+
+		// Lastly the value:
+		item = new QStandardItem;
+		item->setEditable(true);
+		item->setData(QVariant((float)parameters->GetParam(j)), Qt::DisplayRole);
+		items << item;
+
+		parent->appendRow(items);
+	}
+}
+
+QList<QStandardItem *> cmaingui::LoadParametersHeader(QString name, CParameters * param_base)
+{
+	QList<QStandardItem *> items;
+	QStandardItem * item;
+	item = new QStandardItem(name);
+	items << item;
+	item = new QStandardItem(QString(""));
+	items << item;
+	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
+	items << item;
+
+	return items;
 }
 
 void cmaingui::render()

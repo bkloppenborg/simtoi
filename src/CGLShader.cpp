@@ -37,6 +37,15 @@ CGLShader::~CGLShader()
 	delete mParam_locations;
 }
 
+/// Returns the name of the specified parameter, if out of bounds returns an empty string.
+string CGLShader::GetParamName(int i)
+{
+	if(i < mNParams)
+		return mParam_names[i];
+
+	return "";
+}
+
 // Loads the shader from the source file and creates a binary for the current selected context.
 void CGLShader::Init()
 {

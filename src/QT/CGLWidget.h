@@ -34,6 +34,8 @@ protected:
     void resizeEvent(QResizeEvent *evt);
 
 public:
+    CModelList * GetModelList() { return mGLT.GetModelList(); };
+
     void SetParameters(float * params, int n_params);
     void SetScale(double scale);
     void SetShader(int model_id, eGLShaders shader);

@@ -12,6 +12,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "CModel.h"
 #include "CModelList.h"
 #include "CGLShaderList.h"
 
@@ -89,6 +90,7 @@ public:
 
     GLT_Operations GetNextOperation(void);
 	vector< pair<eGLShaders, string> > GetShaderNames(void);
+	CModelList * GetModelList() { return mModelList; };
 
 protected:
     void InitFrameBuffer(void);

@@ -33,6 +33,7 @@ public:
 
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
+	CModel * GetModel(int i) { return mList[i]; };
 
 	vector< pair<eModels, string> > GetList_AllModels(void);
 

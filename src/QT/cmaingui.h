@@ -3,7 +3,11 @@
 
 #include <QtGui/QMainWindow>
 #include <string>
+#include <QStandardItem>
+#include <QStandardItemModel>
+
 #include "ui_cmaingui.h"
+class CParameters;
 
 using namespace std;
 
@@ -22,6 +26,8 @@ public:
 protected:
     void closeEvent(QCloseEvent *evt);
     void SetupComboBoxes(void);
+    void LoadParameters(QStandardItem * parent, CParameters * parameters);
+    QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
 
 private slots:
     void addGLArea();

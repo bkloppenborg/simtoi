@@ -45,6 +45,7 @@ public:
 	eGLShaders GetType() { return mType; };
 	string GetName() { return mFriendlyName; };
 	int GetNParams() { return mNParams; }
+	string GetParamName(int i);
 
 	void Init();
 

@@ -17,9 +17,9 @@
    <widget class="QMdiArea" name="mdiArea">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>310</x>
       <y>10</y>
-      <width>501</width>
+      <width>481</width>
       <height>541</height>
      </rect>
     </property>
@@ -29,8 +29,8 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>271</width>
-      <height>71</height>
+      <width>288</width>
+      <height>41</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -47,17 +47,17 @@
      <item row="0" column="3">
       <widget class="QDoubleSpinBox" name="spinModelScale"/>
      </item>
-     <item row="1" column="0" colspan="4">
-      <widget class="QPushButton" name="btnModelArea">
-       <property name="text">
-        <string>Generate</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Size:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QPushButton" name="btnModelArea">
+       <property name="text">
+        <string>Generate</string>
        </property>
       </widget>
      </item>
@@ -67,9 +67,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
-      <width>271</width>
-      <height>321</height>
+      <y>60</y>
+      <width>291</width>
+      <height>391</height>
      </rect>
     </property>
    </widget>
@@ -77,7 +77,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>510</y>
+      <y>460</y>
       <width>178</width>
       <height>41</height>
      </rect>
@@ -94,6 +94,32 @@
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">
         <string>Delete</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>510</y>
+      <width>271</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnAnimate">
+       <property name="text">
+        <string>Animate</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_4">
+       <property name="text">
+        <string>PushButton</string>
        </property>
       </widget>
      </item>

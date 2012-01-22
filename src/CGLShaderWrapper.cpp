@@ -13,9 +13,11 @@ CGLShaderWrapper::CGLShaderWrapper(CGLShader * shader, int n_params)
 {
 	// Set variables
 	mShader = shader;
+	mName = shader->GetName();
 
-	// Tell the shader to compile
-	//shader->Init();
+	// Now populate the shader parameters
+	for(int i = 0; i < n_params; i++)
+		mParamNames.push_back(shader->GetParamName(i));
 }
 
 CGLShaderWrapper::~CGLShaderWrapper()

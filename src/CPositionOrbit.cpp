@@ -20,6 +20,7 @@ CPositionOrbit::CPositionOrbit()
 {
 	mType = POSITION_ORBIT;
 	mTime = 0;
+	mName = "Orbit";
 
 	mParamNames.push_back("Omega");
 	mParamNames.push_back("Inc");
