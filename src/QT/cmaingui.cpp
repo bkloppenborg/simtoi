@@ -16,6 +16,8 @@
 #include "CGLShaderList.h"
 #include "CModel.h"
 #include "CModelList.h"
+#include "CTreeModel.h"
+#include "CParameterItem.h"
 
 Q_DECLARE_METATYPE(eModels);
 Q_DECLARE_METATYPE(eGLShaders);
@@ -33,12 +35,9 @@ cmaingui::cmaingui(QWidget *parent_widget)
 	ui.spinModelSize->setSingleStep(64);
 	ui.spinModelSize->setValue(128);
 
-	// Set up the combo boxes:
-	SetupComboBoxes();
-
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
-	connect(ui.treeModels, SIGNAL(clicked(QModelIndex)), this, SLOT(model_clicked(QModelIndex)));
+//	connect(ui.treeModels, SIGNAL(clicked(QModelIndex)), this, SLOT(model_clicked(QModelIndex)));
 
 	// TODO: Remove this, shouldn't be hard-coded!
 	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
@@ -53,9 +52,9 @@ cmaingui::~cmaingui()
 void cmaingui::closeEvent(QCloseEvent *evt)
 {
 	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
-    for (int i = 0; i < int(windows.count()); ++i)
+    for (int i = int(windows.count()) - 1; i > 0; i--)
     {
-    	CGLWidget * tmp = (CGLWidget *)windows.at(i);
+    	CGLWidget * tmp = (CGLWidget *)windows.at(i)->widget();
     	tmp->stopRendering();
     }
     QMainWindow::closeEvent(evt);
@@ -93,10 +92,8 @@ void cmaingui::addGLArea()
     tmp[3] = 0.5;
     widget->SetParameters(tmp, 4);
 
-
-
     // Just messing around...
-	QStandardItemModel * TreeModel = new QStandardItemModel();
+    CTreeModel * TreeModel = new CTreeModel();
 	QStringList labels = QStringList();
 	labels << "Name" << "Free" << "Value";
 	TreeModel->setColumnCount(3);
@@ -112,10 +109,9 @@ void cmaingui::addGLArea()
 
 	for(int i = 0; i < model_list->size(); i++)
 	{
-
 		// First pull out the model parameters
 		model = model_list->GetModel(i);
-		items = LoadParametersHeader(QString("Model:"), model);
+		items = LoadParametersHeader(QString("Model"), model);
 		parent = items[0];
 		TreeModel->appendRow(items);
 		LoadParameters(parent, model);
@@ -136,8 +132,12 @@ void cmaingui::addGLArea()
 
 	}
 
+	// Set the model
 	ui.treeModels->setModel(TreeModel);
 	ui.treeModels->setHeaderHidden(false);
+
+	// Now connect the slot
+	connect(TreeModel, SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
 
 }
 
@@ -165,7 +165,7 @@ void cmaingui::addModel(void)
 
 void cmaingui::delGLArea()
 {
-    CGLWidget *widget = (CGLWidget *) ui.mdiArea->activeSubWindow();
+    CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
     if (widget)
     {
         widget->stopRendering();
@@ -185,7 +185,7 @@ void cmaingui::LoadParameters(QStandardItem * parent, CParameters * parameters)
 		items << item;
 
 		// Now the checkbox
-		item = new QStandardItem;
+		item = new CParameterItem(parameters, j);
 		item->setEditable(true);
 		item->setCheckable(true);
 		if(parameters->IsFree(j))
@@ -195,9 +195,9 @@ void cmaingui::LoadParameters(QStandardItem * parent, CParameters * parameters)
 		items << item;
 
 		// Lastly the value:
-		item = new QStandardItem;
+		item = new CParameterItem(parameters, j);
 		item->setEditable(true);
-		item->setData(QVariant((float)parameters->GetParam(j)), Qt::DisplayRole);
+		item->setData(QVariant((double)parameters->GetParam(j)), Qt::DisplayRole);
 		items << item;
 
 		parent->appendRow(items);
@@ -220,7 +220,7 @@ QList<QStandardItem *> cmaingui::LoadParametersHeader(QString name, CParameters 
 
 void cmaingui::render()
 {
-    CGLWidget *widget = (CGLWidget *) ui.mdiArea->activeSubWindow();
+    CGLWidget * widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
     if(widget)
     {
     	widget->EnqueueOperation(GLT_RenderModels);
@@ -256,8 +256,8 @@ void cmaingui::SetupComboBoxes()
 
 }
 
-void cmaingui::model_clicked(const QModelIndex & index)
-{
-	QString text = ui.treeModels->currentIndex().data().toString();
-	printf("Label: %s \n", text.toStdString().c_str());
-}
+//void cmaingui::model_clicked(const QModelIndex & index)
+//{
+//	QString text = ui.treeModels->currentIndex().data().toString();
+//	printf("Label: %s \n", text.toStdString().c_str());
+//}

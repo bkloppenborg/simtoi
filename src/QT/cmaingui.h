@@ -5,9 +5,10 @@
 #include <string>
 #include <QStandardItem>
 #include <QStandardItemModel>
-
 #include "ui_cmaingui.h"
+
 class CParameters;
+class CParameterItem;
 
 using namespace std;
 
@@ -34,7 +35,7 @@ private slots:
     void addModel(void);
     void delGLArea();
     void render();
-    void model_clicked(const QModelIndex &index);
+    //void model_clicked(const QModelIndex &index);
 };
 
 #endif // CMAINGUI_H
