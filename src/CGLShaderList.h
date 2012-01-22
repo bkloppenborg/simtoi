@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include "CVectorList.h"
 
 using namespace std;
 
@@ -24,19 +25,15 @@ enum eGLShaders
 	SHDR_LD_HESTEROFFER1997
 };
 
-class CGLShaderList
+class CGLShaderList: public CVectorList<CGLShader*>
 {
 protected:
-	vector<CGLShader*> shaders;
 	string shader_dir;
 	bool SortModelPredicate(CGLShader * A, CGLShader * B);
 
 public:
 	CGLShaderList(string shader_dir);
 	~CGLShaderList();
-
-protected:
-	void Append(CGLShader * CGLShader);
 
 public:
 	CGLShaderWrapper * GetShader(eGLShaders shader);

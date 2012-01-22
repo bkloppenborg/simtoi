@@ -20,9 +20,7 @@ CGLShaderList::CGLShaderList(string shader_source_dir)
 
 CGLShaderList::~CGLShaderList()
 {
-	// Deallocate the shaders
-	for(int i = shaders.size() - 1; i > -1; i--)
-		if(shaders[i]) delete shaders[i];
+
 }
 
 bool CGLShaderList::SortModelPredicate(CGLShader * A, CGLShader * B)
@@ -31,11 +29,6 @@ bool CGLShaderList::SortModelPredicate(CGLShader * A, CGLShader * B)
 		return true;
 
 	return false;
-}
-
-void CGLShaderList::Append(CGLShader * shader)
-{
-	shaders.push_back(shader);
 }
 
 /// Finds the specified shader in the list, returns the (compiled) version wrapped
@@ -65,7 +58,7 @@ vector< pair<eGLShaders, string> > CGLShaderList::GetShaderNames(void)
 	pair<eGLShaders, string> tmp;
 
 	// Iterate through the list and append the shader information
-    for(vector<CGLShader*>::iterator it = shaders.begin(); it != shaders.end(); ++it)
+    for(vector<CGLShader*>::iterator it = mList.begin(); it != mList.end(); ++it)
     {
     	tmp.first = (*it)->GetType();
     	tmp.second = (*it)->GetName();
@@ -81,7 +74,7 @@ CGLShader * CGLShaderList::FindShader(eGLShaders shader)
 {
 	// There should be a small enough number of shaders that we can use find directly on the
 	// unsorted vector list.  If this becomes a problem, we can sort the values later.
-    for(vector<CGLShader*>::iterator it = shaders.begin(); it != shaders.end(); ++it)
+    for(vector<CGLShader*>::iterator it = mList.begin(); it != mList.end(); ++it)
     {
     	if((*it)->GetType() == shader)
     		return (*it);
@@ -106,7 +99,7 @@ void CGLShaderList::LoadShaders()
 	n_params = 0;
 	param_names.clear();
 	tmp = new CGLShader(SHDR_NONE, shader_dir, base_name, friendly_name, n_params, param_names);
-	this->Append(tmp);
+	Append(tmp);
 
 	// Simple limb darkening.
 	base_name = "LD_Hestroffer1997";
@@ -115,5 +108,5 @@ void CGLShaderList::LoadShaders()
 	param_names.clear();
 	param_names.push_back("alpha");
 	tmp = new CGLShader(SHDR_LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names);
-	this->Append(tmp);
+	Append(tmp);
 }

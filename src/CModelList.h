@@ -17,7 +17,6 @@
 #include "enumerations.h"
 
 class CModel;
-
 class CGLShaderWrapper;
 
 using namespace std;
@@ -25,16 +24,12 @@ using namespace std;
 // A container for a list of models.
 class CModelList : public CVectorList<CModel*>
 {
-protected:
-	//vector<CModel*> mModels;
-//	bool SortModelPredicate(CModel * A, CModel * B);
 
 public:
 	CModelList();
 	~CModelList();
 
 	CModel * AddNewModel(eModels model_id);
-//	void Append(CModel* model);
 
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
@@ -43,7 +38,7 @@ public:
 
 	void Render(GLuint fbo, int width, int height);
 
-//	void SetParameters(float * params, int n_params);
+	void SetParameters(float * params, int n_params);
 	void SetShader(int model_id, CGLShaderWrapper * shader);
 
 };

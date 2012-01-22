@@ -23,17 +23,6 @@ CModelList::~CModelList()
 
 }
 
-
-/// Returns a pair of model names, and their enumerated types
-vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
-{
-	vector< pair<eModels, string> > tmp;
-	tmp.push_back(pair<eModels, string> (MDL_SPHERE, "Sphere"));
-	tmp.push_back(pair<eModels, string> (MDL_CYLINDER, "Cylinder"));
-
-	return tmp;
-}
-
 /// Creates a new model, appends it to the model list and returns a pointer to it.
 CModel * CModelList::AddNewModel(eModels model_id)
 {
@@ -54,6 +43,28 @@ CModel * CModelList::AddNewModel(eModels model_id)
 	return mList.back();
 }
 
+void CModelList::GetParameters(float * params, int n_params)
+{
+    int n = 0;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	(*it)->GetAllParameters(params + n, n_params - n);
+    	n += (*it)->GetTotalFreeParameters();
+    }
+}
+
+/// Returns a pair of model names, and their enumerated types
+vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
+{
+	vector< pair<eModels, string> > tmp;
+	tmp.push_back(pair<eModels, string> (MDL_SPHERE, "Sphere"));
+	tmp.push_back(pair<eModels, string> (MDL_CYLINDER, "Cylinder"));
+
+	return tmp;
+}
+
 // Render the image to the specified OpenGL framebuffer object.
 void CModelList::Render(GLuint fbo, int width, int height)
 {
@@ -72,6 +83,19 @@ void CModelList::Render(GLuint fbo, int width, int height)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glFlush();
     glFinish();
+}
+
+
+void CModelList::SetParameters(float * params, int n_params)
+{
+    int n = 0;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	(*it)->SetAllParameters(params + n, n_params - n);
+    	n += (*it)->GetTotalFreeParameters();
+    }
 }
 
 void CModelList::SetShader(int model_id, CGLShaderWrapper * shader)

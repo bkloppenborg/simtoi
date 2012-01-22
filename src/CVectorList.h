@@ -32,28 +32,10 @@ public:
 		mList.push_back(item);
 	}
 
-	void GetParameters(float * params, int n_params)
+	/// Returns the ith item in the list.
+	T operator [] (int i)
 	{
-	    int n = 0;
-
-	    // Now call render on all of the models:
-	    for(typename vector<T>::iterator it = mList.begin(); it != mList.end(); ++it)
-	    {
-	    	(*it)->GetAllParameters(params + n, n_params - n);
-	    	n += (*it)->GetTotalFreeParameters();
-	    }
-	}
-
-	void SetParameters(float * params, int n_params)
-	{
-	    int n = 0;
-
-	    // Now call render on all of the models:
-	    for(typename vector<T>::iterator it = mList.begin(); it != mList.end(); ++it)
-	    {
-	    	(*it)->SetAllParameters(params + n, n_params - n);
-	    	n += (*it)->GetTotalFreeParameters();
-	    }
+		return mList[i];
 	}
 };
 
