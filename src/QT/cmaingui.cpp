@@ -37,7 +37,7 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
-//	connect(ui.treeModels, SIGNAL(clicked(QModelIndex)), this, SLOT(model_clicked(QModelIndex)));
+	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
 
 	// TODO: Remove this, shouldn't be hard-coded!
 	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
@@ -85,6 +85,7 @@ void cmaingui::addGLArea()
     widget->AddModel(MDL_SPHERE);
     widget->SetShader(0, SHDR_LD_HESTEROFFER1997);
     widget->AddModel(MDL_CYLINDER);
+    widget->SetPositionType(1, POSITION_ORBIT);
     float * tmp = new float[4];
     tmp[0] = 2.0;
     tmp[1] = 0.9;
@@ -135,10 +136,10 @@ void cmaingui::addGLArea()
 	// Set the model
 	ui.treeModels->setModel(TreeModel);
 	ui.treeModels->setHeaderHidden(false);
+	ui.treeModels->resizeColumnToContents(1);
 
 	// Now connect the slot
 	connect(TreeModel, SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
-
 }
 
 void cmaingui::addModel(void)
@@ -225,6 +226,11 @@ void cmaingui::render()
     {
     	widget->EnqueueOperation(GLT_RenderModels);
     }
+}
+
+void cmaingui::subwindowSelected(QMdiSubWindow * window)
+{
+	//ui.treeModels
 }
 
 void cmaingui::SetupComboBoxes()

@@ -32,7 +32,7 @@ protected:
 	void Compute_xyz(double a, double beta, double e,
 			double l1, double l2, double m1, double m2, double n1, double n2,
 			double cos_E, double sin_E,
-			double & x, double & y, double & z);
+			float & x, float & y, float & z);
 
 public:
 	void GetXYZ(float & x, float & y, float & z);

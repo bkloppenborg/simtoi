@@ -35,7 +35,9 @@ private slots:
     void addModel(void);
     void delGLArea();
     void render();
-    //void model_clicked(const QModelIndex &index);
+
+public slots:
+	void subwindowSelected(QMdiSubWindow * window);
 };
 
 #endif // CMAINGUI_H

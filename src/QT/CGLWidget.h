@@ -39,6 +39,7 @@ public:
     void SetParameters(float * params, int n_params);
     void SetScale(double scale);
     void SetShader(int model_id, eGLShaders shader);
+    void SetPositionType(int model_id, ePositionTypes pos_type);
     void startRendering();
     void stopRendering();
 };

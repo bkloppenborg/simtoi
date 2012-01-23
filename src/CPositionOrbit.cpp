@@ -29,6 +29,7 @@ CPositionOrbit::CPositionOrbit()
 	mParamNames.push_back("e");
 	mParamNames.push_back("tau");
 	mParamNames.push_back("T");
+	SetParam(6, 1.0);
 	SetAllFree(false);
 }
 
@@ -128,20 +129,21 @@ void CPositionOrbit::Compute_Coefficients(double Omega, double inc, double omega
 void CPositionOrbit::Compute_xyz(double a, double beta, double e,
 		double l1, double l2, double m1, double m2, double n1, double n2,
 		double cos_E, double sin_E,
-		double & x, double & y, double & z)
+		float & x, float & y, float & z)
 {
-    x = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);
-    y = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);
-    z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);
+    x = float(a * (l1 * cos_E + beta * l2 * sin_E - e * l1));
+    y = float(a * (m1 * cos_E + beta * m2 * sin_E - e * m1));
+    z = float(a * (n1 * cos_E + beta * n2 * sin_E - e * n1));
 }
 
 void CPositionOrbit::GetXYZ(float & x, float & y, float & z)
 {
 	// Local variables (mostly renaming mParams variables for convenience).
+	// Remember to convert the angular parameters into radians.
     double l1, l2, m1, m2, n1, n2;
-    double Omega = (double) mParams[0];
-    double inc = (double) mParams[1];
-    double omega = (double) mParams[2];
+    double Omega = (double) mParams[0] * PI / 180.0;
+    double inc = (double) mParams[1] * PI / 180.0;
+    double omega = (double) mParams[2] * PI / 180.0;
     double alpha = (double) mParams[3];
     double e = (double) mParams[4];
     double tau = (double) mParams[5];
@@ -155,8 +157,9 @@ void CPositionOrbit::GetXYZ(float & x, float & y, float & z)
 
     double cos_E = cos(E);
     double sin_E = sin(E);
+    double beta = sqrt(1 - e*e);
 
     // Now compute the orbital coefficients
     Compute_Coefficients(Omega, inc, omega, l1, m1, n1, l2, m2, n2);
-
+    Compute_xyz(alpha, beta, e, l1, l2, m1, m2, n1, n2, cos_E, sin_E, x, y, z);
 }

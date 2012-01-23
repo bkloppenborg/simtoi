@@ -10,6 +10,7 @@
 #include "CModel.h"
 #include "CModelSphere.h"
 #include "CModelCylinder.h"
+#include "CPosition.h"
 
 using namespace std;
 
@@ -96,6 +97,11 @@ void CModelList::SetParameters(float * params, int n_params)
     	(*it)->SetAllParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
     }
+}
+
+void CModelList::SetPositionType(int model_id, ePositionTypes pos_type)
+{
+	mList[model_id]->SetPositionType(pos_type);
 }
 
 void CModelList::SetShader(int model_id, CGLShaderWrapper * shader)

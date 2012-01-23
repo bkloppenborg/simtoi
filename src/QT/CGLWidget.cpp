@@ -58,3 +58,8 @@ void CGLWidget::SetShader(int model_id, eGLShaders shader)
 	mGLT.SetShader(model_id, shader);
 }
 
+void CGLWidget::SetPositionType(int model_id, ePositionTypes pos_type)
+{
+	mGLT.SetPositionType(model_id, pos_type);
+}
+

@@ -31,13 +31,13 @@ CModel::CModel(int n_params)
 	mShaderLoaded = false;
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
-	mParamNames.push_back("Yaw");
+	mParamNames.push_back("Inclination");
 	SetParam(0, 0);
 	SetFree(0, false);
-	mParamNames.push_back("Pitch");
+	mParamNames.push_back("Pos. Angle");
 	SetParam(1, 0);
 	SetFree(1, false);
-	mParamNames.push_back("Roll");
+	mParamNames.push_back("Rotation");
 	SetParam(2, 0);
 	SetFree(2, false);
 	mParamNames.push_back("Color");

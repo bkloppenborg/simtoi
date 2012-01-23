@@ -40,7 +40,5 @@ void CParameterItem::setData(const QVariant & value, int role)
 			mParent->SetParam(mID, float(value.toDouble()));
 	}
 
-	qDebug() << value << role;
-
 	QStandardItem::setData(value, role);
 }

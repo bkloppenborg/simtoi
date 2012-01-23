@@ -107,6 +107,7 @@ public:
     void run();
 
     void SetParameters(float * params, int n_params);
+    void SetPositionType(int model_id, ePositionTypes pos_type);
     void SetScale(double scale);
     void SetShader(int model_id, eGLShaders shader);
     void stop();

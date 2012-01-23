@@ -261,7 +261,7 @@ void CGLThread::run()
 	glLoadIdentity();
 
 	// Note, the coordinates here are in object-space, not coordinate space.
-	double half_width = mWidth * mScale / 2;
+	double half_width = mWidth * mScale;// / 2;
 	glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
 
     // Init the off-screen frame buffer.
@@ -345,6 +345,11 @@ void CGLThread::SetParameters(float * params, int n_params)
 {
 	mModelList->SetParameters(params, n_params);
 	EnqueueOperation(GLT_RenderModels);
+}
+
+void CGLThread::SetPositionType(int model_id, ePositionTypes pos_type)
+{
+	mModelList->SetPositionType(model_id, pos_type);
 }
 
 /// Sets the scale for the model.
