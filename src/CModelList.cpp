@@ -66,6 +66,12 @@ vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
 	return tmp;
 }
 
+/// Increments the time by the set timestep value.
+void CModelList::IncrementTime()
+{
+	SetTime(mTime + mTimestep);
+}
+
 // Render the image to the specified OpenGL framebuffer object.
 void CModelList::Render(GLuint fbo, int width, int height)
 {
@@ -107,4 +113,22 @@ void CModelList::SetPositionType(int model_id, ePositionTypes pos_type)
 void CModelList::SetShader(int model_id, CGLShaderWrapper * shader)
 {
 	mList[model_id]->SetShader(shader);
+}
+
+/// Sets the time for all of the models
+/// Note, some modes don't care about time
+void CModelList::SetTime(double t)
+{
+	mTime = t;
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	(*it)->SetTime(mTime);
+    }
+}
+
+/// Sets the time increment (for use with animation).
+void CModelList::SetTimestep(double dt)
+{
+	if(dt > 0)
+		mTimestep = dt;
 }

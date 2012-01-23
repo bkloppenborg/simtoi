@@ -19,6 +19,7 @@ class cmaingui : public QMainWindow
 protected:
     Ui::cmainguiClass ui;
     string mShaderSourceDir;
+    bool mAnimating;
 
 public:
     cmaingui(QWidget *parent = 0);
@@ -35,6 +36,7 @@ private slots:
     void addModel(void);
     void delGLArea();
     void render();
+    void Animate();
 
 public slots:
 	void subwindowSelected(QMdiSubWindow * window);

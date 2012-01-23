@@ -8,6 +8,7 @@
 #include "CPositionOrbit.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <cstdio>
 
 #ifdef M_PI
 #define PI M_PI
@@ -116,12 +117,18 @@ void CPositionOrbit::Compute_Coefficients(double Omega, double inc, double omega
 
     // NOTE: Roy's orbital motion equations assume the ecliptic is at i = 0
     // astronomy doesn't use the same convention so L <-> M compared to Roy.
-    M1 = c_Omega * c_omega - s_Omega * s_omega * c_inc;
-    L1 = s_Omega * c_omega + c_Omega * s_omega * c_inc;
+//    M1 = c_Omega * c_omega - s_Omega * s_omega * c_inc;
+//    L1 = s_Omega * c_omega + c_Omega * s_omega * c_inc;
+//    N1 = s_omega * s_inc;
+//    M2 = -c_Omega * s_omega - s_Omega * c_omega * c_inc;
+//    L2 = -s_Omega * s_omega + c_Omega * c_omega * c_inc;
+//    N2 = c_omega * s_inc;
+    L1 = c_Omega * c_omega - s_Omega * s_omega * c_inc;
+    M1 = s_Omega * c_omega + c_Omega * s_omega * c_inc;
     N1 = s_omega * s_inc;
-    M2 = -c_Omega * s_omega - s_Omega * c_omega * c_inc;
-    L2 = -s_Omega * s_omega + c_Omega * c_omega * c_inc;
-    N2 = c_omega * s_inc;
+    L2 = -c_Omega * s_omega - s_Omega * c_omega * c_inc;
+    M2 = -s_Omega * s_omega + c_Omega * c_omega * c_inc;
+    N1 = c_omega * s_inc;
 }
 
 // Computes the (x, y, z) position of the orbit.
@@ -134,6 +141,8 @@ void CPositionOrbit::Compute_xyz(double a, double beta, double e,
     x = float(a * (l1 * cos_E + beta * l2 * sin_E - e * l1));
     y = float(a * (m1 * cos_E + beta * m2 * sin_E - e * m1));
     z = float(a * (n1 * cos_E + beta * n2 * sin_E - e * n1));
+
+    printf("x: %f y: %f z: %f \n", x, y, z);
 }
 
 void CPositionOrbit::GetXYZ(float & x, float & y, float & z)

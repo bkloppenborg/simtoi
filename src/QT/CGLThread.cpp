@@ -60,6 +60,21 @@ void CGLThread::BlitToScreen()
 	CGLThread::CheckOpenGLError("CGLThread::BlitToScreen()");
 }
 
+void CGLThread::ClearQueue()
+{
+	// Clear the queue and reset the semaphore.
+	mQueueMutex.lock();
+
+	// Clear the queue
+	while (!mQueue.empty())
+	{
+		mQueue.pop();
+	}
+
+	mQueueSemaphore.acquire(mQueueSemaphore.available());
+	mQueueMutex.unlock();
+}
+
 /// Static function for checking OpenGL errors:
 void CGLThread::CheckOpenGLError(string function_name)
 {
@@ -262,7 +277,7 @@ void CGLThread::run()
 
 	// Note, the coordinates here are in object-space, not coordinate space.
 	double half_width = mWidth * mScale;// / 2;
-	glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
+	glOrtho(-half_width, half_width, -half_width, half_width, -20, 20);
 
     // Init the off-screen frame buffer.
     InitFrameBuffer();
@@ -285,6 +300,13 @@ void CGLThread::run()
         // NOTE: Resize and Render cascade.
         switch(op)
         {
+        case GLT_Animate:
+         	mModelList->IncrementTime();
+         	QThread::msleep(40);
+         	EnqueueOperation(GLT_RenderModels);
+         	EnqueueOperation(GLT_Animate);
+         	break;
+
         case GLT_Resize:
         	// Resize the screen.
 #ifdef DEBUG
@@ -298,6 +320,7 @@ void CGLThread::run()
             glMatrixMode(GL_MODELVIEW);
         	CGLThread::CheckOpenGLError("CGLThread GLT_Resize");
 
+        default:
         case GLT_RenderModels:
         	// Call the drawing functions
 #ifdef DEBUG_GL
@@ -321,7 +344,7 @@ void CGLThread::run()
      	case GLT_BlitToScreen:
 			BlitToScreen();
 #ifdef DEBUG_GL
-			EnqueueOperation(GLT_Redraw);
+			EnqueueOperation(GLT_RenderModels);
 #endif //DEBUG_GL
         	CGLThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
 			break;
@@ -333,9 +356,10 @@ void CGLThread::run()
             mRun = false;
             break;
 
-        default:
-            break;
-
+        case GLT_StopAnimate:
+        	ClearQueue();
+        	EnqueueOperation(GLT_RenderModels);
+        	break;
         }
     }
 }
@@ -363,6 +387,16 @@ void CGLThread::SetShader(int model_id, eGLShaders shader)
 {
 	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
 	mModelList->SetShader(model_id, tmp_shader);
+}
+
+void CGLThread::SetTime(double t)
+{
+	mModelList->SetTime(t);
+}
+
+void CGLThread::SetTimestep(double dt)
+{
+	mModelList->SetTimestep(dt);
 }
 
 /// Stop the thread.

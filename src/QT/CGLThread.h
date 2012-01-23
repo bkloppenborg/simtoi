@@ -28,6 +28,8 @@ enum GLT_Operations
 	GLT_BlitToScreen,
 	GLT_Resize,
 	GLT_RenderModels,
+	GLT_Animate,
+	GLT_StopAnimate,
 	GLT_Stop
 };
 
@@ -83,6 +85,7 @@ public:
 
 protected:
     void BlitToScreen();
+    void ClearQueue();
 public:
     static void CheckOpenGLError(string function_name);
 
@@ -110,6 +113,8 @@ public:
     void SetPositionType(int model_id, ePositionTypes pos_type);
     void SetScale(double scale);
     void SetShader(int model_id, eGLShaders shader);
+    void SetTime(double t);
+    void SetTimestep(double dt);
     void stop();
 
 };

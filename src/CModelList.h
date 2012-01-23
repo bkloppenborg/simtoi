@@ -25,6 +25,9 @@ using namespace std;
 // A container for a list of models.
 class CModelList : public CVectorList<CModel*>
 {
+protected:
+	double mTime;
+	double mTimestep;
 
 public:
 	CModelList();
@@ -38,11 +41,15 @@ public:
 
 	vector< pair<eModels, string> > GetList_AllModels(void);
 
+	void IncrementTime();
+
 	void Render(GLuint fbo, int width, int height);
 
 	void SetParameters(float * params, int n_params);
 	void SetPositionType(int model_id, ePositionTypes pos_type);
 	void SetShader(int model_id, CGLShaderWrapper * shader);
+	void SetTime(double t);
+	void SetTimestep(double dt);
 
 };
 

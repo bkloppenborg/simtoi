@@ -38,6 +38,7 @@ cmaingui::cmaingui(QWidget *parent_widget)
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
 	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
+	connect(ui.btnAnimate, SIGNAL(clicked(void)), this, SLOT(Animate(void)));
 
 	// TODO: Remove this, shouldn't be hard-coded!
 	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
@@ -45,7 +46,27 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 cmaingui::~cmaingui()
 {
+	mAnimating = false;
+}
 
+void cmaingui::Animate()
+{
+	CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+	if(mAnimating)
+	{
+		widget->EnqueueOperation(GLT_StopAnimate);
+		widget->SetTimestep(0);
+		widget->SetTime(0);
+		mAnimating = false;
+		ui.btnAnimate->setText("Animate");
+	}
+	else
+	{
+		widget->SetTimestep(ui.spinTimestep->value());
+		widget->EnqueueOperation(GLT_Animate);
+		mAnimating = true;
+		ui.btnAnimate->setText("Stop Animation");
+	}
 }
 
 
