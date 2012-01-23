@@ -77,6 +77,9 @@ public:
 	void SetPositionType(ePositionTypes type);
 	void SetShader(CGLShaderWrapper * shader);
 	void SetTime(double time);
+protected:
+	void SetupMatrix();
+public:
 	bool ShaderLoaded(void) { return mShaderLoaded; };
 
 protected:

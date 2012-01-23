@@ -46,14 +46,8 @@ void CModelCylinder::Render(GLuint framebuffer_object, int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	glPushMatrix();
-		// All models should load the modelview and identity matrix after a glPushMatrix().
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		// Load the color:
+		SetupMatrix();
 		Color();
-
-		// Use the shader (this is valid to call even if a shader hasn't been assigned to this object).
 		UseShader();
 
 		// Call base-class rotation and translation functions.

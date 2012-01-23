@@ -34,6 +34,9 @@ cmaingui::cmaingui(QWidget *parent_widget)
 	ui.spinModelSize->setRange(64, 1024);
 	ui.spinModelSize->setSingleStep(64);
 	ui.spinModelSize->setValue(128);
+	ui.spinTimestep->setValue(0.10);
+	ui.spinTimestep->setSingleStep(0.1);
+	ui.spinTimestep->setRange(0, 10000);
 
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));

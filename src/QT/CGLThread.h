@@ -64,6 +64,7 @@ protected:
     int mWidth;
     int mHeight;
     double mScale;
+    double mDepth;
 
     //QGLFramebufferObject * mFBO
 	GLuint mFBO;

@@ -21,6 +21,7 @@ CGLThread::CGLThread(CGLWidget *glWidget, string shader_source_dir)
 
     mModelList = new CModelList();
     mShaderList = new CGLShaderList(shader_source_dir);
+    mDepth = 100; // +mDepth to -mDepth is the viewing region, in coordinate system units.
 }
 
 CGLThread::~CGLThread()
@@ -277,7 +278,7 @@ void CGLThread::run()
 
 	// Note, the coordinates here are in object-space, not coordinate space.
 	double half_width = mWidth * mScale;// / 2;
-	glOrtho(-half_width, half_width, -half_width, half_width, -20, 20);
+	glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
 
     // Init the off-screen frame buffer.
     InitFrameBuffer();
@@ -316,7 +317,7 @@ void CGLThread::run()
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
             half_width = mWidth * mScale / 2;
-			glOrtho(-half_width, half_width, -half_width, half_width, -half_width, half_width);
+			glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
             glMatrixMode(GL_MODELVIEW);
         	CGLThread::CheckOpenGLError("CGLThread GLT_Resize");
 

@@ -91,9 +91,19 @@ void CModel::Rotate()
 	//  R_x(gamma) * R_y(beta) * R_z(alpha)
 	// where gamma = pitch, beta = roll, alpha = yaw.
 
-	glRotatef(mParams[0], 1, 0, 0);	// yaw
-	glRotatef(mParams[1], 0, 1, 0); // pitch
+	glRotatef(mParams[0], 1, 0, 0);	// inclination
+	glRotatef(-mParams[1], 0, 1, 0); // position angle
 	glRotatef(mParams[2], 0, 0, 1); // roll
+}
+
+/// Sets up the matrix mode for rendering models.
+void CModel::SetupMatrix()
+{
+	// Load the matrix mode, and identity, then flip x -> -x to correspond with astronomical notation.
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glScalef(-1, 1, 1);
+
 }
 
 void CModel::Translate()
