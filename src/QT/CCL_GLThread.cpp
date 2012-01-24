@@ -2,16 +2,16 @@
 #include <QTime>
 #include <QtDebug>
 
-#include "CGLThread.h"
+#include "CCL_GLThread.h"
 #include "CGLWidget.h"
 #include "CModel.h"
 #include "CModelList.h"
 #include "CGLShaderList.h"
 #include "CPosition.h"
 
-int CGLThread::count = 0;
+int CCL_GLThread::count = 0;
 
-CGLThread::CGLThread(CGLWidget *glWidget, string shader_source_dir)
+CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir)
 	: QThread(), mGLWidget(glWidget)
 {
     mRun = true;
@@ -24,14 +24,14 @@ CGLThread::CGLThread(CGLWidget *glWidget, string shader_source_dir)
     mDepth = 100; // +mDepth to -mDepth is the viewing region, in coordinate system units.
 }
 
-CGLThread::~CGLThread()
+CCL_GLThread::~CCL_GLThread()
 {
 	delete mModelList;
 	delete mShaderList;
 }
 
 /// Appends a model to the model list, importing shaders and features as necessary.
-void CGLThread::AddModel(eModels model)
+void CCL_GLThread::AddModel(eModels model)
 {
 	// Create the model, load the shader.
 	CModel * tmp_model = mModelList->AddNewModel(model);
@@ -45,7 +45,7 @@ void CGLThread::AddModel(eModels model)
 }
 
 /// Copies the off-screen framebuffer to the on-screen buffer.  To be called only by the thread.
-void CGLThread::BlitToScreen()
+void CCL_GLThread::BlitToScreen()
 {
     // Bind back to the default buffer (just in case something didn't do it),
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -58,10 +58,10 @@ void CGLThread::BlitToScreen()
 
     glFinish();
     mGLWidget->swapBuffers();
-	CGLThread::CheckOpenGLError("CGLThread::BlitToScreen()");
+	CCL_GLThread::CheckOpenGLError("CGLThread::BlitToScreen()");
 }
 
-void CGLThread::ClearQueue()
+void CCL_GLThread::ClearQueue()
 {
 	// Clear the queue and reset the semaphore.
 	mQueueMutex.lock();
@@ -77,7 +77,7 @@ void CGLThread::ClearQueue()
 }
 
 /// Static function for checking OpenGL errors:
-void CGLThread::CheckOpenGLError(string function_name)
+void CCL_GLThread::CheckOpenGLError(string function_name)
 {
     GLenum status = glGetError(); // Check that status of our generated frame buffer
     // If the frame buffer does not report back as complete
@@ -89,8 +89,8 @@ void CGLThread::CheckOpenGLError(string function_name)
     }
 }
 
-/// Enqueue an operation for the CGLThread to process.
-void CGLThread::EnqueueOperation(GLT_Operations op)
+/// Enqueue an operation for the CCL_GLThread to process.
+void CCL_GLThread::EnqueueOperation(CL_GLT_Operations op)
 {
 	// Lock the queue, append the item, increment the semaphore.
 	mQueueMutex.lock();
@@ -100,13 +100,13 @@ void CGLThread::EnqueueOperation(GLT_Operations op)
 }
 
 /// Get the next operation from the queue.  This is a blocking function.
-GLT_Operations CGLThread::GetNextOperation(void)
+CL_GLT_Operations CCL_GLThread::GetNextOperation(void)
 {
 	// First try to get access to the semaphore.  This is a blocking call if the queue is empty.
 	mQueueSemaphore.acquire();
 	// Now lock the queue, pull off the top item, pop it from the queue, and return.
 	mQueueMutex.lock();
-	GLT_Operations tmp = mQueue.top();
+	CL_GLT_Operations tmp = mQueue.top();
 	mQueue.pop();
 	mQueueMutex.unlock();
 	return tmp;
@@ -114,12 +114,12 @@ GLT_Operations CGLThread::GetNextOperation(void)
 
 /// Returns a list of pairs of <eGlShader, string> corresponding to the (enumerated_name, friendly_name)
 /// of the shaders stored in this object.
-vector< pair<eGLShaders, string> > CGLThread::GetShaderNames(void)
+vector< pair<eGLShaders, string> > CCL_GLThread::GetShaderNames(void)
 {
 	return mShaderList->GetShaderNames();
 }
 
-void CGLThread::InitFrameBuffer(void)
+void CCL_GLThread::InitFrameBuffer(void)
 {
     InitFrameBufferDepthBuffer();
     InitFrameBufferTexture();
@@ -144,7 +144,7 @@ void CGLThread::InitFrameBuffer(void)
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
 }
 
-void CGLThread::InitFrameBufferDepthBuffer(void)
+void CCL_GLThread::InitFrameBufferDepthBuffer(void)
 {
     glGenRenderbuffers(1, &mFBO_depth); // Generate one render buffer and store the ID in mFBO_depth
     glBindRenderbuffer(GL_RENDERBUFFER, mFBO_depth); // Bind the mFBO_depth render buffer
@@ -156,7 +156,7 @@ void CGLThread::InitFrameBufferDepthBuffer(void)
     glBindRenderbuffer(GL_RENDERBUFFER, 0); // Unbind the render buffer
 }
 
-void CGLThread::InitFrameBufferTexture(void)
+void CCL_GLThread::InitFrameBufferTexture(void)
 {
     glGenTextures(1, &mFBO_texture); // Generate one texture
     glBindTexture(GL_TEXTURE_2D, mFBO_texture); // Bind the texture mFBOtexture
@@ -182,7 +182,7 @@ void CGLThread::InitFrameBufferTexture(void)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void CGLThread::glDrawTriangle()
+void CCL_GLThread::glDrawTriangle()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
     glLoadIdentity();				// Reset The View
@@ -230,19 +230,19 @@ void CGLThread::glDrawTriangle()
 }
 
 /// Resets any OpenGL errors by looping.
-void CGLThread::ResetGLError()
+void CCL_GLThread::ResetGLError()
 {
     while (glGetError() != GL_NO_ERROR) {};
 }
 
 /// Resize the window.  Normally called from QT
-void CGLThread::resizeViewport(const QSize &size)
+void CCL_GLThread::resizeViewport(const QSize &size)
 {
     resizeViewport(size.width(), size.height());
 }
 
 /// Resize the window.  Called from external applications.
-void CGLThread::resizeViewport(int width, int height)
+void CCL_GLThread::resizeViewport(int width, int height)
 {
 	if(mPermitResize)
 	{
@@ -255,7 +255,7 @@ void CGLThread::resizeViewport(int width, int height)
 }   
 
 /// Run the thread.
-void CGLThread::run()
+void CCL_GLThread::run()
 {
 #ifdef DEBUG
     printf("Starting Render Thread with ID %i\n", id);
@@ -287,9 +287,9 @@ void CGLThread::run()
     mRun = true;
     EnqueueOperation(GLT_RenderModels);
     //EnqueueOperation(GLT_BlitToScreen);
-    GLT_Operations op;
+    CL_GLT_Operations op;
 
-	CGLThread::CheckOpenGLError("Error occured during GL Thread Initialization.");
+	CCL_GLThread::CheckOpenGLError("Error occured during GL Thread Initialization.");
 
     // Main thread loop
     // NOTE: If compiled with -D DEBUG_GL model rendering is skipped and a spinning pyramid is shown
@@ -319,7 +319,7 @@ void CGLThread::run()
             half_width = mWidth * mScale / 2;
 			glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
             glMatrixMode(GL_MODELVIEW);
-        	CGLThread::CheckOpenGLError("CGLThread GLT_Resize");
+        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
 
         default:
         case GLT_RenderModels:
@@ -336,7 +336,7 @@ void CGLThread::run()
             glFinish();
 #else // DEBUG_GL
             // Render the models
-        	CGLThread::CheckOpenGLError("CGLThread GLT_RenderModels");
+        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_RenderModels");
             mModelList->Render(mFBO, mWidth, mHeight);
 
 #endif // DEBUG_GL
@@ -347,7 +347,7 @@ void CGLThread::run()
 #ifdef DEBUG_GL
 			EnqueueOperation(GLT_RenderModels);
 #endif //DEBUG_GL
-        	CGLThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
+        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
 			break;
 
         case GLT_Stop:
@@ -366,42 +366,42 @@ void CGLThread::run()
 }
 
 /// Sets the scale for the model.
-void CGLThread::SetParameters(float * params, int n_params)
+void CCL_GLThread::SetParameters(float * params, int n_params)
 {
 	mModelList->SetParameters(params, n_params);
 	EnqueueOperation(GLT_RenderModels);
 }
 
-void CGLThread::SetPositionType(int model_id, ePositionTypes pos_type)
+void CCL_GLThread::SetPositionType(int model_id, ePositionTypes pos_type)
 {
 	mModelList->SetPositionType(model_id, pos_type);
 }
 
 /// Sets the scale for the model.
-void CGLThread::SetScale(double scale)
+void CCL_GLThread::SetScale(double scale)
 {
 	if(scale > 0)
 		mScale = scale;
 }
 
-void CGLThread::SetShader(int model_id, eGLShaders shader)
+void CCL_GLThread::SetShader(int model_id, eGLShaders shader)
 {
 	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
 	mModelList->SetShader(model_id, tmp_shader);
 }
 
-void CGLThread::SetTime(double t)
+void CCL_GLThread::SetTime(double t)
 {
 	mModelList->SetTime(t);
 }
 
-void CGLThread::SetTimestep(double dt)
+void CCL_GLThread::SetTimestep(double dt)
 {
 	mModelList->SetTimestep(dt);
 }
 
 /// Stop the thread.
-void CGLThread::stop()
+void CCL_GLThread::stop()
 {
     qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
     EnqueueOperation(GLT_Stop);

@@ -1,3 +1,14 @@
+/*
+ * CGLShader.h
+ *
+ *  Created on: Jan 24, 2011
+ *      Author: bkloppenborg
+ *
+ * A common class to encapsulate access to OpenCL and OpenGL.
+ * This class manages all CL/GL memory allocation/deallocation, rendering, and computations.
+ *
+ */
+
 
 #ifndef GLTHREAD
 #define GLTHREAD
@@ -23,7 +34,7 @@ class CGLShaderWrapper;
 using namespace std;
 
 // A list of operations permitted.
-enum GLT_Operations
+enum CL_GLT_Operations
 {
 	GLT_BlitToScreen,
 	GLT_Resize,
@@ -33,13 +44,13 @@ enum GLT_Operations
 	GLT_Stop
 };
 
-/// A quick class for making priority queue comparisons.  Used for CGLThread, mQueue
+/// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
 class GLQueueComparision
 {
 public:
 	GLQueueComparision() {};
 
-	bool operator() (const GLT_Operations& lhs, const GLT_Operations&rhs) const
+	bool operator() (const CL_GLT_Operations& lhs, const CL_GLT_Operations&rhs) const
 	{
 		if(rhs == GLT_Stop)
 			return true;
@@ -49,11 +60,11 @@ public:
 };
 
 
-class CGLThread : public QThread {
+class CCL_GLThread : public QThread {
     Q_OBJECT
 
 protected:
-	priority_queue<GLT_Operations, vector<GLT_Operations>, GLQueueComparision> mQueue;
+	priority_queue<CL_GLT_Operations, vector<CL_GLT_Operations>, GLQueueComparision> mQueue;
     QMutex mQueueMutex;
     QSemaphore mQueueSemaphore;
     CGLWidget * mGLWidget;
@@ -79,8 +90,8 @@ protected:
     static int count;
 
 public:
-    CGLThread(CGLWidget * glWidget, string shader_source_dir);
-    ~CGLThread();
+    CCL_GLThread(CGLWidget * glWidget, string shader_source_dir);
+    ~CCL_GLThread();
 
     void AddModel(eModels model);
 
@@ -90,11 +101,14 @@ protected:
 public:
     static void CheckOpenGLError(string function_name);
 
-    void EnqueueOperation(GLT_Operations op);
+    void EnqueueOperation(CL_GLT_Operations op);
 
-    GLT_Operations GetNextOperation(void);
+	int GetHeight() { return mHeight; };
+    CL_GLT_Operations GetNextOperation(void);
 	vector< pair<eGLShaders, string> > GetShaderNames(void);
 	CModelList * GetModelList() { return mModelList; };
+	float GetScale() { return mScale; };
+	int GetWidth() { return mWidth; };
 
 protected:
     void InitFrameBuffer(void);

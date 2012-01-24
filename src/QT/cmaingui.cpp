@@ -45,6 +45,7 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 	// TODO: Remove this, shouldn't be hard-coded!
 	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
+	mKernelSourceDir = "/home/bkloppenborg/workspace/simtoi/lib/liboi/src/kernels/";
 }
 
 cmaingui::~cmaingui()
@@ -88,7 +89,7 @@ void cmaingui::closeEvent(QCloseEvent *evt)
 void cmaingui::addGLArea()
 {
 	// Create a new subwindow with a title and close button:
-    CGLWidget *widget = new CGLWidget(ui.mdiArea, mShaderSourceDir);
+    CGLWidget *widget = new CGLWidget(ui.mdiArea, mShaderSourceDir, mKernelSourceDir);
     QMdiSubWindow *sw = ui.mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
     sw->setWindowTitle("Model Area");
 

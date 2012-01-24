@@ -19,7 +19,7 @@
 #include "CPosition.h"
 #include "CGLShaderList.h"
 #include "CGLShaderWrapper.h"
-#include "CGLThread.h"
+#include "CCL_GLThread.h"
 #include "enumerations.h"
 
 using namespace std;

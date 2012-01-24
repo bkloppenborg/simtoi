@@ -6,7 +6,7 @@
  */
 
 #include "CModelList.h"
-#include "CGLThread.h"
+#include "CCL_GLThread.h"
 #include "CModel.h"
 #include "CModelSphere.h"
 #include "CModelCylinder.h"

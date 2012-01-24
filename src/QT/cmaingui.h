@@ -19,6 +19,7 @@ class cmaingui : public QMainWindow
 protected:
     Ui::cmainguiClass ui;
     string mShaderSourceDir;
+    string mKernelSourceDir;
     bool mAnimating;
 
 public:

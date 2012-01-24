@@ -1,10 +1,15 @@
 #include "CGLWidget.h"
 
-CGLWidget::CGLWidget(QWidget *parent, string shader_source_dir)
+CGLWidget::CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir)
     : QGLWidget(parent), mGLT(this, shader_source_dir)
 { 
     setAutoBufferSwap(false);
     this->doneCurrent();
+}
+
+CGLWidget::~CGLWidget()
+{
+	stopRendering();
 }
 
 void CGLWidget::AddModel(eModels model)
@@ -12,7 +17,7 @@ void CGLWidget::AddModel(eModels model)
 	mGLT.AddModel(model);
 }
 
-void CGLWidget::EnqueueOperation(GLT_Operations op)
+void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
 {
 	mGLT.EnqueueOperation(op);
 }

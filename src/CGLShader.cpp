@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include "CGLShader.h"
 #include "ReadTextFile.h"
-#include "CGLThread.h"
+#include "CCL_GLThread.h"
 
 CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names)
 {
@@ -64,7 +64,7 @@ void CGLShader::Init()
 
     // Now create the mProgram with vertex and fragement shaders
 	mProgram = glCreateProgram();
-    CGLThread::CheckOpenGLError("Could not create shader mProgram.");
+    CCL_GLThread::CheckOpenGLError("Could not create shader mProgram.");
     mShader_vertex = glCreateShader(GL_VERTEX_SHADER);
     mShader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glAttachShader(mProgram, mShader_vertex);
@@ -89,13 +89,13 @@ void CGLShader::Init()
     	printf("%s\n", infolog);
     }
 
-    CGLThread::CheckOpenGLError("Could not link shader mProgram.");
+    CCL_GLThread::CheckOpenGLError("Could not link shader mProgram.");
 
     // Now look up the locations of the parameters
     for(int i = 0; i < mNParams; i++)
     {
     	mParam_locations[i] = glGetUniformLocation(mProgram, mParam_names[i].c_str());
-    	CGLThread::CheckOpenGLError("Could find variable in shader source.");
+    	CCL_GLThread::CheckOpenGLError("Could find variable in shader source.");
     }
 
     // The shader has been loaded, compiled, and linked.

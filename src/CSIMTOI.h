@@ -13,7 +13,7 @@
 
 #include <string>
 
-class CGLThread;
+class CCL_GLThread;
 class CLibOI;
 class CModelList;
 
@@ -34,7 +34,7 @@ protected:
 	// OpenGL, OpenCL Objects:
 
 	// OpenGL/OpenCL Globals:
-	CGLThread * mGL;
+	CCL_GLThread * mGL;
 	CLibOI * mCL;
 
 	// Model list:

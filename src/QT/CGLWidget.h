@@ -8,24 +8,27 @@
 #include <QResizeEvent>
 #include <QtDebug>
 
-#include "CGLThread.h"
+#include "CCL_GLThread.h"
+#include "CLibOI.h"
 
 class CModel;
 
-class CGLWidget : public QGLWidget {
+class CGLWidget : public QGLWidget
+{
     Q_OBJECT
     
 protected:
-    CGLThread mGLT;
+    CCL_GLThread mGLT;
 
 public:
-    CGLWidget(QWidget *parent, string shader_source_dir);
+    CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir);
+    ~CGLWidget();
 
     void AddModel(eModels model);
 protected:
     void closeEvent(QCloseEvent *evt);
 public:
-    void EnqueueOperation(GLT_Operations op);
+    void EnqueueOperation(CL_GLT_Operations op);
 	vector< pair<eGLShaders, string> > GetShaderNames(void) { return mGLT.GetShaderNames(); };
 
 protected:
