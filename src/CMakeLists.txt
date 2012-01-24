@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi CXX C Fortran)
 
+# include directories for the oilib:
+include_directories(${OI_INCLUDE_DIRS})
+
 # OpenGL is required
 if(NOT OpenGL_FOUND)
 	find_package(OpenGL REQUIRED)
@@ -19,9 +22,6 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/QT ${CMAKE_CURRENT_BINARY_DIR}/QT)
 add_subdirectory(QT)
-
-# include directories for the oilib:
-include_directories(${OI_INCLUDE_DIRS})
 
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp)
