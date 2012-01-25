@@ -30,6 +30,7 @@
 class CGLWidget;
 class CModel;
 class CGLShaderWrapper;
+class CLibOI;
 
 using namespace std;
 
@@ -41,7 +42,8 @@ enum CL_GLT_Operations
 	GLT_RenderModels,
 	GLT_Animate,
 	GLT_StopAnimate,
-	GLT_Stop
+	GLT_Stop,
+	CLT_Init
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
@@ -64,12 +66,8 @@ class CCL_GLThread : public QThread {
     Q_OBJECT
 
 protected:
-	priority_queue<CL_GLT_Operations, vector<CL_GLT_Operations>, GLQueueComparision> mQueue;
-    QMutex mQueueMutex;
-    QSemaphore mQueueSemaphore;
-    CGLWidget * mGLWidget;
-    CModelList * mModelList;
-    CGLShaderList * mShaderList;
+
+    // Window-related items:
     bool mPermitResize;
     bool mResizeInProgress;
     int mWidth;
@@ -77,11 +75,24 @@ protected:
     double mScale;
     double mDepth;
 
-    //QGLFramebufferObject * mFBO
-	GLuint mFBO;
+    // Queue:
+	priority_queue<CL_GLT_Operations, vector<CL_GLT_Operations>, GLQueueComparision> mQueue;
+    QMutex mQueueMutex;
+    QSemaphore mQueueSemaphore;
+
+    // OpenGL / rendering / FBOs
+    CGLWidget * mGLWidget;
+    CModelList * mModelList;
+    CGLShaderList * mShaderList;
+    GLuint mFBO;
 	GLuint mFBO_texture;
 	GLuint mFBO_depth;
 
+    // OpenCL:
+    CLibOI * mCL;
+    string mKernelSourceDir;
+
+    // Misc datamembers:
 	bool mRun;
 
     bool doResize;
@@ -90,7 +101,7 @@ protected:
     static int count;
 
 public:
-    CCL_GLThread(CGLWidget * glWidget, string shader_source_dir);
+    CCL_GLThread(CGLWidget * glWidget, string shader_source_dir, string kernel_source_dir);
     ~CCL_GLThread();
 
     void AddModel(eModels model);

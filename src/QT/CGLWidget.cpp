@@ -1,7 +1,7 @@
 #include "CGLWidget.h"
 
 CGLWidget::CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir)
-    : QGLWidget(parent), mGLT(this, shader_source_dir)
+    : QGLWidget(parent), mGLT(this, shader_source_dir, cl_kernel_dir)
 { 
     setAutoBufferSwap(false);
     this->doneCurrent();

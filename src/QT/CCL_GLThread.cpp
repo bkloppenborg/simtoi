@@ -8,12 +8,15 @@
 #include "CModelList.h"
 #include "CGLShaderList.h"
 #include "CPosition.h"
+#include "CLibOI.h"
 
 int CCL_GLThread::count = 0;
 
-CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir)
+CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string kernel_source_dir)
 	: QThread(), mGLWidget(glWidget)
 {
+	id = count++;
+
     mRun = true;
     mPermitResize = true;
     mResizeInProgress = false;
@@ -22,10 +25,14 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir)
     mModelList = new CModelList();
     mShaderList = new CGLShaderList(shader_source_dir);
     mDepth = 100; // +mDepth to -mDepth is the viewing region, in coordinate system units.
+
+    mKernelSourceDir = kernel_source_dir;
+    mCL = NULL;
 }
 
 CCL_GLThread::~CCL_GLThread()
 {
+	delete mCL;
 	delete mModelList;
 	delete mShaderList;
 }
@@ -291,6 +298,12 @@ void CCL_GLThread::run()
 
 	CCL_GLThread::CheckOpenGLError("Error occured during GL Thread Initialization.");
 
+	// Now setup the OpenCL device.
+	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
+	mCL->SetImage_GLTB(mFBO);
+	mCL->SetKernelSourcePath(mKernelSourceDir);
+//	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
+
     // Main thread loop
     // NOTE: If compiled with -D DEBUG_GL model rendering is skipped and a spinning pyramid is shown
     //       at the maximum possible framerate.
@@ -320,6 +333,8 @@ void CCL_GLThread::run()
 			glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
+        	// Now tell OpenCL about the image
+//        	mCL->SetImageSize(mWidth, mHeight, mScale);
 
         default:
         case GLT_RenderModels:
@@ -361,6 +376,12 @@ void CCL_GLThread::run()
         	ClearQueue();
         	EnqueueOperation(GLT_RenderModels);
         	break;
+
+        case CLT_Init:
+        	// Init all LibOI routines
+        	mCL->Init();
+        	break;
+
         }
     }
 }
