@@ -21,7 +21,7 @@ CModelCylinder::CModelCylinder()
 	mType = MDL_CYLINDER;
 
 	// Set the radius to some useful value, make it free.
-	mParamNames.push_back("Radius");
+	mParamNames.push_back("Diameter");
 	SetParam(mBaseParams + 1, 3.0);
 	SetFree(mBaseParams + 1, true);
 	mParamNames.push_back("Height");
