@@ -189,51 +189,11 @@ void CCL_GLThread::InitFrameBufferTexture(void)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void CCL_GLThread::glDrawTriangle()
+/// Loads data.
+void CCL_GLThread::LoadData(string filename)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear The Screen And The Depth Buffer
-    glLoadIdentity();				// Reset The View
-
-    glTranslatef(-1.5f,0.0f,-6.0f);
-
-    glRotatef(rotAngle,0.0f,1.0f,0.0f);		// Rotate The Pyramid On The Y axis
-
-    // draw a pyramid (in smooth coloring mode)
-    glBegin(GL_POLYGON);				// start drawing a pyramid
-
-    // front face of pyramid
-    glColor3f(1.0f,0.0f,0.0f);			// Set The Color To Red
-    glVertex3f(0.0f, 1.0f, 0.0f);		        // Top of triangle (front)
-    glColor3f(0.0f,1.0f,0.0f);			// Set The Color To Green
-    glVertex3f(-1.0f,-1.0f, 1.0f);		// left of triangle (front)
-    glColor3f(0.0f,0.0f,1.0f);			// Set The Color To Blue
-    glVertex3f(1.0f,-1.0f, 1.0f);		        // right of traingle (front)
-
-    // right face of pyramid
-    glColor3f(1.0f,0.0f,0.0f);			// Red
-    glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Right)
-    glColor3f(0.0f,0.0f,1.0f);			// Blue
-    glVertex3f( 1.0f,-1.0f, 1.0f);		// Left Of Triangle (Right)
-    glColor3f(0.0f,1.0f,0.0f);			// Green
-    glVertex3f( 1.0f,-1.0f, -1.0f);		// Right Of Triangle (Right)
-
-    // back face of pyramid
-    glColor3f(1.0f,0.0f,0.0f);			// Red
-    glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Back)
-    glColor3f(0.0f,1.0f,0.0f);			// Green
-    glVertex3f( 1.0f,-1.0f, -1.0f);		// Left Of Triangle (Back)
-    glColor3f(0.0f,0.0f,1.0f);			// Blue
-    glVertex3f(-1.0f,-1.0f, -1.0f);		// Right Of Triangle (Back)
-
-    // left face of pyramid.
-    glColor3f(1.0f,0.0f,0.0f);			// Red
-    glVertex3f( 0.0f, 1.0f, 0.0f);		// Top Of Triangle (Left)
-    glColor3f(0.0f,0.0f,1.0f);			// Blue
-    glVertex3f(-1.0f,-1.0f,-1.0f);		// Left Of Triangle (Left)
-    glColor3f(0.0f,1.0f,0.0f);			// Green
-    glVertex3f(-1.0f,-1.0f, 1.0f);		// Right Of Triangle (Left)
-
-    glEnd();					// Done Drawing The Pyramid
+	if(mCL)
+		mCL->LoadData(filename);
 }
 
 /// Resets any OpenGL errors by looping.
@@ -341,13 +301,6 @@ void CCL_GLThread::run()
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_RenderModels");
             mModelList->Render(mFBO, mWidth, mHeight);
 
-            if(mCLInitalized)
-            {
-				flux = mCL->TotalFlux(0, true);
-				t = mModelList->GetTime();
-				printf("Flux: %f %f\n", t, flux);
-            }
-
      	case GLT_BlitToScreen:
 			BlitToScreen();
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
@@ -371,6 +324,12 @@ void CCL_GLThread::run()
         	mCLInitalized = true;
         	break;
 
+        case CLT_temp:
+        	mCL->CopyImageToBuffer(0);
+        	float temp = mCL->ImageToChi2(0);
+        	//qDebug() << "time=" << QTime::currentTime().msec() << " " << temp;
+        	EnqueueOperation(CLT_temp);
+        	//printf("%f \n", temp);
         }
     }
 }

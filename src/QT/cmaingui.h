@@ -22,6 +22,8 @@ protected:
     string mKernelSourceDir;
     bool mAnimating;
 
+    string mDataDir;	// Stores the previously opened directory in the file dialog
+
 public:
     cmaingui(QWidget *parent = 0);
     ~cmaingui();
@@ -39,7 +41,8 @@ private slots:
     void render();
     void Animation_StartStop();
     void Animation_Reset();
-    void InitCL();
+    void RunMinimizer();
+    void LoadData();
 
 public slots:
 	void subwindowSelected(QMdiSubWindow * window);

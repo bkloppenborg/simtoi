@@ -43,7 +43,8 @@ enum CL_GLT_Operations
 	GLT_Animate,
 	GLT_StopAnimate,
 	GLT_Stop,
-	CLT_Init
+	CLT_Init,
+	CLT_temp
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
@@ -127,10 +128,11 @@ protected:
     void InitFrameBufferDepthBuffer(void);
     void InitFrameBufferTexture(void);
 
-private:
-    void glDrawTriangle();
-
 public:
+    void LoadData(string filename);
+
+    bool OpenCLInitialized() { return mCLInitalized; };
+
     static void ResetGLError();
     void resizeViewport(const QSize &size);
     void resizeViewport(int width, int height);

@@ -46,10 +46,10 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="1" rowspan="4">
+    <item row="0" column="2" rowspan="9">
      <widget class="QMdiArea" name="mdiArea"/>
     </item>
-    <item row="1" column="0">
+    <item row="4" column="0">
      <widget class="QTreeView" name="treeModels">
       <attribute name="headerMinimumSectionSize">
        <number>1</number>
@@ -59,10 +59,13 @@
       </attribute>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="5" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
        <widget class="QPushButton" name="btnAddModel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Add</string>
         </property>
@@ -70,21 +73,55 @@
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="btnDeleteModel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Delete</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="btnInitCL">
+     </layout>
+    </item>
+    <item row="2" column="0" rowspan="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="btnLoadData">
         <property name="text">
-         <string>InitCL</string>
+         <string>Load Data</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnRemoveData">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Remove Data</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
-    <item row="3" column="0">
+    <item row="1" column="0">
+     <widget class="QListWidget" name="listOpenFiles"/>
+    </item>
+    <item row="7" column="0" rowspan="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QComboBox" name="comboBox"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnMinimizer">
+        <property name="text">
+         <string>Run Minimizer</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="6" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="label_3">

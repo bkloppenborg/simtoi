@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QTreeView>
 #include <QStringList>
+#include <QFileDialog>
 #include <vector>
 #include <utility>
 
@@ -45,11 +46,13 @@ cmaingui::cmaingui(QWidget *parent_widget)
 	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
 	connect(ui.btnStartStop, SIGNAL(clicked(void)), this, SLOT(Animation_StartStop(void)));
 	connect(ui.btnReset, SIGNAL(clicked(void)), this, SLOT(Animation_Reset(void)));
-	connect(ui.btnInitCL, SIGNAL(clicked(void)), this, SLOT(InitCL(void)));
+	connect(ui.btnMinimizer, SIGNAL(clicked(void)), this, SLOT(RunMinimizer(void)));
+	connect(ui.btnLoadData, SIGNAL(clicked(void)), this, SLOT(LoadData(void)));
 
 	// TODO: Remove this, shouldn't be hard-coded!
 	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
 	mKernelSourceDir = "/home/bkloppenborg/workspace/simtoi/lib/liboi/src/kernels/";
+	mDataDir = "./";
 }
 
 cmaingui::~cmaingui()
@@ -121,12 +124,6 @@ void cmaingui::addGLArea()
     widget->SetShader(0, SHDR_LD_HESTEROFFER1997);
     widget->AddModel(MDL_CYLINDER);
     widget->SetPositionType(1, POSITION_ORBIT);
-    float * tmp = new float[4];
-    tmp[0] = 2.0;
-    tmp[1] = 0.9;
-    tmp[2] = 3.0;
-    tmp[3] = 0.5;
-    widget->SetParameters(tmp, 4);
 
     // Just messing around...
     CTreeModel * TreeModel = new CTreeModel();
@@ -209,10 +206,50 @@ void cmaingui::delGLArea()
     }
 }
 
-void cmaingui::InitCL()
+void cmaingui::RunMinimizer()
 {
     CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
-    widget->EnqueueOperation(CLT_Init);
+
+    if(!widget->OpenCLInitialized())
+    	widget->EnqueueOperation(CLT_Init);
+
+    widget->EnqueueOperation(CLT_temp);
+}
+
+void cmaingui::LoadData()
+{
+	string tmp;
+	int size;
+	// Ensure there is a selected widget, if not immediately return.
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    CGLWidget *widget = (CGLWidget*) sw->widget();
+
+    QFileDialog dialog(this);
+    dialog.setDirectory(QString::fromStdString(mDataDir));
+    dialog.setNameFilter(tr("Data Files (*.fit *.fits *.oifits)"));
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+
+
+    QStringList filenames;
+    QString dir = "";
+	if (dialog.exec())
+	{
+		filenames = dialog.selectedFiles();
+	}
+
+	if(filenames.size() > 0)
+		mDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
+
+	for(int i = 0; i < filenames.size(); i++)
+	{
+		tmp = filenames[i].toStdString();
+		size = tmp.size() - mDataDir.size();
+		widget->LoadData(tmp);
+		ui.listOpenFiles->addItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, size) ));
+	}
 }
 
 void cmaingui::LoadParameters(QStandardItem * parent, CParameters * parameters)

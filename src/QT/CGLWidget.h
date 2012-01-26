@@ -28,6 +28,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *evt);
 public:
+
     void EnqueueOperation(CL_GLT_Operations op);
 	vector< pair<eGLShaders, string> > GetShaderNames(void) { return mGLT.GetShaderNames(); };
 
@@ -38,6 +39,10 @@ protected:
 
 public:
     CModelList * GetModelList() { return mGLT.GetModelList(); };
+
+    void LoadData(string filename) { mGLT.LoadData(filename); };
+
+    bool OpenCLInitialized() { return mGLT.OpenCLInitialized(); };
 
     void SetParameters(float * params, int n_params);
     void SetScale(double scale);
