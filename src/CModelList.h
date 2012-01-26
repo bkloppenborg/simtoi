@@ -38,6 +38,7 @@ public:
 	int GetNFreeParameters();
 	void GetParameters(float * params, int n_params);
 	CModel * GetModel(int i) { return mList[i]; };
+	float GetTime() { return mTime; };
 
 	vector< pair<eModels, string> > GetList_AllModels(void);
 

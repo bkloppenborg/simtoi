@@ -36,6 +36,8 @@ public:
 	{
 		return mList.size();
 	}
+
+	T operator[](int i) { return mList[i]; }
 };
 
 #endif /* CVECTORLIST_H_ */
