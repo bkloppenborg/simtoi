@@ -91,6 +91,7 @@ protected:
     // OpenCL:
     CLibOI * mCL;
     string mKernelSourceDir;
+    bool mCLInitalized;
 
     // Misc datamembers:
 	bool mRun;

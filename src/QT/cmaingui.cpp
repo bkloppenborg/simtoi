@@ -38,10 +38,14 @@ cmaingui::cmaingui(QWidget *parent_widget)
 	ui.spinTimestep->setSingleStep(0.1);
 	ui.spinTimestep->setRange(0, 10000);
 
+	mAnimating = false;
+
 	// Now setup some signals and slots
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
 	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
-	connect(ui.btnAnimate, SIGNAL(clicked(void)), this, SLOT(Animate(void)));
+	connect(ui.btnStartStop, SIGNAL(clicked(void)), this, SLOT(Animation_StartStop(void)));
+	connect(ui.btnReset, SIGNAL(clicked(void)), this, SLOT(Animation_Reset(void)));
+	connect(ui.btnInitCL, SIGNAL(clicked(void)), this, SLOT(InitCL(void)));
 
 	// TODO: Remove this, shouldn't be hard-coded!
 	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
@@ -50,27 +54,33 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 cmaingui::~cmaingui()
 {
-	mAnimating = false;
+
 }
 
-void cmaingui::Animate()
+void cmaingui::Animation_StartStop()
 {
 	CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
 	if(mAnimating)
 	{
 		widget->EnqueueOperation(GLT_StopAnimate);
-		widget->SetTimestep(0);
-		widget->SetTime(0);
 		mAnimating = false;
-		ui.btnAnimate->setText("Animate");
+		ui.btnStartStop->setText("Start");
 	}
 	else
 	{
 		widget->SetTimestep(ui.spinTimestep->value());
 		widget->EnqueueOperation(GLT_Animate);
 		mAnimating = true;
-		ui.btnAnimate->setText("Stop Animation");
+		ui.btnStartStop->setText("Stop");
 	}
+}
+
+void cmaingui::Animation_Reset()
+{
+	CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+	widget->SetTime(0);
+	widget->EnqueueOperation(GLT_RenderModels);
+
 }
 
 
@@ -197,6 +207,12 @@ void cmaingui::delGLArea()
         widget->stopRendering();
         delete widget;
     }
+}
+
+void cmaingui::InitCL()
+{
+    CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+    widget->EnqueueOperation(CLT_Init);
 }
 
 void cmaingui::LoadParameters(QStandardItem * parent, CParameters * parameters)

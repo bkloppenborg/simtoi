@@ -37,7 +37,9 @@ private slots:
     void addModel(void);
     void delGLArea();
     void render();
-    void Animate();
+    void Animation_StartStop();
+    void Animation_Reset();
+    void InitCL();
 
 public slots:
 	void subwindowSelected(QMdiSubWindow * window);

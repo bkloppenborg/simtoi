@@ -19,7 +19,6 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
 
     mRun = true;
     mPermitResize = true;
-    mResizeInProgress = false;
     mScale = 0.01;	// init to some value > 0.
 
     mModelList = new CModelList();
@@ -28,6 +27,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
 
     mKernelSourceDir = kernel_source_dir;
     mCL = NULL;
+    mCLInitalized = false;
 }
 
 CCL_GLThread::~CCL_GLThread()
@@ -255,8 +255,6 @@ void CCL_GLThread::resizeViewport(int width, int height)
 	{
 		mWidth = width;
 		mHeight = height;
-		printf("Resizing to %i %i\n.", mWidth, mHeight);
-		// For SIMTOI, only permit a resize once.
 		EnqueueOperation(GLT_Resize);
 	}
 }   
@@ -303,10 +301,10 @@ void CCL_GLThread::run()
 	mCL->SetImage_GLTB(mFBO);
 	mCL->SetKernelSourcePath(mKernelSourceDir);
 //	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
+	float flux = 0;
+	float t = 0;
 
     // Main thread loop
-    // NOTE: If compiled with -D DEBUG_GL model rendering is skipped and a spinning pyramid is shown
-    //       at the maximum possible framerate.
     while (mRun)
     {
         op = GetNextOperation();
@@ -322,9 +320,9 @@ void CCL_GLThread::run()
          	break;
 
         case GLT_Resize:
-        	// Resize the screen.
+        	// Resize the screen, then cascade to a render and a blit.
 #ifdef DEBUG
-        	printf("Resizing...\n");
+    		printf("Resizing to %i %i\n.", mWidth, mHeight);
 #endif //DEBUG
             glViewport(0, 0, mWidth, mHeight);
             glMatrixMode(GL_PROJECTION);
@@ -333,35 +331,25 @@ void CCL_GLThread::run()
 			glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
-        	// Now tell OpenCL about the image
-//        	mCL->SetImageSize(mWidth, mHeight, mScale);
+        	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
+        	mCL->SetImageInfo(mWidth, mHeight, 1, float(mScale));
+        	mPermitResize = false;
 
         default:
         case GLT_RenderModels:
-        	// Call the drawing functions
-#ifdef DEBUG_GL
-        	// Bind to the off-screen framebuffer, clear it.
-            glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-            glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
-            rotAngle = rotAngle + (id+1)*3; // threads rotate pyramid at different rate!
-            qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << ":rendering...";
-            glDrawTriangle();
-            // Let the drawing operation complete.
-            glFinish();
-#else // DEBUG_GL
-            // Render the models
+            // Render the models, then cascade to a blit to screen.
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_RenderModels");
             mModelList->Render(mFBO, mWidth, mHeight);
 
-#endif // DEBUG_GL
-            // Let the rendering complete, then blit to the screen
+            if(mCLInitalized)
+            {
+				flux = mCL->TotalFlux(0, true);
+				t = mModelList->GetTime();
+				printf("Flux: %f %f\n", t, flux);
+            }
 
      	case GLT_BlitToScreen:
 			BlitToScreen();
-#ifdef DEBUG_GL
-			EnqueueOperation(GLT_RenderModels);
-#endif //DEBUG_GL
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
 			break;
 
@@ -380,6 +368,7 @@ void CCL_GLThread::run()
         case CLT_Init:
         	// Init all LibOI routines
         	mCL->Init();
+        	mCLInitalized = true;
         	break;
 
         }
