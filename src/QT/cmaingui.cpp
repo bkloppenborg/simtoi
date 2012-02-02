@@ -122,8 +122,8 @@ void cmaingui::addGLArea()
     // TODO: Remove later.  Add a sphere:
     widget->AddModel(MDL_SPHERE);
     widget->SetShader(0, SHDR_LD_HESTEROFFER1997);
-    widget->AddModel(MDL_CYLINDER);
-    widget->SetPositionType(1, POSITION_ORBIT);
+//    widget->AddModel(MDL_CYLINDER);
+//    widget->SetPositionType(1, POSITION_ORBIT);
 
     // Just messing around...
     CTreeModel * TreeModel = new CTreeModel();
@@ -213,7 +213,8 @@ void cmaingui::RunMinimizer()
     if(!widget->OpenCLInitialized())
     	widget->EnqueueOperation(CLT_Init);
 
-    widget->EnqueueOperation(CLT_temp);
+    widget->LoadMinimizer();
+    widget->RunMinimizer();
 }
 
 void cmaingui::LoadData()
@@ -310,38 +311,3 @@ void cmaingui::subwindowSelected(QMdiSubWindow * window)
 {
 	//ui.treeModels
 }
-
-void cmaingui::SetupComboBoxes()
-{
-//	const char * tmp_string;
-//	// First get a list of the available models and enumerated types.  Append those to the combo box
-//	CModelList tmp1 = CModelList();
-//	vector< pair<eModels, string> > models = tmp1.GetList_AllModels();
-//	eModels tmp_model_id;
-//
-//	for(vector<pair<eModels, string> >::iterator it = models.begin(); it != models.end(); ++it)
-//	{
-//		tmp_string = (*it).second.c_str();
-//		tmp_model_id = (*it).first;
-//		ui.cboModels->addItem(QString(tmp_string), QVariant(tmp_model_id));
-//	}
-
-//	// Now do the same for the shaders:
-//	CGLShaderList tmp2 = CGLShaderList(mShaderSourceDir);
-//	vector< pair<eGLShaders, string> > shaders = tmp2.GetShaderNames();
-//	eGLShaders tmp_shader_id;
-//
-//	for(vector<pair<eGLShaders, string> >::iterator it = shaders.begin(); it != shaders.end(); ++it)
-//	{
-//		tmp_string = (*it).second.c_str();
-//		tmp_shader_id = (*it).first;
-//		ui.cboShaders->addItem(QString(tmp_string), QVariant(tmp_shader_id));
-//	}
-
-}
-
-//void cmaingui::model_clicked(const QModelIndex & index)
-//{
-//	QString text = ui.treeModels->currentIndex().data().toString();
-//	printf("Label: %s \n", text.toStdString().c_str());
-//}

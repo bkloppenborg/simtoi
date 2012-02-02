@@ -36,7 +36,8 @@ public:
 	CModel * AddNewModel(eModels model_id);
 
 	int GetNFreeParameters();
-	void GetParameters(float * params, int n_params);
+	void GetAllParameters(float * params, int n_params);
+	void GetFreeParameters(float * params, int n_params);
 	CModel * GetModel(int i) { return mList[i]; };
 	float GetTime() { return mTime; };
 

@@ -44,7 +44,21 @@ CModel * CModelList::AddNewModel(eModels model_id)
 	return mList.back();
 }
 
-void CModelList::GetParameters(float * params, int n_params)
+/// Returns the total number of free parameters in the models
+int CModelList::GetNFreeParameters()
+{
+    int n = 0;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	n +=(*it)->GetTotalFreeParameters();
+    }
+
+    return n;
+}
+
+void CModelList::GetAllParameters(float * params, int n_params)
 {
     int n = 0;
 
@@ -55,6 +69,19 @@ void CModelList::GetParameters(float * params, int n_params)
     	n += (*it)->GetTotalFreeParameters();
     }
 }
+
+/// Gets the values for all of the free parameters:
+//void CModelList::GetFreeParameters(float * params, int n_params)
+//{
+//    int n = 0;
+//
+//    // Now call render on all of the models:
+//    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+//    {
+//    	params[n] = (*it)->GetAllParameters(params + n, n_params - n);
+//    	n += (*it)->GetTotalFreeParameters();
+//    }
+//}
 
 /// Returns a pair of model names, and their enumerated types
 vector< pair<eModels, string> > CModelList::GetList_AllModels(void)

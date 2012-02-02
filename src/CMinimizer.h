@@ -17,31 +17,27 @@
 #define CMINIMIZER_H_
 
 #include <string>
+#include <cstdio>
+#include "boost/function.hpp"
+#include "boost/bind.hpp"
 
 using namespace std;
 
-class CSIMTOI;
+class CCL_GLThread;
 
 class CMinimizer
 {
 protected:
-	//boost::thread * mThread;
-	CSIMTOI * mSIMTOI;	// A pointer to SIMTOI methods.  Not allocated here so don't deallocate.
+	CCL_GLThread * mCLThread;
+	float * mParams;
 
 public:
-	CMinimizer(CSIMTOI * simtoi);
+	CMinimizer(CCL_GLThread * cl_gl_thread);
 	virtual ~CMinimizer();
 
 public:
-	static CMinimizer * GetMinimizer(string name, CSIMTOI * simtoi);
-
-	virtual int Init() = 0;
-
-	void Run();
-
-	void Stop();
-
-	virtual int ThreadFunc() = 0;
+	virtual void Init();
+	virtual int run() = 0;
 };
 
 #endif /* CMINIMIZER_H_ */

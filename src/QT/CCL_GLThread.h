@@ -44,7 +44,9 @@ enum CL_GLT_Operations
 	GLT_StopAnimate,
 	GLT_Stop,
 	CLT_Init,
-	CLT_temp
+	CLT_Chi,
+	CLT_Chi2,
+	CLT_LogLike
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
@@ -93,6 +95,11 @@ protected:
     CLibOI * mCL;
     string mKernelSourceDir;
     bool mCLInitalized;
+    QSemaphore mCLOpSemaphore;
+    int mCLDataSet;
+    float mCLValue;
+    float * mCLArrayValue;
+    int mCLArrayN;
 
     // Misc datamembers:
 	bool mRun;
@@ -116,12 +123,17 @@ public:
 
     void EnqueueOperation(CL_GLT_Operations op);
 
+	void GetChi(int data_num, float * output, int & n);
+    float GetChi2(int data_num);
 	int GetHeight() { return mHeight; };
+	float GetLogLike(int data_num);
     CL_GLT_Operations GetNextOperation(void);
 	vector< pair<eGLShaders, string> > GetShaderNames(void);
 	CModelList * GetModelList() { return mModelList; };
 	float GetScale() { return mScale; };
 	int GetWidth() { return mWidth; };
+	int GetNFreeParameters() { return mModelList->GetNFreeParameters(); };
+	int GetNData();
 
 protected:
     void InitFrameBuffer(void);

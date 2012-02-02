@@ -31,10 +31,10 @@ CParameters::CParameters(int n_params)
 
 CParameters::~CParameters()
 {
-	delete mParams;
-	delete mFreeParams;
-	delete mScales;
-	delete mScales_min;
+	delete[] mParams;
+	delete[] mFreeParams;
+	delete[] mScales;
+	delete[] mScales_min;
 }
 
 /// Counts the number of free parameters, sets that value to mNFreeParams

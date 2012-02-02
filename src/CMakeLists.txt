@@ -23,8 +23,13 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/QT ${CMAKE_CURRENT_BINARY_DIR}/QT)
 add_subdirectory(QT)
 
+# Include Boost (for boost::bind in the CMinimizer base class)
+find_package(Boost COMPONENTS system REQUIRED)  
+link_directories(${Boost_LIBRARY_DIRS})  
+include_directories(${Boost_INCLUDE_DIRS})  
+
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp)
 add_executable(simtoi ${SOURCE})
-#target_link_libraries(simtoi QT_files textio oi multinest ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
-target_link_libraries(simtoi QT_files textio oi ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(simtoi QT_files textio oi multinest cmpfit ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${Boost_SYSTEM_LIBRARY})
+#target_link_libraries(simtoi QT_files textio oi ${QT_LIBRARIES} ${OPENGL_LIBRARIES})

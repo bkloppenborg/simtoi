@@ -30,7 +30,6 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *evt);
-    void SetupComboBoxes(void);
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
 

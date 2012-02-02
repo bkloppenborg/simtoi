@@ -1,0 +1,113 @@
+/*
+ * CMinimizer_MultiNest.cpp
+ *
+ *  Created on: Jan 26, 2012
+ *      Author: bkloppenborg
+ */
+
+#include "CMinimizer_MultiNest.h"
+#include "CCL_GLThread.h"
+
+CMinimizer_MultiNest::CMinimizer_MultiNest(CCL_GLThread * cl_gl_thread)
+	: CMinimizer(cl_gl_thread)
+{
+
+}
+
+CMinimizer_MultiNest::~CMinimizer_MultiNest()
+{
+	// TODO Auto-generated destructor stub
+}
+
+/// Dumper (do nothing)
+void CMinimizer_MultiNest::dumper(int *nSamples, int *nlive, int *nPar, double **physLive, double **posterior, double *paramConstr, double *maxLogLike, double *logZ, double *logZerr)
+{
+
+/*
+//	 paramConstr(4*nPar):
+//   paramConstr(1) to paramConstr(nPar)	     	= mean values of the parameters
+//   paramConstr(nPar+1) to paramConstr(2*nPar)    	= standard deviation of the parameters
+//   paramConstr(nPar*2+1) to paramConstr(3*nPar)  	= best-fit (maxlike) parameters
+//   paramConstr(nPar*4+1) to paramConstr(4*nPar)  	= MAP (maximum-a-posteriori) parameters
+*/
+//	printf("npar %i\n", *nPar);
+//	printf("Pointer %p\n", paramConstr);
+//
+//	printf("maxLogLike %f, logZ %f, logZerr %f\n", 	*maxLogLike, *logZ, *logZerr);
+//
+//	for(int i = 0; i < *nPar + 1; i++)
+//		printf("%s: %e %e %e\n", param_names[i].c_str(), paramConstr[i], paramConstr[2* (*nPar) + i], paramConstr[3* (*nPar) + i]);
+}
+
+void CMinimizer_MultiNest::log_likelihood(double *Cube, int *ndim, int *npars, double *lnew)
+{
+	// Convert the double parameter values back to floats
+	int nData = mCLThread->GetNData();
+
+	for(int i = 0; i < *npars; i++)
+		mParams = float(Cube[i]);
+
+	mCLThread->SetParameters(mParams, *npars);
+
+	float tmp = 0;
+	for(int i = 0; i < nData; i++)
+		tmp += mCLThread->GetLogLike(i);
+
+	*lnew = tmp;
+}
+
+
+/// Runs MultiNest.
+int CMinimizer_MultiNest::run()
+{
+	// Init local storage space:
+	Init(mCLThread->GetNFreeParams());
+
+	// set the MultiNest sampling parameters
+	int mmodal = 1;					// do mode separation?
+	int ceff = 0;					// run in constant efficiency mode?
+	int nlive = 1000;				// number of live points
+	double efr = 1.0;				// set the required efficiency
+	double tol = 0.5;				// tol, defines the stopping criteria
+	int ndims = 6 + opt_params;					// dimensionality (no. of free parameters)
+	int nPar = 6 + opt_params;					// total no. of parameters including free & derived parameters
+	int nClsPar = 6 + opt_params;				// no. of parameters to do mode separation on
+	int updInt = 100;				// after how many iterations feedback is required & the output files should be updated
+									// note: posterior files are updated & dumper routine is called after every updInt*10 iterations
+	double Ztol = -1E90;			// all the modes with logZ < Ztol are ignored
+	int maxModes = 100;				// expected max no. of modes (used only for memory allocation)
+	int pWrap[ndims];				// which parameters to have periodic boundary conditions?
+	for(int i = 0; i < ndims; i++)
+	    pWrap[i] = 0;
+
+	// omega can have periodic boundary conditions if it occupies 0 ... 2pi
+	if(omega_min == 0 && omega_max == TWO_PI)
+		pWrap[0] = 1;
+
+	char root[100] = "";		// root for output files
+	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
+	int fb = 1;					    // need feedback on standard output?
+	int resume = 0;					// resume from a previous job?
+	int outfile = 1;				// write output files?
+	int initMPI = 0;				// initialize MPI routines?, relevant only if compiling with MPI
+							        // set it to F if you want your main program to handle MPI initialization
+
+	double logZero = -DBL_MAX;		// points with loglike < logZero will be ignored by MultiNest
+	int context = 0;				// not required by MultiNest, any additional information user wants to pass
+
+
+
+    int i;
+	for (i = strlen(root); i < 100; i++)
+	    root[i] = ' ';
+
+    // Run the nested sampling algorithm
+    NESTRUN(&mmodal, &ceff, &nlive, &tol,
+        &efr, &ndims, &nPar, &nClsPar,
+        &maxModes, &updInt, &Ztol, root,
+        &seed, pWrap, &fb, &resume,
+        &outfile, &initMPI, &logZero,
+        LogLike,
+        dumper,
+        &context);
+}

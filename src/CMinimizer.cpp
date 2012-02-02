@@ -6,35 +6,19 @@
  */
 
 #include "CMinimizer.h"
-//#include "CMinimizer_MultiNest.h"
+#include "CCL_GLThread.h"
 
-CMinimizer::CMinimizer(CSIMTOI * simtoi)
+CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 {
-	mSIMTOI = simtoi;
+	mCLThread = cl_gl_thread;
 }
 
 CMinimizer::~CMinimizer()
 {
-
+	delete[] mParams;
 }
 
-CMinimizer * CMinimizer::GetMinimizer(string name, CSIMTOI * simtoi)
+void CMinimizer::Init()
 {
-	CMinimizer * tmp = NULL;
-
-	// Just match the string
-//	if(name == "MultiNest")
-//		tmp = new CMinimizer_MultiNest(simtoi);
-
-	return tmp;
-}
-
-void CMinimizer::Run()
-{
-	//mThread = new boost::thread(boost::bind(&CMinimizer::ThreadFunc, this));
-}
-
-void CMinimizer::Stop()
-{
-
+	mParams = new float[mCLThread->GetNFreeParameters()];
 }

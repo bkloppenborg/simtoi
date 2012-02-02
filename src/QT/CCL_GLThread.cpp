@@ -28,6 +28,8 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
     mKernelSourceDir = kernel_source_dir;
     mCL = NULL;
     mCLInitalized = false;
+    mCLDataSet = 0;
+    mCLValue = 0;
 }
 
 CCL_GLThread::~CCL_GLThread()
@@ -104,6 +106,43 @@ void CCL_GLThread::EnqueueOperation(CL_GLT_Operations op)
 	mQueue.push(op);
 	mQueueMutex.unlock();
 	mQueueSemaphore.release();
+}
+
+/// Returns the chi values in output for the specified data set and the current image.
+void CCL_GLThread::GetChi(int data_num, float * output, int & n)
+{
+	mCLDataSet = data_num;
+	mCLArrayValue = output;
+	mCLArrayN = n;
+	EnqueueOperation(CLT_Chi);
+	mCLOpSemaphore.acquire();
+	n = mCLArrayN;
+}
+
+/// Returns the chi2 for the specified data set
+float CCL_GLThread::GetChi2(int data_num)
+{
+	// Set the data number, enqueue the operation and then block until we receive an answer.
+	mCLDataSet = data_num;
+	EnqueueOperation(CLT_Chi2);
+	mCLOpSemaphore.acquire();
+	return mCLValue;
+}
+
+/// Returns the chi2 for the specified data set
+float CCL_GLThread::GetLogLike(int data_num)
+{
+	// Set the data number, enqueue the operation and then block until we receive an answer.
+	mCLDataSet = data_num;
+	EnqueueOperation(CLT_LogLike);
+	mCLOpSemaphore.acquire();
+	return mCLValue;
+}
+
+/// Returns the total number of data points (V2 + T3) in all data sets loaded.
+int CCL_GLThread::GetNData()
+{
+	return mCL->GetNData();
 }
 
 /// Get the next operation from the queue.  This is a blocking function.
@@ -324,12 +363,29 @@ void CCL_GLThread::run()
         	mCLInitalized = true;
         	break;
 
-        case CLT_temp:
+        case CLT_Chi:
+        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+        	// local value.
         	mCL->CopyImageToBuffer(0);
-        	float temp = mCL->ImageToChi2(0);
-        	//qDebug() << "time=" << QTime::currentTime().msec() << " " << temp;
-        	EnqueueOperation(CLT_temp);
-        	//printf("%f \n", temp);
+        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Chi2:
+        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+        	// TODO: Note the spectral data will need something special here.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->ImageToChi2(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_LogLike:
+        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+        	// TODO: Note the spectral data will need something special here.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
         }
     }
 }
