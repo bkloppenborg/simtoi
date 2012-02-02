@@ -34,7 +34,7 @@ CGLShader::~CGLShader()
 	if(mShader_fragment) glDeleteShader(mShader_fragment);
 
 	// Now release object memory:
-	delete mParam_locations;
+	delete[] mParam_locations;
 }
 
 /// Returns the name of the specified parameter, if out of bounds returns an empty string.
