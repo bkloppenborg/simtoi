@@ -1,7 +1,11 @@
 #include "CGLWidget.h"
 
+#include "CMinimizer.h"
+#include "CMinimizer_mpfit.h"
+
+
 CGLWidget::CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir)
-    : QGLWidget(parent), mGLT(this, shader_source_dir, cl_kernel_dir)
+    : QGLWidget(parent), mGLT(this, shader_source_dir, cl_kernel_dir), mMinThread()
 { 
     setAutoBufferSwap(false);
     this->doneCurrent();
@@ -27,15 +31,28 @@ void CGLWidget::closeEvent(QCloseEvent *evt)
     stopRendering();
     QGLWidget::closeEvent(evt);
 }
+
+void CGLWidget::LoadMinimizer()
+{
+	// TODO: Permit loading of different minimizers here.
+	CMinimizer * tmp;
+	tmp = (CMinimizer*) new CMinimizer_mpfit(&mGLT);
+	mMinThread.SetMinimizer(tmp);
+}
+
 void CGLWidget::paintEvent(QPaintEvent *)
 {
-    // Handled by the GLThread.
+    mGLT.EnqueueOperation(GLT_RenderModels);
 }
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
     mGLT.resizeViewport(evt->size());
 }
 
+void CGLWidget::RunMinimizer()
+{
+	mMinThread.start();
+}
 
 void CGLWidget::startRendering()
 {

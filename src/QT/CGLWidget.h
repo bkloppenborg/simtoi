@@ -9,6 +9,7 @@
 #include <QtDebug>
 
 #include "CCL_GLThread.h"
+#include "CMinimizerThread.h"
 #include "CLibOI.h"
 
 class CModel;
@@ -19,6 +20,7 @@ class CGLWidget : public QGLWidget
     
 protected:
     CCL_GLThread mGLT;
+    CMinimizerThread mMinThread;
 
 public:
     CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir);
@@ -41,8 +43,11 @@ public:
     CModelList * GetModelList() { return mGLT.GetModelList(); };
 
     void LoadData(string filename) { mGLT.LoadData(filename); };
+    void LoadMinimizer();
 
     bool OpenCLInitialized() { return mGLT.OpenCLInitialized(); };
+
+    void RunMinimizer();
 
     void SetParameters(float * params, int n_params);
     void SetScale(double scale);
