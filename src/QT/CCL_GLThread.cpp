@@ -28,8 +28,11 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
     mKernelSourceDir = kernel_source_dir;
     mCL = NULL;
     mCLInitalized = false;
+    // These values come from outside of this class, if they are an array don't delete or free them here.
     mCLDataSet = 0;
     mCLValue = 0;
+    mCLArrayValue = NULL;
+    mCLArrayN = 0;
 }
 
 CCL_GLThread::~CCL_GLThread()

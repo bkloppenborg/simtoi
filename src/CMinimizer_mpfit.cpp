@@ -44,8 +44,14 @@ int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double 
 	tmp->mCLThread->GetChi(0, tmp->mResiduals, nData);
 
 	// Copy the errors back into the double array:
+//	printf("Residuals:\n");
 	for(int i = 0; i < nData; i++)
+	{
 		deviates[i] = double(tmp->mResiduals[i]);
+//		printf("%i %f \n", i, deviates[i]);
+	}
+
+	return 0;
 }
 
 void CMinimizer_mpfit::Init()
@@ -59,17 +65,34 @@ void CMinimizer_mpfit::Init()
 int CMinimizer_mpfit::run()
 {
 	// Create a member function pointer
+	int status = 0;
 	int nParams = mCLThread->GetNFreeParameters();
 	int nData = mCLThread->GetNData();
 
 	double * input_params = new double[nParams];
+	mp_par_struct * pars = new mp_par_struct[nParams];
 
 	for(int i = 0; i < nParams; i++)
-		input_params[i] = 0.5;
+	{
+		input_params[i] = 0.9;
+		pars[i].fixed = 0;
+		pars[i].limited[0] = 0;
+		pars[i].limited[1] = 0;
+		pars[i].limits[0] = 0;
+		pars[i].limits[1] = 0;
+		pars[i].step = 0.01;
+		pars[i].relstep = 0.001;
+		pars[i].side = 2;
+		pars[i].deriv_debug = 0;
+	}
 
-	mpfit(&CMinimizer_mpfit::ErrorFunc, nData, nParams, input_params, 0, 0, (void*) this, NULL);
+
+	status = mpfit(&CMinimizer_mpfit::ErrorFunc, nData, nParams, input_params, pars, 0, (void*) this, NULL);
+
+	printf("Minimizer Exit Code: %d\n", status);
 
 	delete[] input_params;
+	delete[] pars;
 
 	return 0;
 }

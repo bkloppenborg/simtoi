@@ -23,6 +23,8 @@ void CMinimizerThread::run()
 	if(!mMinimizer)
 		return;
 
+	// Call init before running the minimzer to setup memory.
+	mMinimizer->Init();
 	mMinimizer->run();
 }
 
