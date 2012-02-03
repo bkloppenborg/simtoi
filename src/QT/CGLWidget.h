@@ -7,12 +7,14 @@
 #include <QGLWidget>
 #include <QResizeEvent>
 #include <QtDebug>
+#include <QStandardItemModel>
 
 #include "CCL_GLThread.h"
 #include "CMinimizerThread.h"
 #include "CLibOI.h"
 
 class CModel;
+class CTreeModel;
 
 class CGLWidget : public QGLWidget
 {
@@ -21,6 +23,8 @@ class CGLWidget : public QGLWidget
 protected:
     CCL_GLThread mGLT;
     CMinimizerThread mMinThread;
+    QStandardItemModel * mOpenFileModel;
+    CTreeModel * mTreeModel;
 
 public:
     CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir);
@@ -41,10 +45,15 @@ protected:
 
 public:
     CModelList * GetModelList() { return mGLT.GetModelList(); };
+    QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
+    CTreeModel * GetTreeModel() { return mTreeModel; };
 
     void LoadData(string filename) { mGLT.LoadData(filename); };
     void LoadMinimizer();
-
+protected:
+    void LoadParameters(QStandardItem * parent, CParameters * parameters);
+    QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
+public:
     bool OpenCLInitialized() { return mGLT.OpenCLInitialized(); };
 
     void RunMinimizer();

@@ -67,7 +67,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Add</string>
+         <string>Add Model</string>
         </property>
        </widget>
       </item>
@@ -77,7 +77,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Delete</string>
+         <string>Delete Model</string>
         </property>
        </widget>
       </item>
@@ -103,9 +103,6 @@
        </widget>
       </item>
      </layout>
-    </item>
-    <item row="1" column="0">
-     <widget class="QListWidget" name="listOpenFiles"/>
     </item>
     <item row="7" column="0" rowspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -154,6 +151,9 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item row="1" column="0">
+     <widget class="QListView" name="listOpenFiles"/>
     </item>
    </layout>
   </widget>

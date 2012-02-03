@@ -15,10 +15,8 @@
 #include "CGLWidget.h"
 #include "enumerations.h"
 #include "CGLShaderList.h"
-#include "CModel.h"
-#include "CModelList.h"
 #include "CTreeModel.h"
-#include "CParameterItem.h"
+
 
 Q_DECLARE_METATYPE(eModels);
 Q_DECLARE_METATYPE(eGLShaders);
@@ -125,53 +123,12 @@ void cmaingui::addGLArea()
 //    widget->AddModel(MDL_CYLINDER);
 //    widget->SetPositionType(1, POSITION_ORBIT);
 
-    // Just messing around...
-    CTreeModel * TreeModel = new CTreeModel();
-	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value";
-	TreeModel->setColumnCount(3);
-	TreeModel->setHorizontalHeaderLabels(labels);
-	CModelList * model_list = widget->GetModelList();
-
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	QStandardItem * parent;
-	CModel * model;
-	CPosition * position;
-	CGLShaderWrapper * shader;
-
-	for(int i = 0; i < model_list->size(); i++)
-	{
-		// First pull out the model parameters
-		model = model_list->GetModel(i);
-		items = LoadParametersHeader(QString("Model"), model);
-		parent = items[0];
-		TreeModel->appendRow(items);
-		LoadParameters(parent, model);
-
-		// Now for the Position Parameters
-		position = model->GetPosition();
-		items = LoadParametersHeader(QString("Position"), position);
-		item = items[0];
-		parent->appendRow(items);
-		LoadParameters(item, position);
-
-		// Lastly for the shader:
-		shader = model->GetShader();
-		items = LoadParametersHeader(QString("Shader"), shader);
-		item = items[0];
-		parent->appendRow(items);
-		LoadParameters(item, shader);
-
-	}
-
 	// Set the model
-	ui.treeModels->setModel(TreeModel);
 	ui.treeModels->setHeaderHidden(false);
 	ui.treeModels->resizeColumnToContents(1);
 
 	// Now connect the slot
-	connect(TreeModel, SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
+	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
 }
 
 void cmaingui::addModel(void)
@@ -217,22 +174,26 @@ void cmaingui::RunMinimizer()
     widget->RunMinimizer();
 }
 
+/// Loads OIFITS data into the current selected subwindow
 void cmaingui::LoadData()
 {
 	string tmp;
 	int size;
+
 	// Ensure there is a selected widget, if not immediately return.
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
+    // Get access to the current widget and QStandardItemModel:
     CGLWidget *widget = (CGLWidget*) sw->widget();
+    QStandardItemModel * model = widget->GetOpenFileModel();
 
+    // Open a dialog, get a list of file that the user selected:
     QFileDialog dialog(this);
     dialog.setDirectory(QString::fromStdString(mDataDir));
     dialog.setNameFilter(tr("Data Files (*.fit *.fits *.oifits)"));
     dialog.setFileMode(QFileDialog::ExistingFiles);
-
 
     QStringList filenames;
     QString dir = "";
@@ -241,61 +202,18 @@ void cmaingui::LoadData()
 		filenames = dialog.selectedFiles();
 	}
 
+	// Now pull out the data directory (to make file display cleaner)
 	if(filenames.size() > 0)
 		mDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
 
 	for(int i = 0; i < filenames.size(); i++)
 	{
+		// Tell the widget to load the data file and append a row to its file list:
 		tmp = filenames[i].toStdString();
 		size = tmp.size() - mDataDir.size();
 		widget->LoadData(tmp);
-		ui.listOpenFiles->addItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, size) ));
+		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, size) )));
 	}
-}
-
-void cmaingui::LoadParameters(QStandardItem * parent, CParameters * parameters)
-{
-	for(int j = 0; j < parameters->GetNParams(); j++)
-	{
-		QList<QStandardItem *> items;
-		QStandardItem * item;
-
-		// First the name
-		item = new QStandardItem(QString::fromStdString(parameters->GetParamName(j)));
-		items << item;
-
-		// Now the checkbox
-		item = new CParameterItem(parameters, j);
-		item->setEditable(true);
-		item->setCheckable(true);
-		if(parameters->IsFree(j))
-			item->setCheckState(Qt::Checked);
-		else
-			item->setCheckState(Qt::Unchecked);
-		items << item;
-
-		// Lastly the value:
-		item = new CParameterItem(parameters, j);
-		item->setEditable(true);
-		item->setData(QVariant((double)parameters->GetParam(j)), Qt::DisplayRole);
-		items << item;
-
-		parent->appendRow(items);
-	}
-}
-
-QList<QStandardItem *> cmaingui::LoadParametersHeader(QString name, CParameters * param_base)
-{
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	item = new QStandardItem(name);
-	items << item;
-	item = new QStandardItem(QString(""));
-	items << item;
-	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
-	items << item;
-
-	return items;
 }
 
 void cmaingui::render()
@@ -309,5 +227,11 @@ void cmaingui::render()
 
 void cmaingui::subwindowSelected(QMdiSubWindow * window)
 {
-	//ui.treeModels
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    CGLWidget *widget = (CGLWidget*) sw->widget();
+    ui.listOpenFiles->setModel(widget->GetOpenFileModel());
+	ui.treeModels->setModel(widget->GetTreeModel());
 }

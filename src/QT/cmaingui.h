@@ -30,8 +30,6 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *evt);
-    void LoadParameters(QStandardItem * parent, CParameters * parameters);
-    QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
 
 private slots:
     void addGLArea();
