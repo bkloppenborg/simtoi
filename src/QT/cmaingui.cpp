@@ -183,7 +183,12 @@ void cmaingui::LoadData()
 	// Ensure there is a selected widget, if not immediately return.
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
+    {
+		QMessageBox msgBox;
+		msgBox.setText("You must have an active model region before you can load data.");
+		msgBox.exec();
     	return;
+    }
 
     // Get access to the current widget and QStandardItemModel:
     CGLWidget *widget = (CGLWidget*) sw->widget();
@@ -214,6 +219,25 @@ void cmaingui::LoadData()
 		widget->LoadData(tmp);
 		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, size) )));
 	}
+}
+
+/// Removes the current selected data set.
+void cmaingui::RemoveData()
+{
+//	// Ensure there is a selected widget, if not immediately return.
+//    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+//    if(!sw)
+//    	return;
+//
+//    // Get access to the current widget, and QStandardItemModel list
+//    CGLWidget *widget = (CGLWidget*) sw->widget();
+//    QStandardItemModel * list = widget->GetOpenFileModel();
+//
+//    // Get the selected indicies:
+////    QModelIndexList selection = ui.listOpenFiles->selectedIndexes();
+
+
+
 }
 
 void cmaingui::render()
