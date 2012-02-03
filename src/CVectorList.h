@@ -32,6 +32,14 @@ public:
 		mList.push_back(item);
 	}
 
+	void Remove(int i)
+	{
+		if(i < mList.size())
+		{
+			mList.erase(mList.begin() + i);
+		}
+	}
+
 	int size(void)
 	{
 		return mList.size();
