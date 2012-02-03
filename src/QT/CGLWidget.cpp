@@ -10,8 +10,8 @@
 #include "CParameterItem.h"
 
 
-CGLWidget::CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir)
-    : QGLWidget(parent), mGLT(this, shader_source_dir, cl_kernel_dir), mMinThread()
+CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
+    : QGLWidget(widget_parent), mGLT(this, shader_source_dir, cl_kernel_dir), mMinThread()
 { 
     setAutoBufferSwap(false);
     this->doneCurrent();
@@ -41,7 +41,7 @@ void CGLWidget::AddModel(eModels model_type)
 
 	QList<QStandardItem *> items;
 	QStandardItem * item;
-	QStandardItem * parent;
+	QStandardItem * item_parent;
 	CModel * model;
 	CPosition * position;
 	CGLShaderWrapper * shader;
@@ -52,22 +52,22 @@ void CGLWidget::AddModel(eModels model_type)
 		// First pull out the model parameters
 		model = model_list->GetModel(i);
 		items = LoadParametersHeader(QString("Model"), model);
-		parent = items[0];
+		item_parent = items[0];
 		mTreeModel->appendRow(items);
-		LoadParameters(parent, model);
+		LoadParameters(item_parent, model);
 
 		// Now for the Position Parameters
 		position = model->GetPosition();
 		items = LoadParametersHeader(QString("Position"), position);
 		item = items[0];
-		parent->appendRow(items);
+		item_parent->appendRow(items);
 		LoadParameters(item, position);
 
 		// Lastly for the shader:
 		shader = model->GetShader();
 		items = LoadParametersHeader(QString("Shader"), shader);
 		item = items[0];
-		parent->appendRow(items);
+		item_parent->appendRow(items);
 		LoadParameters(item, shader);
 	}
 

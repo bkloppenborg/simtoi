@@ -11,9 +11,9 @@
 
 #include "CParameters.h"
 
-CParameterItem::CParameterItem(CParameters * parent, int id)
+CParameterItem::CParameterItem(CParameters * item_parent, int id)
 {
-	mParent = parent;
+	mParent = item_parent;
 	mID = id;
 
 }

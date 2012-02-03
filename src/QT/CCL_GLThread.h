@@ -55,7 +55,7 @@ class GLQueueComparision
 public:
 	GLQueueComparision() {};
 
-	bool operator() (const CL_GLT_Operations& lhs, const CL_GLT_Operations&rhs) const
+	bool operator() (const CL_GLT_Operations & lhs, const CL_GLT_Operations & rhs) const
 	{
 		if(rhs == GLT_Stop)
 			return true;

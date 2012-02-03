@@ -18,9 +18,9 @@ CTreeModel::~CTreeModel()
 	// TODO Auto-generated destructor stub
 }
 
-bool CTreeModel::setData(const QModelIndex & index, const QVariant & value, int role)
+bool CTreeModel::setData(const QModelIndex & item_index, const QVariant & value, int role)
 {
-	bool tmp = QStandardItemModel::setData(index, value, role);
+	bool tmp = QStandardItemModel::setData(item_index, value, role);
 	emit parameterUpdated();
 
 	return tmp;

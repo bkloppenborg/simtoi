@@ -26,7 +26,7 @@ protected:
 	int mID;
 
 public:
-	CParameterItem(CParameters * parent, int id);
+	CParameterItem(CParameters * item_parent, int id);
 	virtual ~CParameterItem();
 
 	QVariant data(int role = Qt::UserRole + 1) const;

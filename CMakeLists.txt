@@ -4,6 +4,7 @@ project(simtoi)
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O0")
+#set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Wshadow")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 
 # Call CMake on the subdirectories

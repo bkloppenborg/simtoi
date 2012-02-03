@@ -178,7 +178,7 @@ void cmaingui::RunMinimizer()
 void cmaingui::LoadData()
 {
 	string tmp;
-	int size;
+	int dir_size = 0;
 
 	// Ensure there is a selected widget, if not immediately return.
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
@@ -215,9 +215,9 @@ void cmaingui::LoadData()
 	{
 		// Tell the widget to load the data file and append a row to its file list:
 		tmp = filenames[i].toStdString();
-		size = tmp.size() - mDataDir.size();
+		dir_size = tmp.size() - mDataDir.size();
 		widget->LoadData(tmp);
-		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, size) )));
+		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, dir_size) )));
 	}
 }
 
@@ -249,7 +249,7 @@ void cmaingui::render()
     }
 }
 
-void cmaingui::subwindowSelected(QMdiSubWindow * window)
+void cmaingui::subwindowSelected(QMdiSubWindow * mdi_subwindow)
 {
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)

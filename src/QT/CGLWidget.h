@@ -27,7 +27,7 @@ protected:
     CTreeModel * mTreeModel;
 
 public:
-    CGLWidget(QWidget *parent, string shader_source_dir, string cl_kernel_dir);
+    CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);
     ~CGLWidget();
 
     void AddModel(eModels model);

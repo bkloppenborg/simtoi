@@ -80,9 +80,9 @@ vector< pair<int, string> > CParameters::GetParamIDsNames()
 	return tmp;
 }
 
-string CParameters::GetParamName(int i)
+string CParameters::GetParamName(unsigned int i)
 {
-	if(i > -1 && i < mParamNames.size())
+	if(i < mParamNames.size())
 		return mParamNames[i];
 
 	return "! NotFound !";

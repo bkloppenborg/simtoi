@@ -45,7 +45,7 @@ public:
 	float GetParam(int i);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
-	string GetParamName(int param_num);
+	string GetParamName(unsigned int param_num);
 
 	bool IsFree(int param_num);
 
