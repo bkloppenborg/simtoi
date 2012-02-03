@@ -30,6 +30,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *evt);
+    void ButtonCheck();
 
 private slots:
     void addGLArea();

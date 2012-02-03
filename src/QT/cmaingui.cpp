@@ -52,11 +52,6 @@ cmaingui::cmaingui(QWidget *parent_widget)
 	mShaderSourceDir = app_path + "/shaders/";
 	mKernelSourceDir = app_path + "/kernels/";
 	mDataDir = "./";
-
-	// TODO: Remove this, shouldn't be hard-coded!
-//	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
-//	mKernelSourceDir = "/home/bkloppenborg/workspace/simtoi/lib/liboi/src/kernels/";
-//	mDataDir = "./";
 }
 
 cmaingui::~cmaingui()
@@ -135,6 +130,9 @@ void cmaingui::addGLArea()
 
 	// Now connect the slot
 	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
+
+	// If the load data button isn't enabled, turn it on
+	ButtonCheck();
 }
 
 void cmaingui::addModel(void)
@@ -159,6 +157,35 @@ void cmaingui::addModel(void)
 //	}
 }
 
+/// Checks to see which buttons can be enabled/disabled.
+void cmaingui::ButtonCheck()
+{
+	ui.btnAddModel->setEnabled(false);
+	ui.btnLoadData->setEnabled(false);
+	ui.btnRemoveData->setEnabled(false);
+	ui.btnDeleteModel->setEnabled(false);
+	ui.btnStartStop->setEnabled(false);
+	ui.btnReset->setEnabled(false);
+	ui.btnMinimizer->setEnabled(false);
+
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	ui.btnAddModel->setEnabled(true);
+	ui.btnLoadData->setEnabled(true);
+	ui.btnStartStop->setEnabled(true);
+	ui.btnReset->setEnabled(true);
+	ui.btnMinimizer->setEnabled(true);
+
+	CGLWidget * widget = (CGLWidget*) sw->widget();
+	if(widget->GetOpenFileModel()->rowCount() > 0)
+		ui.btnRemoveData->setEnabled(true);
+
+	if(widget->GetTreeModel()->rowCount() > 0)
+		ui.btnDeleteModel->setEnabled(true);
+}
+
 void cmaingui::delGLArea()
 {
     CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
@@ -167,6 +194,8 @@ void cmaingui::delGLArea()
         widget->stopRendering();
         delete widget;
     }
+
+    ButtonCheck();
 }
 
 void cmaingui::RunMinimizer()
@@ -225,6 +254,8 @@ void cmaingui::LoadData()
 		widget->LoadData(tmp);
 		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, dir_size) )));
 	}
+
+	ButtonCheck();
 }
 
 /// Removes the current selected data set.
@@ -257,6 +288,8 @@ void cmaingui::render()
 
 void cmaingui::subwindowSelected(QMdiSubWindow * mdi_subwindow)
 {
+	ButtonCheck();
+
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
     	return;
