@@ -3,7 +3,8 @@ project(simtoi)
 
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG")
+#set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 
 # Call CMake on the subdirectories
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
@@ -22,6 +23,10 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/oifitslib)
 # Include multinest
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/multinest)
 include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
+
+# Include cmpfit (version 1.2)
+add_subdirectory(${CMAKE_SOURCE_DIR}/lib/cmpfit-1.2)
+include_directories(${CMAKE_SOURCE_DIR}/lib/cmpfit-1.2)
 
 add_subdirectory(src)
 
