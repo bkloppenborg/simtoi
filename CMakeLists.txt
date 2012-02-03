@@ -21,8 +21,8 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/getoifits)
 include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/oifitslib)
 
 # Include multinest
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/multinest)
-include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/lib/multinest)
+#include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
 
 # Include cmpfit (version 1.2)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/cmpfit-1.2)
