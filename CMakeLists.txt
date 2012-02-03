@@ -31,3 +31,12 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/cmpfit-1.2)
 
 add_subdirectory(src)
 
+# Copy over kernel and shader sources:
+file(GLOB KERNELS ${CMAKE_SOURCE_DIR}/lib/liboi/src/kernels/*.cl)
+file(COPY ${KERNELS} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/kernels/)
+
+file(GLOB FRAG_SHADERS ${CMAKE_SOURCE_DIR}/src/shaders/*.frag)
+file(COPY ${FRAG_SHADERS} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/shaders/)
+
+file(GLOB VERT_SHADERS ${CMAKE_SOURCE_DIR}/src/shaders/*.vert)
+file(COPY ${VERT_SHADERS} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/shaders/)

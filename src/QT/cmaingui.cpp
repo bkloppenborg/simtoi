@@ -47,10 +47,16 @@ cmaingui::cmaingui(QWidget *parent_widget)
 	connect(ui.btnMinimizer, SIGNAL(clicked(void)), this, SLOT(RunMinimizer(void)));
 	connect(ui.btnLoadData, SIGNAL(clicked(void)), this, SLOT(LoadData(void)));
 
-	// TODO: Remove this, shouldn't be hard-coded!
-	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
-	mKernelSourceDir = "/home/bkloppenborg/workspace/simtoi/lib/liboi/src/kernels/";
+	// Get the application path,
+	string app_path = QCoreApplication::applicationDirPath().toStdString();
+	mShaderSourceDir = app_path + "/shaders/";
+	mKernelSourceDir = app_path + "/kernels/";
 	mDataDir = "./";
+
+	// TODO: Remove this, shouldn't be hard-coded!
+//	mShaderSourceDir = "/home/bkloppenborg/workspace/simtoi/src/shaders/";
+//	mKernelSourceDir = "/home/bkloppenborg/workspace/simtoi/lib/liboi/src/kernels/";
+//	mDataDir = "./";
 }
 
 cmaingui::~cmaingui()
