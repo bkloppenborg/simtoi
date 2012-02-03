@@ -82,14 +82,18 @@ vector< pair<int, string> > CParameters::GetParamIDsNames()
 
 string CParameters::GetParamName(int i)
 {
-	if(i < mParamNames.size())
+	if(i > -1 && i < mParamNames.size())
 		return mParamNames[i];
+
+	return "! NotFound !";
 }
 
 bool CParameters::IsFree(int param_num)
 {
 	if(param_num < mNParams)
 		return mFreeParams[param_num];
+
+	return false;
 }
 
 /// Toggles the state of all variables to free (is_free = true) or fixed (is_free = false)

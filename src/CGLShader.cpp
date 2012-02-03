@@ -22,8 +22,8 @@ CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, s
 	mParam_locations = new GLuint[n_parameters];
 	mShaderLoaded = false;
 	mProgram = 0;
-	mShader_vertex = NULL;
-	mShader_fragment = NULL;
+	mShader_vertex = 0;
+	mShader_fragment = 0;
 }
 
 CGLShader::~CGLShader()

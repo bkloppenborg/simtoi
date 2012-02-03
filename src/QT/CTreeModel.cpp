@@ -20,6 +20,8 @@ CTreeModel::~CTreeModel()
 
 bool CTreeModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
-	QStandardItemModel::setData(index, value, role);
+	bool tmp = QStandardItemModel::setData(index, value, role);
 	emit parameterUpdated();
+
+	return tmp;
 }
