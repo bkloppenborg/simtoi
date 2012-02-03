@@ -18,8 +18,6 @@
 
 #include <string>
 #include <cstdio>
-#include "boost/function.hpp"
-#include "boost/bind.hpp"
 
 using namespace std;
 
