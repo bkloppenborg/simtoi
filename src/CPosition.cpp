@@ -11,7 +11,8 @@
 CPosition::CPosition(int n_parameters)
 	: CParameters(n_parameters)
 {
-	// Do nothing.
+	// Init to an invalid position type.
+	mType = POSITION_NONE;
 }
 
 CPosition::~CPosition()

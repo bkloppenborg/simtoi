@@ -40,6 +40,7 @@ private slots:
     void Animation_Reset();
     void RunMinimizer();
     void LoadData();
+    void RemoveData();
 
 public slots:
 	void subwindowSelected(QMdiSubWindow * window);

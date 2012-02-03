@@ -21,6 +21,7 @@ enum eFeatureTypes
 ///       GetList_AllModels() and in GetNewModel().  We want to change this, see issue #50.
 enum eModels
 {
+	MDL_None,
 	MDL_SPHERE,
 	MDL_CYLINDER
 };

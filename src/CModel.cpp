@@ -23,6 +23,7 @@ CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
 {
 	mPosition = NULL;
+	mType = MDL_None;
 
 	mBaseParams = 3;	// Number of base params, less one (zero indexed).
 

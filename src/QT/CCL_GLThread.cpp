@@ -19,6 +19,8 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
 
     mRun = true;
     mPermitResize = true;
+    mWidth = 1;
+    mHeight = 1;
     mScale = 0.01;	// init to some value > 0.
 
     mModelList = new CModelList();
@@ -303,8 +305,6 @@ void CCL_GLThread::run()
 	mCL->SetImage_GLTB(mFBO);
 	mCL->SetKernelSourcePath(mKernelSourceDir);
 //	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
-	float flux = 0;
-	float t = 0;
 
     // Main thread loop
     while (mRun)

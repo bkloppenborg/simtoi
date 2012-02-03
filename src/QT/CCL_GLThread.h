@@ -72,7 +72,6 @@ protected:
 
     // Window-related items:
     bool mPermitResize;
-    bool mResizeInProgress;
     int mWidth;
     int mHeight;
     double mScale;
@@ -104,8 +103,6 @@ protected:
     // Misc datamembers:
 	bool mRun;
 
-    bool doResize;
-    float rotAngle;
     int id;
     static int count;
 

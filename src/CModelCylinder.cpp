@@ -17,6 +17,7 @@ CModelCylinder::CModelCylinder()
 	// and mParams[3] = color
 
 	mSlices = 50;	// seems like a good number.
+	mStacks = 50;
 	mName = "Cylinder";
 	mType = MDL_CYLINDER;
 

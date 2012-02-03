@@ -12,7 +12,7 @@
 CMinimizer_mpfit::CMinimizer_mpfit(CCL_GLThread * cl_gl_thread)
 	: CMinimizer(cl_gl_thread)
 {
-
+	mResiduals = NULL;
 }
 
 CMinimizer_mpfit::~CMinimizer_mpfit()

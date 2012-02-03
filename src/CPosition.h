@@ -16,6 +16,7 @@
 
 enum ePositionTypes
 {
+	POSITION_NONE,
 	POSITION_XY,
 	POSITION_XYZ,
 	POSITION_ORBIT

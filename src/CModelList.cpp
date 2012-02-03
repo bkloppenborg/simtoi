@@ -16,7 +16,8 @@ using namespace std;
 
 CModelList::CModelList()
 {
-
+	mTime = 0;
+	mTimestep = 0;
 }
 
 CModelList::~CModelList()
