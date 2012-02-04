@@ -71,18 +71,18 @@ void CModelList::GetAllParameters(float * params, int n_params)
     }
 }
 
-/// Gets the values for all of the free parameters:
-//void CModelList::GetFreeParameters(float * params, int n_params)
-//{
-//    int n = 0;
-//
-//    // Now call render on all of the models:
-//    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
-//    {
-//    	params[n] = (*it)->GetAllParameters(params + n, n_params - n);
-//    	n += (*it)->GetTotalFreeParameters();
-//    }
-//}
+/// Gets the values for all of the free parameters.
+void CModelList::GetFreeParameters(float * params, int n_params)
+{
+    int n = 0;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	(*it)->GetFreeParameters(params + n, n_params - n);
+    	n += (*it)->GetTotalFreeParameters();
+    }
+}
 
 /// Returns a pair of model names, and their enumerated types
 vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
@@ -121,14 +121,14 @@ void CModelList::Render(GLuint fbo, int width, int height)
 }
 
 
-void CModelList::SetParameters(float * params, int n_params)
+void CModelList::SetFreeParameters(float * params, int n_params)
 {
     int n = 0;
 
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
     {
-    	(*it)->SetAllParameters(params + n, n_params - n);
+    	(*it)->SetFreeParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
     }
 }

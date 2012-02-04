@@ -57,8 +57,11 @@ public:
     bool OpenCLInitialized() { return mGLT.OpenCLInitialized(); };
 
     void RunMinimizer();
+protected:
+    void RebuildTree();
 
-    void SetParameters(float * params, int n_params);
+public:
+    void SetFreeParameters(float * params, int n_params);
     void SetScale(double scale);
     void SetShader(int model_id, eGLShaders shader);
     void SetPositionType(int model_id, ePositionTypes pos_type);

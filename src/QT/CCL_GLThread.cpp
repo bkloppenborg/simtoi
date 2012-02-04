@@ -394,9 +394,9 @@ void CCL_GLThread::run()
 }
 
 /// Sets the scale for the model.
-void CCL_GLThread::SetParameters(float * params, int n_params)
+void CCL_GLThread::SetFreeParameters(float * params, int n_params)
 {
-	mModelList->SetParameters(params, n_params);
+	mModelList->SetFreeParameters(params, n_params);
 	EnqueueOperation(GLT_RenderModels);
 }
 

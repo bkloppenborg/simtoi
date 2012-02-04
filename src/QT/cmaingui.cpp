@@ -130,10 +130,6 @@ void cmaingui::addGLArea()
 //    widget->AddModel(MDL_CYLINDER);
 //    widget->SetPositionType(1, POSITION_ORBIT);
 
-	// Set the model
-	ui.treeModels->setHeaderHidden(false);
-	ui.treeModels->resizeColumnToContents(1);
-
 	// Now connect the slot
 	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
 
@@ -299,6 +295,8 @@ void cmaingui::subwindowSelected(QMdiSubWindow * mdi_subwindow)
     	return;
 
     CGLWidget *widget = (CGLWidget*) sw->widget();
-    ui.listOpenFiles->setModel(widget->GetOpenFileModel());
+	ui.treeModels->setHeaderHidden(false);
+	ui.treeModels->resizeColumnToContents(1);
 	ui.treeModels->setModel(widget->GetTreeModel());
+    ui.listOpenFiles->setModel(widget->GetOpenFileModel());
 }

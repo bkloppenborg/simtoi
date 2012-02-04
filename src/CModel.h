@@ -52,7 +52,8 @@ protected:
 
 public:
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
-	void SetAllParameters(float * params, int n_params);
+	void GetFreeParameters(float * params, int n_params);
+	void SetFreeParameters(float * params, int n_params);
 	void GetAllParameters(float * params, int n_params);
 
 public:

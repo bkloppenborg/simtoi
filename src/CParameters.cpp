@@ -16,7 +16,7 @@ CParameters::CParameters(int n_params)
 	mParams = new float[mNParams];
 	mFreeParams = new bool[mNParams];
 	mScales = new float[mNParams];
-	mScales_min = new float[mNParams];
+	mMinMax = new pair<float,float>[mNParams];
 	mName = "";
 
 	// Init parameter values.
@@ -25,7 +25,7 @@ CParameters::CParameters(int n_params)
 		mParams[i] = 0;
 		mFreeParams[i] = false;
 		mScales[i] = 1;
-		mScales_min[i] = 0;
+		mMinMax[i] = pair<float,float>(0.0, 0.0);
 	}
 }
 
@@ -34,7 +34,7 @@ CParameters::~CParameters()
 	delete[] mParams;
 	delete[] mFreeParams;
 	delete[] mScales;
-	delete[] mScales_min;
+	delete[] mMinMax;
 }
 
 /// Counts the number of free parameters, sets that value to mNFreeParams
@@ -59,6 +59,17 @@ float CParameters::GetParam(int param_n)
 
 /// Gets the values of the (scaled) parameters for this object.
 void CParameters::GetParams(float * out_params, int n_params)
+{
+	// Copy the current parameter value into out_params
+	// keep in bounds for both n_params and mNParams.
+	for(unsigned int i = 0; (i < n_params && i < mNParams); i++)
+	{
+		out_params[i] = mParams[i];
+	}
+}
+
+/// Gets the values of the free (scaled) parameters for this object.
+void CParameters::GetFreeParams(float * out_params, int n_params)
 {
 	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
 }
@@ -116,7 +127,7 @@ void CParameters::SetFree(int param_num, bool is_free)
 }
 
 /// Sets the specified parameter to the indicated value.
-/// Note, scaling is not applied.
+/// Note, scaling from the unit hypercube is not applied.
 void CParameters::SetParam(int n_param, float value)
 {
 	if(n_param < mNParams)
@@ -124,15 +135,15 @@ void CParameters::SetParam(int n_param, float value)
 }
 
 /// Sets the values for the parameters for this object scaling them as necessary.
-void CParameters::SetParams(float * in_params, int n_params)
+void CParameters::SetFreeParams(float * in_params, int n_params)
 {
 	// Set the parameter values
-	pull_params(in_params, n_params, mParams, mNParams, mFreeParams);
+	push_params(in_params, n_params, mParams, mNParams, mFreeParams);
 
 	// Now scale the parameters (only free parameters could have changed, so just scale those)
 	for(int i = 0; i < mNParams; i++)
 	{
 		if(mFreeParams[i])
-			mParams[i] = mScales_min[i] + mScales[i] * mParams[i];
+			mParams[i] = mMinMax[i].first + mScales[i] * mParams[i];
 	}
 }

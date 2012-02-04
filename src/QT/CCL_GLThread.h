@@ -120,6 +120,7 @@ public:
 
     void EnqueueOperation(CL_GLT_Operations op);
 
+    void GetFreeParameters(float * params, int n_params) { mModelList->GetFreeParameters(params, n_params); };
 	void GetChi(int data_num, float * output, int & n);
     float GetChi2(int data_num);
 	int GetHeight() { return mHeight; };
@@ -147,7 +148,7 @@ public:
     void resizeViewport(int width, int height);
     void run();
 
-    void SetParameters(float * params, int n_params);
+    void SetFreeParameters(float * params, int n_params);
     void SetPositionType(int model_id, ePositionTypes pos_type);
     void SetScale(double scale);
     void SetShader(int model_id, eGLShaders shader);

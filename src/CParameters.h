@@ -25,7 +25,7 @@ protected:
 	int mNFreeParams;
 	bool * mFreeParams;
 	float * mScales;
-	float * mScales_min;
+	pair<float, float> * mMinMax;
 	vector<string> mParamNames;
 
 	string mName;
@@ -42,6 +42,7 @@ public:
 	int GetNFreeParams(void) { return mNFreeParams; };
 	int GetNParams(void) { return mNParams; };
 	void GetParams(float * params, int n_params);
+	void GetFreeParams(float * params, int n_param);
 	float GetParam(int i);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
@@ -53,7 +54,7 @@ public:
 	void SetFree(int param_num, bool is_free);
 	void SetName(string name) { mName = name; };
 	void SetParam(int n_param, float value);
-	void SetParams(float * in_params, int n_params);
+	void SetFreeParams(float * in_params, int n_params);
 };
 
 #endif /* CPARAMETERS_H_ */

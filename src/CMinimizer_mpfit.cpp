@@ -36,7 +36,7 @@ int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double 
 	printf("\n");
 
 	// Set the parameters:
-	tmp->mCLThread->SetParameters(tmp->mParams, nParams);
+	tmp->mCLThread->SetFreeParameters(tmp->mParams, nParams);
 	tmp->mCLThread->EnqueueOperation(GLT_RenderModels);
 
 	// Now iterate through the data and pull out the residuals
@@ -69,16 +69,19 @@ int CMinimizer_mpfit::run()
 	int nParams = mCLThread->GetNFreeParameters();
 	int nData = mCLThread->GetNData();
 
-	double * input_params = new double[nParams];
+	// Setup the input parameters and values:
 	mp_par_struct * pars = new mp_par_struct[nParams];
+	double * input_params = new double[nParams];
+	float * tmp = new float[nParams];
+	mCLThread->GetFreeParameters(tmp, nParams);
 
 	for(int i = 0; i < nParams; i++)
 	{
-		input_params[i] = 0.9;
+		input_params[i] = double(tmp[i]);
 		pars[i].fixed = 0;
-		pars[i].limited[0] = 0;
+		pars[i].limited[0] = 1;
 		pars[i].limited[1] = 0;
-		pars[i].limits[0] = 0;
+		pars[i].limits[0] = 0.00;
 		pars[i].limits[1] = 0;
 		pars[i].step = 0.01;
 		pars[i].relstep = 0.001;
@@ -86,13 +89,13 @@ int CMinimizer_mpfit::run()
 		pars[i].deriv_debug = 0;
 	}
 
-
 	status = mpfit(&CMinimizer_mpfit::ErrorFunc, nData, nParams, input_params, pars, 0, (void*) this, NULL);
 
 	printf("Minimizer Exit Code: %d\n", status);
 
 	delete[] input_params;
 	delete[] pars;
+	delete[] tmp;
 
 	return 0;
 }

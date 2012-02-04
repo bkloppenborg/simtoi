@@ -32,45 +32,7 @@ void CGLWidget::AddModel(eModels model_type)
 	// Instruct the thread to add the model to it's list:
 	mGLT.AddModel(model_type);
 
-	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value";
-	mTreeModel->clear();
-	mTreeModel->setColumnCount(3);
-	mTreeModel->setHorizontalHeaderLabels(labels);
-	CModelList * model_list = mGLT.GetModelList();
-
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	QStandardItem * item_parent;
-	CModel * model;
-	CPosition * position;
-	CGLShaderWrapper * shader;
-
-	// Now pull out the pertinent information
-	for(int i = 0; i < model_list->size(); i++)
-	{
-		// First pull out the model parameters
-		model = model_list->GetModel(i);
-		items = LoadParametersHeader(QString("Model"), model);
-		item_parent = items[0];
-		mTreeModel->appendRow(items);
-		LoadParameters(item_parent, model);
-
-		// Now for the Position Parameters
-		position = model->GetPosition();
-		items = LoadParametersHeader(QString("Position"), position);
-		item = items[0];
-		item_parent->appendRow(items);
-		LoadParameters(item, position);
-
-		// Lastly for the shader:
-		shader = model->GetShader();
-		items = LoadParametersHeader(QString("Shader"), shader);
-		item = items[0];
-		item_parent->appendRow(items);
-		LoadParameters(item, shader);
-	}
-
+	RebuildTree();
 }
 
 void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
@@ -141,6 +103,49 @@ void CGLWidget::paintEvent(QPaintEvent *)
 {
     mGLT.EnqueueOperation(GLT_RenderModels);
 }
+
+void CGLWidget::RebuildTree()
+{
+	QStringList labels = QStringList();
+	labels << "Name" << "Free" << "Value";
+	mTreeModel->clear();
+	mTreeModel->setColumnCount(3);
+	mTreeModel->setHorizontalHeaderLabels(labels);
+	CModelList * model_list = mGLT.GetModelList();
+
+	QList<QStandardItem *> items;
+	QStandardItem * item;
+	QStandardItem * item_parent;
+	CModel * model;
+	CPosition * position;
+	CGLShaderWrapper * shader;
+
+	// Now pull out the pertinent information
+	for(int i = 0; i < model_list->size(); i++)
+	{
+		// First pull out the model parameters
+		model = model_list->GetModel(i);
+		items = LoadParametersHeader(QString("Model"), model);
+		item_parent = items[0];
+		mTreeModel->appendRow(items);
+		LoadParameters(item_parent, model);
+
+		// Now for the Position Parameters
+		position = model->GetPosition();
+		items = LoadParametersHeader(QString("Position"), position);
+		item = items[0];
+		item_parent->appendRow(items);
+		LoadParameters(item, position);
+
+		// Lastly for the shader:
+		shader = model->GetShader();
+		items = LoadParametersHeader(QString("Shader"), shader);
+		item = items[0];
+		item_parent->appendRow(items);
+		LoadParameters(item, shader);
+	}
+}
+
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
     mGLT.resizeViewport(evt->size());
@@ -162,9 +167,9 @@ void CGLWidget::stopRendering()
     mGLT.wait();
 }
 
-void CGLWidget::SetParameters(float * params, int n_params)
+void CGLWidget::SetFreeParameters(float * params, int n_params)
 {
-	mGLT.SetParameters(params, n_params);
+	mGLT.SetFreeParameters(params, n_params);
 }
 
 void CGLWidget::SetScale(double scale)
@@ -175,10 +180,12 @@ void CGLWidget::SetScale(double scale)
 void CGLWidget::SetShader(int model_id, eGLShaders shader)
 {
 	mGLT.SetShader(model_id, shader);
+	RebuildTree();
 }
 
 void CGLWidget::SetPositionType(int model_id, ePositionTypes pos_type)
 {
 	mGLT.SetPositionType(model_id, pos_type);
+	RebuildTree();
 }
 

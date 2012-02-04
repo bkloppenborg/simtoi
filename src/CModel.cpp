@@ -61,18 +61,35 @@ void CModel::GetAllParameters(float * params, int n_params)
 	// We use pointer math to advance the position of the array passed to the functions
 	int n = 0;
 	GetParams(params, n_params);
-	n += this->mNFreeParams;
+	n += this->mNParams;
 	mPosition->GetParams(params + n, n_params - n);
-	n += mPosition->GetNFreeParams();
+	n += mPosition->GetNParams();
 
 	if(mShader != NULL)
 	{
 		mShader->GetParams(params + n, n_params - n);
-		n += mShader->GetNFreeParams();
+		n += mShader->GetNParams();
 	}
 
 	// TODO: Implement this function
 	//features->GetParams(params + n, n_params - n);
+}
+
+/// Sets the free parameters for this model.
+void CModel::GetFreeParameters(float * params, int n_params)
+{
+	int n = 0;
+	GetFreeParams(params, n_params);
+	n += this->mNFreeParams;
+	mPosition->GetFreeParams(params + n, n_params - n);
+	n += mPosition->GetNFreeParams();
+
+	if(mShader != NULL)
+	{
+		mShader->GetFreeParams(params + n, n_params - n);
+		n += mShader->GetNFreeParams();
+	}
+
 }
 
 int CModel::GetTotalFreeParameters()
@@ -117,20 +134,20 @@ void CModel::Translate()
 }
 
 /// Sets the parameters for this model, the position, shader, and all features.
-void CModel::SetAllParameters(float * in_params, int n_params)
+void CModel::SetFreeParameters(float * in_params, int n_params)
 {
 	// Here we use pointer math to advance the position of the array passed to the functions
 	// that set the parameters.  First assign values to this model (use pull_params):
 	int n = 0;
-	SetParams(in_params, n_params);
+	SetFreeParams(in_params, n_params);
 	n += mNFreeParams;
 	// Now set the values for the position object
-	mPosition->SetParams(in_params + n, n_params - n);
+	mPosition->SetFreeParams(in_params + n, n_params - n);
 	n += mPosition->GetNFreeParams();
 	// Then the shader.
 	if(mShader != NULL)
 	{
-		mShader->SetParams(in_params + n, n_params - n);
+		mShader->SetFreeParams(in_params + n, n_params - n);
 		n += mShader->GetNFreeParams();
 	}
 	// Lastly the features
