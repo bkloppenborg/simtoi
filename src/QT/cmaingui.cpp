@@ -39,13 +39,19 @@ cmaingui::cmaingui(QWidget *parent_widget)
 
 	mAnimating = false;
 
-	// Now setup some signals and slots
+	// Model area
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
 	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
+	// Animiation buttons
 	connect(ui.btnStartStop, SIGNAL(clicked(void)), this, SLOT(Animation_StartStop(void)));
 	connect(ui.btnReset, SIGNAL(clicked(void)), this, SLOT(Animation_Reset(void)));
+	// Minimizer:
 	connect(ui.btnMinimizer, SIGNAL(clicked(void)), this, SLOT(RunMinimizer(void)));
+	// Add/delete data
 	connect(ui.btnLoadData, SIGNAL(clicked(void)), this, SLOT(LoadData(void)));
+	// Add/delete models
+	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(addModel(void)));
+	connect(ui.btnDeleteModel, SIGNAL(clicked(void)), this, SLOT(deleteModel(void)));
 
 	// Get the application path,
 	string app_path = QCoreApplication::applicationDirPath().toStdString();
@@ -137,24 +143,12 @@ void cmaingui::addGLArea()
 
 void cmaingui::addModel(void)
 {
-//	QMdiSubWindow * window = ui.mdiArea->activeSubWindow();
-//
-//	if(window != NULL)
-//	{
-//		CGLWidget * widget = (CGLWidget*) window->widget();
-//		QVariant tmp = ui.cboModels->itemData(ui.cboModels->currentIndex());
-//		eModels model = tmp.value<eModels>();
-////		tmp = ui.cboShaders->itemData(ui.cboShaders->currentIndex());
-////		eGLShaders shader = tmp.value<eGLShaders>();
-//
-//		widget->AddModel(model);
-//	}
-//	else
-//	{
-//		QMessageBox msgBox;
-//		msgBox.setText("Please select a window to which the model may be added.");
-//		msgBox.exec();
-//	}
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    CGLWidget * widget = (CGLWidget *) sw->widget();
+    widget->AddModel(MDL_SPHERE);
 }
 
 /// Checks to see which buttons can be enabled/disabled.
@@ -184,6 +178,16 @@ void cmaingui::ButtonCheck()
 
 	if(widget->GetTreeModel()->rowCount() > 0)
 		ui.btnDeleteModel->setEnabled(true);
+}
+
+/// Deletes the selected model from the model list
+void cmaingui::deleteModel()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+
 }
 
 void cmaingui::delGLArea()

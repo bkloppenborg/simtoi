@@ -35,6 +35,7 @@ protected:
 private slots:
     void addGLArea();
     void addModel(void);
+    void deleteModel(void);
     void delGLArea();
     void render();
     void Animation_StartStop();
