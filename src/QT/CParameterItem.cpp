@@ -32,19 +32,18 @@ void CParameterItem::setData(const QVariant & value, int role)
 {
 	// TODO: This is a really hacky way of setting the parameter values,
 	// we should find a different way of doing it?
-	switch(role)
+	int col = column();
+
+	if(role == Qt::CheckStateRole || role == Qt::EditRole)
 	{
-	case Qt::CheckStateRole:
-		// Checkbox enabled/disabled
-		if(value.type() == QVariant::Int)
+		if(col == 1)
 			mParent->SetFree(mID, value.toBool());
-		break;
-
-	case Qt::EditRole:
-		if(value.type() == QVariant::Double)
+		if(col == 2)	// Parameter value
 			mParent->SetParam(mID, float(value.toDouble()));
-		break;
-
+		if(col == 3)	// min value
+			mParent->SetMin(mID, float(value.toDouble()));
+		if(col == 4)	// max value
+			mParent->SetMax(mID, float(value.toDouble()));
 	}
 
 	QStandardItem::setData(value, role);

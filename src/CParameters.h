@@ -36,9 +36,12 @@ public:
 
 protected:
 	void CountFree(void);
+	void CalculateScale(int param_num);
 
 public:
 	string GetName(void) { return mName; };
+	float GetMax(int param_num);
+	float GetMin(int param_num);
 	int GetNFreeParams(void) { return mNFreeParams; };
 	int GetNParams(void) { return mNParams; };
 	void GetParams(float * params, int n_params);
@@ -51,10 +54,12 @@ public:
 	bool IsFree(int param_num);
 
 	void SetAllFree(bool is_free);
+	void SetFreeParams(float * in_params, int n_params);
 	void SetFree(int param_num, bool is_free);
+	void SetMin(int param_num, float value);
+	void SetMax(int param_num, float value);
 	void SetName(string name) { mName = name; };
 	void SetParam(int n_param, float value);
-	void SetFreeParams(float * in_params, int n_params);
 };
 
 #endif /* CPARAMETERS_H_ */

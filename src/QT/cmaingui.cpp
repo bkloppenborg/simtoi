@@ -295,8 +295,14 @@ void cmaingui::subwindowSelected(QMdiSubWindow * mdi_subwindow)
     	return;
 
     CGLWidget *widget = (CGLWidget*) sw->widget();
+    CTreeModel * model = widget->GetTreeModel();
+    int cols = model->columnCount(QModelIndex());
 	ui.treeModels->setHeaderHidden(false);
-	ui.treeModels->resizeColumnToContents(1);
 	ui.treeModels->setModel(widget->GetTreeModel());
+
+	ui.treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
+
     ui.listOpenFiles->setModel(widget->GetOpenFileModel());
+
 }
+

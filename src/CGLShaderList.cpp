@@ -103,7 +103,7 @@ void CGLShaderList::LoadShaders()
 
 	// Simple limb darkening.
 	base_name = "LD_Hestroffer1997";
-	friendly_name = "LDL - Hesteroffer (1997)";
+	friendly_name = "LDL - Hesteroffer";
 	n_params = 1;
 	param_names.clear();
 	param_names.push_back("alpha");

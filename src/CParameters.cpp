@@ -6,7 +6,12 @@
  */
 
 #include "CParameters.h"
+#include <cmath>
+
 #include "misc.h"	// needed for pull_params
+
+// A number after which we consider a parameter to be zero.
+#define ZERO_COMP 1E-8
 
 CParameters::CParameters(int n_params)
 {
@@ -37,6 +42,18 @@ CParameters::~CParameters()
 	delete[] mMinMax;
 }
 
+/// Calculate and set the scale factor for the specified parameter
+void CParameters::CalculateScale(int param_num)
+{
+	if(param_num > mNParams - 1)
+		return;
+
+	if(fabs(mMinMax[param_num].first) < ZERO_COMP)
+		mScales[param_num] = 0;
+	else
+		mScales[param_num] = mMinMax[param_num].second / mMinMax[param_num].first;
+}
+
 /// Counts the number of free parameters, sets that value to mNFreeParams
 void CParameters::CountFree(void)
 {
@@ -46,6 +63,24 @@ void CParameters::CountFree(void)
 		if(mFreeParams[i])
 			mNFreeParams += 1;
 	}
+}
+
+/// Returns the maximum allowable value of the specified parameter, -1 if param_num is out of bounds.
+float CParameters::GetMax(int param_num)
+{
+	if(param_num < mNParams)
+		return mMinMax[param_num].second;
+
+	return -1;
+}
+
+/// Returns the minimum allowable value of the specified parameter, -1 if param_num is out of bounds.
+float CParameters::GetMin(int param_num)
+{
+	if(param_num < mNParams)
+		return mMinMax[param_num].first;
+
+	return -1;
 }
 
 /// Gets the vale of the specified parameter, returns -1 if outside of bounds:
@@ -116,24 +151,6 @@ void CParameters::SetAllFree(bool is_free)
 	CountFree();
 }
 
-/// Sets the specified parameter as free (is_free = true) or fixed (is_free = false)
-void CParameters::SetFree(int param_num, bool is_free)
-{
-	if(param_num <= mNParams)
-		mFreeParams[param_num] = is_free;
-
-	// Update the number of free parameters
-	CountFree();
-}
-
-/// Sets the specified parameter to the indicated value.
-/// Note, scaling from the unit hypercube is not applied.
-void CParameters::SetParam(int n_param, float value)
-{
-	if(n_param < mNParams)
-		mParams[n_param] = value;
-}
-
 /// Sets the values for the parameters for this object scaling them as necessary.
 void CParameters::SetFreeParams(float * in_params, int n_params)
 {
@@ -147,3 +164,42 @@ void CParameters::SetFreeParams(float * in_params, int n_params)
 			mParams[i] = mMinMax[i].first + mScales[i] * mParams[i];
 	}
 }
+
+/// Sets the specified parameter as free (is_free = true) or fixed (is_free = false)
+void CParameters::SetFree(int param_num, bool is_free)
+{
+	if(param_num <= mNParams)
+		mFreeParams[param_num] = is_free;
+
+	// Update the number of free parameters
+	CountFree();
+}
+
+/// Sets the specified parameter's minimum value.
+void CParameters::SetMin(int param_num, float value)
+{
+	if(param_num < mNParams)
+	{
+		mMinMax[param_num].first = value;
+		CalculateScale(param_num);
+	}
+}
+
+/// Sets the specified paramter's maximum value.
+void CParameters::SetMax(int param_num, float value)
+{
+	if(param_num < mNParams)
+	{
+		mMinMax[param_num].second = value;
+		CalculateScale(param_num);
+	}
+}
+
+/// Sets the specified parameter to the indicated value.
+/// Note, scaling from the unit hypercube is not applied.
+void CParameters::SetParam(int n_param, float value)
+{
+	if(n_param < mNParams)
+		mParams[n_param] = value;
+}
+

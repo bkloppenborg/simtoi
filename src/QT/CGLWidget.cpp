@@ -67,10 +67,22 @@ void CGLWidget::LoadParameters(QStandardItem * parent, CParameters * parameters)
 			item->setCheckState(Qt::Unchecked);
 		items << item;
 
-		// Lastly the value:
+		// The Value
 		item = new CParameterItem(parameters, j);
 		item->setEditable(true);
 		item->setData(QVariant((double)parameters->GetParam(j)), Qt::DisplayRole);
+		items << item;
+
+		// Minimum parameter value
+		item = new CParameterItem(parameters, j);
+		item->setEditable(true);
+		item->setData(QVariant((double)parameters->GetMin(j)), Qt::DisplayRole);
+		items << item;
+
+		// Maximum parameter value
+		item = new CParameterItem(parameters, j);
+		item->setEditable(true);
+		item->setData(QVariant((double)parameters->GetMax(j)), Qt::DisplayRole);
 		items << item;
 
 		parent->appendRow(items);
@@ -107,9 +119,9 @@ void CGLWidget::paintEvent(QPaintEvent *)
 void CGLWidget::RebuildTree()
 {
 	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value";
+	labels << "Name" << "Free" << "Value" << "Min" << "Max";
 	mTreeModel->clear();
-	mTreeModel->setColumnCount(3);
+	mTreeModel->setColumnCount(5);
 	mTreeModel->setHorizontalHeaderLabels(labels);
 	CModelList * model_list = mGLT.GetModelList();
 
@@ -144,6 +156,8 @@ void CGLWidget::RebuildTree()
 		item_parent->appendRow(items);
 		LoadParameters(item, shader);
 	}
+
+
 }
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)
