@@ -92,13 +92,15 @@ void CGLShaderList::LoadShaders()
 	int n_params;
 	vector<string> param_names;
 	CGLShader * tmp;
+	vector<pair<float, float> > minmax;
 
 	// Default do-nothing Shader
 	base_name = "Default";
 	friendly_name = "Default (None)";
 	n_params = 0;
 	param_names.clear();
-	tmp = new CGLShader(SHDR_NONE, shader_dir, base_name, friendly_name, n_params, param_names);
+	minmax.clear();
+	tmp = new CGLShader(SHDR_NONE, shader_dir, base_name, friendly_name, n_params, param_names, minmax);
 	Append(tmp);
 
 	// Simple limb darkening.
@@ -107,6 +109,7 @@ void CGLShaderList::LoadShaders()
 	n_params = 1;
 	param_names.clear();
 	param_names.push_back("alpha");
-	tmp = new CGLShader(SHDR_LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names);
+	minmax.push_back(pair<float,float>(0, 1));
+	tmp = new CGLShader(SHDR_LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names, minmax);
 	Append(tmp);
 }

@@ -9,6 +9,7 @@
 #define CMINIMIZER_MPFIT_H_
 
 #include "CMinimizer.h"
+#include "mpfit.h"
 
 class CMinimizer_mpfit: public CMinimizer
 {
@@ -21,6 +22,8 @@ public:
 	static int ErrorFunc(int nData, int nParams, double * params, double * deviates, double ** derivs, void * misc);
 
 	void Init();
+
+	void printresult(double *x, mp_result *result);
 
 	int run();
 };

@@ -30,6 +30,8 @@ CModelSphere::CModelSphere()
 	mParamNames.push_back("Radius");
 	SetParam(mBaseParams + 1, 1.0);
 	SetFree(mBaseParams + 1, true);
+	SetMin(mBaseParams + 1, 0);
+	SetMax(mBaseParams + 1, 100);
 }
 
 CModelSphere::~CModelSphere()

@@ -17,6 +17,7 @@
 #include <GL/glu.h>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "CGLShaderList.h"
 
@@ -34,18 +35,21 @@ protected:
 	string mFriendlyName;
 	int mNParams;
 	vector<string> mParam_names;
+	pair<float,float> * mMinMax;
 
 	eGLShaders mType;
 	bool mShaderLoaded;
 
 public:
-	CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names);
+	CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax);
 	virtual ~CGLShader();
 
 	eGLShaders GetType() { return mType; };
+	float GetMin(unsigned int i);
+	float GetMax(unsigned int i);
 	string GetName() { return mFriendlyName; };
 	int GetNParams() { return mNParams; }
-	string GetParamName(int i);
+	string GetParamName(unsigned int i);
 
 	void Init();
 

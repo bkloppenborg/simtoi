@@ -49,7 +49,7 @@ void CParameters::CalculateScale(int param_num)
 		return;
 
 	if(fabs(mMinMax[param_num].first) < ZERO_COMP)
-		mScales[param_num] = 0;
+		mScales[param_num] = mMinMax[param_num].second;
 	else
 		mScales[param_num] = mMinMax[param_num].second / mMinMax[param_num].first;
 }
@@ -103,10 +103,23 @@ void CParameters::GetParams(float * out_params, int n_params)
 	}
 }
 
-/// Gets the values of the free (scaled) parameters for this object.
+/// Gets the values of the free parameters for this object, scales them into
+/// a uniform hypercube [0...1]
 void CParameters::GetFreeParams(float * out_params, int n_params)
 {
 	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
+
+	// Scale the parameters back to the unit hypercube.
+	int j = 0;
+	for(int i = 0; i < mNParams; i++)
+	{
+		if(mFreeParams[i])
+		{
+			out_params[j] = (out_params[j] - mMinMax[i].first) /  mScales[i];
+			j++;
+		}
+	}
+
 }
 
 /// Returns all of the parameter names as a vector of strints

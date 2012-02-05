@@ -7,7 +7,6 @@
 
 #include "CMinimizer_mpfit.h"
 #include "CCL_GLThread.h"
-#include "mpfit.h"
 
 CMinimizer_mpfit::CMinimizer_mpfit(CCL_GLThread * cl_gl_thread)
 	: CMinimizer(cl_gl_thread)
@@ -62,12 +61,36 @@ void CMinimizer_mpfit::Init()
 	mResiduals = new float[nData];
 }
 
+/// Prints out cmpfit results (from testmpfit.c)
+void CMinimizer_mpfit::printresult(double * x, mp_result * result)
+{
+	if ((x == 0) || (result == 0))
+		return;
+
+	printf("  CHI-SQUARE = %f    (%d DOF)\n", result->bestnorm, result->nfunc-result->nfree);
+	printf("R-CHI-SQUARE = %f\n", result->bestnorm / result->nfunc-result->nfree);
+	printf("        NPAR = %d\n", result->npar);
+	printf("       NFREE = %d\n", result->nfree);
+	printf("     NPEGGED = %d\n", result->npegged);
+	printf("       NITER = %d\n", result->niter);
+	printf("        NFEV = %d\n", result->nfev);
+	printf("\n");
+
+	for(int i=0; i< result->npar; i++)
+	{
+		printf("  P[%d] = %f +/- %f\n", i, x[i], result->xerror[i]);
+	}
+}
+
 int CMinimizer_mpfit::run()
 {
 	// Create a member function pointer
 	int status = 0;
 	int nParams = mCLThread->GetNFreeParameters();
 	int nData = mCLThread->GetNData();
+	mp_result result;
+	memset(&result,0,sizeof(result));
+	result.xerror = new double[nParams];
 
 	// Setup the input parameters and values:
 	mp_par_struct * pars = new mp_par_struct[nParams];
@@ -75,24 +98,28 @@ int CMinimizer_mpfit::run()
 	float * tmp = new float[nParams];
 	mCLThread->GetFreeParameters(tmp, nParams);
 
+	// Init parameter values
 	for(int i = 0; i < nParams; i++)
 	{
 		input_params[i] = double(tmp[i]);
 		pars[i].fixed = 0;
 		pars[i].limited[0] = 1;
-		pars[i].limited[1] = 0;
-		pars[i].limits[0] = 0.00;
-		pars[i].limits[1] = 0;
+		pars[i].limited[1] = 1;
+		pars[i].limits[0] = 0;
+		pars[i].limits[1] = 1;
 		pars[i].step = 0.01;
 		pars[i].relstep = 0.001;
 		pars[i].side = 2;
 		pars[i].deriv_debug = 0;
 	}
 
-	status = mpfit(&CMinimizer_mpfit::ErrorFunc, nData, nParams, input_params, pars, 0, (void*) this, NULL);
+	status = mpfit(&CMinimizer_mpfit::ErrorFunc, nData, nParams, input_params, pars, 0, (void*) this, &result);
 
+	// Print out the exit code and fit information.
 	printf("Minimizer Exit Code: %d\n", status);
+	printresult(input_params, &result);
 
+	delete[] result.xerror;
 	delete[] input_params;
 	delete[] pars;
 	delete[] tmp;

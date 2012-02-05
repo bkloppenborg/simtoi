@@ -11,7 +11,7 @@
 #include "ReadTextFile.h"
 #include "CCL_GLThread.h"
 
-CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names)
+CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax)
 {
 	mType = type;
 	mShader_dir = shader_dir;
@@ -24,6 +24,13 @@ CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, s
 	mProgram = 0;
 	mShader_vertex = 0;
 	mShader_fragment = 0;
+	mMinMax = new pair<float, float>[mNParams];
+
+	for(int i = 0; i < mNParams; i++)
+	{
+		mMinMax[i].first = minmax[i].first;
+		mMinMax[i].second = minmax[i].second;
+	}
 }
 
 CGLShader::~CGLShader()
@@ -37,8 +44,26 @@ CGLShader::~CGLShader()
 	delete[] mParam_locations;
 }
 
+/// Returns the minimum parameter value, -1 if i is out of range.
+float CGLShader::GetMin(unsigned int i)
+{
+	if(i < mNParams)
+		return mMinMax[i].first;
+
+	return -1;
+}
+
+/// Returns the maximum parameter value, -1 if i is out of range.
+float CGLShader::GetMax(unsigned int i)
+{
+	if(i < mNParams)
+		return mMinMax[i].second;
+
+	return -1;
+}
+
 /// Returns the name of the specified parameter, if out of bounds returns an empty string.
-string CGLShader::GetParamName(int i)
+string CGLShader::GetParamName(unsigned int i)
 {
 	if(i < mNParams)
 		return mParam_names[i];
