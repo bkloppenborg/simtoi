@@ -28,6 +28,9 @@ public:
 
 	void run();
 	void stop();
+
+	signals:
+	void ParametersChanged();
 };
 
 #endif /* CMINIMIZERTHREAD_H_ */
