@@ -85,7 +85,7 @@ void CModelList::GetFreeParameters(float * params, int n_params)
 }
 
 /// Returns a pair of model names, and their enumerated types
-vector< pair<eModels, string> > CModelList::GetList_AllModels(void)
+vector< pair<eModels, string> > CModelList::GetTypes(void)
 {
 	vector< pair<eModels, string> > tmp;
 	tmp.push_back(pair<eModels, string> (MDL_SPHERE, "Sphere"));

@@ -191,7 +191,7 @@ CL_GLT_Operations CCL_GLThread::GetNextOperation(void)
 /// of the shaders stored in this object.
 vector< pair<eGLShaders, string> > CCL_GLThread::GetShaderNames(void)
 {
-	return mShaderList->GetShaderNames();
+	return mShaderList->GetTypes();
 }
 
 void CCL_GLThread::InitFrameBuffer(void)

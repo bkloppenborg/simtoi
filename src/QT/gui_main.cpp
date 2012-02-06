@@ -16,6 +16,7 @@
 #include "enumerations.h"
 #include "CGLShaderList.h"
 #include "CTreeModel.h"
+#include "gui_model.h"
 
 
 Q_DECLARE_METATYPE(eModels);
@@ -144,7 +145,19 @@ void gui_main::addModel(void)
     	return;
 
     CGLWidget * widget = (CGLWidget *) sw->widget();
-    widget->AddModel(MDL_SPHERE);
+
+    gui_model tmp;
+    tmp.SetModelTypes(widget->GetModelTypes());
+    tmp.SetShaderTypes(widget->GetShaderTypes());
+//    tmp.SetPositionTypes(widget->GetPositionTypes());
+    tmp.show();
+    tmp.exec();
+
+    // Now setup the model, position type, and shader.
+//    widget->AddModel(model_type);
+//	  widget->SetPositionType(widget->GetNModels(), position_type);
+//	  widget->SetShader(widget->GetNModels(), shader_type);
+    widget->EnqueueOperation(GLT_RenderModels);
 }
 
 /// Checks to see which buttons can be enabled/disabled.

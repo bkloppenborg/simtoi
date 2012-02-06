@@ -137,6 +137,10 @@ public:
 	vector< pair<eGLShaders, string> > GetShaderNames(void);
 	int GetWidth() { return mWidth; };
 
+    vector< pair<eModels, string> > GetModelTypes() { return mModelList->GetTypes(); };
+    vector< pair<eGLShaders, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
+//    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
+
 
 protected:
     void InitFrameBuffer(void);

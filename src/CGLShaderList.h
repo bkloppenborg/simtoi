@@ -37,7 +37,7 @@ public:
 
 public:
 	CGLShaderWrapper * GetShader(eGLShaders shader);
-	vector< pair<eGLShaders, string> > GetShaderNames(void);
+	vector< pair<eGLShaders, string> > GetTypes(void);
 
 protected:
 	CGLShader * FindShader(eGLShaders shader);

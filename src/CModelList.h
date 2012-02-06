@@ -22,6 +22,16 @@ class CGLShaderWrapper;
 
 using namespace std;
 
+/// Enumerated Model Names.
+/// Note, when adding a new model, list it in this enum and add it to functions:
+///       GetTypes() and in GetNewModel().  We want to change this, see issue #50.
+enum eModels
+{
+	MDL_None,
+	MDL_SPHERE,
+	MDL_CYLINDER
+};
+
 // A container for a list of models.
 class CModelList : public CVectorList<CModel*>
 {
@@ -41,7 +51,7 @@ public:
 	CModel * GetModel(int i) { return mList[i]; };
 	double GetTime() { return mTime; };
 
-	vector< pair<eModels, string> > GetList_AllModels(void);
+	vector< pair<eModels, string> > GetTypes(void);
 
 	void IncrementTime();
 

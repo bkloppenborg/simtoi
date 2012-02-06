@@ -35,15 +35,15 @@ void CGLWidget::AddModel(eModels model_type)
 	RebuildTree();
 }
 
-void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
-{
-	mGLT.EnqueueOperation(op);
-}
-
 void CGLWidget::closeEvent(QCloseEvent *evt)
 {
     stopRendering();
     QGLWidget::closeEvent(evt);
+}
+
+void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
+{
+	mGLT.EnqueueOperation(op);
 }
 
 void CGLWidget::LoadParameters(QStandardItem * parent, CParameters * parameters)

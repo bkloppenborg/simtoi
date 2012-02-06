@@ -8,6 +8,8 @@
 #include <QResizeEvent>
 #include <QtDebug>
 #include <QStandardItemModel>
+#include <utility>
+#include <vector>
 
 #include "CCL_GLThread.h"
 #include "CMinimizerThread.h"
@@ -44,6 +46,11 @@ protected:
     void resizeEvent(QResizeEvent *evt);
 
 public:
+
+    vector< pair<eModels, string> > GetModelTypes() { return mGLT.GetModelTypes(); };
+    vector< pair<eGLShaders, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
+//    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
+
     CModelList * GetModelList() { return mGLT.GetModelList(); };
     QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
     CTreeModel * GetTreeModel() { return mTreeModel; };
