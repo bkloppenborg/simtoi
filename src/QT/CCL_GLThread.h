@@ -120,18 +120,23 @@ public:
 
     void EnqueueOperation(CL_GLT_Operations op);
 
-    void GetFreeParameters(float * params, int n_params) { mModelList->GetFreeParameters(params, n_params); };
 	void GetChi(int data_num, float * output, int & n);
     float GetChi2(int data_num);
-	int GetHeight() { return mHeight; };
+    double GetDataAveTime(int data_num);
+    void GetFreeParameters(float * params, int n_params) { mModelList->GetFreeParameters(params, n_params); };
+    int GetHeight() { return mHeight; };
 	float GetLogLike(int data_num);
-    CL_GLT_Operations GetNextOperation(void);
-	vector< pair<eGLShaders, string> > GetShaderNames(void);
 	CModelList * GetModelList() { return mModelList; };
-	float GetScale() { return mScale; };
-	int GetWidth() { return mWidth; };
+    CL_GLT_Operations GetNextOperation(void);
 	int GetNFreeParameters() { return mModelList->GetNFreeParameters(); };
 	int GetNData();
+	int GetNDataAllocated();
+	int GetNDataAllocated(int data_num);
+	int GetNDataSets();
+	float GetScale() { return mScale; };
+	vector< pair<eGLShaders, string> > GetShaderNames(void);
+	int GetWidth() { return mWidth; };
+
 
 protected:
     void InitFrameBuffer(void);

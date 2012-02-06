@@ -24,6 +24,9 @@ CMinimizer_mpfit::~CMinimizer_mpfit()
 int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double * deviates, double ** derivs, void * misc)
 {
 	CMinimizer_mpfit * tmp = reinterpret_cast<CMinimizer_mpfit*>(misc);
+	int n_data_sets = 0;
+	int n_data_alloc = 0;
+	int n_data_offset = 0;
 
 	// Convert the double parameter values back to floats
 	printf("Parameters: ");
@@ -36,11 +39,18 @@ int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double 
 
 	// Set the parameters:
 	tmp->mCLThread->SetFreeParameters(tmp->mParams, nParams);
-	tmp->mCLThread->EnqueueOperation(GLT_RenderModels);
 
-	// Now iterate through the data and pull out the residuals
-	// TODO: Make this work with multiple data sets, probably will have to do pointer math.
-	tmp->mCLThread->GetChi(0, tmp->mResiduals, nData);
+	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
+	n_data_sets = tmp->mCLThread->GetNDataSets();
+	for(int data_set = 0; data_set < n_data_sets; data_set++)
+	{
+		n_data_alloc = tmp->mCLThread->GetNDataAllocated(data_set);
+		tmp->mCLThread->SetTime(tmp->mCLThread->GetDataAveTime(data_set));
+		tmp->mCLThread->EnqueueOperation(GLT_RenderModels);
+		tmp->mCLThread->GetChi(data_set, tmp->mResiduals + n_data_offset, n_data_alloc);
+		n_data_offset += n_data_alloc;
+	}
+
 
 	// Copy the errors back into the double array:
 //	printf("Residuals:\n");
@@ -56,7 +66,7 @@ int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double 
 void CMinimizer_mpfit::Init()
 {
 	CMinimizer::Init();
-	int nData = mCLThread->GetNData();
+	int nData = mCLThread->GetNDataAllocated();
 
 	mResiduals = new float[nData];
 }
@@ -67,13 +77,14 @@ void CMinimizer_mpfit::printresult(double * x, mp_result * result)
 	if ((x == 0) || (result == 0))
 		return;
 
-	printf("  CHI-SQUARE = %f    (%d DOF)\n", result->bestnorm, result->nfunc-result->nfree);
-	printf("R-CHI-SQUARE = %f\n", result->bestnorm / result->nfunc-result->nfree);
-	printf("        NPAR = %d\n", result->npar);
-	printf("       NFREE = %d\n", result->nfree);
-	printf("     NPEGGED = %d\n", result->npegged);
-	printf("       NITER = %d\n", result->niter);
-	printf("        NFEV = %d\n", result->nfev);
+	printf("INIT CHI-SQUARE = %f \n", result->orignorm);
+	printf("     CHI-SQUARE = %f    (%d DOF)\n", result->bestnorm, result->nfunc-result->nfree);
+	printf("   R-CHI-SQUARE = %f\n", result->bestnorm / result->nfunc-result->nfree);
+	printf("           NPAR = %d\n", result->npar);
+	printf("          NFREE = %d\n", result->nfree);
+	printf("        NPEGGED = %d\n", result->npegged);
+	printf("          NITER = %d\n", result->niter);
+	printf("           NFEV = %d\n", result->nfev);
 	printf("\n");
 
 	for(int i=0; i< result->npar; i++)
@@ -87,7 +98,7 @@ int CMinimizer_mpfit::run()
 	// Create a member function pointer
 	int status = 0;
 	int nParams = mCLThread->GetNFreeParameters();
-	int nData = mCLThread->GetNData();
+	int nData = mCLThread->GetNDataAllocated();
 	mp_result result;
 	memset(&result,0,sizeof(result));
 	result.xerror = new double[nParams];

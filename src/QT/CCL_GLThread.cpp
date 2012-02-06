@@ -134,6 +134,12 @@ float CCL_GLThread::GetChi2(int data_num)
 	return mCLValue;
 }
 
+/// Returns the average
+double CCL_GLThread::GetDataAveTime(int data_num)
+{
+	return mCL->GetDataAveTime(data_num);
+}
+
 /// Returns the chi2 for the specified data set
 float CCL_GLThread::GetLogLike(int data_num)
 {
@@ -148,6 +154,24 @@ float CCL_GLThread::GetLogLike(int data_num)
 int CCL_GLThread::GetNData()
 {
 	return mCL->GetNData();
+}
+
+/// Returns the total allocation size for all data points (V2 + 2 * T3)
+int CCL_GLThread::GetNDataAllocated()
+{
+	return mCL->GetNDataAllocated();
+}
+
+/// Returns the data allocation size for the data_num entry, returns zero if data_num is invalid.
+int CCL_GLThread::GetNDataAllocated(int data_num)
+{
+	return mCL->GetNDataAllocated(data_num);
+}
+
+/// Returns the total number of data sets.
+int CCL_GLThread::GetNDataSets()
+{
+	return mCL->GetNDataSets();
 }
 
 /// Get the next operation from the queue.  This is a blocking function.
