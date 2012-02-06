@@ -126,6 +126,14 @@ int CMinimizer_mpfit::run()
 
 	status = mpfit(&CMinimizer_mpfit::ErrorFunc, nData, nParams, input_params, pars, 0, (void*) this, &result);
 
+	// Render the model with the best-fit parameters:
+	for(int i = 0; i < nParams; i++)
+		tmp[i] = float(input_params[i]);
+
+	mCLThread->SetFreeParameters(tmp, nParams);
+	mCLThread->EnqueueOperation(GLT_RenderModels);
+
+
 	// Print out the exit code and fit information.
 	printf("Minimizer Exit Code: %d\n", status);
 	printresult(input_params, &result);
