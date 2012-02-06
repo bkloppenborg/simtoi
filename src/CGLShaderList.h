@@ -18,15 +18,17 @@ using namespace std;
 class CGLShader;
 class CGLShaderWrapper;
 
-/// Enumerated shader names
-enum eGLShaders
-{
-	SHDR_NONE,
-	SHDR_LD_HESTEROFFER1997
-};
-
 class CGLShaderList: public CVectorList<CGLShader*>
 {
+public:
+	/// Enumerated shader names
+	enum ShaderTypes
+	{
+		SHDR_NONE,
+		SHDR_LD_HESTEROFFER1997,
+		LAST_VALUE // must be the last element
+	};
+
 protected:
 	string shader_dir;
 	bool SortModelPredicate(CGLShader * A, CGLShader * B);
@@ -36,11 +38,11 @@ public:
 	~CGLShaderList();
 
 public:
-	CGLShaderWrapper * GetShader(eGLShaders shader);
-	vector< pair<eGLShaders, string> > GetTypes(void);
+	CGLShaderWrapper * GetShader(ShaderTypes shader);
+	vector< pair<ShaderTypes, string> > GetTypes(void);
 
 protected:
-	CGLShader * FindShader(eGLShaders shader);
+	CGLShader * FindShader(ShaderTypes shader);
 
 	void LoadShaders();
 };

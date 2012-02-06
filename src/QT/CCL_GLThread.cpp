@@ -52,7 +52,7 @@ void CCL_GLThread::AddModel(eModels model)
 
 	// Initialize with default (XY) position and no shader.
 	tmp_model->SetPositionType(POSITION_XY);
-	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(SHDR_NONE);
+	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(CGLShaderList::SHDR_NONE);
 	tmp_model->SetShader(tmp_shader);
 
 	EnqueueOperation(GLT_RenderModels);
@@ -189,7 +189,7 @@ CL_GLT_Operations CCL_GLThread::GetNextOperation(void)
 
 /// Returns a list of pairs of <eGlShader, string> corresponding to the (enumerated_name, friendly_name)
 /// of the shaders stored in this object.
-vector< pair<eGLShaders, string> > CCL_GLThread::GetShaderNames(void)
+vector< pair<CGLShaderList::ShaderTypes, string> > CCL_GLThread::GetShaderNames(void)
 {
 	return mShaderList->GetTypes();
 }
@@ -436,7 +436,7 @@ void CCL_GLThread::SetScale(double scale)
 		mScale = scale;
 }
 
-void CCL_GLThread::SetShader(int model_id, eGLShaders shader)
+void CCL_GLThread::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
 {
 	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
 	mModelList->SetShader(model_id, tmp_shader);

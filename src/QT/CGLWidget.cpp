@@ -191,7 +191,7 @@ void CGLWidget::SetScale(double scale)
 	mGLT.SetScale(scale);
 }
 
-void CGLWidget::SetShader(int model_id, eGLShaders shader)
+void CGLWidget::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
 {
 	mGLT.SetShader(model_id, shader);
 	RebuildTree();

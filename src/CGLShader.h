@@ -37,14 +37,14 @@ protected:
 	vector<string> mParam_names;
 	pair<float,float> * mMinMax;
 
-	eGLShaders mType;
+	CGLShaderList::ShaderTypes mType;
 	bool mShaderLoaded;
 
 public:
-	CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax);
+	CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax);
 	virtual ~CGLShader();
 
-	eGLShaders GetType() { return mType; };
+	CGLShaderList::ShaderTypes GetType() { return mType; };
 	float GetMin(unsigned int i);
 	float GetMax(unsigned int i);
 	string GetName() { return mFriendlyName; };

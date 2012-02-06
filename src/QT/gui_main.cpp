@@ -19,8 +19,8 @@
 #include "gui_model.h"
 
 
-Q_DECLARE_METATYPE(eModels);
-Q_DECLARE_METATYPE(eGLShaders);
+//Q_DECLARE_METATYPE(eModels);
+//Q_DECLARE_METATYPE(CGLShaderList::ShaderTypes);
 
 gui_main::gui_main(QWidget *parent_widget)
     : QMainWindow(parent_widget)
@@ -127,7 +127,7 @@ void gui_main::addGLArea()
 
     // TODO: Remove later.  Add a sphere:
     widget->AddModel(MDL_SPHERE);
-    widget->SetShader(0, SHDR_LD_HESTEROFFER1997);
+    widget->SetShader(0, CGLShaderList::SHDR_LD_HESTEROFFER1997);
 //    widget->AddModel(MDL_CYLINDER);
 //    widget->SetPositionType(1, POSITION_ORBIT);
 

@@ -134,11 +134,11 @@ public:
 	int GetNDataAllocated(int data_num);
 	int GetNDataSets();
 	float GetScale() { return mScale; };
-	vector< pair<eGLShaders, string> > GetShaderNames(void);
+	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
 	int GetWidth() { return mWidth; };
 
     vector< pair<eModels, string> > GetModelTypes() { return mModelList->GetTypes(); };
-    vector< pair<eGLShaders, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
+    vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
 
@@ -160,7 +160,7 @@ public:
     void SetFreeParameters(float * params, int n_params);
     void SetPositionType(int model_id, ePositionTypes pos_type);
     void SetScale(double scale);
-    void SetShader(int model_id, eGLShaders shader);
+    void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetTime(double t);
     void SetTimestep(double dt);
     void stop();

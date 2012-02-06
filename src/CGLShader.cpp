@@ -11,7 +11,7 @@
 #include "ReadTextFile.h"
 #include "CCL_GLThread.h"
 
-CGLShader::CGLShader(eGLShaders type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax)
+CGLShader::CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax)
 {
 	mType = type;
 	mShader_dir = shader_dir;

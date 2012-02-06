@@ -33,7 +33,7 @@ bool CGLShaderList::SortModelPredicate(CGLShader * A, CGLShader * B)
 
 /// Finds the specified shader in the list, returns the (compiled) version wrapped
 /// into a CGLShaderWrapper.
-CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
+CGLShaderWrapper * CGLShaderList::GetShader(ShaderTypes shader)
 {
 	// First see if the shader is already loaded
 	CGLShader * tmp = NULL;
@@ -50,12 +50,12 @@ CGLShaderWrapper * CGLShaderList::GetShader(eGLShaders shader)
 	return wrapper;
 }
 
-/// Returns a vector of pair<eGLShaders, string> which identify the enumerated name and friendly name
+/// Returns a vector of pair<ShaderTypes, string> which identify the enumerated name and friendly name
 /// of each shader in the list.
-vector< pair<eGLShaders, string> > CGLShaderList::GetTypes(void)
+vector< pair<CGLShaderList::ShaderTypes, string> > CGLShaderList::GetTypes(void)
 {
-	vector< pair<eGLShaders, string> > list;
-	pair<eGLShaders, string> tmp;
+	vector< pair<ShaderTypes, string> > list;
+	pair<ShaderTypes, string> tmp;
 
 	// Iterate through the list and append the shader information
     for(vector<CGLShader*>::iterator it = mList.begin(); it != mList.end(); ++it)
@@ -70,7 +70,7 @@ vector< pair<eGLShaders, string> > CGLShaderList::GetTypes(void)
 }
 
 /// Finds the specified shader.
-CGLShader * CGLShaderList::FindShader(eGLShaders shader)
+CGLShader * CGLShaderList::FindShader(CGLShaderList::ShaderTypes shader)
 {
 	// There should be a small enough number of shaders that we can use find directly on the
 	// unsorted vector list.  If this becomes a problem, we can sort the values later.
@@ -100,7 +100,7 @@ void CGLShaderList::LoadShaders()
 	n_params = 0;
 	param_names.clear();
 	minmax.clear();
-	tmp = new CGLShader(SHDR_NONE, shader_dir, base_name, friendly_name, n_params, param_names, minmax);
+	tmp = new CGLShader(CGLShaderList::SHDR_NONE, shader_dir, base_name, friendly_name, n_params, param_names, minmax);
 	Append(tmp);
 
 	// Simple limb darkening.
@@ -110,6 +110,6 @@ void CGLShaderList::LoadShaders()
 	param_names.clear();
 	param_names.push_back("alpha");
 	minmax.push_back(pair<float,float>(0, 1));
-	tmp = new CGLShader(SHDR_LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names, minmax);
+	tmp = new CGLShader(CGLShaderList::SHDR_LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names, minmax);
 	Append(tmp);
 }

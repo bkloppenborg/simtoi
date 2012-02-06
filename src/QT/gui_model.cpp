@@ -26,7 +26,7 @@ void gui_model::SetPositionTypes(vector< pair<int, string> > position_info)
 	gui_model_ns::SetupComboOptions(ui.cboPositions, position_info);
 }
 
-void gui_model::SetShaderTypes(vector< pair<eGLShaders, string> > shader_info)
+void gui_model::SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info)
 {
 	gui_model_ns::SetupComboOptions(ui.cboShaders, shader_info);
 }

@@ -38,7 +38,7 @@ protected:
 public:
 
     void EnqueueOperation(CL_GLT_Operations op);
-	vector< pair<eGLShaders, string> > GetShaderNames(void) { return mGLT.GetShaderNames(); };
+	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void) { return mGLT.GetShaderNames(); };
 
 protected:
 	void paintEvent(QPaintEvent * );
@@ -48,7 +48,7 @@ protected:
 public:
 
     vector< pair<eModels, string> > GetModelTypes() { return mGLT.GetModelTypes(); };
-    vector< pair<eGLShaders, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
+    vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
     CModelList * GetModelList() { return mGLT.GetModelList(); };
@@ -70,7 +70,7 @@ protected:
 public:
     void SetFreeParameters(float * params, int n_params);
     void SetScale(double scale);
-    void SetShader(int model_id, eGLShaders shader);
+    void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetPositionType(int model_id, ePositionTypes pos_type);
     void SetTime(double t) { mGLT.SetTime(t); };
     void SetTimestep(double dt) { mGLT.SetTimestep(dt); };

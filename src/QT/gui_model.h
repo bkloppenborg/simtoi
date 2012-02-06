@@ -22,7 +22,7 @@ public:
     void SetFeatureTypes(vector< pair<int, string> > feature_info);
     void SetModelTypes(vector< pair<eModels, string> > model_info);
     void SetPositionTypes(vector< pair<int, string> > position_info);
-    void SetShaderTypes(vector< pair<eGLShaders, string> > shader_info);
+    void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
 
 private:
     //void SetupComboOptions(QComboBox * combo_box, vector< pair<int, string> > values);
@@ -34,7 +34,6 @@ private:
 namespace gui_model_ns
 {
 template <typename T>
-
 void SetupComboOptions(QComboBox * combo_box, vector< pair<T, string> > values)
 {
 	QString tmp_str = "";
@@ -46,6 +45,16 @@ void SetupComboOptions(QComboBox * combo_box, vector< pair<T, string> > values)
 		tmp_str = QString::fromStdString(values[i].second);
 		combo_box->addItem(tmp_str, tmp_val);
 	}
+}
+
+template <typename T>
+T InterpretComboValue(int value)
+{
+	if(value < T::LAST_VALUE)
+		return reinterpret_cast<T>(value);
+
+	throw "Exception: Value out of range.";
+	return 0;
 }
 
 }

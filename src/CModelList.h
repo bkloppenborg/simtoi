@@ -29,7 +29,8 @@ enum eModels
 {
 	MDL_None,
 	MDL_SPHERE,
-	MDL_CYLINDER
+	MDL_CYLINDER,
+	LAST_VALUE // must be the last value in this list.
 };
 
 // A container for a list of models.
