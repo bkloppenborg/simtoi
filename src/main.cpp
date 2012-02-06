@@ -17,7 +17,7 @@
 #endif
 
 #include "main.h"
-#include "cmaingui.h"
+#include "gui_main.h"
 
 using namespace std;
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
 	// Pass off to the GUI:
     QApplication app(argc, argv);
-    cmaingui main_window;
+    gui_main main_window;
     main_window.show();
     return app.exec();
 }
