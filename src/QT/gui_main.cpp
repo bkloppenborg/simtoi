@@ -19,7 +19,7 @@
 #include "gui_model.h"
 
 
-//Q_DECLARE_METATYPE(eModels);
+//Q_DECLARE_METATYPE(ModelTypes);
 //Q_DECLARE_METATYPE(CGLShaderList::ShaderTypes);
 
 gui_main::gui_main(QWidget *parent_widget)
@@ -126,9 +126,9 @@ void gui_main::addGLArea()
     widget->startRendering();
 
     // TODO: Remove later.  Add a sphere:
-    widget->AddModel(MDL_SPHERE);
-    widget->SetShader(0, CGLShaderList::SHDR_LD_HESTEROFFER1997);
-//    widget->AddModel(MDL_CYLINDER);
+    widget->AddModel(CModelList::SPHERE);
+    widget->SetShader(0, CGLShaderList::LD_HESTEROFFER1997);
+//    widget->AddModel(CYLINDER);
 //    widget->SetPositionType(1, POSITION_ORBIT);
 
 	// Now connect the slot

@@ -24,8 +24,8 @@ public:
 	/// Enumerated shader names
 	enum ShaderTypes
 	{
-		SHDR_NONE,
-		SHDR_LD_HESTEROFFER1997,
+		NONE,
+		LD_HESTEROFFER1997,
 		LAST_VALUE // must be the last element
 	};
 

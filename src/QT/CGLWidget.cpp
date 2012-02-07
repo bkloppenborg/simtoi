@@ -27,7 +27,7 @@ CGLWidget::~CGLWidget()
 	delete mTreeModel;
 }
 
-void CGLWidget::AddModel(eModels model_type)
+void CGLWidget::AddModel(CModelList::ModelTypes model_type)
 {
 	// Instruct the thread to add the model to it's list:
 	mGLT.AddModel(model_type);

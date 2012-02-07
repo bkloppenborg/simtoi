@@ -19,7 +19,7 @@ CModelCylinder::CModelCylinder()
 	mSlices = 50;	// seems like a good number.
 	mStacks = 50;
 	mName = "Cylinder";
-	mType = MDL_CYLINDER;
+	mType = CModelList::CYLINDER;
 
 	// Set the radius to some useful value, make it free.
 	mParamNames.push_back("Diameter");

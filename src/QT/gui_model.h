@@ -20,7 +20,7 @@ public:
     ~gui_model();
 
     void SetFeatureTypes(vector< pair<int, string> > feature_info);
-    void SetModelTypes(vector< pair<eModels, string> > model_info);
+    void SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info);
     void SetPositionTypes(vector< pair<int, string> > position_info);
     void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
 

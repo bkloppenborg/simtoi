@@ -22,20 +22,23 @@ class CGLShaderWrapper;
 
 using namespace std;
 
-/// Enumerated Model Names.
-/// Note, when adding a new model, list it in this enum and add it to functions:
-///       GetTypes() and in GetNewModel().  We want to change this, see issue #50.
-enum eModels
-{
-	MDL_None,
-	MDL_SPHERE,
-	MDL_CYLINDER,
-	LAST_VALUE // must be the last value in this list.
-};
+
 
 // A container for a list of models.
 class CModelList : public CVectorList<CModel*>
 {
+public:
+	/// Enumerated Model Names.
+	/// Note, when adding a new model, list it in this enum and add it to functions:
+	///       GetTypes() and in GetNewModel().  We want to change this, see issue #50.
+	enum ModelTypes
+	{
+		NONE,
+		SPHERE,
+		CYLINDER,
+		LAST_VALUE // must be the last value in this list.
+	};
+
 protected:
 	double mTime;
 	double mTimestep;
@@ -44,7 +47,7 @@ public:
 	CModelList();
 	~CModelList();
 
-	CModel * AddNewModel(eModels model_id);
+	CModel * AddNewModel(ModelTypes model_id);
 
 	int GetNFreeParameters();
 	void GetAllParameters(float * params, int n_params);
@@ -52,7 +55,7 @@ public:
 	CModel * GetModel(int i) { return mList[i]; };
 	double GetTime() { return mTime; };
 
-	vector< pair<eModels, string> > GetTypes(void);
+	vector< pair<ModelTypes, string> > GetTypes(void);
 
 	void IncrementTime();
 

@@ -16,7 +16,7 @@ void gui_model::SetFeatureTypes(vector< pair<int, string> > feature_info)
 //	SetupComboOptions(ui.listFeatures, feature_info);
 }
 
-void gui_model::SetModelTypes(vector< pair<eModels, string> > model_info)
+void gui_model::SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info)
 {
 	gui_model_ns::SetupComboOptions(ui.cboModels, model_info);
 }

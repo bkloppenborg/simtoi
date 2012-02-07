@@ -26,16 +26,16 @@ CModelList::~CModelList()
 }
 
 /// Creates a new model, appends it to the model list and returns a pointer to it.
-CModel * CModelList::AddNewModel(eModels model_id)
+CModel * CModelList::AddNewModel(ModelTypes model_id)
 {
 	CModel * tmp;
 	switch(model_id)
 	{
-	case MDL_CYLINDER:
+	case CYLINDER:
 		tmp = new CModelCylinder();
 		break;
 
-	case MDL_SPHERE:
+	case SPHERE:
 	default:
 		tmp = new CModelSphere();
 		break;
@@ -85,11 +85,11 @@ void CModelList::GetFreeParameters(float * params, int n_params)
 }
 
 /// Returns a pair of model names, and their enumerated types
-vector< pair<eModels, string> > CModelList::GetTypes(void)
+vector< pair<CModelList::ModelTypes, string> > CModelList::GetTypes(void)
 {
-	vector< pair<eModels, string> > tmp;
-	tmp.push_back(pair<eModels, string> (MDL_SPHERE, "Sphere"));
-	tmp.push_back(pair<eModels, string> (MDL_CYLINDER, "Cylinder"));
+	vector< pair<ModelTypes, string> > tmp;
+	tmp.push_back(pair<ModelTypes, string> (CModelList::SPHERE, "Sphere"));
+	tmp.push_back(pair<ModelTypes, string> (CModelList::CYLINDER, "Cylinder"));
 
 	return tmp;
 }

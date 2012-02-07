@@ -45,14 +45,14 @@ CCL_GLThread::~CCL_GLThread()
 }
 
 /// Appends a model to the model list, importing shaders and features as necessary.
-void CCL_GLThread::AddModel(eModels model)
+void CCL_GLThread::AddModel(CModelList::ModelTypes model)
 {
 	// Create the model, load the shader.
 	CModel * tmp_model = mModelList->AddNewModel(model);
 
 	// Initialize with default (XY) position and no shader.
 	tmp_model->SetPositionType(POSITION_XY);
-	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(CGLShaderList::SHDR_NONE);
+	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(CGLShaderList::NONE);
 	tmp_model->SetShader(tmp_shader);
 
 	EnqueueOperation(GLT_RenderModels);

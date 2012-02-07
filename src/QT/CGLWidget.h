@@ -14,6 +14,7 @@
 #include "CCL_GLThread.h"
 #include "CMinimizerThread.h"
 #include "CLibOI.h"
+#include "CModelList.h"
 
 class CModel;
 class CTreeModel;
@@ -32,7 +33,7 @@ public:
     CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);
     ~CGLWidget();
 
-    void AddModel(eModels model);
+    void AddModel(CModelList::ModelTypes model);
 protected:
     void closeEvent(QCloseEvent *evt);
 public:
@@ -47,7 +48,7 @@ protected:
 
 public:
 
-    vector< pair<eModels, string> > GetModelTypes() { return mGLT.GetModelTypes(); };
+    vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mGLT.GetModelTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 

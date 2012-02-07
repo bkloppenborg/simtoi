@@ -110,7 +110,7 @@ public:
     CCL_GLThread(CGLWidget * glWidget, string shader_source_dir, string kernel_source_dir);
     ~CCL_GLThread();
 
-    void AddModel(eModels model);
+    void AddModel(CModelList::ModelTypes model);
 
 protected:
     void BlitToScreen();
@@ -137,7 +137,7 @@ public:
 	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
 	int GetWidth() { return mWidth; };
 
-    vector< pair<eModels, string> > GetModelTypes() { return mModelList->GetTypes(); };
+    vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mModelList->GetTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 

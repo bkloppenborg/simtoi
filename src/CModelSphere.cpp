@@ -24,7 +24,7 @@ CModelSphere::CModelSphere()
 
 	mSlices = 50;	// seems like a good number.
 	mName = "Sphere";
-	mType = MDL_SPHERE;
+	mType = CModelList::SPHERE;
 
 	// Set the radius to some useful value, make it free.
 	mParamNames.push_back("Radius");

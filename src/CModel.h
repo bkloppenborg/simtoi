@@ -37,7 +37,7 @@ protected:
 //	bool is_analytic;
 	int mBaseParams;
 
-	eModels mType;
+	CModelList::ModelTypes mType;
 
 	CPosition * mPosition;
 
@@ -71,7 +71,7 @@ public:
 	CPosition * GetPosition(void) { return mPosition; };
 	CGLShaderWrapper * GetShader(void) { return mShader; };
 	int GetTotalFreeParameters();
-	eModels GetType(void) { return mType; };
+	CModelList::ModelTypes GetType(void) { return mType; };
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 
