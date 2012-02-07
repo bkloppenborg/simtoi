@@ -51,7 +51,9 @@ public:
 
 	int GetNFreeParameters();
 	void GetAllParameters(float * params, int n_params);
+	vector< pair<float, float> > GetFreeParamMinMaxes();
 	void GetFreeParameters(float * params, int n_params);
+	vector<string> GetFreeParamNames();
 	CModel * GetModel(int i) { return mList[i]; };
 	double GetTime() { return mTime; };
 

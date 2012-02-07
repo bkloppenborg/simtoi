@@ -45,7 +45,7 @@ int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double 
 	for(int data_set = 0; data_set < n_data_sets; data_set++)
 	{
 		n_data_alloc = tmp->mCLThread->GetNDataAllocated(data_set);
-		tmp->mCLThread->SetTime(tmp->mCLThread->GetDataAveTime(data_set));
+		tmp->mCLThread->SetTime(tmp->mCLThread->GetDataAveJD(data_set));
 		tmp->mCLThread->EnqueueOperation(GLT_RenderModels);
 		tmp->mCLThread->GetChi(data_set, tmp->mResiduals + n_data_offset, n_data_alloc);
 		n_data_offset += n_data_alloc;
@@ -72,10 +72,15 @@ void CMinimizer_mpfit::Init()
 }
 
 /// Prints out cmpfit results (from testmpfit.c)
-void CMinimizer_mpfit::printresult(double * x, mp_result * result)
+void CMinimizer_mpfit::printresult(double * x, mp_result * result, vector<string> names, vector< pair<float, float> > min_max)
 {
 	if ((x == 0) || (result == 0))
 		return;
+
+	double value = 0;
+	double err = 0;
+	double scale;
+	string name = "";
 
 	printf("INIT CHI-SQUARE = %f \n", result->orignorm);
 	printf("     CHI-SQUARE = %f    (%d DOF)\n", result->bestnorm, result->nfunc-result->nfree);
@@ -89,7 +94,11 @@ void CMinimizer_mpfit::printresult(double * x, mp_result * result)
 
 	for(int i=0; i< result->npar; i++)
 	{
-		printf("  P[%d] = %f +/- %f\n", i, x[i], result->xerror[i]);
+		scale = min_max[i].second - min_max[i].first;
+		value = x[i] * scale + min_max[i].first;
+		err = result->xerror[i] * scale;
+		name = names[i];
+		printf("  P[%d] = %f +/- %f (%s)\n", i, value, err, name.c_str());
 	}
 }
 
@@ -108,6 +117,8 @@ int CMinimizer_mpfit::run()
 	double * input_params = new double[nParams];
 	float * tmp = new float[nParams];
 	mCLThread->GetFreeParameters(tmp, nParams);
+	vector<string> names = mCLThread->GetFreeParamNames();
+	vector< pair<float, float> > min_max = mCLThread->GetFreeParamMinMaxes();
 
 	// Init parameter values
 	for(int i = 0; i < nParams; i++)
@@ -118,8 +129,8 @@ int CMinimizer_mpfit::run()
 		pars[i].limited[1] = 1;
 		pars[i].limits[0] = 0;
 		pars[i].limits[1] = 1;
-		pars[i].step = 0.01;
-		pars[i].relstep = 0.001;
+		pars[i].step = 0.1;
+		pars[i].relstep = 0.01;
 		pars[i].side = 2;
 		pars[i].deriv_debug = 0;
 	}
@@ -136,7 +147,7 @@ int CMinimizer_mpfit::run()
 
 	// Print out the exit code and fit information.
 	printf("Minimizer Exit Code: %d\n", status);
-	printresult(input_params, &result);
+	printresult(input_params, &result, names, min_max);
 
 	delete[] result.xerror;
 	delete[] input_params;

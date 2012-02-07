@@ -42,18 +42,6 @@ CParameters::~CParameters()
 	delete[] mMinMax;
 }
 
-/// Calculate and set the scale factor for the specified parameter
-void CParameters::CalculateScale(int param_num)
-{
-	if(param_num > mNParams - 1)
-		return;
-
-	if(fabs(mMinMax[param_num].first) < ZERO_COMP)
-		mScales[param_num] = mMinMax[param_num].second;
-	else
-		mScales[param_num] = mMinMax[param_num].second / mMinMax[param_num].first;
-}
-
 /// Counts the number of free parameters, sets that value to mNFreeParams
 void CParameters::CountFree(void)
 {
@@ -103,23 +91,52 @@ void CParameters::GetParams(float * out_params, int n_params)
 	}
 }
 
+/// Returns a vector of pairs containing the min/max values for the parameters.
+vector< pair<float, float> > CParameters::GetFreeMinMaxes()
+{
+	vector< pair<float, float> > tmp;
+	for(int i = 0; i < mNParams; i++)
+	{
+		if(mFreeParams[i])
+			tmp.push_back(mMinMax[i]);
+	}
+
+	return tmp;
+}
+
 /// Gets the values of the free parameters for this object, scales them into
 /// a uniform hypercube [0...1]
 void CParameters::GetFreeParams(float * out_params, int n_params)
 {
 	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
 
-	// Scale the parameters back to the unit hypercube.
+	// Scale the parameters into a unit hypercube.
+	// f(x) = (x - min) / (max - min) // the scaled value
+	// x = f(x) * (max - min) + min   // restore the original value, see SetFreeParams
+
 	int j = 0;
 	for(int i = 0; i < mNParams; i++)
 	{
 		if(mFreeParams[i])
 		{
-			out_params[j] = (out_params[j] - mMinMax[i].first) /  mScales[i];
+			out_params[j] = (out_params[j] - mMinMax[i].first) /  (mMinMax[i].second - mMinMax[i].first);
 			j++;
 		}
 	}
 
+}
+
+/// Returns a vector of strings containing the names of the free parameters.
+vector<string> CParameters::GetFreeParamNames()
+{
+	vector<string> tmp;
+	for(int i = 0; i < mNParams; i++)
+	{
+		if(mFreeParams[i])
+			tmp.push_back(GetParamName(i));
+	}
+
+	return tmp;
 }
 
 /// Returns all of the parameter names as a vector of strints
@@ -170,11 +187,13 @@ void CParameters::SetFreeParams(float * in_params, int n_params)
 	// Set the parameter values
 	push_params(in_params, n_params, mParams, mNParams, mFreeParams);
 
-	// Now scale the parameters (only free parameters could have changed, so just scale those)
+	// Scale the parameters into regular units
+	// f(x) = (x - min) / (max - min) // the scaled value (see GetFreeParams)
+	// x = f(x) * (max - min) + min   // restore the original value.
 	for(int i = 0; i < mNParams; i++)
 	{
 		if(mFreeParams[i])
-			mParams[i] = mMinMax[i].first + mScales[i] * mParams[i];
+			mParams[i] = (mMinMax[i].second - mMinMax[i].first) * mParams[i] + mMinMax[i].first;
 	}
 }
 
@@ -191,21 +210,15 @@ void CParameters::SetFree(int param_num, bool is_free)
 /// Sets the specified parameter's minimum value.
 void CParameters::SetMin(int param_num, float value)
 {
-	if(param_num < mNParams)
-	{
+	if(param_num < mNParams && value < mMinMax[param_num].second)
 		mMinMax[param_num].first = value;
-		CalculateScale(param_num);
-	}
 }
 
 /// Sets the specified paramter's maximum value.
 void CParameters::SetMax(int param_num, float value)
 {
-	if(param_num < mNParams)
-	{
+	if(param_num < mNParams && value > mMinMax[param_num].first)
 		mMinMax[param_num].second = value;
-		CalculateScale(param_num);
-	}
 }
 
 /// Sets the specified parameter to the indicated value.

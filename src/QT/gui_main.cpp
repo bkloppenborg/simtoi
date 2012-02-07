@@ -301,7 +301,11 @@ void gui_main::RemoveData()
 
 void gui_main::render()
 {
-    CGLWidget * widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    CGLWidget * widget = (CGLWidget*) sw->widget();
     if(widget)
     {
     	widget->EnqueueOperation(GLT_RenderModels);

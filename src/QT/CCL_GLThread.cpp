@@ -135,9 +135,9 @@ float CCL_GLThread::GetChi2(int data_num)
 }
 
 /// Returns the average
-double CCL_GLThread::GetDataAveTime(int data_num)
+double CCL_GLThread::GetDataAveJD(int data_num)
 {
-	return mCL->GetDataAveTime(data_num);
+	return mCL->GetDataAveJD(data_num);
 }
 
 /// Returns the chi2 for the specified data set

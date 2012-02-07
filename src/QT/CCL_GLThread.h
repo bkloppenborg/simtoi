@@ -122,13 +122,15 @@ public:
 
 	void GetChi(int data_num, float * output, int & n);
     float GetChi2(int data_num);
-    double GetDataAveTime(int data_num);
+    double GetDataAveJD(int data_num);
     void GetFreeParameters(float * params, int n_params) { mModelList->GetFreeParameters(params, n_params); };
     int GetHeight() { return mHeight; };
 	float GetLogLike(int data_num);
 	CModelList * GetModelList() { return mModelList; };
     CL_GLT_Operations GetNextOperation(void);
 	int GetNFreeParameters() { return mModelList->GetNFreeParameters(); };
+	vector< pair<float, float> > GetFreeParamMinMaxes() { return mModelList->GetFreeParamMinMaxes(); };
+	vector<string> GetFreeParamNames() { return mModelList->GetFreeParamNames(); };
 	int GetNData();
 	int GetNDataAllocated();
 	int GetNDataAllocated(int data_num);

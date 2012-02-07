@@ -39,13 +39,15 @@ protected:
 	void CalculateScale(int param_num);
 
 public:
+	void GetFreeParams(float * params, int n_param);
+	vector<string> GetFreeParamNames();
 	string GetName(void) { return mName; };
-	float GetMax(int param_num);
-	float GetMin(int param_num);
 	int GetNFreeParams(void) { return mNFreeParams; };
 	int GetNParams(void) { return mNParams; };
-	void GetParams(float * params, int n_params);
-	void GetFreeParams(float * params, int n_param);
+	float GetMax(int param_num);
+	float GetMin(int param_num);
+	vector< pair<float, float> > GetFreeMinMaxes();
+	void GetParams(float * params, int n_params);;
 	float GetParam(int i);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();

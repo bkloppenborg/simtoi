@@ -75,6 +75,23 @@ void CModel::GetAllParameters(float * params, int n_params)
 	//features->GetParams(params + n, n_params - n);
 }
 
+vector< pair<float, float> > CModel::GetFreeParamMinMaxes()
+{
+	vector< pair<float, float> > tmp1;
+	vector< pair<float, float> > tmp2 = GetFreeMinMaxes();
+	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	tmp2 = mPosition->GetFreeMinMaxes();
+	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+
+	if(mShader != NULL)
+	{
+		tmp2 = mShader->GetFreeMinMaxes();
+		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	}
+
+	return tmp1;
+}
+
 /// Sets the free parameters for this model.
 void CModel::GetFreeParameters(float * params, int n_params)
 {
@@ -90,6 +107,24 @@ void CModel::GetFreeParameters(float * params, int n_params)
 		n += mShader->GetNFreeParams();
 	}
 
+}
+
+/// Returns a vector of strings containing the names of the free parameters:
+vector<string> CModel::GetFreeParameterNames()
+{
+	vector<string> tmp1;
+	vector<string> tmp2 = GetFreeParamNames();
+	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	tmp2 = mPosition->GetFreeParamNames();
+	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+
+	if(mShader != NULL)
+	{
+		tmp2 = mShader->GetFreeParamNames();
+		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	}
+
+	return tmp1;
 }
 
 int CModel::GetTotalFreeParameters()

@@ -18,6 +18,8 @@
 
 #include <string>
 #include <cstdio>
+#include <utility>
+#include <vector>
 
 using namespace std;
 

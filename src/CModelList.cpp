@@ -71,6 +71,21 @@ void CModelList::GetAllParameters(float * params, int n_params)
     }
 }
 
+vector< pair<float, float> > CModelList::GetFreeParamMinMaxes()
+{
+    vector< pair<float, float> > tmp1;
+    vector< pair<float, float> > tmp2;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	tmp2 = (*it)->GetFreeParamMinMaxes();
+    	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+    }
+
+    return tmp1;
+}
+
 /// Gets the values for all of the free parameters.
 void CModelList::GetFreeParameters(float * params, int n_params)
 {
@@ -82,6 +97,22 @@ void CModelList::GetFreeParameters(float * params, int n_params)
     	(*it)->GetFreeParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
     }
+}
+
+/// Returns a vector of string containing the parameter names.
+vector<string> CModelList::GetFreeParamNames()
+{
+    vector<string> tmp1;
+    vector<string> tmp2;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	tmp2 = (*it)->GetFreeParameterNames();
+    	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+    }
+
+    return tmp1;
 }
 
 /// Returns a pair of model names, and their enumerated types
