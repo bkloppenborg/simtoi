@@ -76,7 +76,7 @@ public:
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 
 public:
-	void SetPositionType(ePositionTypes type);
+	void SetPositionType(CPosition::PositionTypes type);
 	void SetShader(CGLShaderWrapper * shader);
 	void SetTime(double time);
 protected:

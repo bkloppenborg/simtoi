@@ -158,7 +158,7 @@ public:
     void run();
 
     void SetFreeParameters(float * params, int n_params);
-    void SetPositionType(int model_id, ePositionTypes pos_type);
+    void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetTime(double t);

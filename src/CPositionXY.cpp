@@ -10,7 +10,7 @@
 CPositionXY::CPositionXY()
 	: CPosition(2)
 {
-	mType = POSITION_XY;
+	mType = XY;
 	mName = "XY";
 
 	// Init the position variables, set them to be fixed.

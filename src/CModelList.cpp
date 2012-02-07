@@ -133,14 +133,16 @@ void CModelList::SetFreeParameters(float * params, int n_params)
     }
 }
 
-void CModelList::SetPositionType(int model_id, ePositionTypes pos_type)
+void CModelList::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
 {
-	mList[model_id]->SetPositionType(pos_type);
+	if(model_id < mList.size())
+		mList[model_id]->SetPositionType(pos_type);
 }
 
 void CModelList::SetShader(int model_id, CGLShaderWrapper * shader)
 {
-	mList[model_id]->SetShader(shader);
+	if(model_id < mList.size())
+		mList[model_id]->SetShader(shader);
 }
 
 /// Sets the time for all of the models

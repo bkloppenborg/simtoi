@@ -155,31 +155,19 @@ void CModel::SetFreeParameters(float * in_params, int n_params)
 }
 
 /// Assigns and initializes a position type.
-void CModel::SetPositionType(ePositionTypes type)
+void CModel::SetPositionType(CPosition::PositionTypes type)
 {
 	// If the position is already set and is of the current type, break.
 	if(mPosition != NULL && mPosition->GetType() == type)
 		return;
 
-	// Otherwise assign the position.
-	switch(type)
-	{
-	case POSITION_ORBIT:
-		mPosition = new CPositionOrbit();
-		break;
-
-	case POSITION_XY:
-	default:
-		// By default models use XY position.
-		mPosition = new CPositionXY();
-		break;
-	}
+	mPosition = CPosition::GetPosition(type);
 }
 
 void CModel::SetTime(double time)
 {
 	CPositionOrbit * tmp;
-	if(mPosition->GetType() == POSITION_ORBIT)
+	if(mPosition->GetType() == CPosition::ORBIT)
 	{
 		tmp = reinterpret_cast<CPositionOrbit*>(mPosition);
 		tmp->SetTime(time);

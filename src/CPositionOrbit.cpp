@@ -19,7 +19,7 @@
 CPositionOrbit::CPositionOrbit()
 	: CPosition(7)
 {
-	mType = POSITION_ORBIT;
+	mType = ORBIT;
 	mTime = 0;
 	mName = "Orbit";
 

@@ -21,6 +21,7 @@ private:
 protected:
     CGLShaderList::ShaderTypes mShaderType;
     CModelList::ModelTypes mModelType;
+    CPosition::PositionTypes mPositionType;
 
 public:
     gui_model(QWidget *parent = 0);
@@ -28,11 +29,12 @@ public:
 
     CModelList::ModelTypes GetModelType() { return mModelType; };
     CGLShaderList::ShaderTypes GetShaderType() { return mShaderType; };
+    CPosition::PositionTypes GetPositionType() { return mPositionType; };
 
 
     void SetFeatureTypes(vector< pair<int, string> > feature_info);
     void SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info);
-    void SetPositionTypes(vector< pair<int, string> > position_info);
+    void SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info);
     void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
 
     public slots:

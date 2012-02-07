@@ -55,14 +55,14 @@ public:
 	CModel * GetModel(int i) { return mList[i]; };
 	double GetTime() { return mTime; };
 
-	vector< pair<ModelTypes, string> > GetTypes(void);
+	static vector< pair<ModelTypes, string> > GetTypes(void);
 
 	void IncrementTime();
 
 	void Render(GLuint fbo, int width, int height);
 
 	void SetFreeParameters(float * params, int n_params);
-	void SetPositionType(int model_id, ePositionTypes pos_type);
+	void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
 	void SetShader(int model_id, CGLShaderWrapper * shader);
 	void SetTime(double t);
 	void SetTimestep(double dt);

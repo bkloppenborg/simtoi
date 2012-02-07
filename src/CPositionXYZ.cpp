@@ -11,7 +11,7 @@
 CPositionXYZ::CPositionXYZ()
 	: CPosition(3)
 {
-	mType = POSITION_XYZ;
+	mType = XYZ;
 	mName = "XYZ";
 
 	// Init the position variables, set them to be fixed.

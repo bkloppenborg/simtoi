@@ -27,7 +27,7 @@ void gui_model::SetModelTypes(vector< pair<CModelList::ModelTypes, string> > mod
 	gui_model_ns::SetupComboOptions(ui.cboModels, model_info);
 }
 
-void gui_model::SetPositionTypes(vector< pair<int, string> > position_info)
+void gui_model::SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info)
 {
 	gui_model_ns::SetupComboOptions(ui.cboPositions, position_info);
 }
@@ -39,13 +39,21 @@ void gui_model::SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> 
 
 void gui_model::ValuesAccepted(void)
 {
+	// First pull out the model
 	int value = ui.cboModels->itemData(ui.cboModels->currentIndex()).toInt();
 	if(value > CModelList::NONE && value < CModelList::LAST_VALUE)
 		mModelType = CModelList::ModelTypes(value);
 
+	// Position
+	value = ui.cboPositions->itemData(ui.cboPositions->currentIndex()).toInt();
+	if(value > CPosition::NONE && value < CPosition::LAST_VALUE)
+		mPositionType = CPosition::PositionTypes(value);
+
+	// Shader
 	value = ui.cboShaders->itemData(ui.cboShaders->currentIndex()).toInt();
 	if(value > CGLShaderList::NONE && value < CGLShaderList::LAST_VALUE)
 		mShaderType = CGLShaderList::ShaderTypes(value);
+
 
 	// Now call the default close function.
 	done(1);

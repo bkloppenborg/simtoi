@@ -6,13 +6,14 @@
  */
 
 #include "CPosition.h"
-#include "misc.h"	// needed for pull_params
+#include "CPositionXY.h"
+#include "CPositionOrbit.h"
 
 CPosition::CPosition(int n_parameters)
 	: CParameters(n_parameters)
 {
 	// Init to an invalid position type.
-	mType = POSITION_NONE;
+	mType = NONE;
 }
 
 CPosition::~CPosition()
@@ -20,3 +21,41 @@ CPosition::~CPosition()
 
 }
 
+CPosition * CPosition::GetPosition(CPosition::PositionTypes type)
+{
+	CPosition * tmp = NULL;
+
+	// Otherwise assign the position.
+	switch(type)
+	{
+	case ORBIT:
+		tmp = new CPositionOrbit();
+		break;
+
+	case XY:
+	default:
+		// By default models use XY position.
+		tmp = new CPositionXY();
+		break;
+	}
+
+	return tmp;
+}
+
+/// Returns a pair of model names, and their enumerated types
+vector< pair<CPosition::PositionTypes, string> > CPosition::GetTypes(void)
+{
+	vector< pair<CPosition::PositionTypes, string> > tmp;
+	tmp.push_back(pair<CPosition::PositionTypes, string> (CPosition::XY, "XY"));
+	tmp.push_back(pair<CPosition::PositionTypes, string> (CPosition::ORBIT, "Orbit"));
+
+	return tmp;
+}
+
+/// Baseclass function, set all zeros
+void CPosition::GetXYZ(float & x, float & y, float & z)
+{
+	x = 0;
+	y = 0;
+	z = 0;
+}

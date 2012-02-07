@@ -51,7 +51,7 @@ void CCL_GLThread::AddModel(CModelList::ModelTypes model)
 	CModel * tmp_model = mModelList->AddNewModel(model);
 
 	// Initialize with default (XY) position and no shader.
-	tmp_model->SetPositionType(POSITION_XY);
+	tmp_model->SetPositionType(CPosition::XY);
 	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(CGLShaderList::NONE);
 	tmp_model->SetShader(tmp_shader);
 
@@ -424,7 +424,7 @@ void CCL_GLThread::SetFreeParameters(float * params, int n_params)
 	EnqueueOperation(GLT_RenderModels);
 }
 
-void CCL_GLThread::SetPositionType(int model_id, ePositionTypes pos_type)
+void CCL_GLThread::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
 {
 	mModelList->SetPositionType(model_id, pos_type);
 }

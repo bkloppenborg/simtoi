@@ -14,6 +14,7 @@
 
 #include "CGLWidget.h"
 #include "enumerations.h"
+#include "CPosition.h"
 #include "CGLShaderList.h"
 #include "CTreeModel.h"
 #include "gui_model.h"
@@ -129,7 +130,7 @@ void gui_main::addGLArea()
 //    widget->AddModel(CModelList::SPHERE);
 //    widget->SetShader(0, CGLShaderList::LD_HESTEROFFER1997);
 //    widget->AddModel(CYLINDER);
-//    widget->SetPositionType(1, POSITION_ORBIT);
+//    widget->SetPositionType(1, ORBIT);
 
 	// Now connect the slot
 	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
@@ -146,21 +147,25 @@ void gui_main::addModel(void)
 
     CGLWidget * widget = (CGLWidget *) sw->widget();
     int id = 0;
+    int n_features;
 
     gui_model tmp;
-    tmp.SetModelTypes(widget->GetModelTypes());
+    tmp.SetModelTypes(CModelList::GetTypes());
     tmp.SetShaderTypes(widget->GetShaderTypes());
-//    tmp.SetPositionTypes(widget->GetPositionTypes());
+    tmp.SetPositionTypes(CPosition::GetTypes());
     tmp.show();
+
     if(tmp.exec())
     {
 		// Now setup the model, position type, and shader.
 		widget->AddModel(tmp.GetModelType());
 		id = widget->GetNModels() - 1;
-		//widget->SetPositionType(id, position_type);
+		widget->SetPositionType(id, tmp.GetPositionType());
 		widget->SetShader(id, tmp.GetShaderType());
 
     }
+
+    // Now render the models:
     widget->EnqueueOperation(GLT_RenderModels);
 }
 

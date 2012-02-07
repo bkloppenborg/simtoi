@@ -73,7 +73,7 @@ public:
     void SetFreeParameters(float * params, int n_params);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
-    void SetPositionType(int model_id, ePositionTypes pos_type);
+    void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetTime(double t) { mGLT.SetTime(t); };
     void SetTimestep(double dt) { mGLT.SetTimestep(dt); };
 

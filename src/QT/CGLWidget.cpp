@@ -197,7 +197,7 @@ void CGLWidget::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
 	RebuildTree();
 }
 
-void CGLWidget::SetPositionType(int model_id, ePositionTypes pos_type)
+void CGLWidget::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
 {
 	mGLT.SetPositionType(model_id, pos_type);
 	RebuildTree();
