@@ -126,8 +126,8 @@ void gui_main::addGLArea()
     widget->startRendering();
 
     // TODO: Remove later.  Add a sphere:
-    widget->AddModel(CModelList::SPHERE);
-    widget->SetShader(0, CGLShaderList::LD_HESTEROFFER1997);
+//    widget->AddModel(CModelList::SPHERE);
+//    widget->SetShader(0, CGLShaderList::LD_HESTEROFFER1997);
 //    widget->AddModel(CYLINDER);
 //    widget->SetPositionType(1, POSITION_ORBIT);
 
@@ -145,18 +145,22 @@ void gui_main::addModel(void)
     	return;
 
     CGLWidget * widget = (CGLWidget *) sw->widget();
+    int id = 0;
 
     gui_model tmp;
     tmp.SetModelTypes(widget->GetModelTypes());
     tmp.SetShaderTypes(widget->GetShaderTypes());
 //    tmp.SetPositionTypes(widget->GetPositionTypes());
     tmp.show();
-    tmp.exec();
+    if(tmp.exec())
+    {
+		// Now setup the model, position type, and shader.
+		widget->AddModel(tmp.GetModelType());
+		id = widget->GetNModels() - 1;
+		//widget->SetPositionType(id, position_type);
+		widget->SetShader(id, tmp.GetShaderType());
 
-    // Now setup the model, position type, and shader.
-//    widget->AddModel(model_type);
-//	  widget->SetPositionType(widget->GetNModels(), position_type);
-//	  widget->SetShader(widget->GetNModels(), shader_type);
+    }
     widget->EnqueueOperation(GLT_RenderModels);
 }
 

@@ -4,6 +4,12 @@ gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
 {
 	ui.setupUi(this);
+
+	mModelType = CModelList::NONE;
+	mShaderType = CGLShaderList::NONE;
+
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(ValuesAccepted()));
+	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
 gui_model::~gui_model()
@@ -31,3 +37,16 @@ void gui_model::SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> 
 	gui_model_ns::SetupComboOptions(ui.cboShaders, shader_info);
 }
 
+void gui_model::ValuesAccepted(void)
+{
+	int value = ui.cboModels->itemData(ui.cboModels->currentIndex()).toInt();
+	if(value > CModelList::NONE && value < CModelList::LAST_VALUE)
+		mModelType = CModelList::ModelTypes(value);
+
+	value = ui.cboShaders->itemData(ui.cboShaders->currentIndex()).toInt();
+	if(value > CGLShaderList::NONE && value < CGLShaderList::LAST_VALUE)
+		mShaderType = CGLShaderList::ShaderTypes(value);
+
+	// Now call the default close function.
+	done(1);
+}

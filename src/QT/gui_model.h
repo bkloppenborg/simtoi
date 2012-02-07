@@ -8,27 +8,36 @@
 #include <vector>
 #include "CModelList.h"
 #include "CGLShaderList.h"
+#include "CModelList.h"
 
 using namespace std;
 
 class gui_model : public QDialog
 {
     Q_OBJECT
+private:
+    Ui::gui_addmodelClass ui;
+
+protected:
+    CGLShaderList::ShaderTypes mShaderType;
+    CModelList::ModelTypes mModelType;
 
 public:
     gui_model(QWidget *parent = 0);
     ~gui_model();
+
+    CModelList::ModelTypes GetModelType() { return mModelType; };
+    CGLShaderList::ShaderTypes GetShaderType() { return mShaderType; };
+
 
     void SetFeatureTypes(vector< pair<int, string> > feature_info);
     void SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info);
     void SetPositionTypes(vector< pair<int, string> > position_info);
     void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
 
-private:
-    //void SetupComboOptions(QComboBox * combo_box, vector< pair<int, string> > values);
+    public slots:
+    void ValuesAccepted();
 
-private:
-    Ui::gui_addmodelClass ui;
 };
 
 namespace gui_model_ns
@@ -45,16 +54,8 @@ void SetupComboOptions(QComboBox * combo_box, vector< pair<T, string> > values)
 		tmp_str = QString::fromStdString(values[i].second);
 		combo_box->addItem(tmp_str, tmp_val);
 	}
-}
 
-template <typename T>
-T InterpretComboValue(int value)
-{
-	if(value < T::LAST_VALUE)
-		return reinterpret_cast<T>(value);
-
-	throw "Exception: Value out of range.";
-	return 0;
+	// TODO: Sort the combo box alphabetically.
 }
 
 }

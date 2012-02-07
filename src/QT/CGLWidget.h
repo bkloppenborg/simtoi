@@ -52,6 +52,7 @@ public:
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
+    int GetNModels() { return mGLT.GetModelList()->size(); };
     CModelList * GetModelList() { return mGLT.GetModelList(); };
     QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
     CTreeModel * GetTreeModel() { return mTreeModel; };
