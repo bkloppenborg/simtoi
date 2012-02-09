@@ -1,7 +1,7 @@
 #version 120
 // Power law limb darkening implemented according to Hestroffer (1997)
-varying in vec3 normal;
-varying in vec4 color;
+in vec3 normal;
+in vec4 color;
 uniform float alpha;
 
 void main(void)
