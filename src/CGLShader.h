@@ -44,6 +44,8 @@ public:
 	CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax);
 	virtual ~CGLShader();
 
+	void CompileShader(GLuint shader);
+
 	CGLShaderList::ShaderTypes GetType() { return mType; };
 	float GetMin(unsigned int i);
 	float GetMax(unsigned int i);

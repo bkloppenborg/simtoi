@@ -44,6 +44,22 @@ CGLShader::~CGLShader()
 	delete[] mParam_locations;
 }
 
+/// Compiles an OpenGL shader, checking for errors.
+void CGLShader::CompileShader(GLuint shader)
+{
+    GLint tmp = GL_TRUE;
+    glCompileShader(shader);
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &tmp);
+    if(tmp != GL_TRUE)
+    {
+		char * infolog = (char*) malloc(501);
+		int length;
+		printf("Could not build shader!\n");
+		glGetShaderInfoLog(shader, 500, &length, infolog);
+		printf("%s\n", infolog);
+    }
+}
+
 /// Returns the minimum parameter value, -1 if i is out of range.
 float CGLShader::GetMin(unsigned int i)
 {
@@ -78,6 +94,8 @@ void CGLShader::Init()
 	if(mShaderLoaded)
 		return;
 
+    GLint tmp = GL_TRUE;
+
     // First load the mProgram source.
     string source_v, source_f;
 	const GLchar * tmp_source_v;
@@ -91,7 +109,13 @@ void CGLShader::Init()
 	mProgram = glCreateProgram();
     CCL_GLThread::CheckOpenGLError("Could not create shader mProgram.");
     mShader_vertex = glCreateShader(GL_VERTEX_SHADER);
+    if(!bool(glIsShader(mShader_vertex)))
+    	CCL_GLThread::CheckOpenGLError("Could not create vertex shader.");
+
     mShader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    if(!bool(glIsShader(mShader_vertex)))
+    	CCL_GLThread::CheckOpenGLError("Could not create fragement shader shader.");
+
     glAttachShader(mProgram, mShader_vertex);
     glAttachShader(mProgram, mShader_fragment);
 
@@ -99,13 +123,11 @@ void CGLShader::Init()
     glShaderSource(mShader_vertex, 1, &tmp_source_v, NULL);
     glShaderSource(mShader_fragment, 1, &tmp_source_f, NULL);
 
-    glCompileShader(mShader_vertex);
-    CCL_GLThread::CheckOpenGLError("Could not compile OpenGL Vertex Shader.");
-    glCompileShader(mShader_fragment);
-    CCL_GLThread::CheckOpenGLError("Could not compile OpenGL Fragement Shader.");
+    CompileShader(mShader_vertex);
+    CompileShader(mShader_fragment);
+
     glLinkProgram(mProgram);
 
-    GLint tmp;
     glGetProgramiv(mProgram, GL_LINK_STATUS, &tmp);
     if(tmp == GL_FALSE)
     {

@@ -147,6 +147,7 @@ void CModel::Rotate()
 	glRotatef(mParams[0], 1, 0, 0);	// inclination
 	glRotatef(-mParams[1], 0, 1, 0); // position angle
 	glRotatef(mParams[2], 0, 0, 1); // roll
+	CCL_GLThread::CheckOpenGLError("CModel::Rotate()");
 }
 
 /// Sets up the matrix mode for rendering models.
@@ -166,6 +167,7 @@ void CModel::Translate()
 
 	// Call the translation routines.  Use the double-precision call.
 	glTranslatef(x, y, z);
+	CCL_GLThread::CheckOpenGLError("CModel::Translate()");
 }
 
 /// Sets the parameters for this model, the position, shader, and all features.
@@ -218,4 +220,6 @@ void CModel::UseShader()
 {
 	if(mShader != NULL)
 		mShader->UseShader();
+
+	CCL_GLThread::CheckOpenGLError("CModel::UseShader()");
 }
