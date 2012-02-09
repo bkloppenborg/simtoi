@@ -55,6 +55,8 @@ public:
 
 	void Init();
 
+	void LinkProgram(GLuint program);
+
 	void UseShader(float * params, int in_params);
 
 };

@@ -126,17 +126,7 @@ void CGLShader::Init()
     CompileShader(mShader_vertex);
     CompileShader(mShader_fragment);
 
-    glLinkProgram(mProgram);
-
-    glGetProgramiv(mProgram, GL_LINK_STATUS, &tmp);
-    if(tmp == GL_FALSE)
-    {
-    	char * infolog = (char*) malloc(501);
-    	int length;
-    	printf("Could not build mProgram!");
-    	glGetProgramInfoLog(mProgram, 500, &length, infolog);
-    	printf("%s\n", infolog);
-    }
+    LinkProgram(mProgram);
 
     CCL_GLThread::CheckOpenGLError("Could not link shader mProgram.");
 
@@ -149,6 +139,22 @@ void CGLShader::Init()
 
     // The shader has been loaded, compiled, and linked.
     mShaderLoaded = true;
+}
+
+/// Links an OpenGL program.
+void CGLShader::LinkProgram(GLuint program)
+{
+	GLint tmp = GL_TRUE;
+    glLinkProgram(mProgram);
+    glGetProgramiv(mProgram, GL_LINK_STATUS, &tmp);
+    if(tmp == GL_FALSE)
+    {
+    	char * infolog = (char*) malloc(501);
+    	int length;
+    	printf("Could not build mProgram!");
+    	glGetProgramInfoLog(mProgram, 500, &length, infolog);
+    	printf("%s\n", infolog);
+    }
 }
 
 void CGLShader::UseShader(float * params, int imNParams)
