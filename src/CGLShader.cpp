@@ -100,7 +100,9 @@ void CGLShader::Init()
     glShaderSource(mShader_fragment, 1, &tmp_source_f, NULL);
 
     glCompileShader(mShader_vertex);
+    CCL_GLThread::CheckOpenGLError("Could not compile OpenGL Vertex Shader.");
     glCompileShader(mShader_fragment);
+    CCL_GLThread::CheckOpenGLError("Could not compile OpenGL Fragement Shader.");
     glLinkProgram(mProgram);
 
     GLint tmp;
