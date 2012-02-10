@@ -45,7 +45,6 @@ void CMinimizer_MultiNest::log_likelihood(double * Cube, int * ndim, int * npars
 	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(minimizer_tmp::minimizer);
 	int n_data_sets = minimizer->mCLThread->GetNDataSets();
 	double tmp = 0;
-	float * output = new float[*npars];
 
 	// Convert the double parameter values back to floats
 	int nData = minimizer->mCLThread->GetNData();
@@ -66,12 +65,16 @@ void CMinimizer_MultiNest::log_likelihood(double * Cube, int * ndim, int * npars
 	}
 
 	// Set the scaled cube values.
-	minimizer->mCLThread->GetFreeParameters(output, *npars);
+//	printf("Parameters: ");
+	minimizer->mCLThread->GetFreeParametersScaled(minimizer->mParams, *npars);
 	for(int i = 0; i < *npars; i++)
-		Cube[i] = double(output[i]);
+	{
+		Cube[i] = double(minimizer->mParams[i]);
+//		printf("%f ", minimizer->mParams[i]);
+	}
+//	printf("\n");
 
 	*lnew = tmp;
-	delete[] output;
 }
 
 
@@ -88,12 +91,12 @@ int CMinimizer_MultiNest::run()
 	int mmodal = 1;					// do mode separation?
 	int ceff = 0;					// run in constant efficiency mode?
 	int nlive = 100;				// number of live points
-	double efr = 1.0;				// set the required efficiency
+	double efr = 0.8;				// set the required efficiency
 	double tol = 0.5;				// tol, defines the stopping criteria
 	int ndims = nParams;			// dimensionality (no. of free parameters)
 	int nPar = nParams;				// total no. of parameters including free & derived parameters
 	int nClsPar = nParams;			// no. of parameters to do mode separation on
-	int updInt = 100;				// after how many iterations feedback is required & the output files should be updated
+	int updInt = 10;				// after how many iterations feedback is required & the output files should be updated
 									// note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	double Ztol = -1E90;			// all the modes with logZ < Ztol are ignored
 	int maxModes = 100;				// expected max no. of modes (used only for memory allocation)
@@ -127,6 +130,4 @@ int CMinimizer_MultiNest::run()
         CMinimizer_MultiNest::log_likelihood,
         CMinimizer_MultiNest::dumper,
         &context);
-
-    printf("Minimizer finished.\n");
 }

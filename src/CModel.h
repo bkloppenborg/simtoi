@@ -54,6 +54,7 @@ protected:
 public:
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
 	void GetFreeParameters(float * params, int n_params);
+	void GetFreeParametersScaled(float * params, int n_params);
 	vector<string> GetFreeParameterNames();
 	vector< pair<float, float> > GetFreeParamMinMaxes();
 	void SetFreeParameters(float * params, int n_params);

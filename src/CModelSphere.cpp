@@ -27,11 +27,12 @@ CModelSphere::CModelSphere()
 	mType = CModelList::SPHERE;
 
 	// Set the radius to some useful value, make it free.
+	// NOTE: it is necessary to set max BEFORE setting min so logic test min < max works correctly.
 	mParamNames.push_back("Radius");
-	SetParam(mBaseParams + 1, 0.1);
+	SetParam(mBaseParams + 1, 1);
 	SetFree(mBaseParams + 1, true);
-	SetMin(mBaseParams + 1, 0);
-	SetMax(mBaseParams + 1, 100);
+	SetMax(mBaseParams + 1, 5);
+	SetMin(mBaseParams + 1, 0.1);
 }
 
 CModelSphere::~CModelSphere()

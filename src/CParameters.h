@@ -40,6 +40,7 @@ protected:
 
 public:
 	void GetFreeParams(float * params, int n_param);
+	void GetFreeParamsScaled(float * params, int n_param);
 	vector<string> GetFreeParamNames();
 	string GetName(void) { return mName; };
 	int GetNFreeParams(void) { return mNFreeParams; };

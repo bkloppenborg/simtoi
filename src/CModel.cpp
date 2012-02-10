@@ -92,7 +92,7 @@ vector< pair<float, float> > CModel::GetFreeParamMinMaxes()
 	return tmp1;
 }
 
-/// Sets the free parameters for this model.
+/// Gets the free parameters for this model in a uniform hypercube
 void CModel::GetFreeParameters(float * params, int n_params)
 {
 	int n = 0;
@@ -104,6 +104,23 @@ void CModel::GetFreeParameters(float * params, int n_params)
 	if(mShader != NULL)
 	{
 		mShader->GetFreeParams(params + n, n_params - n);
+		n += mShader->GetNFreeParams();
+	}
+
+}
+
+/// Gets the free parameters for this model in their native units
+void CModel::GetFreeParametersScaled(float * params, int n_params)
+{
+	int n = 0;
+	GetFreeParamsScaled(params, n_params);
+	n += this->mNFreeParams;
+	mPosition->GetFreeParamsScaled(params + n, n_params - n);
+	n += mPosition->GetNFreeParams();
+
+	if(mShader != NULL)
+	{
+		mShader->GetFreeParamsScaled(params + n, n_params - n);
 		n += mShader->GetNFreeParams();
 	}
 

@@ -15,7 +15,8 @@ CMinimizerThread::CMinimizerThread()
 
 CMinimizerThread::~CMinimizerThread()
 {
-	// TODO Auto-generated destructor stub
+	// Free memory (if it's still allocated)
+	delete mMinimizer;
 }
 
 void CMinimizerThread::run()
@@ -26,8 +27,7 @@ void CMinimizerThread::run()
 	// Call init before running the minimzer to setup memory.
 	mMinimizer->Init();
 	mMinimizer->run();
-
-	emit ParametersChanged();
+	exit();
 }
 
 /// Sets the minimizer, freeing the old minimizer if needed.

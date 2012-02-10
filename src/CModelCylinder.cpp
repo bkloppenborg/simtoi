@@ -25,9 +25,13 @@ CModelCylinder::CModelCylinder()
 	mParamNames.push_back("Diameter");
 	SetParam(mBaseParams + 1, 3.0);
 	SetFree(mBaseParams + 1, true);
+	SetMax(mBaseParams + 1, 3.0);
+	SetMin(mBaseParams + 1, 0.1);
 	mParamNames.push_back("Height");
 	SetParam(mBaseParams + 2, 0.5);
 	SetFree(mBaseParams + 2, true);
+	SetMax(mBaseParams + 2, 3.0);
+	SetMin(mBaseParams + 2, 0.1);
 }
 
 CModelCylinder::~CModelCylinder()

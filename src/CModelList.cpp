@@ -99,6 +99,19 @@ void CModelList::GetFreeParameters(float * params, int n_params)
     }
 }
 
+/// Gets the values for all of the free parameters.
+void CModelList::GetFreeParametersScaled(float * params, int n_params)
+{
+    int n = 0;
+
+    // Now call render on all of the models:
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	(*it)->GetFreeParametersScaled(params + n, n_params - n);
+    	n += (*it)->GetTotalFreeParameters();
+    }
+}
+
 /// Returns a vector of string containing the parameter names.
 vector<string> CModelList::GetFreeParamNames()
 {

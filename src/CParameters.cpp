@@ -108,7 +108,7 @@ vector< pair<float, float> > CParameters::GetFreeMinMaxes()
 /// a uniform hypercube [0...1]
 void CParameters::GetFreeParams(float * out_params, int n_params)
 {
-	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
+	GetFreeParamsScaled(out_params, n_params);
 
 	// Scale the parameters into a unit hypercube.
 	// f(x) = (x - min) / (max - min) // the scaled value
@@ -123,7 +123,12 @@ void CParameters::GetFreeParams(float * out_params, int n_params)
 			j++;
 		}
 	}
+}
 
+/// Gets the values of the free parameters for this object, returning them in their native (scaled) units.
+void CParameters::GetFreeParamsScaled(float * out_params, int n_params)
+{
+	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
 }
 
 /// Returns a vector of strings containing the names of the free parameters.

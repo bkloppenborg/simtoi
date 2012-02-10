@@ -112,7 +112,7 @@ void CGLShaderList::LoadShaders()
 	param_names.clear();
 	starting_values.clear();
 	param_names.push_back("alpha");
-	minmax.push_back(pair<float,float>(0, 1));
+	minmax.push_back(pair<float,float>(0.1, 1));
 	starting_values.push_back(0.5);
 	tmp = new CGLShader(CGLShaderList::LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
 	Append(tmp);
