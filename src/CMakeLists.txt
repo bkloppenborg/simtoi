@@ -26,4 +26,5 @@ add_subdirectory(QT)
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp)
 add_executable(simtoi ${SOURCE})
+SET_TARGET_PROPERTIES(simtoi PROPERTIES LINKER_LANGUAGE Fortran)
 target_link_libraries(simtoi QT_files textio oi cmpfit multinest ${QT_LIBRARIES} ${OPENGL_LIBRARIES})

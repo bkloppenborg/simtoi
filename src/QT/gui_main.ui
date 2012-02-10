@@ -20,20 +20,6 @@
       <item row="0" column="1">
        <widget class="QSpinBox" name="spinModelSize"/>
       </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Scale:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QDoubleSpinBox" name="spinModelScale">
-        <property name="decimals">
-         <number>4</number>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -45,6 +31,20 @@
        <widget class="QPushButton" name="btnModelArea">
         <property name="text">
          <string>New Region</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QDoubleSpinBox" name="spinModelScale">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Scale:</string>
         </property>
        </widget>
       </item>
