@@ -130,4 +130,6 @@ int CMinimizer_MultiNest::run()
         CMinimizer_MultiNest::log_likelihood,
         CMinimizer_MultiNest::dumper,
         &context);
+
+    return 0;
 }

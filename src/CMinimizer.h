@@ -29,6 +29,7 @@ public:
 	enum MinimizerTypes
 	{
 		NONE,
+		BENCHMARK,
 		CMPFIT,
 		MULTINEST,
 		LAST_VALUE	// this must always be the last value in this enum.

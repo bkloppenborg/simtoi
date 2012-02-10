@@ -7,6 +7,7 @@
 
 #include "CMinimizer.h"
 #include "CCL_GLThread.h"
+#include "CMinimizer_Benchmark.h"
 #include "CMinimizer_mpfit.h"
 #include "CMinimizer_MultiNest.h"
 
@@ -26,13 +27,17 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 	CMinimizer * tmp;
 	switch(type)
 	{
+	case CMPFIT:
+		tmp = new CMinimizer_mpfit(cl_gl_thread);
+		break;
+
 	case MULTINEST:
 		tmp = new CMinimizer_MultiNest(cl_gl_thread);
 		break;
 
 	default:
-	case CMPFIT:
-		tmp = new CMinimizer_mpfit(cl_gl_thread);
+	case BENCHMARK:
+		tmp = new CMinimizer_Benchmark(cl_gl_thread);
 		break;
 	}
 
@@ -42,6 +47,7 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 {
 	vector< pair<CMinimizer::MinimizerTypes, string> > tmp;
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BENCHMARK, "Benchmark"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::CMPFIT, "CMPFit"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::MULTINEST, "MultiNest"));
 
