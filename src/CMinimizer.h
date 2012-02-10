@@ -4,13 +4,11 @@
  *  Created on: Dec 8, 2011
  *      Author: bkloppenborg
  *
- *  A generic wrapper class for minimization routines.  This class implements the
- *  basic thread synchronization tasks that are required to interop with SIMTOI.
+ *  A generic base class for minimization routines.
  *
- *  TODO: I'm not fully convinced the scaling of the parameters should be here, but some
- *  minimization programs, like MultiNest, expect the parameters to be on a uniform hypercube
- *  so for now this is how it will be implemented.  Eventually, perhaps, the models could do
- *  the scaling themselves?
+ *  NOTE: This class also maintains a static function for minimizer creation.  If you add a new
+ *  minimizer, be sure to modify GetTypes() and GetMinimizer()
+ *
  */
 
 #ifndef CMINIMIZER_H_
@@ -27,17 +25,38 @@ class CCL_GLThread;
 
 class CMinimizer
 {
-protected:
+public:
+	enum MinimizerTypes
+	{
+		NONE,
+		CMPFIT,
+		MULTINEST,
+		LAST_VALUE	// this must always be the last value in this enum.
+	};
+
+public:
 	CCL_GLThread * mCLThread;
 	float * mParams;
 
-public:
+	CMinimizer::MinimizerTypes mType;
+
 	CMinimizer(CCL_GLThread * cl_gl_thread);
 	virtual ~CMinimizer();
 
-public:
+	static CMinimizer * GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread);
+	static vector< pair<CMinimizer::MinimizerTypes, string> > GetTypes(void);
+
 	virtual void Init();
 	virtual int run() = 0;
 };
+
+// If the minimizer cannot pass a void* pointer to the minimization function do a
+//   minimizer_tmp::minimizer = reinterpret_cast<void*>(this)
+// in the run function before calling the actual minimizer.  NOTE: This limits the
+// number of concurrent minimizer using void * minimizer to at most ONE instance.
+namespace minimizer_tmp
+{
+	static void * minimizer;
+}
 
 #endif /* CMINIMIZER_H_ */

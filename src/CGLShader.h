@@ -36,12 +36,13 @@ protected:
 	int mNParams;
 	vector<string> mParam_names;
 	pair<float,float> * mMinMax;
+	float * mStartingValues;
 
 	CGLShaderList::ShaderTypes mType;
 	bool mShaderLoaded;
 
 public:
-	CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax);
+	CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax);
 	virtual ~CGLShader();
 
 	void CompileShader(GLuint shader);
@@ -52,6 +53,7 @@ public:
 	string GetName() { return mFriendlyName; };
 	int GetNParams() { return mNParams; }
 	string GetParamName(unsigned int i);
+	float GetStartingValue(unsigned int i);
 
 	void Init();
 

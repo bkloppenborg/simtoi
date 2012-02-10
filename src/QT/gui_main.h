@@ -31,6 +31,7 @@ public:
 protected:
     void closeEvent(QCloseEvent *evt);
     void ButtonCheck();
+    void SetupComboBoxes();
 
 private slots:
     void addGLArea();
@@ -43,6 +44,7 @@ private slots:
     void RunMinimizer();
     void LoadData();
     void RemoveData();
+
 
 public slots:
 	void subwindowSelected(QMdiSubWindow * window);

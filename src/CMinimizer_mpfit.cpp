@@ -12,6 +12,7 @@ CMinimizer_mpfit::CMinimizer_mpfit(CCL_GLThread * cl_gl_thread)
 	: CMinimizer(cl_gl_thread)
 {
 	mResiduals = NULL;
+	mType = CMinimizer::CMPFIT;
 }
 
 CMinimizer_mpfit::~CMinimizer_mpfit()
@@ -23,31 +24,31 @@ CMinimizer_mpfit::~CMinimizer_mpfit()
 /// so we have to use boost::bind to access it from C/Fortran function calls.
 int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double * deviates, double ** derivs, void * misc)
 {
-	CMinimizer_mpfit * tmp = reinterpret_cast<CMinimizer_mpfit*>(misc);
+	CMinimizer_mpfit * minimizer = reinterpret_cast<CMinimizer_mpfit*>(misc);
 	int n_data_sets = 0;
 	int n_data_alloc = 0;
 	int n_data_offset = 0;
 
 	// Convert the double parameter values back to floats
-	printf("Parameters: ");
+//	printf("Parameters: ");
 	for(int i = 0; i < nParams; i++)
 	{
-		tmp->mParams[i] = float(params[i]);
-		printf("(%f %f) ", params[i], tmp->mParams[i]);
+		minimizer->mParams[i] = float(params[i]);
+//		printf("%f ", params[i], minimizer->mParams[i]);
 	}
-	printf("\n");
+//	printf("\n");
 
 	// Set the parameters:
-	tmp->mCLThread->SetFreeParameters(tmp->mParams, nParams);
+	minimizer->mCLThread->SetFreeParameters(minimizer->mParams, nParams);
 
 	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
-	n_data_sets = tmp->mCLThread->GetNDataSets();
+	n_data_sets = minimizer->mCLThread->GetNDataSets();
 	for(int data_set = 0; data_set < n_data_sets; data_set++)
 	{
-		n_data_alloc = tmp->mCLThread->GetNDataAllocated(data_set);
-		tmp->mCLThread->SetTime(tmp->mCLThread->GetDataAveJD(data_set));
-		tmp->mCLThread->EnqueueOperation(GLT_RenderModels);
-		tmp->mCLThread->GetChi(data_set, tmp->mResiduals + n_data_offset, n_data_alloc);
+		n_data_alloc = minimizer->mCLThread->GetNDataAllocated(data_set);
+		minimizer->mCLThread->SetTime(minimizer->mCLThread->GetDataAveJD(data_set));
+		minimizer->mCLThread->EnqueueOperation(GLT_RenderModels);
+		minimizer->mCLThread->GetChi(data_set, minimizer->mResiduals + n_data_offset, n_data_alloc);
 		n_data_offset += n_data_alloc;
 	}
 
@@ -56,7 +57,7 @@ int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double 
 //	printf("Residuals:\n");
 	for(int i = 0; i < nData; i++)
 	{
-		deviates[i] = double(tmp->mResiduals[i]);
+		deviates[i] = double(minimizer->mResiduals[i]);
 //		printf("%i %f \n", i, deviates[i]);
 	}
 

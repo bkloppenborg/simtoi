@@ -110,7 +110,7 @@
     <item row="7" column="0" rowspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QComboBox" name="comboBox"/>
+       <widget class="QComboBox" name="cboMinimizers"/>
       </item>
       <item>
        <widget class="QPushButton" name="btnMinimizer">

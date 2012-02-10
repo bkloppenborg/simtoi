@@ -11,7 +11,7 @@
 #include "ReadTextFile.h"
 #include "CCL_GLThread.h"
 
-CGLShader::CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector< pair<float, float> > minmax)
+CGLShader::CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax)
 {
 	mType = type;
 	mShader_dir = shader_dir;
@@ -25,9 +25,11 @@ CGLShader::CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string 
 	mShader_vertex = 0;
 	mShader_fragment = 0;
 	mMinMax = new pair<float, float>[mNParams];
+	mStartingValues = new float[mNParams];
 
 	for(int i = 0; i < mNParams; i++)
 	{
+		mStartingValues[i] = starting_values[i];
 		mMinMax[i].first = minmax[i].first;
 		mMinMax[i].second = minmax[i].second;
 	}
@@ -85,6 +87,14 @@ string CGLShader::GetParamName(unsigned int i)
 		return mParam_names[i];
 
 	return "";
+}
+
+float CGLShader::GetStartingValue(unsigned int i)
+{
+	if(i < mNParams)
+		return mStartingValues[i];
+
+	return 0;
 }
 
 // Loads the shader from the source file and creates a binary for the current selected context.

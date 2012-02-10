@@ -28,7 +28,7 @@ CModelSphere::CModelSphere()
 
 	// Set the radius to some useful value, make it free.
 	mParamNames.push_back("Radius");
-	SetParam(mBaseParams + 1, 1.0);
+	SetParam(mBaseParams + 1, 0.1);
 	SetFree(mBaseParams + 1, true);
 	SetMin(mBaseParams + 1, 0);
 	SetMax(mBaseParams + 1, 100);

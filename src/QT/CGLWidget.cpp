@@ -103,11 +103,10 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	return items;
 }
 
-void CGLWidget::LoadMinimizer()
+void CGLWidget::LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type)
 {
 	// TODO: Permit loading of different minimizers here.
-	CMinimizer * tmp;
-	tmp = (CMinimizer*) new CMinimizer_mpfit(&mGLT);
+	CMinimizer * tmp = CMinimizer::GetMinimizer(minimizer_type, &mGLT);
 	mMinThread.SetMinimizer(tmp);
 }
 

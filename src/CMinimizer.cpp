@@ -7,6 +7,8 @@
 
 #include "CMinimizer.h"
 #include "CCL_GLThread.h"
+#include "CMinimizer_mpfit.h"
+#include "CMinimizer_MultiNest.h"
 
 CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 {
@@ -17,6 +19,33 @@ CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 CMinimizer::~CMinimizer()
 {
 	delete[] mParams;
+}
+
+CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread)
+{
+	CMinimizer * tmp;
+	switch(type)
+	{
+	case MULTINEST:
+		tmp = new CMinimizer_MultiNest(cl_gl_thread);
+		break;
+
+	default:
+	case CMPFIT:
+		tmp = new CMinimizer_mpfit(cl_gl_thread);
+		break;
+	}
+
+	return tmp;
+}
+
+vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
+{
+	vector< pair<CMinimizer::MinimizerTypes, string> > tmp;
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::CMPFIT, "CMPFit"));
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::MULTINEST, "MultiNest"));
+
+	return tmp;
 }
 
 void CMinimizer::Init()

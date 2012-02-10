@@ -15,6 +15,7 @@
 #include "CMinimizerThread.h"
 #include "CLibOI.h"
 #include "CModelList.h"
+#include "CMinimizer.h"
 
 class CModel;
 class CTreeModel;
@@ -58,7 +59,7 @@ public:
     CTreeModel * GetTreeModel() { return mTreeModel; };
 
     void LoadData(string filename) { mGLT.LoadData(filename); };
-    void LoadMinimizer();
+    void LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type);
 protected:
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);

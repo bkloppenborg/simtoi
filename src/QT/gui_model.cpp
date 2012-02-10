@@ -1,4 +1,5 @@
 #include "gui_model.h"
+#include "gui_general.h"
 
 gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
@@ -24,17 +25,17 @@ void gui_model::SetFeatureTypes(vector< pair<int, string> > feature_info)
 
 void gui_model::SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info)
 {
-	gui_model_ns::SetupComboOptions(ui.cboModels, model_info);
+	gui_general::SetupComboOptions(ui.cboModels, model_info);
 }
 
 void gui_model::SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info)
 {
-	gui_model_ns::SetupComboOptions(ui.cboPositions, position_info);
+	gui_general::SetupComboOptions(ui.cboPositions, position_info);
 }
 
 void gui_model::SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info)
 {
-	gui_model_ns::SetupComboOptions(ui.cboShaders, shader_info);
+	gui_general::SetupComboOptions(ui.cboShaders, shader_info);
 }
 
 void gui_model::ValuesAccepted(void)

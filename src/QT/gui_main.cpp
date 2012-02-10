@@ -12,13 +12,14 @@
 #include <vector>
 #include <utility>
 
-#include "CGLWidget.h"
 #include "enumerations.h"
+#include "CGLWidget.h"
 #include "CPosition.h"
 #include "CGLShaderList.h"
+#include "CMinimizer.h"
 #include "CTreeModel.h"
 #include "gui_model.h"
-
+#include "gui_general.h"
 
 //Q_DECLARE_METATYPE(ModelTypes);
 //Q_DECLARE_METATYPE(CGLShaderList::ShaderTypes);
@@ -60,6 +61,8 @@ gui_main::gui_main(QWidget *parent_widget)
 	mShaderSourceDir = app_path + "/shaders/";
 	mKernelSourceDir = app_path + "/kernels/";
 	mDataDir = "./";
+
+	SetupComboBoxes();
 }
 
 gui_main::~gui_main()
@@ -223,12 +226,24 @@ void gui_main::delGLArea()
 void gui_main::RunMinimizer()
 {
     CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+    CMinimizer::MinimizerTypes minimizer;
 
     if(!widget->OpenCLInitialized())
     	widget->EnqueueOperation(CLT_Init);
 
-    widget->LoadMinimizer();
-    widget->RunMinimizer();
+    // Now determine which minimizer is selected:
+	int value = ui.cboMinimizers->itemData(ui.cboMinimizers->currentIndex()).toInt();
+	if(value > CMinimizer::NONE && value < CMinimizer::LAST_VALUE)
+	{
+		minimizer = CMinimizer::MinimizerTypes(value);
+	    widget->LoadMinimizer(minimizer);
+	    widget->RunMinimizer();
+	}
+}
+
+void gui_main::SetupComboBoxes()
+{
+	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
 }
 
 /// Loads OIFITS data into the current selected subwindow

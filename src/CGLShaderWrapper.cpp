@@ -19,6 +19,7 @@ CGLShaderWrapper::CGLShaderWrapper(CGLShader * shader, int n_params)
 	for(int i = 0; i < n_params; i++)
 	{
 		mParamNames.push_back(shader->GetParamName(i));
+		mParams[i] = shader->GetStartingValue(i);
 		mMinMax[i].first = shader->GetMin(i);
 		mMinMax[i].second = shader->GetMax(i);
 	}
