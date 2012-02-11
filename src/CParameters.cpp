@@ -215,14 +215,14 @@ void CParameters::SetFree(int param_num, bool is_free)
 /// Sets the specified parameter's minimum value.
 void CParameters::SetMin(int param_num, float value)
 {
-	if(param_num < mNParams && value < mMinMax[param_num].second)
+	if(param_num < mNParams)
 		mMinMax[param_num].first = value;
 }
 
 /// Sets the specified paramter's maximum value.
 void CParameters::SetMax(int param_num, float value)
 {
-	if(param_num < mNParams && value > mMinMax[param_num].first)
+	if(param_num < mNParams)
 		mMinMax[param_num].second = value;
 }
 
