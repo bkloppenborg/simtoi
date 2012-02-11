@@ -72,7 +72,12 @@ gui_main::~gui_main()
 
 void gui_main::Animation_StartStop()
 {
-	CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
 	if(mAnimating)
 	{
 		widget->EnqueueOperation(GLT_StopAnimate);
@@ -90,7 +95,12 @@ void gui_main::Animation_StartStop()
 
 void gui_main::Animation_Reset()
 {
-	CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
 	widget->SetTime(0);
 	widget->EnqueueOperation(GLT_RenderModels);
 
@@ -102,7 +112,7 @@ void gui_main::closeEvent(QCloseEvent *evt)
 	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
     for (int i = int(windows.count()) - 1; i > 0; i--)
     {
-    	CGLWidget * tmp = (CGLWidget *)windows.at(i)->widget();
+    	CGLWidget * tmp = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
     	tmp->stopRendering();
     }
     QMainWindow::closeEvent(evt);
@@ -112,8 +122,8 @@ void gui_main::closeEvent(QCloseEvent *evt)
 void gui_main::addGLArea()
 {
 	// Create a new subwindow with a title and close button:
-    CGLWidget *widget = new CGLWidget(ui.mdiArea, mShaderSourceDir, mKernelSourceDir);
-    QMdiSubWindow *sw = ui.mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
+    CGLWidget * widget = new CGLWidget(ui.mdiArea, mShaderSourceDir, mKernelSourceDir);
+    QMdiSubWindow * sw = ui.mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
     sw->setWindowTitle("Model Area");
 
     // TODO: This is approximately right for my machine, probably not ok on other OSes.
@@ -148,7 +158,7 @@ void gui_main::addModel(void)
     if(!sw)
     	return;
 
-    CGLWidget * widget = (CGLWidget *) sw->widget();
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     int id = 0;
     int n_features;
 
@@ -208,12 +218,18 @@ void gui_main::deleteModel()
     if(!sw)
     	return;
 
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
 
 }
 
 void gui_main::delGLArea()
 {
-    CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     if (widget)
     {
         widget->stopRendering();
@@ -225,7 +241,11 @@ void gui_main::delGLArea()
 
 void gui_main::RunMinimizer()
 {
-    CGLWidget *widget = (CGLWidget*) ui.mdiArea->activeSubWindow()->widget();
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     CMinimizer::MinimizerTypes minimizer;
 
     if(!widget->OpenCLInitialized())
@@ -263,7 +283,7 @@ void gui_main::LoadData()
     }
 
     // Get access to the current widget and QStandardItemModel:
-    CGLWidget *widget = (CGLWidget*) sw->widget();
+    CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     QStandardItemModel * model = widget->GetOpenFileModel();
 
     // Open a dialog, get a list of file that the user selected:
@@ -320,7 +340,7 @@ void gui_main::render()
     if(!sw)
     	return;
 
-    CGLWidget * widget = (CGLWidget*) sw->widget();
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     if(widget)
     {
     	widget->EnqueueOperation(GLT_RenderModels);
@@ -335,7 +355,7 @@ void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
     if(!sw)
     	return;
 
-    CGLWidget *widget = (CGLWidget*) sw->widget();
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     CTreeModel * model = widget->GetTreeModel();
     int cols = model->columnCount(QModelIndex());
 	ui.treeModels->setHeaderHidden(false);
