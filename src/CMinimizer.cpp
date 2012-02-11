@@ -15,6 +15,7 @@ CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 {
 	mCLThread = cl_gl_thread;
 	mParams = NULL;
+	mType = NONE;
 }
 
 CMinimizer::~CMinimizer()
