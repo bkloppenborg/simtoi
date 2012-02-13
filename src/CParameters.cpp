@@ -184,13 +184,17 @@ void CParameters::Restore(Json::Value input)
 {
 	// Restore parameters.  Check that the parameter is set in the file before attempting
 	// to restore it.
+	string name;
 	for(unsigned int i = 0; i < mNParams; i++)
 	{
-		if(input.isMember(mParamNames[i]))
+		name = mParamNames[i];
+		if(input.isMember(name))
 		{
-			mParams[i] =        float( input[mParamNames[i]][0u].asDouble() );
-			mMinMax[i].first =  float( input[mParamNames[i]][1u].asDouble() );
-			mMinMax[i].second = float( input[mParamNames[i]][2u].asDouble() );
+			//
+			mParams[i] =        float( input[name][0u].asDouble() );
+			mMinMax[i].first =  float( input[name][1u].asDouble() );
+			mMinMax[i].second = float( input[name][2u].asDouble() );
+			mFreeParams[i] =    bool ( input[name][3u].asBool()   );
 		}
 	}
 }
@@ -264,6 +268,7 @@ Json::Value CParameters::Serialize()
 		tmp.append(Json::Value(mParams[i]));
 		tmp.append(Json::Value(mMinMax[i].first));
 		tmp.append(Json::Value(mMinMax[i].second));
+		tmp.append(Json::Value(mFreeParams[i]));
 		output[mParamNames[i]] = tmp;
 	}
 
