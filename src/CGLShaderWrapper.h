@@ -11,8 +11,7 @@
 #define CGLSHADERWRAPPER_H_
 
 #include "CParameters.h"
-
-class CGLShader;
+#include "CGLShader.h"
 
 class CGLShaderWrapper : public CParameters
 {
@@ -22,6 +21,8 @@ protected:
 public:
 	CGLShaderWrapper(CGLShader * shader, int n_params);
 	virtual ~CGLShaderWrapper();
+
+	CGLShaderList::ShaderTypes GetType() { return mShader->GetType(); };
 
 	void UseShader();
 };

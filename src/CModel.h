@@ -77,8 +77,11 @@ public:
 	CModelList::ModelTypes GetType(void) { return mType; };
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
+public:
+	void Restore(Json::Value input, CGLShaderList * shader_list);
 
 public:
+	Json::Value Serialize();
 	void SetPositionType(CPosition::PositionTypes type);
 	void SetShader(CGLShaderWrapper * shader);
 	void SetTime(double time);

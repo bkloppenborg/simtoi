@@ -46,7 +46,7 @@ void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
 	mGLT.EnqueueOperation(op);
 }
 
-void CGLWidget::LoadParameters(QStandardItem * parent, CParameters * parameters)
+void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
 {
 	for(int j = 0; j < parameters->GetNParams(); j++)
 	{
@@ -85,7 +85,7 @@ void CGLWidget::LoadParameters(QStandardItem * parent, CParameters * parameters)
 		item->setData(QVariant((double)parameters->GetMax(j)), Qt::DisplayRole);
 		items << item;
 
-		parent->appendRow(items);
+		parent_widget->appendRow(items);
 	}
 }
 
@@ -108,6 +108,12 @@ void CGLWidget::LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type)
 	// TODO: Permit loading of different minimizers here.
 	CMinimizer * tmp = CMinimizer::GetMinimizer(minimizer_type, &mGLT);
 	mMinThread.SetMinimizer(tmp);
+}
+
+void CGLWidget::Open(string filename)
+{
+	mGLT.Open(filename);
+	RebuildTree();
 }
 
 void CGLWidget::paintEvent(QPaintEvent *)

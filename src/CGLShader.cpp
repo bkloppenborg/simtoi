@@ -167,7 +167,7 @@ void CGLShader::LinkProgram(GLuint program)
     }
 }
 
-void CGLShader::UseShader(float * params, int imNParams)
+void CGLShader::UseShader(float * params, unsigned int in_params)
 {
 	if(!mShaderLoaded)
 		Init();
@@ -179,6 +179,6 @@ void CGLShader::UseShader(float * params, int imNParams)
 	glUseProgram(mProgram);
 
 	// Set the parameters.
-	for(int i = 0; i < mNParams; i++)
+	for(int i = 0; (i < mNParams && i < in_params); i++)
 		glUniform1fv(mParam_locations[i], 1, &params[i]);
 }

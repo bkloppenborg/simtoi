@@ -19,6 +19,7 @@
 
 class CModel;
 class CGLShaderWrapper;
+class CGLShaderList;
 
 using namespace std;
 
@@ -63,10 +64,12 @@ public:
 	void IncrementTime();
 
 	void Render(GLuint fbo, int width, int height);
+	void Restore(Json::Value input, CGLShaderList * shader_list);
 
+	Json::Value Serialize();
 	void SetFreeParameters(float * params, int n_params);
-	void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
-	void SetShader(int model_id, CGLShaderWrapper * shader);
+	void SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type);
+	void SetShader(unsigned int model_id, CGLShaderWrapper * shader);
 	void SetTime(double t);
 	void SetTimestep(double dt);
 

@@ -130,8 +130,8 @@ int CMinimizer_mpfit::run()
 		pars[i].limited[1] = 1;
 		pars[i].limits[0] = 0;
 		pars[i].limits[1] = 1;
-		pars[i].step = 0.1;
-		pars[i].relstep = 0.05;
+		pars[i].step = 0.4;
+		pars[i].relstep = 0.1;
 		pars[i].side = 2;
 		pars[i].deriv_debug = 0;
 	}

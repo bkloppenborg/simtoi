@@ -186,20 +186,26 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew_Model"/>
+    <addaction name="actionNew"/>
+    <addaction name="actionSave"/>
     <addaction name="actionOpen"/>
    </widget>
    <addaction name="menuFIle"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionNew_Model">
+  <action name="actionNew">
    <property name="text">
-    <string>New Model</string>
+    <string>New</string>
    </property>
   </action>
   <action name="actionOpen">
    <property name="text">
-    <string>Open Model</string>
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
    </property>
   </action>
  </widget>

@@ -1,6 +1,7 @@
 
 #include <QTime>
 #include <QtDebug>
+#include <fstream>
 
 #include "CCL_GLThread.h"
 #include "CGLWidget.h"
@@ -9,6 +10,8 @@
 #include "CGLShaderList.h"
 #include "CPosition.h"
 #include "CLibOI.h"
+#include "json/json.h"
+#include "ReadTextFile.h"
 
 int CCL_GLThread::count = 0;
 
@@ -264,6 +267,19 @@ void CCL_GLThread::LoadData(string filename)
 		mCL->LoadData(filename);
 }
 
+/// Opens a save file
+void CCL_GLThread::Open(string filename)
+{
+	Json::Reader reader;
+	Json::Value input;
+	string file_contents = ReadFile(filename, "Could not read save file.");
+	bool parsingSuccessful = reader.parse(file_contents, input);
+	if(parsingSuccessful)
+		mModelList->Restore(input, mShaderList);
+
+	EnqueueOperation(GLT_RenderModels);
+}
+
 /// Resets any OpenGL errors by looping.
 void CCL_GLThread::ResetGLError()
 {
@@ -416,6 +432,16 @@ void CCL_GLThread::run()
         	break;
         }
     }
+}
+
+/// Saves the list of models and their values to the specified location
+/// in the JSON file format.
+void CCL_GLThread::Save(string filename)
+{
+	Json::StyledStreamWriter writer;
+	Json::Value output = mModelList->Serialize();
+	std::ofstream outfile(filename.c_str());
+	writer.write(outfile, output);
 }
 
 /// Sets the scale for the model.

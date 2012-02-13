@@ -6,11 +6,15 @@
  */
 
 #include "CModelList.h"
+
+#include <sstream>
+
 #include "CCL_GLThread.h"
 #include "CModel.h"
 #include "CModelSphere.h"
 #include "CModelCylinder.h"
 #include "CPosition.h"
+#include "CGLShaderList.h"
 
 using namespace std;
 
@@ -164,6 +168,48 @@ void CModelList::Render(GLuint fbo, int width, int height)
     glFinish();
 }
 
+/// Restores the saved models
+void CModelList::Restore(Json::Value input, CGLShaderList * shader_list)
+{
+	CModelList::ModelTypes type = CModelList::NONE;
+	CModel * model;
+	Json::Value tmp;
+	int value = 0;
+
+	Json::Value::Members members = input.getMemberNames();
+	for(unsigned int i = 0; i < members.size(); i++)
+	{
+		value = input[members[i]]["base"]["type"].asInt();
+		tmp = input[members[i]];
+		type = CModelList::ModelTypes( value );
+		model = AddNewModel(type);
+		model->Restore(tmp, shader_list);
+	}
+}
+
+/// Serializes the model list:
+Json::Value CModelList::Serialize()
+{
+	Json::Value output;
+	output.setComment("// Model save file from SIMTOI in JSON format.", Json::commentBefore);
+	stringstream name;
+
+    // Now call render on all of the models:
+	int i = 0;
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    {
+    	Json::Value tmp;
+    	name.str("");
+    	name << "model_" << i;
+    	output[name.str()] = (*it)->Serialize();
+//    	tmp[name.str()] = (*it)->Serialize();
+//    	tmp.setComment("// Next Model", Json::commentBefore);
+//    	output.append(tmp);
+    	i++;
+    }
+
+    return output;
+}
 
 void CModelList::SetFreeParameters(float * params, int n_params)
 {
@@ -177,13 +223,13 @@ void CModelList::SetFreeParameters(float * params, int n_params)
     }
 }
 
-void CModelList::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
+void CModelList::SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type)
 {
 	if(model_id < mList.size())
 		mList[model_id]->SetPositionType(pos_type);
 }
 
-void CModelList::SetShader(int model_id, CGLShaderWrapper * shader)
+void CModelList::SetShader(unsigned int model_id, CGLShaderWrapper * shader)
 {
 	if(model_id < mList.size())
 		mList[model_id]->SetShader(shader);

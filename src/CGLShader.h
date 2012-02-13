@@ -33,7 +33,7 @@ protected:
 	string mBase_name;
 	string mShader_dir;
 	string mFriendlyName;
-	int mNParams;
+	unsigned int mNParams;
 	vector<string> mParam_names;
 	pair<float,float> * mMinMax;
 	float * mStartingValues;
@@ -47,19 +47,19 @@ public:
 
 	void CompileShader(GLuint shader);
 
-	CGLShaderList::ShaderTypes GetType() { return mType; };
 	float GetMin(unsigned int i);
 	float GetMax(unsigned int i);
 	string GetName() { return mFriendlyName; };
 	int GetNParams() { return mNParams; }
 	string GetParamName(unsigned int i);
 	float GetStartingValue(unsigned int i);
+	CGLShaderList::ShaderTypes GetType() { return mType; };
 
 	void Init();
 
 	void LinkProgram(GLuint program);
 
-	void UseShader(float * params, int in_params);
+	void UseShader(float * params, unsigned int in_params);
 
 };
 

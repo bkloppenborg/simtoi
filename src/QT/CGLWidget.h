@@ -63,7 +63,9 @@ public:
 protected:
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
+
 public:
+    void Open(string filename);
     bool OpenCLInitialized() { return mGLT.OpenCLInitialized(); };
 
     void RunMinimizer();
@@ -71,6 +73,7 @@ protected:
     void RebuildTree();
 
 public:
+    void Save(string location) { mGLT.Save(location); };
     void SetFreeParameters(float * params, int n_params);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);

@@ -167,6 +167,34 @@ void CModel::Rotate()
 	CCL_GLThread::CheckOpenGLError("CModel::Rotate()");
 }
 
+void CModel::Restore(Json::Value input, CGLShaderList * shader_list)
+{
+	// Restore the base parameters
+	CParameters::Restore(input["base"]);
+	CGLShaderWrapper * shader;
+
+	// Now the position
+	if(input.isMember("position"))
+	{
+		if(input["position"].isMember("type"))
+		{
+			SetPositionType( CPosition::PositionTypes(input["position"]["type"].asInt()) );
+			mPosition->Restore(input["position"]);
+		}
+	}
+
+	// Now the shader
+	if(input.isMember("shader"))
+	{
+		if(input["shader"].isMember("type"))
+		{
+			shader = shader_list->GetShader( CGLShaderList::ShaderTypes( input["shader"]["type"].asInt()) );
+			SetShader(shader);
+			mShader->Restore(input["shader"]);
+		}
+	}
+}
+
 /// Sets up the matrix mode for rendering models.
 void CModel::SetupMatrix()
 {
@@ -177,14 +205,22 @@ void CModel::SetupMatrix()
 
 }
 
-void CModel::Translate()
+/// Serializes a model object into a JSON object.
+Json::Value CModel::Serialize()
 {
-	float x, y, z;
-	mPosition->GetXYZ(x, y, z);
+	Json::Value output;
+	output["base"] = CParameters::Serialize();
+	output["base"]["type"] = mType;
+	output["position"] = mPosition->Serialize();
+	output["position"]["type"] = mPosition->GetType();
 
-	// Call the translation routines.  Use the double-precision call.
-	glTranslatef(x, y, z);
-	CCL_GLThread::CheckOpenGLError("CModel::Translate()");
+	if(mShader != NULL)
+	{
+		output["shader"] = mShader->Serialize();
+		output["shader"]["type"] = mShader->GetType();
+	}
+
+	return output;
 }
 
 /// Sets the parameters for this model, the position, shader, and all features.
@@ -231,6 +267,16 @@ void CModel::SetTime(double time)
 void CModel::SetShader(CGLShaderWrapper * shader)
 {
 	mShader = shader;
+}
+
+void CModel::Translate()
+{
+	float x, y, z;
+	mPosition->GetXYZ(x, y, z);
+
+	// Call the translation routines.  Use the double-precision call.
+	glTranslatef(x, y, z);
+	CCL_GLThread::CheckOpenGLError("CModel::Translate()");
 }
 
 void CModel::UseShader()

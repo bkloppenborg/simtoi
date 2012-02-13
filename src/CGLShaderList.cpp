@@ -74,6 +74,9 @@ CGLShader * CGLShaderList::FindShader(CGLShaderList::ShaderTypes shader)
 {
 	// There should be a small enough number of shaders that we can use find directly on the
 	// unsorted vector list.  If this becomes a problem, we can sort the values later.
+	if(shader < NONE || shader > LAST_VALUE)
+		shader = NONE;
+
     for(vector<CGLShader*>::iterator it = mList.begin(); it != mList.end(); ++it)
     {
     	if((*it)->GetType() == shader)

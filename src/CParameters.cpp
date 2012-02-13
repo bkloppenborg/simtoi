@@ -10,6 +10,8 @@
 
 #include "misc.h"	// needed for pull_params
 
+// TODO: Note, none of the store/set operations here are thread safe!
+
 // A number after which we consider a parameter to be zero.
 #define ZERO_COMP 1E-8
 
@@ -81,7 +83,7 @@ float CParameters::GetParam(int param_n)
 }
 
 /// Gets the values of the (scaled) parameters for this object.
-void CParameters::GetParams(float * out_params, int n_params)
+void CParameters::GetParams(float * out_params, unsigned int n_params)
 {
 	// Copy the current parameter value into out_params
 	// keep in bounds for both n_params and mNParams.
@@ -177,6 +179,22 @@ bool CParameters::IsFree(int param_num)
 	return false;
 }
 
+/// Restores parameters values from the JSON value
+void CParameters::Restore(Json::Value input)
+{
+	// Restore parameters.  Check that the parameter is set in the file before attempting
+	// to restore it.
+	for(unsigned int i = 0; i < mNParams; i++)
+	{
+		if(input.isMember(mParamNames[i]))
+		{
+			mParams[i] =        float( input[mParamNames[i]][0u].asDouble() );
+			mMinMax[i].first =  float( input[mParamNames[i]][1u].asDouble() );
+			mMinMax[i].second = float( input[mParamNames[i]][2u].asDouble() );
+		}
+	}
+}
+
 /// Toggles the state of all variables to free (is_free = true) or fixed (is_free = false)
 void CParameters::SetAllFree(bool is_free)
 {
@@ -234,3 +252,20 @@ void CParameters::SetParam(int n_param, float value)
 		mParams[n_param] = value;
 }
 
+/// Serializes the parameters to a Json::Value object
+Json::Value CParameters::Serialize()
+{
+	Json::Value output;
+
+	for(unsigned int i = 0; i < mNParams; i++)
+	{
+		// Write out the parameters in [name, value, min, max] format
+		Json::Value tmp;
+		tmp.append(Json::Value(mParams[i]));
+		tmp.append(Json::Value(mMinMax[i].first));
+		tmp.append(Json::Value(mMinMax[i].second));
+		output[mParamNames[i]] = tmp;
+	}
+
+	return output;
+}

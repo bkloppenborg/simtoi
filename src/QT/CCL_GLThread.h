@@ -153,6 +153,7 @@ protected:
 public:
     void LoadData(string filename);
 
+    void Open(string filename);
     bool OpenCLInitialized() { return mCLInitalized; };
 
     static void ResetGLError();
@@ -160,6 +161,7 @@ public:
     void resizeViewport(int width, int height);
     void run();
 
+    void Save(string filename);
     void SetFreeParameters(float * params, int n_params);
     void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetScale(double scale);

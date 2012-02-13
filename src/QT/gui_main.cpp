@@ -56,6 +56,10 @@ gui_main::gui_main(QWidget *parent_widget)
 	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(addModel(void)));
 	connect(ui.btnDeleteModel, SIGNAL(clicked(void)), this, SLOT(deleteModel(void)));
 
+	// File menu:
+	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(save(void)));
+	connect(ui.actionOpen, SIGNAL(triggered(void)), this, SLOT(open(void)));
+
 	// Get the application path,
 	string app_path = QCoreApplication::applicationDirPath().toStdString();
 	mShaderSourceDir = app_path + "/shaders/";
@@ -220,6 +224,7 @@ void gui_main::deleteModel()
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 
+	// TODO: Finish this function
 
 }
 
@@ -237,33 +242,6 @@ void gui_main::delGLArea()
     }
 
     ButtonCheck();
-}
-
-void gui_main::RunMinimizer()
-{
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    CMinimizer::MinimizerTypes minimizer;
-
-    if(!widget->OpenCLInitialized())
-    	widget->EnqueueOperation(CLT_Init);
-
-    // Now determine which minimizer is selected:
-	int value = ui.cboMinimizers->itemData(ui.cboMinimizers->currentIndex()).toInt();
-	if(value > CMinimizer::NONE && value < CMinimizer::LAST_VALUE)
-	{
-		minimizer = CMinimizer::MinimizerTypes(value);
-	    widget->LoadMinimizer(minimizer);
-	    widget->RunMinimizer();
-	}
-}
-
-void gui_main::SetupComboBoxes()
-{
-	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
 }
 
 /// Loads OIFITS data into the current selected subwindow
@@ -315,6 +293,48 @@ void gui_main::LoadData()
 	ButtonCheck();
 }
 
+void gui_main::open()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("SIMTOI Save Files (*.json)"));
+    dialog.setViewMode(QFileDialog::Detail);
+    QStringList fileNames;
+	if (dialog.exec())
+	{
+		fileNames = dialog.selectedFiles();
+
+		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+		widget->Open(fileNames.first().toStdString());
+	}
+}
+
+void gui_main::RunMinimizer()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+    CMinimizer::MinimizerTypes minimizer;
+
+    if(!widget->OpenCLInitialized())
+    	widget->EnqueueOperation(CLT_Init);
+
+    // Now determine which minimizer is selected:
+	int value = ui.cboMinimizers->itemData(ui.cboMinimizers->currentIndex()).toInt();
+	if(value > CMinimizer::NONE && value < CMinimizer::LAST_VALUE)
+	{
+		minimizer = CMinimizer::MinimizerTypes(value);
+	    widget->LoadMinimizer(minimizer);
+	    widget->RunMinimizer();
+	}
+}
+
 /// Removes the current selected data set.
 void gui_main::RemoveData()
 {
@@ -347,10 +367,34 @@ void gui_main::render()
     }
 }
 
+void gui_main::save()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("SIMTOI Save Files (*.json)"));
+    dialog.setViewMode(QFileDialog::Detail);
+    QStringList fileNames;
+	if (dialog.exec())
+	{
+		fileNames = dialog.selectedFiles();
+
+		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+		widget->Save(fileNames.first().toStdString());
+	}
+}
+
+void gui_main::SetupComboBoxes()
+{
+	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
+}
+
 void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
 {
 	ButtonCheck();
-
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
     	return;
