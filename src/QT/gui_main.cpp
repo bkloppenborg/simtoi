@@ -373,6 +373,7 @@ void gui_main::save()
     if(!sw)
     	return;
 
+    string filename;
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(tr("SIMTOI Save Files (*.json)"));
@@ -381,9 +382,14 @@ void gui_main::save()
 	if (dialog.exec())
 	{
 		fileNames = dialog.selectedFiles();
+		filename = fileNames.first().toStdString();
+		string tmp =filename.substr(filename.size() - 5, 5);
+
+		if(filename.substr(filename.size() - 5, 5) != ".json")
+			filename += ".json";
 
 		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-		widget->Save(fileNames.first().toStdString());
+		widget->Save(filename);
 	}
 }
 
