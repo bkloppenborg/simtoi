@@ -171,6 +171,10 @@ void CModelList::Render(GLuint fbo, int width, int height)
 /// Restores the saved models
 void CModelList::Restore(Json::Value input, CGLShaderList * shader_list)
 {
+	// Clear the list if there are already models in it.
+	if(mList.size() > 0)
+		this->Clear();
+
 	CModelList::ModelTypes type = CModelList::NONE;
 	CModel * model;
 	Json::Value tmp;

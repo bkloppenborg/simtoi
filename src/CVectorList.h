@@ -23,13 +23,19 @@ public:
 
 	~CVectorList()
 	{
-		for(int i = mList.size() - 1; i > -1; i--)
-			delete mList[i];
+		Clear();
 	}
 
 	void Append(T item)
 	{
 		mList.push_back(item);
+	}
+
+	// if the vector contains pointers, call this function rather than mList.clear()
+	void Clear()
+	{
+		for(int i = mList.size() - 1; i > -1; i--)
+			delete mList[i];
 	}
 
 	void Remove(int i)

@@ -197,6 +197,8 @@ void CParameters::Restore(Json::Value input)
 			mFreeParams[i] =    bool ( input[name][3u].asBool()   );
 		}
 	}
+
+	CountFree();
 }
 
 /// Toggles the state of all variables to free (is_free = true) or fixed (is_free = false)

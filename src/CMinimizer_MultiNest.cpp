@@ -61,6 +61,7 @@ void CMinimizer_MultiNest::log_likelihood(double * Cube, int * ndim, int * npars
 	for(int data_set = 0; data_set < n_data_sets; data_set++)
 	{
 		minimizer->mCLThread->SetTime(minimizer->mCLThread->GetDataAveJD(data_set));
+		minimizer->mCLThread->EnqueueOperation(GLT_RenderModels);
 		tmp += minimizer->mCLThread->GetLogLike(data_set);
 	}
 

@@ -322,6 +322,14 @@ void gui_main::RunMinimizer()
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     CMinimizer::MinimizerTypes minimizer;
 
+    if(widget->GetNData() == 0)
+    {
+		QMessageBox msgBox;
+		msgBox.setText("You must load data before running a minimizer.");
+		msgBox.exec();
+    	return;
+    }
+
     if(!widget->OpenCLInitialized())
     	widget->EnqueueOperation(CLT_Init);
 
@@ -378,6 +386,7 @@ void gui_main::save()
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setNameFilter(tr("SIMTOI Save Files (*.json)"));
     dialog.setViewMode(QFileDialog::Detail);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
     QStringList fileNames;
 	if (dialog.exec())
 	{
