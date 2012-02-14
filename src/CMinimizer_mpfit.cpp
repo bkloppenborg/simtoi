@@ -39,7 +39,7 @@ int CMinimizer_mpfit::ErrorFunc(int nData, int nParams, double * params, double 
 //	printf("\n");
 
 	// Set the parameters:
-	minimizer->mCLThread->SetFreeParameters(minimizer->mParams, nParams);
+	minimizer->mCLThread->SetFreeParameters(minimizer->mParams, nParams, false);
 
 	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
 	n_data_sets = minimizer->mCLThread->GetNDataSets();
@@ -73,15 +73,10 @@ void CMinimizer_mpfit::Init()
 }
 
 /// Prints out cmpfit results (from testmpfit.c)
-void CMinimizer_mpfit::printresult(double * x, mp_result * result, vector<string> names, vector< pair<float, float> > min_max)
+void CMinimizer_mpfit::printresult(double * x, mp_result * result, vector<string> names)
 {
 	if ((x == 0) || (result == 0))
 		return;
-
-	double value = 0;
-	double err = 0;
-	double scale;
-	string name = "";
 
 	printf("INIT CHI-SQUARE = %f \n", result->orignorm);
 	printf("     CHI-SQUARE = %f    (%d DOF)\n", result->bestnorm, result->nfunc-result->nfree);
@@ -94,13 +89,7 @@ void CMinimizer_mpfit::printresult(double * x, mp_result * result, vector<string
 	printf("\n");
 
 	for(int i=0; i< result->npar; i++)
-	{
-		scale = min_max[i].second - min_max[i].first;
-		value = x[i] * scale + min_max[i].first;
-		err = result->xerror[i] * scale;
-		name = names[i];
-		printf("  P[%d] = %f +/- %f (%s)\n", i, value, err, name.c_str());
-	}
+		printf("  P[%d] = %f +/- %f (%s)\n", i, x[i], result->xerror[i], names[i].c_str());
 }
 
 int CMinimizer_mpfit::run()
@@ -117,7 +106,7 @@ int CMinimizer_mpfit::run()
 	mp_par_struct * pars = new mp_par_struct[nParams];
 	double * input_params = new double[nParams];
 	float * tmp = new float[nParams];
-	mCLThread->GetFreeParameters(tmp, nParams);
+	mCLThread->GetFreeParameters(tmp, nParams, true);
 	vector<string> names = mCLThread->GetFreeParamNames();
 	vector< pair<float, float> > min_max = mCLThread->GetFreeParamMinMaxes();
 
@@ -128,10 +117,10 @@ int CMinimizer_mpfit::run()
 		pars[i].fixed = 0;
 		pars[i].limited[0] = 1;
 		pars[i].limited[1] = 1;
-		pars[i].limits[0] = 0.0;
-		pars[i].limits[1] = 1.0;
-		pars[i].step = 0;
-		pars[i].relstep = 0.05;
+		pars[i].limits[0] = min_max[i].first;
+		pars[i].limits[1] = min_max[i].second;
+		pars[i].step = 1;
+		pars[i].relstep = 0.5;
 		pars[i].side = 2;
 		pars[i].deriv_debug = 0;
 	}
@@ -142,13 +131,13 @@ int CMinimizer_mpfit::run()
 	for(int i = 0; i < nParams; i++)
 		tmp[i] = float(input_params[i]);
 
-	mCLThread->SetFreeParameters(tmp, nParams);
+	mCLThread->SetFreeParameters(tmp, nParams, false);
 	mCLThread->EnqueueOperation(GLT_RenderModels);
 
 
 	// Print out the exit code and fit information.
 	printf("Minimizer Exit Code: %d\n", status);
-	printresult(input_params, &result, names, min_max);
+	printresult(input_params, &result, names);
 
 	delete[] result.xerror;
 	delete[] input_params;

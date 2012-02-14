@@ -23,7 +23,7 @@ public:
 
 	void Init();
 
-	void printresult(double * x, int n_pars, vector<string> names, vector< pair<float, float> > min_max);
+	void printresult(double * x, int n_pars, vector<string> names, double * info);
 
 	int run();
 };
