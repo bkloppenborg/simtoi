@@ -20,10 +20,10 @@ CParameters::CParameters(int n_params)
 	// Init the parameter storage location
 	mNParams = n_params;
 	mNFreeParams = 0;
-	mParams = new float[mNParams];
+	mParams = new double[mNParams];
 	mFreeParams = new bool[mNParams];
-	mScales = new float[mNParams];
-	mMinMax = new pair<float,float>[mNParams];
+	mScales = new double[mNParams];
+	mMinMax = new pair<double,double>[mNParams];
 	mName = "";
 
 	// Init parameter values.
@@ -32,7 +32,7 @@ CParameters::CParameters(int n_params)
 		mParams[i] = 0;
 		mFreeParams[i] = false;
 		mScales[i] = 1;
-		mMinMax[i] = pair<float,float>(0.0, 0.0);
+		mMinMax[i] = pair<double,double>(0.0, 0.0);
 	}
 }
 
@@ -56,7 +56,7 @@ void CParameters::CountFree(void)
 }
 
 /// Returns the maximum allowable value of the specified parameter, -1 if param_num is out of bounds.
-float CParameters::GetMax(int param_num)
+double CParameters::GetMax(int param_num)
 {
 	if(param_num < mNParams)
 		return mMinMax[param_num].second;
@@ -65,7 +65,7 @@ float CParameters::GetMax(int param_num)
 }
 
 /// Returns the minimum allowable value of the specified parameter, -1 if param_num is out of bounds.
-float CParameters::GetMin(int param_num)
+double CParameters::GetMin(int param_num)
 {
 	if(param_num < mNParams)
 		return mMinMax[param_num].first;
@@ -74,7 +74,7 @@ float CParameters::GetMin(int param_num)
 }
 
 /// Gets the vale of the specified parameter, returns -1 if outside of bounds:
-float CParameters::GetParam(int param_n)
+double CParameters::GetParam(int param_n)
 {
 	if(param_n < mNParams)
 		return mParams[param_n];
@@ -83,7 +83,7 @@ float CParameters::GetParam(int param_n)
 }
 
 /// Gets all of the parameter values for this object, returning them in intervals x_i = [param[i].min ... param[i].max].
-void CParameters::GetParams(float * out_params, unsigned int n_params)
+void CParameters::GetParams(double * out_params, unsigned int n_params)
 {
 	// Copy the current parameter value into out_params
 	// keep in bounds for both n_params and mNParams.
@@ -94,9 +94,9 @@ void CParameters::GetParams(float * out_params, unsigned int n_params)
 }
 
 /// Returns a vector of pairs containing the min/max values for the parameters.
-vector< pair<float, float> > CParameters::GetFreeMinMaxes()
+vector< pair<double, double> > CParameters::GetFreeMinMaxes()
 {
-	vector< pair<float, float> > tmp;
+	vector< pair<double, double> > tmp;
 	for(int i = 0; i < mNParams; i++)
 	{
 		if(mFreeParams[i])
@@ -108,7 +108,7 @@ vector< pair<float, float> > CParameters::GetFreeMinMaxes()
 
 /// Gets the values of the free parameters for this object, scales them into
 // If scale_params = false, parameters are returned within the interval x = [0...1] otherwise, x = [param.min ... param.max]
-void CParameters::GetFreeParams(float * out_params, int n_params, bool scale_params)
+void CParameters::GetFreeParams(double * out_params, int n_params, bool scale_params)
 {
 	// Get the scaled parameter values
 	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
@@ -186,9 +186,9 @@ void CParameters::Restore(Json::Value input)
 		if(input.isMember(name))
 		{
 			//
-			mParams[i] =        float( input[name][0u].asDouble() );
-			mMinMax[i].first =  float( input[name][1u].asDouble() );
-			mMinMax[i].second = float( input[name][2u].asDouble() );
+			mParams[i] =        double( input[name][0u].asDouble() );
+			mMinMax[i].first =  double( input[name][1u].asDouble() );
+			mMinMax[i].second = double( input[name][2u].asDouble() );
 			mFreeParams[i] =    bool ( input[name][3u].asBool()   );
 		}
 	}
@@ -208,7 +208,7 @@ void CParameters::SetAllFree(bool is_free)
 /// Sets the values for the parameters for this object
 /// If scale_params = true then the values are scaled into their native interval, [param.min ... param.max],
 /// otherwise if scale_params = false the parameters are assumed to be scaled.
-void CParameters::SetFreeParams(float * in_params, int n_params, bool scale_params)
+void CParameters::SetFreeParams(double * in_params, int n_params, bool scale_params)
 {
 	// Set the parameter values
 	push_params(in_params, n_params, mParams, mNParams, mFreeParams);
@@ -238,14 +238,14 @@ void CParameters::SetFree(int param_num, bool is_free)
 }
 
 /// Sets the specified parameter's minimum value.
-void CParameters::SetMin(int param_num, float value)
+void CParameters::SetMin(int param_num, double value)
 {
 	if(param_num < mNParams)
 		mMinMax[param_num].first = value;
 }
 
 /// Sets the specified paramter's maximum value.
-void CParameters::SetMax(int param_num, float value)
+void CParameters::SetMax(int param_num, double value)
 {
 	if(param_num < mNParams)
 		mMinMax[param_num].second = value;
@@ -253,7 +253,7 @@ void CParameters::SetMax(int param_num, float value)
 
 /// Sets the specified parameter to the indicated value.
 /// Note, scaling from the unit hypercube is not applied.
-void CParameters::SetParam(int n_param, float value)
+void CParameters::SetParam(int n_param, double value)
 {
 	if(n_param < mNParams)
 		mParams[n_param] = value;

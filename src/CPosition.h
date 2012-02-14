@@ -37,7 +37,7 @@ public:
 	CPosition::PositionTypes GetType() { return mType; };
 
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
-	virtual void GetXYZ(float & x, float & y, float & z);
+	virtual void GetXYZ(double & x, double & y, double & z);
 	static CPosition * GetPosition(CPosition::PositionTypes type);
 	static vector< pair<CPosition::PositionTypes, string> > GetTypes();
 };

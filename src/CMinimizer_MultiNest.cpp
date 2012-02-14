@@ -40,7 +40,7 @@ void CMinimizer_MultiNest::dumper(int *nSamples, int *nlive, int *nPar, double *
 //		printf("%s: %e %e %e\n", param_names[i].c_str(), paramConstr[i], paramConstr[2* (*nPar) + i], paramConstr[3* (*nPar) + i]);
 }
 
-void CMinimizer_MultiNest::log_likelihood(double * Cube, int * ndim, int * npars, double * lnew)
+void CMinimizer_MultiNest::log_likelihood(double * params, int * ndim, int * npars, double * lnew)
 {
 	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(minimizer_tmp::minimizer);
 	int n_data_sets = minimizer->mCLThread->GetNDataSets();
@@ -49,15 +49,7 @@ void CMinimizer_MultiNest::log_likelihood(double * Cube, int * ndim, int * npars
 	// Convert the double parameter values back to floats
 	int nData = minimizer->mCLThread->GetNData();
 
-//	printf("Parameters: ");
-	for(int i = 0; i < *ndim; i++)
-	{
-		minimizer->mParams[i] = float(Cube[i]);
-//		printf("%f ", minimizer->mParams[i]);
-	}
-//	printf("\n");
-
-	minimizer->mCLThread->SetFreeParameters(minimizer->mParams, *npars, true);
+	minimizer->mCLThread->SetFreeParameters(params, *npars, true);
 	for(int data_set = 0; data_set < n_data_sets; data_set++)
 	{
 		minimizer->mCLThread->SetTime(minimizer->mCLThread->GetDataAveJD(data_set));
@@ -66,14 +58,7 @@ void CMinimizer_MultiNest::log_likelihood(double * Cube, int * ndim, int * npars
 	}
 
 	// Get the scaled parameter values
-//	printf("Parameters: ");
-	minimizer->mCLThread->GetFreeParameters(minimizer->mParams, *npars, true);
-	for(int i = 0; i < *npars; i++)
-	{
-		Cube[i] = double(minimizer->mParams[i]);
-//		printf("%f ", minimizer->mParams[i]);
-	}
-//	printf("\n");
+	minimizer->mCLThread->GetFreeParameters(params, *npars, true);;
 
 	*lnew = tmp;
 }

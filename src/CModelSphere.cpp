@@ -45,7 +45,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
 
 	// Rename a few variables for convenience:
-	float radius = mParams[mBaseParams + 1] / 2;
+	double radius = float(mParams[mBaseParams + 1] / 2);
 
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);

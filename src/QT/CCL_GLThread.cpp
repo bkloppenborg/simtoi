@@ -128,7 +128,7 @@ void CCL_GLThread::GetChi(int data_num, float * output, int & n)
 }
 
 /// Returns the chi2 for the specified data set
-float CCL_GLThread::GetChi2(int data_num)
+double CCL_GLThread::GetChi2(int data_num)
 {
 	// Set the data number, enqueue the operation and then block until we receive an answer.
 	mCLDataSet = data_num;
@@ -144,7 +144,7 @@ double CCL_GLThread::GetDataAveJD(int data_num)
 }
 
 /// Returns the chi2 for the specified data set
-float CCL_GLThread::GetLogLike(int data_num)
+double CCL_GLThread::GetLogLike(int data_num)
 {
 	// Set the data number, enqueue the operation and then block until we receive an answer.
 	mCLDataSet = data_num;
@@ -243,7 +243,7 @@ void CCL_GLThread::InitFrameBufferTexture(void)
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
     // These other formats might work, check that GL_BYTE is still correct for the higher precision.
-    // I don't think we'll ever need floating point numbers, but those are here too:
+    // I don't think we'll ever need doubleing point numbers, but those are here too:
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, mWidth, mHeight, 0, GL_RED, CL_HALF_FLOAT, NULL);
@@ -375,7 +375,7 @@ void CCL_GLThread::run()
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
         	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
-        	mCL->SetImageInfo(mWidth, mHeight, 1, float(mScale));
+        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
         	mPermitResize = false;
 
         default:
@@ -445,7 +445,7 @@ void CCL_GLThread::Save(string filename)
 }
 
 /// Sets the scale for the model.
-void CCL_GLThread::SetFreeParameters(float * params, int n_params, bool scale_params)
+void CCL_GLThread::SetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	mModelList->SetFreeParameters(params, n_params, scale_params);
 	EnqueueOperation(GLT_RenderModels);

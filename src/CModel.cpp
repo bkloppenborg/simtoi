@@ -55,7 +55,7 @@ CModel::~CModel()
 
 /// Returns the values for all parameters in this model
 /// including the model, position, shader, and all features.
-void CModel::GetAllParameters(float * params, int n_params)
+void CModel::GetAllParameters(double * params, int n_params)
 {
 	// Send parameter set command to the components of this model.
 	// We use pointer math to advance the position of the array passed to the functions
@@ -75,10 +75,10 @@ void CModel::GetAllParameters(float * params, int n_params)
 	//features->GetParams(params + n, n_params - n);
 }
 
-vector< pair<float, float> > CModel::GetFreeParamMinMaxes()
+vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 {
-	vector< pair<float, float> > tmp1;
-	vector< pair<float, float> > tmp2 = GetFreeMinMaxes();
+	vector< pair<double, double> > tmp1;
+	vector< pair<double, double> > tmp2 = GetFreeMinMaxes();
 	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	tmp2 = mPosition->GetFreeMinMaxes();
 	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
@@ -95,7 +95,7 @@ vector< pair<float, float> > CModel::GetFreeParamMinMaxes()
 /// Gets the free parameters for this model in a:
 ///  scale_params = false => uniform hypercube (x = [0...1])
 ///  scale_params = true => native values (x = [param.min... param.max])
-void CModel::GetFreeParameters(float * params, int n_params, bool scale_params)
+void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	int n = 0;
 	GetFreeParams(params, n_params, scale_params);
@@ -210,7 +210,7 @@ Json::Value CModel::Serialize()
 }
 
 /// Sets the parameters for this model, the position, shader, and all features.
-void CModel::SetFreeParameters(float * in_params, int n_params, bool scale_params)
+void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_params)
 {
 	// Here we use pointer math to advance the position of the array passed to the functions
 	// that set the parameters.  First assign values to this model (use pull_params):
@@ -257,7 +257,7 @@ void CModel::SetShader(CGLShaderWrapper * shader)
 
 void CModel::Translate()
 {
-	float x, y, z;
+	double x, y, z;
 	mPosition->GetXYZ(x, y, z);
 
 	// Call the translation routines.  Use the double-precision call.

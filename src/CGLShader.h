@@ -59,7 +59,7 @@ public:
 
 	void LinkProgram(GLuint program);
 
-	void UseShader(float * params, unsigned int in_params);
+	void UseShader(double * params, unsigned int in_params);
 
 };
 

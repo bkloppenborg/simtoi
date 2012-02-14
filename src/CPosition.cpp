@@ -53,7 +53,7 @@ vector< pair<CPosition::PositionTypes, string> > CPosition::GetTypes(void)
 }
 
 /// Baseclass function, set all zeros
-void CPosition::GetXYZ(float & x, float & y, float & z)
+void CPosition::GetXYZ(double & x, double & y, double & z)
 {
 	x = 0;
 	y = 0;

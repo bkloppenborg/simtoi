@@ -51,10 +51,10 @@ public:
 	CModel * AddNewModel(ModelTypes model_id);
 
 	int GetNFreeParameters();
-	void GetAllParameters(float * params, int n_params);
-	vector< pair<float, float> > GetFreeParamMinMaxes();
-	void GetFreeParameters(float * params, int n_params, bool scale_params);
-	void GetFreeParametersScaled(float * params, int n_params);
+	void GetAllParameters(double * params, int n_params);
+	vector< pair<double, double> > GetFreeParamMinMaxes();
+	void GetFreeParameters(double * params, int n_params, bool scale_params);
+	void GetFreeParametersScaled(double * params, int n_params);
 	vector<string> GetFreeParamNames();
 	CModel * GetModel(int i) { return mList[i]; };
 	double GetTime() { return mTime; };
@@ -67,7 +67,7 @@ public:
 	void Restore(Json::Value input, CGLShaderList * shader_list);
 
 	Json::Value Serialize();
-	void SetFreeParameters(float * params, int n_params, bool scale_params);
+	void SetFreeParameters(double * params, int n_params, bool scale_params);
 	void SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type);
 	void SetShader(unsigned int model_id, CGLShaderWrapper * shader);
 	void SetTime(double t);

@@ -63,7 +63,7 @@ int CModelList::GetNFreeParameters()
     return n;
 }
 
-void CModelList::GetAllParameters(float * params, int n_params)
+void CModelList::GetAllParameters(double * params, int n_params)
 {
     int n = 0;
 
@@ -75,10 +75,10 @@ void CModelList::GetAllParameters(float * params, int n_params)
     }
 }
 
-vector< pair<float, float> > CModelList::GetFreeParamMinMaxes()
+vector< pair<double, double> > CModelList::GetFreeParamMinMaxes()
 {
-    vector< pair<float, float> > tmp1;
-    vector< pair<float, float> > tmp2;
+    vector< pair<double, double> > tmp1;
+    vector< pair<double, double> > tmp2;
 
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
@@ -91,7 +91,7 @@ vector< pair<float, float> > CModelList::GetFreeParamMinMaxes()
 }
 
 /// Gets the values for all of the free parameters.
-void CModelList::GetFreeParameters(float * params, int n_params, bool scale_params)
+void CModelList::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
     int n = 0;
 
@@ -203,7 +203,7 @@ Json::Value CModelList::Serialize()
 }
 
 /// Sets all of the free parameter values
-void CModelList::SetFreeParameters(float * params, int n_params, bool scale_params)
+void CModelList::SetFreeParameters(double * params, int n_params, bool scale_params)
 {
     int n = 0;
 

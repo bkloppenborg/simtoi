@@ -167,7 +167,7 @@ void CGLShader::LinkProgram(GLuint program)
     }
 }
 
-void CGLShader::UseShader(float * params, unsigned int in_params)
+void CGLShader::UseShader(double * params, unsigned int in_params)
 {
 	if(!mShaderLoaded)
 		Init();
@@ -178,7 +178,12 @@ void CGLShader::UseShader(float * params, unsigned int in_params)
 	// Tell OpenGL to use the mProgram
 	glUseProgram(mProgram);
 
-	// Set the parameters.
+	// Set the parameters
+	// NOTE: we intentionally downcast from double to GLfloat, loss of precision unavoidable here.
+	GLfloat tmp;
 	for(int i = 0; (i < mNParams && i < in_params); i++)
-		glUniform1fv(mParam_locations[i], 1, &params[i]);
+	{
+		tmp = GLfloat(params[i]);
+		glUniform1fv(mParam_locations[i], 1, &tmp);
+	}
 }

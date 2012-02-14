@@ -185,7 +185,7 @@ void CGLWidget::stopRendering()
     mGLT.wait();
 }
 
-void CGLWidget::SetFreeParameters(float * params, int n_params, bool scale_params)
+void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	mGLT.SetFreeParameters(params, n_params, scale_params);
 }

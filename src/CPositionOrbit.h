@@ -32,12 +32,12 @@ protected:
 	void Compute_xyz(double a, double beta, double e,
 			double l1, double l2, double m1, double m2, double n1, double n2,
 			double cos_E, double sin_E,
-			float & x, float & y, float & z);
+			double & x, double & y, double & z);
 
 public:
-	void GetXYZ(float & x, float & y, float & z);
+	void GetXYZ(double & x, double & y, double & z);
 
-	void SetTime(float t) { mTime = t; };
+	void SetTime(double t) { mTime = t; };
 };
 
 #endif /* CPOSITIONORBIT_H_ */

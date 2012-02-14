@@ -22,10 +22,10 @@ CModelCylinder::CModelCylinder()
 	mType = CModelList::CYLINDER;
 
 	// Set the radius and diameter to something useful:
-	mParamNames.push_back("Radius");
+	mParamNames.push_back("Diameter");
 	SetParam(mBaseParams + 1, 3.0);
 	SetFree(mBaseParams + 1, true);
-	SetMax(mBaseParams + 1, 3.0);
+	SetMax(mBaseParams + 1, 6.0);
 	SetMin(mBaseParams + 1, 0.1);
 
 	mParamNames.push_back("Height");	// that is, full height
@@ -45,8 +45,8 @@ void CModelCylinder::Render(GLuint framebuffer_object, int width, int height)
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
 
 	// Rename a few variables for convenience:
-	float cyl_radius = mParams[mBaseParams + 1];
-	float cyl_height = mParams[mBaseParams + 2];
+	double cyl_radius = mParams[mBaseParams + 1] / 2;	// diameter / 2
+	double cyl_height = mParams[mBaseParams + 2];
 
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);

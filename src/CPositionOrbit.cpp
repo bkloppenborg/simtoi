@@ -130,14 +130,14 @@ void CPositionOrbit::Compute_Coefficients(double Omega, double inc, double omega
 void CPositionOrbit::Compute_xyz(double a, double beta, double e,
 		double l1, double l2, double m1, double m2, double n1, double n2,
 		double cos_E, double sin_E,
-		float & x, float & y, float & z)
+		double & x, double & y, double & z)
 {
-    x = float(a * (l1 * cos_E + beta * l2 * sin_E - e * l1));
-    y = float(a * (m1 * cos_E + beta * m2 * sin_E - e * m1));
-    z = float(a * (n1 * cos_E + beta * n2 * sin_E - e * n1));
+    x = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);
+    y = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);
+    z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);
 }
 
-void CPositionOrbit::GetXYZ(float & x, float & y, float & z)
+void CPositionOrbit::GetXYZ(double & x, double & y, double & z)
 {
 	// Local variables (mostly renaming mParams variables for convenience).
 	// Remember to convert the angular parameters into radians.

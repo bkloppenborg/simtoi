@@ -96,7 +96,7 @@ protected:
     bool mCLInitalized;
     QSemaphore mCLOpSemaphore;
     int mCLDataSet;
-    float mCLValue;
+    double mCLValue;
     float * mCLArrayValue;
     int mCLArrayN;
 
@@ -121,21 +121,21 @@ public:
     void EnqueueOperation(CL_GLT_Operations op);
 
 	void GetChi(int data_num, float * output, int & n);
-    float GetChi2(int data_num);
+    double GetChi2(int data_num);
     double GetDataAveJD(int data_num);
-    void GetFreeParameters(float * params, int n_params, bool scale_params) { mModelList->GetFreeParameters(params, n_params, scale_params); };
+    void GetFreeParameters(double * params, int n_params, bool scale_params) { mModelList->GetFreeParameters(params, n_params, scale_params); };
     int GetHeight() { return mHeight; };
-	float GetLogLike(int data_num);
+	double GetLogLike(int data_num);
 	CModelList * GetModelList() { return mModelList; };
     CL_GLT_Operations GetNextOperation(void);
 	int GetNFreeParameters() { return mModelList->GetNFreeParameters(); };
-	vector< pair<float, float> > GetFreeParamMinMaxes() { return mModelList->GetFreeParamMinMaxes(); };
+	vector< pair<double, double> > GetFreeParamMinMaxes() { return mModelList->GetFreeParamMinMaxes(); };
 	vector<string> GetFreeParamNames() { return mModelList->GetFreeParamNames(); };
 	int GetNData();
 	int GetNDataAllocated();
 	int GetNDataAllocated(int data_num);
 	int GetNDataSets();
-	float GetScale() { return mScale; };
+	double GetScale() { return mScale; };
 	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
 	int GetWidth() { return mWidth; };
 
@@ -161,7 +161,7 @@ public:
     void run();
 
     void Save(string filename);
-    void SetFreeParameters(float * params, int n_params, bool scale_params);
+    void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);

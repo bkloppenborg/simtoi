@@ -26,7 +26,7 @@ CPositionXY::~CPositionXY()
 }
 
 
-void CPositionXY::GetXYZ(float & x, float & y, float & z)
+void CPositionXY::GetXYZ(double & x, double & y, double & z)
 {
 	x = mParams[0];
 	y = mParams[1];

@@ -29,16 +29,8 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 	int n_data_alloc = 0;
 	int n_data_offset = 0;
 
-//	printf("Parameters:");
-	for(int i = 0; i < nParams; i++)
-	{
-		minimizer->mParams[i] = float(params[i]);
-//		printf("%f ", params[i], minimizer->mParams[i]);
-	}
-//	printf("\n");
-
 	// Set the parameters (note, they are already scaled)
-	minimizer->mCLThread->SetFreeParameters(minimizer->mParams, nParams, false);
+	minimizer->mCLThread->SetFreeParameters(params, nParams, false);
 
 	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
 	for(int data_set = 0; data_set < n_data_sets; data_set++)
@@ -49,7 +41,6 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 		minimizer->mCLThread->GetChi(data_set, minimizer->mResiduals + n_data_offset, n_data_alloc);
 		n_data_offset += n_data_alloc;
 	}
-
 
 	// Copy the errors back into the double array:
 //	printf("Residuals:\n");
@@ -121,15 +112,13 @@ int CMinimizer_levmar::run()
 
 	// Copy out the initial values for the parameters:
 	double params[nParams];
-	float tmp[nParams];
-	mCLThread->GetFreeParameters(tmp, nParams, true);
+	mCLThread->GetFreeParameters(params, nParams, true);
 	vector<string> names = mCLThread->GetFreeParamNames();
-	vector< pair<float, float> > min_max = mCLThread->GetFreeParamMinMaxes();
+	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
 
 	// Init parameter values
 	for(int i = 0; i < nParams; i++)
 	{
-		params[i] = double(tmp[i]);
 		lb[i] = min_max[i].first;
 		ub[i] = min_max[i].second;
 	}
@@ -137,11 +126,7 @@ int CMinimizer_levmar::run()
 	// Call levmar:
 	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, nParams, nData, lb, ub, opts, max_iterations, NULL, info, NULL, NULL, (void*)this);
 
-	// Render the model with the best-fit parameters:
-	for(int i = 0; i < nParams; i++)
-		tmp[i] = float(params[i]);
-
-	mCLThread->SetFreeParameters(tmp, nParams, false);
+	mCLThread->SetFreeParameters(params, nParams, false);
 	mCLThread->EnqueueOperation(GLT_RenderModels);
 
 	printf("Levmar executed %i iterations.\n", iterations);
