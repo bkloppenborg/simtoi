@@ -1,8 +1,3 @@
-// Copyright 2007-2010 Baptiste Lepilleur
-// Distributed under MIT license, or public domain if desired and
-// recognized in your jurisdiction.
-// See file LICENSE for detail or copy at http://jsoncpp.sourceforge.net/LICENSE
-
 #ifndef JSONTEST_H_INCLUDED
 # define JSONTEST_H_INCLUDED
 
@@ -199,7 +194,7 @@ namespace JsonTest {
 /// JSONTEST_ASSERT( x == y ) << "x=" << x << ", y=" << y;
 /// JSONTEST_ASSERT( x == y );
 #define JSONTEST_ASSERT( expr )                                               \
-   if ( expr )                                                                \
+   if ( condition )                                                           \
    {                                                                          \
    }                                                                          \
    else                                                                       \
