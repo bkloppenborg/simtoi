@@ -28,10 +28,10 @@ CModelSphere::CModelSphere()
 
 	// Set the radius to some useful value, make it free.
 	// NOTE: it is necessary to set max BEFORE setting min so logic test min < max works correctly.
-	mParamNames.push_back("Radius");
+	mParamNames.push_back("Diameter");
 	SetParam(mBaseParams + 1, 1);
 	SetFree(mBaseParams + 1, true);
-	SetMax(mBaseParams + 1, 5);
+	SetMax(mBaseParams + 1, 3.0);
 	SetMin(mBaseParams + 1, 0.1);
 }
 
@@ -45,7 +45,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
 
 	// Rename a few variables for convenience:
-	float radius = mParams[mBaseParams + 1];
+	float radius = mParams[mBaseParams + 1] / 2;
 
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);

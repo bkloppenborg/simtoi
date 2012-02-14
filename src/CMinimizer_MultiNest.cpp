@@ -92,8 +92,8 @@ int CMinimizer_MultiNest::run()
 	int mmodal = 1;					// do mode separation?
 	int ceff = 0;					// run in constant efficiency mode?
 	int nlive = 100;				// number of live points
-	double efr = 0.8;				// set the required efficiency
-	double tol = 0.5;				// tol, defines the stopping criteria
+	double efr = 1.0;				// set the required efficiency
+	double tol = 0.9;				// tol, defines the stopping criteria
 	int ndims = nParams;			// dimensionality (no. of free parameters)
 	int nPar = nParams;				// total no. of parameters including free & derived parameters
 	int nClsPar = nParams;			// no. of parameters to do mode separation on
