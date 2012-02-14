@@ -2,7 +2,6 @@
 #include "CTreeModel.h"
 
 #include "CMinimizer.h"
-#include "CMinimizer_mpfit.h"
 
 #include "CModel.h"
 #include "CModelList.h"
@@ -186,9 +185,9 @@ void CGLWidget::stopRendering()
     mGLT.wait();
 }
 
-void CGLWidget::SetFreeParameters(float * params, int n_params)
+void CGLWidget::SetFreeParameters(float * params, int n_params, bool scale_params)
 {
-	mGLT.SetFreeParameters(params, n_params);
+	mGLT.SetFreeParameters(params, n_params, scale_params);
 }
 
 void CGLWidget::SetScale(double scale)

@@ -75,7 +75,7 @@ protected:
 
 public:
     void Save(string location) { mGLT.Save(location); };
-    void SetFreeParameters(float * params, int n_params);
+    void SetFreeParameters(float * params, int n_params, bool scale_params);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetPositionType(int model_id, CPosition::PositionTypes pos_type);

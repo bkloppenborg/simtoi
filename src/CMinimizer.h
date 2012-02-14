@@ -30,7 +30,6 @@ public:
 	{
 		NONE,
 		BENCHMARK,
-		CMPFIT,
 		MULTINEST,
 		LEVMAR,
 		LAST_VALUE	// this must always be the last value in this enum.
