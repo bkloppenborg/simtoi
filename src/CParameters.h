@@ -40,8 +40,7 @@ protected:
 	void CalculateScale(int param_num);
 
 public:
-	void GetFreeParams(float * params, int n_param);
-	void GetFreeParamsScaled(float * params, int n_param);
+	void GetFreeParams(float * params, int n_param, bool scale_params);
 	vector<string> GetFreeParamNames();
 	string GetName(void) { return mName; };
 	int GetNFreeParams(void) { return mNFreeParams; };
@@ -49,7 +48,7 @@ public:
 	float GetMax(int param_num);
 	float GetMin(int param_num);
 	vector< pair<float, float> > GetFreeMinMaxes();
-	void GetParams(float * params, unsigned int n_params);;
+	void GetParams(float * params, unsigned int n_params);
 	float GetParam(int i);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
@@ -60,7 +59,7 @@ public:
 	virtual void Restore(Json::Value input);
 
 	void SetAllFree(bool is_free);
-	void SetFreeParams(float * in_params, int n_params);
+	void SetFreeParams(float * in_params, int n_params, bool scale_params);
 	void SetFree(int param_num, bool is_free);
 	void SetMin(int param_num, float value);
 	void SetMax(int param_num, float value);

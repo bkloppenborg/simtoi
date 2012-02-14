@@ -82,7 +82,7 @@ float CParameters::GetParam(int param_n)
 	return -1;
 }
 
-/// Gets the values of the (scaled) parameters for this object.
+/// Gets all of the parameter values for this object, returning them in intervals x_i = [param[i].min ... param[i].max].
 void CParameters::GetParams(float * out_params, unsigned int n_params)
 {
 	// Copy the current parameter value into out_params
@@ -107,14 +107,15 @@ vector< pair<float, float> > CParameters::GetFreeMinMaxes()
 }
 
 /// Gets the values of the free parameters for this object, scales them into
-/// a uniform hypercube [0...1]
-void CParameters::GetFreeParams(float * out_params, int n_params)
+// If scale_params = false, parameters are returned within the interval x = [0...1] otherwise, x = [param.min ... param.max]
+void CParameters::GetFreeParams(float * out_params, int n_params, bool scale_params)
 {
-	GetFreeParamsScaled(out_params, n_params);
+	// Get the scaled parameter values
+	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
 
-	// Scale the parameters into a unit hypercube.
-	// f(x) = (x - min) / (max - min) // the scaled value
-	// x = f(x) * (max - min) + min   // restore the original value, see SetFreeParams
+	// if we want scaled values, return, otherwise cast them into the interval [0...1]
+	if(scale_params)
+		return;
 
 	int j = 0;
 	for(int i = 0; i < mNParams; i++)
@@ -125,12 +126,6 @@ void CParameters::GetFreeParams(float * out_params, int n_params)
 			j++;
 		}
 	}
-}
-
-/// Gets the values of the free parameters for this object, returning them in their native (scaled) units.
-void CParameters::GetFreeParamsScaled(float * out_params, int n_params)
-{
-	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
 }
 
 /// Returns a vector of strings containing the names of the free parameters.
@@ -210,11 +205,17 @@ void CParameters::SetAllFree(bool is_free)
 	CountFree();
 }
 
-/// Sets the values for the parameters for this object scaling them as necessary.
-void CParameters::SetFreeParams(float * in_params, int n_params)
+/// Sets the values for the parameters for this object
+/// If scale_params = true then the values are scaled into their native interval, [param.min ... param.max],
+/// otherwise if scale_params = false the parameters are assumed to be scaled.
+void CParameters::SetFreeParams(float * in_params, int n_params, bool scale_params)
 {
 	// Set the parameter values
 	push_params(in_params, n_params, mParams, mNParams, mFreeParams);
+
+	// If the parameters do not need to be scaled, we are done.
+	if(!(scale_params))
+		return;
 
 	// Scale the parameters into regular units
 	// f(x) = (x - min) / (max - min) // the scaled value (see GetFreeParams)

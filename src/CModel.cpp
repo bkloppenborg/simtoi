@@ -92,39 +92,25 @@ vector< pair<float, float> > CModel::GetFreeParamMinMaxes()
 	return tmp1;
 }
 
-/// Gets the free parameters for this model in a uniform hypercube
-void CModel::GetFreeParameters(float * params, int n_params)
+/// Gets the free parameters for this model in a:
+///  scale_params = false => uniform hypercube (x = [0...1])
+///  scale_params = true => native values (x = [param.min... param.max])
+void CModel::GetFreeParameters(float * params, int n_params, bool scale_params)
 {
 	int n = 0;
-	GetFreeParams(params, n_params);
+	GetFreeParams(params, n_params, scale_params);
 	n += this->mNFreeParams;
-	mPosition->GetFreeParams(params + n, n_params - n);
+	mPosition->GetFreeParams(params + n, n_params - n, scale_params);
 	n += mPosition->GetNFreeParams();
 
 	if(mShader != NULL)
 	{
-		mShader->GetFreeParams(params + n, n_params - n);
+		mShader->GetFreeParams(params + n, n_params - n, scale_params);
 		n += mShader->GetNFreeParams();
 	}
 
 }
 
-/// Gets the free parameters for this model in their native units
-void CModel::GetFreeParametersScaled(float * params, int n_params)
-{
-	int n = 0;
-	GetFreeParamsScaled(params, n_params);
-	n += this->mNFreeParams;
-	mPosition->GetFreeParamsScaled(params + n, n_params - n);
-	n += mPosition->GetNFreeParams();
-
-	if(mShader != NULL)
-	{
-		mShader->GetFreeParamsScaled(params + n, n_params - n);
-		n += mShader->GetNFreeParams();
-	}
-
-}
 
 /// Returns a vector of strings containing the names of the free parameters:
 vector<string> CModel::GetFreeParameterNames()
@@ -224,20 +210,20 @@ Json::Value CModel::Serialize()
 }
 
 /// Sets the parameters for this model, the position, shader, and all features.
-void CModel::SetFreeParameters(float * in_params, int n_params)
+void CModel::SetFreeParameters(float * in_params, int n_params, bool scale_params)
 {
 	// Here we use pointer math to advance the position of the array passed to the functions
 	// that set the parameters.  First assign values to this model (use pull_params):
 	int n = 0;
-	SetFreeParams(in_params, n_params);
+	SetFreeParams(in_params, n_params, scale_params);
 	n += mNFreeParams;
 	// Now set the values for the position object
-	mPosition->SetFreeParams(in_params + n, n_params - n);
+	mPosition->SetFreeParams(in_params + n, n_params - n, scale_params);
 	n += mPosition->GetNFreeParams();
 	// Then the shader.
 	if(mShader != NULL)
 	{
-		mShader->SetFreeParams(in_params + n, n_params - n);
+		mShader->SetFreeParams(in_params + n, n_params - n, scale_params);
 		n += mShader->GetNFreeParams();
 	}
 	// Lastly the features

@@ -91,27 +91,14 @@ vector< pair<float, float> > CModelList::GetFreeParamMinMaxes()
 }
 
 /// Gets the values for all of the free parameters.
-void CModelList::GetFreeParameters(float * params, int n_params)
+void CModelList::GetFreeParameters(float * params, int n_params, bool scale_params)
 {
     int n = 0;
 
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
     {
-    	(*it)->GetFreeParameters(params + n, n_params - n);
-    	n += (*it)->GetTotalFreeParameters();
-    }
-}
-
-/// Gets the values for all of the free parameters.
-void CModelList::GetFreeParametersScaled(float * params, int n_params)
-{
-    int n = 0;
-
-    // Now call render on all of the models:
-    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
-    {
-    	(*it)->GetFreeParametersScaled(params + n, n_params - n);
+    	(*it)->GetFreeParameters(params + n, n_params - n, scale_params);
     	n += (*it)->GetTotalFreeParameters();
     }
 }
@@ -215,14 +202,15 @@ Json::Value CModelList::Serialize()
     return output;
 }
 
-void CModelList::SetFreeParameters(float * params, int n_params)
+/// Sets all of the free parameter values
+void CModelList::SetFreeParameters(float * params, int n_params, bool scale_params)
 {
     int n = 0;
 
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
     {
-    	(*it)->SetFreeParameters(params + n, n_params - n);
+    	(*it)->SetFreeParameters(params + n, n_params - n, scale_params);
     	n += (*it)->GetTotalFreeParameters();
     }
 }
