@@ -430,6 +430,12 @@ void CCL_GLThread::run()
         	mCLValue = mCL->ImageToLogLike(mCLDataSet);
         	mCLOpSemaphore.release(1);
         	break;
+
+        case CLT_Tests:
+        	// Runs the LibOI test sequence on the zeroth data set
+        	mCL->CopyImageToBuffer(0);
+        	mCL->RunVerification(0);
+        	break;
         }
     }
 }

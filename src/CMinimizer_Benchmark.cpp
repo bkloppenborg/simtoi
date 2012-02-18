@@ -8,6 +8,7 @@
 #include "CMinimizer_Benchmark.h"
 #include <sys/timeb.h>
 #include "CCL_GLThread.h"
+#include "misc.h"
 
 CMinimizer_Benchmark::CMinimizer_Benchmark(CCL_GLThread * cl_gl_thread)
 : CMinimizer(cl_gl_thread)
@@ -47,9 +48,11 @@ int CMinimizer_Benchmark::run()
 {
 	// only the first loaded data set is used.
 	float chi2 = 0;
+	double chi_cpu = 0;
 	int n_iterations = 1000;
 	double time = 0;
-	int n_data_alloc = 0;
+	int n_data_alloc = mCLThread->GetNDataAllocated(0);
+	float output[n_data_alloc];
 
 	int start = GetMilliCount();
 

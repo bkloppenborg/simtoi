@@ -42,4 +42,21 @@ void pull_params(T * in_params, int n_in_params, T * out_params, int n_out_param
 	}
 }
 
+template <typename T>
+double sum(T * input, int n_input)
+{
+	double tmp = 0;
+	for(unsigned int i = 0; i < n_input; i++)
+		tmp += input[i];
+
+	return tmp;
+}
+
+template <typename T>
+void square(T * input, int n_input)
+{
+	for(unsigned int i = 0; i < n_input; i++)
+		input[i] = input[i] * input[i];
+}
+
 #endif /* MISC_H_ */

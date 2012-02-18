@@ -46,7 +46,8 @@ enum CL_GLT_Operations
 	CLT_Init,
 	CLT_Chi,
 	CLT_Chi2,
-	CLT_LogLike
+	CLT_LogLike,
+	CLT_Tests
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue

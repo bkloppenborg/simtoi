@@ -10,6 +10,7 @@
 #include "CMinimizer_Benchmark.h"
 #include "CMinimizer_MultiNest.h"
 #include "CMinimizer_levmar.h"
+#include "CMinimizer_Verify.h"
 
 CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 {
@@ -36,6 +37,10 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 		tmp = new CMinimizer_levmar(cl_gl_thread);
 		break;
 
+	case VERIFY:
+		tmp = new CMinimizer_Verify(cl_gl_thread);
+		break;
+
 	default:
 	case BENCHMARK:
 		tmp = new CMinimizer_Benchmark(cl_gl_thread);
@@ -51,7 +56,7 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BENCHMARK, "Benchmark"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::MULTINEST, "MultiNest"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::LEVMAR, "Levmar"));
-
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::VERIFY, "Tests"));
 	return tmp;
 }
 
