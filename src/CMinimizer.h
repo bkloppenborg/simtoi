@@ -32,7 +32,7 @@ public:
 		BENCHMARK,
 		MULTINEST,
 		LEVMAR,
-		VERIFY,
+		TEST,
 		LAST_VALUE	// this must always be the last value in this enum.
 	};
 
