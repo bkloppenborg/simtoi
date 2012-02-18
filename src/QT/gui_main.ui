@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>585</height>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,44 +50,13 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="2" rowspan="9">
+    <item row="0" column="1" rowspan="6">
      <widget class="QMdiArea" name="mdiArea"/>
     </item>
-    <item row="4" column="0">
-     <widget class="QTreeView" name="treeModels">
-      <attribute name="headerMinimumSectionSize">
-       <number>1</number>
-      </attribute>
-      <attribute name="headerMinimumSectionSize">
-       <number>1</number>
-      </attribute>
-     </widget>
+    <item row="1" column="0">
+     <widget class="QListView" name="listOpenFiles"/>
     </item>
-    <item row="5" column="0">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QPushButton" name="btnAddModel">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Add Model</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="btnDeleteModel">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Delete Model</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="0" rowspan="2">
+    <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QPushButton" name="btnLoadData">
@@ -111,65 +80,163 @@
       </item>
      </layout>
     </item>
-    <item row="7" column="0" rowspan="2">
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QComboBox" name="cboMinimizers"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnMinimizer">
+    <item row="3" column="0">
+     <widget class="QTreeView" name="treeModels">
+      <attribute name="headerMinimumSectionSize">
+       <number>1</number>
+      </attribute>
+      <attribute name="headerMinimumSectionSize">
+       <number>1</number>
+      </attribute>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="btnAddModel">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Run Minimizer</string>
+         <string>Add Model</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="btnDeleteModel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Delete Model</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
-    <item row="6" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Time Step:</string>
+    <item row="5" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="elideMode">
+       <enum>Qt::ElideNone</enum>
+      </property>
+      <property name="usesScrollButtons">
+       <bool>true</bool>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tabWidgetPage1" native="true">
+       <attribute name="title">
+        <string>Animation</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="margin">
+         <number>0</number>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDoubleSpinBox" name="spinTimestep"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnStartStop">
-        <property name="enabled">
-         <bool>false</bool>
+        <property name="spacing">
+         <number>0</number>
         </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-          <horstretch>85</horstretch>
-          <verstretch>27</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Start</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnReset">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Reset</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="0">
-     <widget class="QListView" name="listOpenFiles"/>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Time Step:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="spinTimestep"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="btnStartStop">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+            <horstretch>85</horstretch>
+            <verstretch>27</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Total Time</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="spinTotalTime">
+          <property name="maximum">
+           <double>100000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>100.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="btnReset">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Reset</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="btnSavePhotometry">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Save Photometry</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabWidgetPage2">
+       <attribute name="title">
+        <string>Minimizer</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QComboBox" name="cboMinimizers"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnMinimizer">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Run Minimizer</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>

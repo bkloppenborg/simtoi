@@ -76,7 +76,7 @@ int CMinimizer_MultiNest::run()
 	// set the MultiNest sampling parameters
 	int mmodal = 1;					// do mode separation?
 	int ceff = 0;					// run in constant efficiency mode?
-	int nlive = 100;				// number of live points
+	int nlive = 200;				// number of live points
 	double efr = 1.0;				// set the required efficiency
 	double tol = 0.9;				// tol, defines the stopping criteria
 	int ndims = nParams;			// dimensionality (no. of free parameters)
@@ -90,7 +90,7 @@ int CMinimizer_MultiNest::run()
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	char root[100] = "/tmp/";		// root for output files
+	char root[100] = "/tmp/mn";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
 	int resume = 0;					// resume from a previous job?

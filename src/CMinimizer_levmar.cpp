@@ -59,6 +59,40 @@ void CMinimizer_levmar::Init()
 	mResiduals = new float[nData];
 }
 
+string GetExitString(int exit_num)
+{
+	string tmp;
+	switch(exit_num)
+	{
+	case 1:
+		tmp = "1 - stopped by small gradient J^T e";
+		break;
+	case 2:
+		tmp =  "2 - stopped by small Dp";
+		break;
+	case 3:
+		tmp =  "3 - stopped by itmax";
+		break;
+	case 4:
+		tmp =  "4 - singular matrix. Restart from current p with increased mu";
+		break;
+	case 5:
+		tmp =  "5 - no further error reduction is possible. Restart with increased mu";
+		break;
+	case 6:
+		tmp =  "6 - stopped by small ||e||_2";
+		break;
+	case 7:
+		tmp =  "7 - stopped by invalid (i.e. NaN or Inf) 'func' values; a user error";
+		break;
+	default:
+		tmp =  "Unknown Exit Condition!";
+		break;
+	}
+
+	return tmp;
+}
+
 /// Prints out cmpfit results (from testmpfit.c)
 void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, double * info)
 {
@@ -70,7 +104,7 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 	double scale;
 	string name = "";
 
-	printf("Reason for exiting: %i\n", int(info[6]));
+	printf("Reason for exiting:\n %s\n", GetExitString(int(info[6])).c_str());
 
 	for(int i=0; i < n_pars; i++)
 		printf("  P[%d] = %f +/- %f (%s)\n", i, x[i], err, names[i].c_str());
@@ -104,7 +138,7 @@ int CMinimizer_levmar::run()
 	//  opts[2] = ||Dp||_2 				= LM_STOP_THRESH = 1E-15;
 	//  opts[3] = mu/max[J^T J]_ii ] 	= LM_STOP_THRESH * LM_STOP_THRESH = 1E-17 * 1E-17;
 	//  opts[4]= LM_DIFF_DELTA;
-	opts[0]= 1E-2;
+	opts[0]= 1E-3;
 	opts[1]= 1E-8;
 	opts[2]= 1E-6;
 	opts[3]= 1E-6;
