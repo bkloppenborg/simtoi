@@ -241,6 +241,5 @@ void CModelList::SetTime(double t)
 /// Sets the time increment (for use with animation).
 void CModelList::SetTimestep(double dt)
 {
-	if(dt > 0)
-		mTimestep = dt;
+	mTimestep = dt;
 }
