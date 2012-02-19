@@ -201,7 +201,7 @@ void gui_main::ButtonCheck()
 	ui.btnMinimizer->setEnabled(true);
 	ui.btnSavePhotometry->setEnabled(true);
 
-	CGLWidget * widget = (CGLWidget*) sw->widget();
+	CGLWidget * widget = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
 	if(widget->GetOpenFileModel()->rowCount() > 0)
 		ui.btnRemoveData->setEnabled(true);
 
@@ -396,8 +396,7 @@ void gui_main::RunMinimizer()
     	return;
     }
 
-    if(!widget->OpenCLInitialized())
-    	widget->EnqueueOperation(CLT_Init);
+	widget->EnqueueOperation(CLT_Init);
 
     // Now determine which minimizer is selected:
 	int value = ui.cboMinimizers->itemData(ui.cboMinimizers->currentIndex()).toInt();
@@ -418,7 +417,7 @@ void gui_main::RemoveData()
 //    	return;
 //
 //    // Get access to the current widget, and QStandardItemModel list
-//    CGLWidget *widget = (CGLWidget*) sw->widget();
+//	  CGLWidget * widget = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
 //    QStandardItemModel * list = widget->GetOpenFileModel();
 //
 //    // Get the selected indicies:
