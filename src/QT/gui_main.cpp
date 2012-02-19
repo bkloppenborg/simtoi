@@ -201,7 +201,7 @@ void gui_main::ButtonCheck()
 	ui.btnMinimizer->setEnabled(true);
 	ui.btnSavePhotometry->setEnabled(true);
 
-	CGLWidget * widget = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
+	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 	if(widget->GetOpenFileModel()->rowCount() > 0)
 		ui.btnRemoveData->setEnabled(true);
 
