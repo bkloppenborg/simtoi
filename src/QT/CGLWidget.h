@@ -53,6 +53,7 @@ public:
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
+    double GetFlux() { return mGLT.GetFlux(); };
     int GetNData() { return mGLT.GetNData(); };
     int GetNModels() { return mGLT.GetModelList()->size(); };
     CModelList * GetModelList() { return mGLT.GetModelList(); };

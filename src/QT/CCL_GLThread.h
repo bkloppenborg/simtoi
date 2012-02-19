@@ -44,6 +44,7 @@ enum CL_GLT_Operations
 	GLT_StopAnimate,
 	GLT_Stop,
 	CLT_Init,
+	CLT_Flux,
 	CLT_Chi,
 	CLT_Chi2,
 	CLT_LogLike,
@@ -124,6 +125,7 @@ public:
 	void GetChi(int data_num, float * output, int & n);
     double GetChi2(int data_num);
     double GetDataAveJD(int data_num);
+    double GetFlux();
     void GetFreeParameters(double * params, int n_params, bool scale_params) { mModelList->GetFreeParameters(params, n_params, scale_params); };
     int GetHeight() { return mHeight; };
 	double GetLogLike(int data_num);

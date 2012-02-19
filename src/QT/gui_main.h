@@ -40,6 +40,7 @@ private slots:
     void Animation_Reset();
     void deleteModel(void);
     void delGLArea();
+    void ExportPhotometry();
     void LoadData();
     void render();
     void open();

@@ -143,6 +143,14 @@ double CCL_GLThread::GetDataAveJD(int data_num)
 	return mCL->GetDataAveJD(data_num);
 }
 
+/// Returns the flux of the current rendered image
+double CCL_GLThread::GetFlux()
+{
+	EnqueueOperation(CLT_Flux);
+	mCLOpSemaphore.acquire();
+	return mCLValue;
+}
+
 /// Returns the chi2 for the specified data set
 double CCL_GLThread::GetLogLike(int data_num)
 {
@@ -401,12 +409,6 @@ void CCL_GLThread::run()
         	EnqueueOperation(GLT_RenderModels);
         	break;
 
-        case CLT_Init:
-        	// Init all LibOI routines
-        	mCL->Init();
-        	mCLInitalized = true;
-        	break;
-
         case CLT_Chi:
         	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
         	// local value.
@@ -421,6 +423,20 @@ void CCL_GLThread::run()
         	mCL->CopyImageToBuffer(0);
         	mCLValue = mCL->ImageToChi2(mCLDataSet);
         	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Flux:
+        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+        	// local value.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->TotalFlux(0, true);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Init:
+        	// Init all LibOI routines
+        	mCL->Init();
+        	mCLInitalized = true;
         	break;
 
         case CLT_LogLike:

@@ -11,6 +11,8 @@
 #include <QFileDialog>
 #include <vector>
 #include <utility>
+#include <fstream>
+#include <cmath>
 
 #include "enumerations.h"
 #include "CGLWidget.h"
@@ -59,6 +61,9 @@ gui_main::gui_main(QWidget *parent_widget)
 	// File menu:
 	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(save(void)));
 	connect(ui.actionOpen, SIGNAL(triggered(void)), this, SLOT(open(void)));
+
+	// Flux simulations
+	connect(ui.btnSavePhotometry, SIGNAL(clicked(void)), this, SLOT(ExportPhotometry(void)));
 
 	// Get the application path,
 	string app_path = QCoreApplication::applicationDirPath().toStdString();
@@ -109,19 +114,6 @@ void gui_main::Animation_Reset()
 	widget->EnqueueOperation(GLT_RenderModels);
 
 }
-
-
-void gui_main::closeEvent(QCloseEvent *evt)
-{
-	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
-    for (int i = int(windows.count()) - 1; i > 0; i--)
-    {
-    	CGLWidget * tmp = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
-    	tmp->stopRendering();
-    }
-    QMainWindow::closeEvent(evt);
-}
-
 
 void gui_main::addGLArea()
 {
@@ -196,6 +188,7 @@ void gui_main::ButtonCheck()
 	ui.btnStartStop->setEnabled(false);
 	ui.btnReset->setEnabled(false);
 	ui.btnMinimizer->setEnabled(false);
+	ui.btnSavePhotometry->setEnabled(false);
 
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -206,6 +199,7 @@ void gui_main::ButtonCheck()
 	ui.btnStartStop->setEnabled(true);
 	ui.btnReset->setEnabled(true);
 	ui.btnMinimizer->setEnabled(true);
+	ui.btnSavePhotometry->setEnabled(true);
 
 	CGLWidget * widget = (CGLWidget*) sw->widget();
 	if(widget->GetOpenFileModel()->rowCount() > 0)
@@ -213,6 +207,17 @@ void gui_main::ButtonCheck()
 
 	if(widget->GetTreeModel()->rowCount() > 0)
 		ui.btnDeleteModel->setEnabled(true);
+}
+
+void gui_main::closeEvent(QCloseEvent *evt)
+{
+	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
+    for (int i = int(windows.count()) - 1; i > 0; i--)
+    {
+    	CGLWidget * tmp = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
+    	tmp->stopRendering();
+    }
+    QMainWindow::closeEvent(evt);
 }
 
 /// Deletes the selected model from the model list
@@ -242,6 +247,67 @@ void gui_main::delGLArea()
     }
 
     ButtonCheck();
+}
+
+/// Animates the display, exporting the photometry at specified intervals
+void gui_main::ExportPhotometry()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+	widget->EnqueueOperation(CLT_Init);
+
+    double t = 0;
+    double step = ui.spinTimestep->value();
+    double max = ui.spinTotalTime->value();
+    vector< pair<float, float> > output;
+    float flux;
+
+    string filename;
+    QStringList fileNames;
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("Text Files (*.txt)"));
+    dialog.setViewMode(QFileDialog::Detail);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+
+	if (dialog.exec())
+	{
+		// Compute the flux
+		while(t < max)
+		{
+			widget->SetTime(t);
+			widget->EnqueueOperation(GLT_RenderModels);
+			flux = widget->GetFlux();
+
+			output.push_back( pair<float, float>(t, flux));
+			t += step;
+		}
+
+		fileNames = dialog.selectedFiles();
+		filename = fileNames.first().toStdString();
+		string tmp =filename.substr(filename.size() - 4, 4);
+
+		if(filename.substr(filename.size() - 4, 4) != ".txt")
+			filename += ".txt";
+
+		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+		widget->Save(filename);
+	}
+
+	ofstream outfile;
+	outfile.open(filename.c_str());
+	outfile << "Time Flux" << endl;
+
+	for(int i = 0; i < output.size(); i++)
+	{
+		outfile << output[i].first << " " << -2.5*log10(output[i].second) << endl;
+	}
+
+	outfile.close();
+
 }
 
 /// Loads OIFITS data into the current selected subwindow
