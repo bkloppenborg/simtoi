@@ -21,9 +21,8 @@ CMinimizer_MultiNest::~CMinimizer_MultiNest()
 }
 
 /// Dumper (do nothing)
-void CMinimizer_MultiNest::dumper(int *nSamples, int *nlive, int *nPar, double **physLive, double **posterior, double *paramConstr, double *maxLogLike, double *logZ, double *logZerr)
+void CMinimizer_MultiNest::dumper(int &nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double ** paramConstr, double &maxLogLike, double & logZ, double & logZerr, void * misc)
 {
-
 /*
 //	 paramConstr(4*nPar):
 //   paramConstr(1) to paramConstr(nPar)	     	= mean values of the parameters
@@ -40,16 +39,16 @@ void CMinimizer_MultiNest::dumper(int *nSamples, int *nlive, int *nPar, double *
 //		printf("%s: %e %e %e\n", param_names[i].c_str(), paramConstr[i], paramConstr[2* (*nPar) + i], paramConstr[3* (*nPar) + i]);
 }
 
-void CMinimizer_MultiNest::log_likelihood(double * params, int * ndim, int * npars, double * lnew)
+void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
 {
-	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(minimizer_tmp::minimizer);
+	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
 	int n_data_sets = minimizer->mCLThread->GetNDataSets();
 	double tmp = 0;
 
 	// Convert the double parameter values back to floats
 	int nData = minimizer->mCLThread->GetNData();
 
-	minimizer->mCLThread->SetFreeParameters(params, *npars, true);
+	minimizer->mCLThread->SetFreeParameters(params, npars, true);
 	for(int data_set = 0; data_set < n_data_sets; data_set++)
 	{
 		minimizer->mCLThread->SetTime(minimizer->mCLThread->GetDataAveJD(data_set));
@@ -58,9 +57,9 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int * ndim, int * npa
 	}
 
 	// Get the scaled parameter values
-	minimizer->mCLThread->GetFreeParameters(params, *npars, true);;
+	minimizer->mCLThread->GetFreeParameters(params, npars, true);;
 
-	*lnew = tmp;
+	lnew = tmp;
 }
 
 
@@ -71,7 +70,7 @@ int CMinimizer_MultiNest::run()
 	int nParams = mCLThread->GetNFreeParameters();
 	//string tmp_output = mCLThread->GetTempOutputDir();
 
-	minimizer_tmp::minimizer = reinterpret_cast<void*>(this);
+	void * misc = reinterpret_cast<void*>(this);
 
 	// set the MultiNest sampling parameters
 	int mmodal = 1;					// do mode separation?
@@ -90,7 +89,7 @@ int CMinimizer_MultiNest::run()
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	char root[100] = "/tmp/mn";		// root for output files
+	const std::string path = "/tmp/mn";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
 	int resume = 0;					// resume from a previous job?
@@ -101,21 +100,15 @@ int CMinimizer_MultiNest::run()
 	double logZero = -DBL_MAX;		// points with loglike < logZero will be ignored by MultiNest
 	int context = 0;				// not required by MultiNest, any additional information user wants to pass
 
-
-
-    int i;
-	for (i = strlen(root); i < 100; i++)
-	    root[i] = ' ';
-
     // Run the nested sampling algorithm
-    NESTRUN(&mmodal, &ceff, &nlive, &tol,
-        &efr, &ndims, &nPar, &nClsPar,
-        &maxModes, &updInt, &Ztol, root,
-        &seed, pWrap, &fb, &resume,
-        &outfile, &initMPI, &logZero,
+    nested::run(mmodal, ceff, nlive, tol,
+        efr, ndims, nPar, nClsPar,
+        maxModes, updInt, Ztol, path,
+        seed, pWrap, fb, resume,
+        outfile, initMPI, logZero,
         CMinimizer_MultiNest::log_likelihood,
         CMinimizer_MultiNest::dumper,
-        &context);
+        misc);
 
     return 0;
 }
