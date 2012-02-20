@@ -207,3 +207,7 @@ void CGLWidget::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
 	RebuildTree();
 }
 
+void CGLWidget::StopMinimizer()
+{
+	mMinThread.stop();
+}

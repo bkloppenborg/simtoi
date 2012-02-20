@@ -17,6 +17,7 @@ CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 	mCLThread = cl_gl_thread;
 	mParams = NULL;
 	mType = NONE;
+	mRun = true;
 }
 
 CMinimizer::~CMinimizer()
@@ -63,4 +64,11 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 void CMinimizer::Init()
 {
 	mParams = new float[mCLThread->GetNFreeParameters()];
+}
+
+/// Tells the thread to gracefully exit.
+/// The event loop of the minimization thread must mRun for this routine to work correctly.
+void CMinimizer::Stop()
+{
+	mRun = false;
 }

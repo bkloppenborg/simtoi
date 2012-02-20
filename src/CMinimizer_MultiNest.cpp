@@ -45,6 +45,13 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 	int n_data_sets = minimizer->mCLThread->GetNDataSets();
 	double tmp = 0;
 
+	// See if we have been requested to exit.  If so, give MultiNest an invalid result
+	if(!minimizer->mRun)
+	{
+		lnew = 1.0/0;	// Intentional, generate NAN to cause MultiNest to terminate.
+		return;
+	}
+
 	// Convert the double parameter values back to floats
 	int nData = minimizer->mCLThread->GetNData();
 

@@ -39,6 +39,7 @@ public:
 public:
 	CCL_GLThread * mCLThread;
 	float * mParams;
+	bool mRun;
 
 	CMinimizer::MinimizerTypes mType;
 
@@ -50,6 +51,7 @@ public:
 
 	virtual void Init();
 	virtual int run() = 0;
+	void Stop();
 };
 
 #endif /* CMINIMIZER_H_ */

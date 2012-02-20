@@ -82,6 +82,7 @@ public:
     void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetTime(double t) { mGLT.SetTime(t); };
     void SetTimestep(double dt) { mGLT.SetTimestep(dt); };
+    void StopMinimizer();
 
     void startRendering();
     void stopRendering();

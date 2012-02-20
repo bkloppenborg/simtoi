@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>554</height>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,6 +107,12 @@
     </item>
     <item row="3" column="0">
      <widget class="QTreeView" name="treeModels">
+      <property name="minimumSize">
+       <size>
+        <width>320</width>
+        <height>0</height>
+       </size>
+      </property>
       <attribute name="headerMinimumSectionSize">
        <number>1</number>
       </attribute>
@@ -148,7 +154,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -272,17 +278,27 @@
        <attribute name="title">
         <string>Minimizer</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0" colspan="2">
          <widget class="QComboBox" name="cboMinimizers"/>
         </item>
-        <item>
-         <widget class="QPushButton" name="btnMinimizer">
+        <item row="1" column="0">
+         <widget class="QPushButton" name="btnRunMinimizer">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>Run Minimizer</string>
+           <string>Run</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="btnStopMinimizer">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Stop</string>
           </property>
          </widget>
         </item>

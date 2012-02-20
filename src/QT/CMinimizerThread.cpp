@@ -11,6 +11,9 @@
 CMinimizerThread::CMinimizerThread()
 {
 	mMinimizer = NULL;
+
+	// Get this thing to run as often as possible.
+	//Priority = QThread::TimeCriticalPriority;
 }
 
 CMinimizerThread::~CMinimizerThread()
@@ -36,4 +39,9 @@ void CMinimizerThread::SetMinimizer(CMinimizer * minimizer)
 	delete mMinimizer;
 
 	mMinimizer = minimizer;
+}
+
+void CMinimizerThread::stop()
+{
+	mMinimizer->Stop();
 }

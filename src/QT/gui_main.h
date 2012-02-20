@@ -47,6 +47,7 @@ private slots:
     void RunMinimizer();
     void RemoveData();
     void save();
+    void StopMinimizer();
 
 
 public slots:

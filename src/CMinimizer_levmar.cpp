@@ -29,6 +29,13 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 	int n_data_alloc = 0;
 	int n_data_offset = 0;
 
+	// See if we have been requested to exit.  If so, give levmar an invalid result
+	if(!minimizer->mRun)
+	{
+		output[0] = 1.0/0;	// Intentional, generate NAN to cause levmar to terminate.
+		return;
+	}
+
 	// Set the parameters (note, they are already scaled)
 	minimizer->mCLThread->SetFreeParameters(params, nParams, false);
 
@@ -59,7 +66,7 @@ void CMinimizer_levmar::Init()
 	mResiduals = new float[nData];
 }
 
-string GetExitString(int exit_num)
+string CMinimizer_levmar::GetExitString(int exit_num)
 {
 	string tmp;
 	switch(exit_num)
@@ -83,7 +90,11 @@ string GetExitString(int exit_num)
 		tmp =  "6 - stopped by small ||e||_2";
 		break;
 	case 7:
-		tmp =  "7 - stopped by invalid (i.e. NaN or Inf) 'func' values; a user error";
+		if(mRun)
+			tmp =  "7 - stopped by invalid (i.e. NaN or Inf) 'func' values; a user error";
+		else
+			tmp = "Terminated by User Request.";
+
 		break;
 	default:
 		tmp =  "Unknown Exit Condition!";
@@ -109,7 +120,7 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 	for(int i=0; i < n_pars; i++)
 		printf("  P[%d] = %f +/- %f (%s)\n", i, x[i], err, names[i].c_str());
 
-	if(int(info[6]) == 7)
+	if(int(info[6]) == 7 && mRun)
 	{
 		printf("Dumping Residuals Buffer:\n");
 		for(int i = 0; i < n_data; i++)

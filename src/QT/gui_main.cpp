@@ -41,7 +41,8 @@ gui_main::gui_main(QWidget *parent_widget)
 	connect(ui.btnReset, SIGNAL(clicked(void)), this, SLOT(Animation_Reset(void)));
 
 	// Minimizer:
-	connect(ui.btnMinimizer, SIGNAL(clicked(void)), this, SLOT(RunMinimizer(void)));
+	connect(ui.btnRunMinimizer, SIGNAL(clicked(void)), this, SLOT(RunMinimizer(void)));
+	connect(ui.btnStopMinimizer, SIGNAL(clicked(void)), this, SLOT(StopMinimizer(void)));
 
 	// Add/delete data
 	connect(ui.btnLoadData, SIGNAL(clicked(void)), this, SLOT(LoadData(void)));
@@ -179,7 +180,8 @@ void gui_main::ButtonCheck()
 	ui.btnDeleteModel->setEnabled(false);
 	ui.btnStartStop->setEnabled(false);
 	ui.btnReset->setEnabled(false);
-	ui.btnMinimizer->setEnabled(false);
+	ui.btnRunMinimizer->setEnabled(false);
+	ui.btnStopMinimizer->setEnabled(false);
 	ui.btnSavePhotometry->setEnabled(false);
 
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
@@ -190,7 +192,8 @@ void gui_main::ButtonCheck()
 	ui.btnLoadData->setEnabled(true);
 	ui.btnStartStop->setEnabled(true);
 	ui.btnReset->setEnabled(true);
-	ui.btnMinimizer->setEnabled(true);
+	ui.btnRunMinimizer->setEnabled(true);
+	ui.btnStopMinimizer->setEnabled(true);
 	ui.btnSavePhotometry->setEnabled(true);
 
 	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
@@ -466,6 +469,19 @@ void gui_main::save()
 void gui_main::SetupComboBoxes()
 {
 	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
+}
+
+/// Stops the minimizer
+void gui_main::StopMinimizer()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+    CMinimizer::MinimizerTypes minimizer;
+
+	widget->StopMinimizer();
 }
 
 void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
