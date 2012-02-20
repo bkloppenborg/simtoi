@@ -52,13 +52,4 @@ public:
 	virtual int run() = 0;
 };
 
-// If the minimizer cannot pass a void* pointer to the minimization function do a
-//   minimizer_tmp::minimizer = reinterpret_cast<void*>(this)
-// in the run function before calling the actual minimizer.  NOTE: This limits the
-// number of concurrent minimizer using void * minimizer to at most ONE instance.
-namespace minimizer_tmp
-{
-	static void * minimizer;
-}
-
 #endif /* CMINIMIZER_H_ */

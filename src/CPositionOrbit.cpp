@@ -142,14 +142,14 @@ void CPositionOrbit::GetXYZ(double & x, double & y, double & z)
 	// Local variables (mostly renaming mParams variables for convenience).
 	// Remember to convert the angular parameters into radians.
     double l1, l2, m1, m2, n1, n2;
-    double inc = (double) mParams[0] * PI / 180.0;
-    double Omega = (double) mParams[1] * PI / 180.0;
-    double omega = (double) mParams[2] * PI / 180.0;
-    double alpha = (double) mParams[3];
-    double e = (double) mParams[4];
-    double tau = (double) mParams[5];
-    double T = (double) mParams[6];
-    double t = (double) mTime;
+    double inc = mParams[0] * PI / 180.0;
+    double Omega = mParams[1] * PI / 180.0;
+    double omega = mParams[2] * PI / 180.0;
+    double alpha = mParams[3];
+    double e = mParams[4];
+    double tau = mParams[5];
+    double T = mParams[6];
+    double t = mTime;
 
 	// Pre-compute a few values
     double n = ComputeN(T);

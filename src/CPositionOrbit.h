@@ -9,7 +9,7 @@
 #define CPOSITIONORBIT_H_
 
 // Constants for computing E.
-double const ORBIT_THRESH = 1E-5;
+double const ORBIT_THRESH = 1E-8;
 int const ORBIT_MAX_ITERATIONS = 50;
 
 #include "CPosition.h"
