@@ -30,30 +30,22 @@ gui_main::gui_main(QWidget *parent_widget)
     : QMainWindow(parent_widget)
 {
 	ui.setupUi(this);
-
-	// Set initial values for the spinboxes:
-	ui.spinModelScale->setRange(0.01, 1.0);
-	ui.spinModelScale->setSingleStep(0.05);
-	ui.spinModelScale->setValue(0.05);
-	ui.spinModelSize->setRange(64, 1024);
-	ui.spinModelSize->setSingleStep(64);
-	ui.spinModelSize->setValue(128);
-	ui.spinTimestep->setValue(0.10);
-	ui.spinTimestep->setSingleStep(0.1);
-	ui.spinTimestep->setRange(0, 10000);
-
 	mAnimating = false;
 
 	// Model area
 	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
 	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
+
 	// Animiation buttons
 	connect(ui.btnStartStop, SIGNAL(clicked(void)), this, SLOT(Animation_StartStop(void)));
 	connect(ui.btnReset, SIGNAL(clicked(void)), this, SLOT(Animation_Reset(void)));
+
 	// Minimizer:
 	connect(ui.btnMinimizer, SIGNAL(clicked(void)), this, SLOT(RunMinimizer(void)));
+
 	// Add/delete data
 	connect(ui.btnLoadData, SIGNAL(clicked(void)), this, SLOT(LoadData(void)));
+
 	// Add/delete models
 	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(addModel(void)));
 	connect(ui.btnDeleteModel, SIGNAL(clicked(void)), this, SLOT(deleteModel(void)));
@@ -62,7 +54,7 @@ gui_main::gui_main(QWidget *parent_widget)
 	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(save(void)));
 	connect(ui.actionOpen, SIGNAL(triggered(void)), this, SLOT(open(void)));
 
-	// Flux simulations
+	// Flux simulation
 	connect(ui.btnSavePhotometry, SIGNAL(clicked(void)), this, SLOT(ExportPhotometry(void)));
 
 	// Get the application path,
@@ -95,7 +87,7 @@ void gui_main::Animation_StartStop()
 	}
 	else
 	{
-		widget->SetTimestep(ui.spinTimestep->value());
+		widget->SetTimestep(ui.spinTimeStep->value());
 		widget->EnqueueOperation(GLT_Animate);
 		mAnimating = true;
 		ui.btnStartStop->setText("Stop");
@@ -110,7 +102,7 @@ void gui_main::Animation_Reset()
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 
-	widget->SetTime(0);
+	widget->SetTime(ui.spinTimeStart->value());
 	widget->EnqueueOperation(GLT_RenderModels);
 
 }
@@ -259,9 +251,10 @@ void gui_main::ExportPhotometry()
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 	widget->EnqueueOperation(CLT_Init);
 
-    double t = 0;
-    double step = ui.spinTimestep->value();
-    double max = ui.spinTotalTime->value();
+    double t = ui.spinTimeStart->value();
+    double step = ui.spinTimeStep->value();
+    double duration = ui.spinTimeDuration->value();
+    double stop = t + duration;
     vector< pair<float, float> > output;
     float flux;
 
@@ -276,7 +269,7 @@ void gui_main::ExportPhotometry()
 	if (dialog.exec())
 	{
 		// Compute the flux
-		while(t < max)
+		while(t < stop)
 		{
 			widget->SetTime(t);
 			widget->EnqueueOperation(GLT_RenderModels);
@@ -299,7 +292,10 @@ void gui_main::ExportPhotometry()
 
 	ofstream outfile;
 	outfile.open(filename.c_str());
-	outfile << "Time Flux" << endl;
+	outfile.precision(4);
+	outfile.setf(ios::fixed,ios::floatfield);
+	outfile << "# Time Flux" << endl;
+	//outfile << "# Created using the following parameters: " << endl;
 
 	for(int i = 0; i < output.size(); i++)
 	{
