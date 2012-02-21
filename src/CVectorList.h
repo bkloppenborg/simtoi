@@ -31,7 +31,6 @@ public:
 		mList.push_back(item);
 	}
 
-	// if the vector contains pointers, call this function rather than mList.clear()
 	void Clear()
 	{
 		for(int i = mList.size() - 1; i > -1; i--)
@@ -42,6 +41,7 @@ public:
 	{
 		if(i < mList.size())
 		{
+			delete mList[i];
 			mList.erase(mList.begin() + i);
 		}
 	}
