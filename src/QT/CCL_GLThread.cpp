@@ -140,7 +140,10 @@ double CCL_GLThread::GetChi2(int data_num)
 /// Returns the average
 double CCL_GLThread::GetDataAveJD(int data_num)
 {
-	return mCL->GetDataAveJD(data_num);
+	if(mCL != NULL)
+		return mCL->GetDataAveJD(data_num);
+
+	return 0;
 }
 
 /// Returns the flux of the current rendered image
@@ -164,25 +167,31 @@ double CCL_GLThread::GetLogLike(int data_num)
 /// Returns the total number of data points (V2 + T3) in all data sets loaded.
 int CCL_GLThread::GetNData()
 {
-	return mCL->GetNData();
+	if(mCL != NULL)
+		return mCL->GetNData();
+
+	return 0;
 }
 
 /// Returns the total allocation size for all data points (V2 + 2 * T3)
 int CCL_GLThread::GetNDataAllocated()
 {
-	return mCL->GetNDataAllocated();
+	if(mCL != NULL)
+		return mCL->GetNDataAllocated();
 }
 
 /// Returns the data allocation size for the data_num entry, returns zero if data_num is invalid.
 int CCL_GLThread::GetNDataAllocated(int data_num)
 {
-	return mCL->GetNDataAllocated(data_num);
+	if(mCL != NULL)
+		return mCL->GetNDataAllocated(data_num);
 }
 
 /// Returns the total number of data sets.
 int CCL_GLThread::GetNDataSets()
 {
-	return mCL->GetNDataSets();
+	if(mCL != NULL)
+		return mCL->GetNDataSets();
 }
 
 /// Get the next operation from the queue.  This is a blocking function.
@@ -271,7 +280,7 @@ void CCL_GLThread::InitFrameBufferTexture(void)
 /// Loads data.
 void CCL_GLThread::LoadData(string filename)
 {
-	if(mCL)
+	if(mCL != NULL)
 		mCL->LoadData(filename);
 }
 
@@ -286,6 +295,12 @@ void CCL_GLThread::Open(string filename)
 		mModelList->Restore(input, mShaderList);
 
 	EnqueueOperation(GLT_RenderModels);
+}
+
+void CCL_GLThread::RemoveData(int data_num)
+{
+	if(mCL != NULL)
+		mCL->RemoveData(data_num);
 }
 
 /// Resets any OpenGL errors by looping.
@@ -347,7 +362,7 @@ void CCL_GLThread::run()
     //EnqueueOperation(GLT_BlitToScreen);
     CL_GLT_Operations op;
 
-	CCL_GLThread::CheckOpenGLError("Error occured during GL Thread Initialization.");
+	CCL_GLThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
 	// Now setup the OpenCL device.
 	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
@@ -406,49 +421,49 @@ void CCL_GLThread::run()
         	EnqueueOperation(GLT_RenderModels);
         	break;
 
-//        case CLT_Chi:
-//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-//        	// local value.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Chi2:
-//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-//        	// TODO: Note the spectral data will need something special here.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCLValue = mCL->ImageToChi2(mCLDataSet);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Flux:
-//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-//        	// local value.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCLValue = mCL->TotalFlux(true);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Init:
-//        	// Init all LibOI routines
-//        	mCL->Init();
-//        	mCLInitalized = true;
-//        	break;
-//
-//        case CLT_LogLike:
-//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-//        	// TODO: Note the spectral data will need something special here.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Tests:
-//        	// Runs the LibOI test sequence on the zeroth data set
-//        	mCL->CopyImageToBuffer(0);
-//        	mCL->RunVerification(0);
-//        	break;
+        case CLT_Chi:
+        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+        	// local value.
+        	mCL->CopyImageToBuffer(0);
+        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Chi2:
+        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+        	// TODO: Note the spectral data will need something special here.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->ImageToChi2(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Flux:
+        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+        	// local value.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->TotalFlux(true);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Init:
+        	// Init all LibOI routines
+        	mCL->Init();
+        	mCLInitalized = true;
+        	break;
+
+        case CLT_LogLike:
+        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+        	// TODO: Note the spectral data will need something special here.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Tests:
+        	// Runs the LibOI test sequence on the zeroth data set
+        	mCL->CopyImageToBuffer(0);
+        	mCL->RunVerification(0);
+        	break;
         }
     }
 }

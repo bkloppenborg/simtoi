@@ -55,6 +55,8 @@ public:
 
     double GetFlux() { return mGLT.GetFlux(); };
     int GetNData() { return mGLT.GetNData(); };
+    int GetNDataSets() { return mGLT.GetNDataSets(); };
+    double GetDataAveJD(int data_num) { return mGLT.GetDataAveJD(data_num); };
     int GetNModels() { return mGLT.GetModelList()->size(); };
     CModelList * GetModelList() { return mGLT.GetModelList(); };
     QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
@@ -73,6 +75,8 @@ public:
     void RunMinimizer();
 protected:
     void RebuildTree();
+public:
+    void RemoveData(int data_num) { mGLT.RemoveData(data_num); };
 
 public:
     void Save(string location) { mGLT.Save(location); };

@@ -158,6 +158,7 @@ public:
     void Open(string filename);
     bool OpenCLInitialized() { return mCLInitalized; };
 
+    void RemoveData(int data_num);
     static void ResetGLError();
     void resizeViewport(const QSize &size);
     void resizeViewport(int width, int height);

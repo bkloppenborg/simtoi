@@ -16,6 +16,12 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
     this->doneCurrent();
 
     mOpenFileModel = new QStandardItemModel();
+	QStringList labels = QStringList();
+	labels << "File" << "Mean JD";
+	mOpenFileModel->clear();
+	mOpenFileModel->setColumnCount(2);
+	mOpenFileModel->setHorizontalHeaderLabels(labels);
+
     mTreeModel = new CTreeModel();
 }
 

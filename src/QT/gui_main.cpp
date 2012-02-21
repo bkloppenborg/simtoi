@@ -46,6 +46,7 @@ gui_main::gui_main(QWidget *parent_widget)
 
 	// Add/delete data
 	connect(ui.btnAddData, SIGNAL(clicked(void)), this, SLOT(AddData(void)));
+	connect(ui.btnRemoveData, SIGNAL(clicked(void)), this, SLOT(RemoveData(void)));
 
 	// Add/delete models
 	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(AddModel(void)));
@@ -170,6 +171,10 @@ void gui_main::AddData()
 {
 	string tmp;
 	int dir_size = 0;
+	stringstream time_str;
+	time_str.precision(4);
+	time_str.setf(ios::fixed,ios::floatfield);
+	QList<QStandardItem *> items;
 
 	// Ensure there is a selected widget, if not immediately return.
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
@@ -204,11 +209,20 @@ void gui_main::AddData()
 
 	for(int i = 0; i < filenames.size(); i++)
 	{
+		items.clear();
 		// Tell the widget to load the data file and append a row to its file list:
 		tmp = filenames[i].toStdString();
 		dir_size = tmp.size() - mDataDir.size();
 		widget->LoadData(tmp);
-		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, dir_size) )));
+
+		// Filename
+		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, dir_size) )));
+		// Mean JD
+		time_str.str("");
+		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
+		items.append( new QStandardItem(QString::fromStdString( time_str.str() )));
+
+		model->appendRow(items);
 	}
 
 	ButtonCheck();
@@ -414,20 +428,26 @@ void gui_main::RunMinimizer()
 /// Removes the current selected data set.
 void gui_main::RemoveData()
 {
-//	// Ensure there is a selected widget, if not immediately return.
-//    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-//    if(!sw)
-//    	return;
-//
-//    // Get access to the current widget, and QStandardItemModel list
-//	  CGLWidget * widget = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
-//    QStandardItemModel * list = widget->GetOpenFileModel();
-//
-//    // Get the selected indicies:
-////    QModelIndexList selection = ui.listOpenFiles->selectedIndexes();
+	// Ensure there is a selected widget, if not immediately return.
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
 
+    // Get access to the current widget, and QStandardItemModel list
+    CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 
+    // Get the selected indicies:
+    QModelIndexList list = ui.treeOpenFiles->selectionModel()->selectedIndexes();
+    QStandardItemModel * model = widget->GetOpenFileModel();
 
+    QList<QModelIndex>::iterator it;
+    int id = 0;
+    for(it = list.end() - 1; it > list.begin(); it--)
+    {
+    	id = (*it).row();
+    	widget->RemoveData(id);
+    	model->removeRow(id, QModelIndex());
+    }
 }
 
 void gui_main::render()
@@ -496,14 +516,18 @@ void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
     	return;
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
+	// Configure the open file widget:
+	ui.treeOpenFiles->setHeaderHidden(false);
+    ui.treeOpenFiles->setModel(widget->GetOpenFileModel());
+	ui.treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
+
+	// Configure the model tree
     CTreeModel * model = widget->GetTreeModel();
-    int cols = model->columnCount(QModelIndex());
 	ui.treeModels->setHeaderHidden(false);
 	ui.treeModels->setModel(widget->GetTreeModel());
-
 	ui.treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
 
-    ui.listOpenFiles->setModel(widget->GetOpenFileModel());
 
 }
 
