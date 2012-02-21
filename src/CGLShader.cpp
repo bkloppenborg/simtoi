@@ -44,6 +44,8 @@ CGLShader::~CGLShader()
 
 	// Now release object memory:
 	delete[] mParam_locations;
+	delete[] mMinMax;
+	delete[] mStartingValues;
 }
 
 /// Compiles an OpenGL shader, checking for errors.
