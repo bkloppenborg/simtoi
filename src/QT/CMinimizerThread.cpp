@@ -44,5 +44,6 @@ void CMinimizerThread::SetMinimizer(CMinimizer * minimizer)
 
 void CMinimizerThread::stop()
 {
-	mMinimizer->Stop();
+	if(mMinimizer != NULL)
+		mMinimizer->Stop();
 }
