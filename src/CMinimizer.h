@@ -25,6 +25,9 @@ class CCL_GLThread;
 
 class CMinimizer
 {
+protected:
+	bool mIsRunning;
+
 public:
 	enum MinimizerTypes
 	{
@@ -50,6 +53,8 @@ public:
 	static vector< pair<CMinimizer::MinimizerTypes, string> > GetTypes(void);
 
 	virtual void Init();
+	bool IsRunning();
+
 	virtual int run() = 0;
 	void Stop();
 };

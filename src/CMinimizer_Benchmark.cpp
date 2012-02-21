@@ -56,7 +56,7 @@ int CMinimizer_Benchmark::run()
 
 	int start = GetMilliCount();
 
-	for(int i = 0; i < n_iterations; i++)
+	for(int i = 0; i < n_iterations && mRun; i++)
 	{
 		n_data_alloc = mCLThread->GetNDataAllocated(0);
 		mCLThread->SetTime(mCLThread->GetDataAveJD(0));

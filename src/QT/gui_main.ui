@@ -109,7 +109,7 @@
      <widget class="QTreeView" name="treeModels">
       <property name="minimumSize">
        <size>
-        <width>320</width>
+        <width>350</width>
         <height>0</height>
        </size>
       </property>
@@ -154,7 +154,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>

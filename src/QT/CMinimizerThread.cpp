@@ -36,9 +36,11 @@ void CMinimizerThread::run()
 /// Sets the minimizer, freeing the old minimizer if needed.
 void CMinimizerThread::SetMinimizer(CMinimizer * minimizer)
 {
-	delete mMinimizer;
-
-	mMinimizer = minimizer;
+	if(!mMinimizer->IsRunning())
+	{
+		delete mMinimizer;
+		mMinimizer = minimizer;
+	}
 }
 
 void CMinimizerThread::stop()

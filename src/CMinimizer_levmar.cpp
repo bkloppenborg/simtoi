@@ -168,11 +168,15 @@ int CMinimizer_levmar::run()
 		ub[i] = min_max[i].second;
 	}
 
+	mIsRunning = true;
+
 	// Call levmar:
 	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, nParams, nData, lb, ub, opts, max_iterations, NULL, info, NULL, NULL, (void*)this);
 
 	mCLThread->SetFreeParameters(params, nParams, false);
 	mCLThread->EnqueueOperation(GLT_RenderModels);
+
+	mIsRunning = false;
 
 	printf("Levmar executed %i iterations.\n", iterations);
 	printresult(params, nParams, nData, names, info);

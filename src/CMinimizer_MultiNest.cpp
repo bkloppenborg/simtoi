@@ -107,6 +107,8 @@ int CMinimizer_MultiNest::run()
 	double logZero = -DBL_MAX;		// points with loglike < logZero will be ignored by MultiNest
 	int context = 0;				// not required by MultiNest, any additional information user wants to pass
 
+	mIsRunning = true;
+
     // Run the nested sampling algorithm
     nested::run(mmodal, ceff, nlive, tol,
         efr, ndims, nPar, nClsPar,
@@ -116,6 +118,8 @@ int CMinimizer_MultiNest::run()
         CMinimizer_MultiNest::log_likelihood,
         CMinimizer_MultiNest::dumper,
         misc);
+
+    mIsRunning = false;
 
     return 0;
 }
