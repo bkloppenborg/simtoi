@@ -84,12 +84,12 @@
     <item row="2" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QPushButton" name="btnLoadData">
+       <widget class="QPushButton" name="btnAddData">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Load Data</string>
+         <string>Add Data</string>
         </property>
        </widget>
       </item>
@@ -139,7 +139,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Delete Model</string>
+         <string>Remove Model</string>
         </property>
        </widget>
       </item>
@@ -308,6 +308,7 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -327,7 +328,6 @@
    </widget>
    <addaction name="menuFIle"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNew">
    <property name="text">
     <string>New</string>

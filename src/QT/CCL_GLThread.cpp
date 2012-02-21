@@ -353,7 +353,7 @@ void CCL_GLThread::run()
 	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
 	mCL->SetImage_GLTB(mFBO);
 	mCL->SetKernelSourcePath(mKernelSourceDir);
-//	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
+////	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
     // Main thread loop
     while (mRun)
@@ -383,7 +383,7 @@ void CCL_GLThread::run()
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
         	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
-        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
+//        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
         	mPermitResize = false;
 
         default:
@@ -406,49 +406,49 @@ void CCL_GLThread::run()
         	EnqueueOperation(GLT_RenderModels);
         	break;
 
-        case CLT_Chi:
-        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-        	// local value.
-        	mCL->CopyImageToBuffer(0);
-        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Chi2:
-        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-        	// TODO: Note the spectral data will need something special here.
-        	mCL->CopyImageToBuffer(0);
-        	mCLValue = mCL->ImageToChi2(mCLDataSet);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Flux:
-        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-        	// local value.
-        	mCL->CopyImageToBuffer(0);
-        	mCLValue = mCL->TotalFlux(0, true);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Init:
-        	// Init all LibOI routines
-        	mCL->Init();
-        	mCLInitalized = true;
-        	break;
-
-        case CLT_LogLike:
-        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-        	// TODO: Note the spectral data will need something special here.
-        	mCL->CopyImageToBuffer(0);
-        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Tests:
-        	// Runs the LibOI test sequence on the zeroth data set
-        	mCL->CopyImageToBuffer(0);
-        	mCL->RunVerification(0);
-        	break;
+//        case CLT_Chi:
+//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+//        	// local value.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Chi2:
+//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+//        	// TODO: Note the spectral data will need something special here.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCLValue = mCL->ImageToChi2(mCLDataSet);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Flux:
+//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+//        	// local value.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCLValue = mCL->TotalFlux(true);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Init:
+//        	// Init all LibOI routines
+//        	mCL->Init();
+//        	mCLInitalized = true;
+//        	break;
+//
+//        case CLT_LogLike:
+//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+//        	// TODO: Note the spectral data will need something special here.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Tests:
+//        	// Runs the LibOI test sequence on the zeroth data set
+//        	mCL->CopyImageToBuffer(0);
+//        	mCL->RunVerification(0);
+//        	break;
         }
     }
 }
@@ -501,6 +501,5 @@ void CCL_GLThread::SetTimestep(double dt)
 /// Stop the thread.
 void CCL_GLThread::stop()
 {
-    qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
     EnqueueOperation(GLT_Stop);
 }

@@ -48,7 +48,7 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 	// See if we have been requested to exit.  If so, give MultiNest an invalid result
 	if(!minimizer->mRun)
 	{
-		lnew = 1.0/0;	// Intentional, generate NAN to cause MultiNest to terminate.
+		lnew = 0;
 		return;
 	}
 

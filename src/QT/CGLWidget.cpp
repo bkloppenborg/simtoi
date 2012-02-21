@@ -36,6 +36,7 @@ void CGLWidget::AddModel(CModelList::ModelTypes model_type)
 
 void CGLWidget::closeEvent(QCloseEvent *evt)
 {
+	StopMinimizer();
     stopRendering();
     QGLWidget::closeEvent(evt);
 }

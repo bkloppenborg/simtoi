@@ -33,7 +33,7 @@ gui_main::gui_main(QWidget *parent_widget)
 	mAnimating = false;
 
 	// Model area
-	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(addGLArea(void)));
+	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(AddGLArea(void)));
 	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
 
 	// Animiation buttons
@@ -45,11 +45,11 @@ gui_main::gui_main(QWidget *parent_widget)
 	connect(ui.btnStopMinimizer, SIGNAL(clicked(void)), this, SLOT(StopMinimizer(void)));
 
 	// Add/delete data
-	connect(ui.btnLoadData, SIGNAL(clicked(void)), this, SLOT(LoadData(void)));
+	connect(ui.btnAddData, SIGNAL(clicked(void)), this, SLOT(AddData(void)));
 
 	// Add/delete models
-	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(addModel(void)));
-	connect(ui.btnDeleteModel, SIGNAL(clicked(void)), this, SLOT(deleteModel(void)));
+	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(AddModel(void)));
+	connect(ui.btnDeleteModel, SIGNAL(clicked(void)), this, SLOT(DeleteModel(void)));
 
 	// File menu:
 	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(save(void)));
@@ -69,7 +69,7 @@ gui_main::gui_main(QWidget *parent_widget)
 
 gui_main::~gui_main()
 {
-
+	close();
 }
 
 void gui_main::Animation_StartStop()
@@ -108,7 +108,7 @@ void gui_main::Animation_Reset()
 
 }
 
-void gui_main::addGLArea()
+void gui_main::AddGLArea()
 {
 	// Create a new subwindow with a title and close button:
     CGLWidget * widget = new CGLWidget(ui.mdiArea, mShaderSourceDir, mKernelSourceDir);
@@ -128,12 +128,6 @@ void gui_main::addGLArea()
     widget->SetScale(ui.spinModelScale->value());
     widget->startRendering();
 
-    // TODO: Remove later.  Add a sphere:
-//    widget->AddModel(CModelList::SPHERE);
-//    widget->SetShader(0, CGLShaderList::LD_HESTEROFFER1997);
-//    widget->AddModel(CYLINDER);
-//    widget->SetPositionType(1, ORBIT);
-
 	// Now connect the slot
 	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
 
@@ -141,7 +135,7 @@ void gui_main::addGLArea()
 	ButtonCheck();
 }
 
-void gui_main::addModel(void)
+void gui_main::AddModel(void)
 {
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -171,13 +165,62 @@ void gui_main::addModel(void)
     widget->EnqueueOperation(GLT_RenderModels);
 }
 
+/// Loads OIFITS data into the current selected subwindow
+void gui_main::AddData()
+{
+	string tmp;
+	int dir_size = 0;
+
+	// Ensure there is a selected widget, if not immediately return.
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    {
+		QMessageBox msgBox;
+		msgBox.setText("You must have an active model region before you can load data.");
+		msgBox.exec();
+    	return;
+    }
+
+    // Get access to the current widget and QStandardItemModel:
+    CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+    QStandardItemModel * model = widget->GetOpenFileModel();
+
+    // Open a dialog, get a list of file that the user selected:
+    QFileDialog dialog(this);
+    dialog.setDirectory(QString::fromStdString(mDataDir));
+    dialog.setNameFilter(tr("Data Files (*.fit *.fits *.oifits)"));
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+
+    QStringList filenames;
+    QString dir = "";
+	if (dialog.exec())
+	{
+		filenames = dialog.selectedFiles();
+	}
+
+	// Now pull out the data directory (to make file display cleaner)
+	if(filenames.size() > 0)
+		mDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
+
+	for(int i = 0; i < filenames.size(); i++)
+	{
+		// Tell the widget to load the data file and append a row to its file list:
+		tmp = filenames[i].toStdString();
+		dir_size = tmp.size() - mDataDir.size();
+		widget->LoadData(tmp);
+		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, dir_size) )));
+	}
+
+	ButtonCheck();
+}
+
 /// Checks to see which buttons can be enabled/disabled.
 void gui_main::ButtonCheck()
 {
 	ui.btnAddModel->setEnabled(false);
-	ui.btnLoadData->setEnabled(false);
-	ui.btnRemoveData->setEnabled(false);
 	ui.btnDeleteModel->setEnabled(false);
+	ui.btnAddData->setEnabled(false);
+	ui.btnRemoveData->setEnabled(false);
 	ui.btnStartStop->setEnabled(false);
 	ui.btnReset->setEnabled(false);
 	ui.btnRunMinimizer->setEnabled(false);
@@ -189,7 +232,7 @@ void gui_main::ButtonCheck()
     	return;
 
 	ui.btnAddModel->setEnabled(true);
-	ui.btnLoadData->setEnabled(true);
+	ui.btnAddData->setEnabled(true);
 	ui.btnStartStop->setEnabled(true);
 	ui.btnReset->setEnabled(true);
 	ui.btnRunMinimizer->setEnabled(true);
@@ -204,19 +247,29 @@ void gui_main::ButtonCheck()
 		ui.btnDeleteModel->setEnabled(true);
 }
 
-void gui_main::closeEvent(QCloseEvent *evt)
+void gui_main::close()
 {
+	CGLWidget * widget = NULL;
+	QMdiSubWindow * sw = NULL;
+
 	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
     for (int i = int(windows.count()) - 1; i > 0; i--)
     {
-    	CGLWidget * tmp = dynamic_cast<CGLWidget *>(windows.at(i)->widget());
-    	tmp->stopRendering();
+    	QMdiSubWindow * sw = windows.at(i);
+    	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
+    	widget->stopRendering();
+    	sw->close();
     }
+}
+
+void gui_main::closeEvent(QCloseEvent *evt)
+{
+	close();
     QMainWindow::closeEvent(evt);
 }
 
 /// Deletes the selected model from the model list
-void gui_main::deleteModel()
+void gui_main::DeleteModel()
 {
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -228,7 +281,7 @@ void gui_main::deleteModel()
 
 }
 
-void gui_main::delGLArea()
+void gui_main::DeleteGLArea()
 {
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -307,55 +360,6 @@ void gui_main::ExportPhotometry()
 
 	outfile.close();
 
-}
-
-/// Loads OIFITS data into the current selected subwindow
-void gui_main::LoadData()
-{
-	string tmp;
-	int dir_size = 0;
-
-	// Ensure there is a selected widget, if not immediately return.
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    {
-		QMessageBox msgBox;
-		msgBox.setText("You must have an active model region before you can load data.");
-		msgBox.exec();
-    	return;
-    }
-
-    // Get access to the current widget and QStandardItemModel:
-    CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    QStandardItemModel * model = widget->GetOpenFileModel();
-
-    // Open a dialog, get a list of file that the user selected:
-    QFileDialog dialog(this);
-    dialog.setDirectory(QString::fromStdString(mDataDir));
-    dialog.setNameFilter(tr("Data Files (*.fit *.fits *.oifits)"));
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-
-    QStringList filenames;
-    QString dir = "";
-	if (dialog.exec())
-	{
-		filenames = dialog.selectedFiles();
-	}
-
-	// Now pull out the data directory (to make file display cleaner)
-	if(filenames.size() > 0)
-		mDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
-
-	for(int i = 0; i < filenames.size(); i++)
-	{
-		// Tell the widget to load the data file and append a row to its file list:
-		tmp = filenames[i].toStdString();
-		dir_size = tmp.size() - mDataDir.size();
-		widget->LoadData(tmp);
-		model->appendRow(new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, dir_size) )));
-	}
-
-	ButtonCheck();
 }
 
 void gui_main::open()

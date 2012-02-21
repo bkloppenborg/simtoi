@@ -29,19 +29,20 @@ public:
     ~gui_main();
 
 protected:
+    void close();
     void closeEvent(QCloseEvent *evt);
     void ButtonCheck();
     void SetupComboBoxes();
 
 private slots:
-    void addGLArea();
-    void addModel(void);
+    void AddGLArea();
+    void AddModel(void);
+    void AddData(void);
     void Animation_StartStop();
     void Animation_Reset();
-    void deleteModel(void);
-    void delGLArea();
+    void DeleteModel(void);
+    void DeleteGLArea();
     void ExportPhotometry();
-    void LoadData();
     void render();
     void open();
     void RunMinimizer();
