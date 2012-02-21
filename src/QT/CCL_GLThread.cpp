@@ -398,9 +398,6 @@ void CCL_GLThread::run()
 			break;
 
         case GLT_Stop:
-#ifdef DEBUG
-            qDebug() << "time=" << QTime::currentTime().msec() << " thread=" << id << " STOP";
-#endif //DEBUG
             mRun = false;
             break;
 
