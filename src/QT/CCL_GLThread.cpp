@@ -398,7 +398,7 @@ void CCL_GLThread::run()
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
         	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
-//        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
+        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
         	mPermitResize = false;
 
         default:
