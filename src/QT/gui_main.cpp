@@ -442,7 +442,7 @@ void gui_main::RemoveData()
 
     QList<QModelIndex>::iterator it;
     int id = 0;
-    for(it = list.end() - 1; it > list.begin(); it--)
+    for(it = --list.end(); it > list.begin(); it--)
     {
     	id = (*it).row();
     	widget->RemoveData(id);
