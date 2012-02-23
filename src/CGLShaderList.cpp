@@ -119,4 +119,16 @@ void CGLShaderList::LoadShaders()
 	starting_values.push_back(0.5);
 	tmp = new CGLShader(CGLShaderList::LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
 	Append(tmp);
+
+	// Simple scale height
+	base_name = "ScaleHeight";
+	friendly_name = "Scale Height - z";
+	n_params = 1;
+	param_names.clear();
+	starting_values.clear();
+	param_names.push_back("h_z");
+	minmax.push_back(pair<float,float>(0.01, 1));
+	starting_values.push_back(0.1);
+	tmp = new CGLShader(CGLShaderList::SCALE_HEIGHT, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
+	Append(tmp);
 }

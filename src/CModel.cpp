@@ -138,7 +138,7 @@ int CModel::GetTotalFreeParameters()
 
 void CModel::Color()
 {
-	glColor3f(mParams[3], 0.0, 0.0);
+	glColor4d(mParams[3], 0.0, 0.0, 1.0);
 }
 
 void CModel::Rotate()

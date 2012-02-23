@@ -305,9 +305,12 @@
     </item>
     <item row="1" column="0">
      <widget class="QTreeView" name="treeOpenFiles">
-      <property name="selectionMode">
-       <enum>QAbstractItemView::MultiSelection</enum>
-      </property>
+      <attribute name="headerMinimumSectionSize">
+       <number>1</number>
+      </attribute>
+      <attribute name="headerMinimumSectionSize">
+       <number>1</number>
+      </attribute>
      </widget>
     </item>
    </layout>

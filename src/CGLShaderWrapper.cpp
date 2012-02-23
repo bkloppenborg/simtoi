@@ -7,6 +7,7 @@
 
 #include "CGLShader.h"
 #include "CGLShaderWrapper.h"
+#include "CModel.h"
 
 CGLShaderWrapper::CGLShaderWrapper(CGLShader * shader, int n_params)
 	: CParameters(n_params)

@@ -7,5 +7,5 @@ void main(void)
 {
     normal = gl_NormalMatrix * gl_Normal;
     color = gl_Color;
-    gl_Position = ftransform();
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }

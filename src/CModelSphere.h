@@ -19,6 +19,8 @@ public:
 	CModelSphere();
 	virtual ~CModelSphere();
 
+	double GetMaxHeight();
+
 	void Render(GLuint framebuffer_object, int width, int height);
 };
 

@@ -258,10 +258,9 @@ void CCL_GLThread::InitFrameBufferTexture(void)
 
     // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
     // These other formats might work, check that GL_BYTE is still correct for the higher precision.
-    // I don't think we'll ever need doubleing point numbers, but those are here too:
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, mWidth, mHeight, 0, GL_RED, CL_HALF_FLOAT, NULL);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mWidth, mHeight, 0, GL_RED, GL_FLOAT, NULL);
@@ -340,9 +339,11 @@ void CCL_GLThread::run()
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	// Set to flat (non-interpolated) shading:
 	glShadeModel(GL_FLAT);
-	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
+	glDisable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
 	glEnable(GL_POLYGON_SMOOTH);
 	glDisable(GL_DITHER);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
 
 	// Now setup the projection system to be orthographic

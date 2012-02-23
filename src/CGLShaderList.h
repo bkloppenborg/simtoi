@@ -26,6 +26,7 @@ public:
 	{
 		NONE = 0,
 		LD_HESTEROFFER1997 = 1,
+		SCALE_HEIGHT = 2,
 		LAST_VALUE // must be the last element
 	};
 
