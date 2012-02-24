@@ -24,8 +24,6 @@ public:
 	CModelCylinder();
 	virtual ~CModelCylinder();
 
-	static void CircleTable( double *sint, double *cost, const int n );
-
 	void DrawCylinder();
 
 	void Render(GLuint framebuffer_object, int width, int height);

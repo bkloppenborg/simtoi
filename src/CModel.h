@@ -23,6 +23,20 @@
 //#include "enumerations.h"
 #include "CModelList.h"
 
+#include <cstdlib>
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <cstdio>
+#include <cassert>
+
+#ifndef PI
+#ifdef M_PI
+#define PI M_PI
+#else
+#define PI 3.1415926535897932384626433832795028841968
+#endif // M_PI
+#endif // PI
+
 using namespace std;
 
 class CPosition;
@@ -52,6 +66,8 @@ protected:
 	void Translate();
 
 public:
+	static void CircleTable( double * sint, double * cost, const int n );
+
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
 	void GetFreeParameters(double * params, int n_params, bool scale_params);
 	vector<string> GetFreeParameterNames();

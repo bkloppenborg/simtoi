@@ -1,5 +1,6 @@
 #version 120
 // Power law limb darkening implemented according to Hestroffer (1997)
+// Implemented using alpha blending.
 varying out vec3 normal;
 varying out vec4 color;
 

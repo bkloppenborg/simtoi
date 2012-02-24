@@ -7,7 +7,7 @@
  *  A basic cylinder.
  *
  *  Note: This file makes use of OpenGLUT rendering routines:
- *  	ogCircleTable
+ *  	ogCircleTable (located in CModel)
  *  	glutSolidCylinder (although with modifications)
  *
  *  , copyright notice below:
@@ -43,20 +43,6 @@
 
 #include "CModelCylinder.h"
 
-#include <cstdlib>
-#define _USE_MATH_DEFINES
-#include <cmath>
-#include <cstdio>
-#include <cassert>
-
-#ifdef M_PI
-#define PI M_PI
-#else
-#define PI 3.1415926535897932384626433832795028841968
-#endif
-
-using namespace std;
-
 CModelCylinder::CModelCylinder()
 	: CModel(2)
 {
@@ -89,29 +75,8 @@ CModelCylinder::CModelCylinder()
 
 CModelCylinder::~CModelCylinder()
 {
-	// TODO Auto-generated destructor stub
-}
-
-/// Creates a lookup table of sine and cosine values for use in drawing
-/// Taken from http://openglut.cvs.sourceforge.net/viewvc/openglut/openglut/lib/src/og_geometry.c
-void CModelCylinder::CircleTable( double * sint, double * cost, const int n )
-{
-    int i;
-    const int size = abs( n );
-    double angle;
-
-    assert( n );
-    angle = 2 * PI / ( double )n;
-
-    for( i = 0; i < size; i++ )
-    {
-        sint[ i ] = sin( angle * i );
-        cost[ i ] = cos( angle * i );
-    }
-
-    /* Last sample is duplicate of the first */
-    sint[ size ] = sint[ 0 ];
-    cost[ size ] = cost[ 0 ];
+	delete[] mSinT;
+	delete[] mCosT;
 }
 
 /// Draws a cylinder with a top and bottom
@@ -123,6 +88,8 @@ void CModelCylinder::DrawCylinder()
 	// Rename a few variables for convenience:
 	const double radius = mParams[mBaseParams + 1] / 2;	// diameter / 2
 	const double height = mParams[mBaseParams + 2];
+	const double scale_height = mParams[mBaseParams + 3];
+	double transparency = 0;
     const double zStep = height / mStacks;
     double z0 = 0;
     double z1 = 0;
@@ -198,5 +165,5 @@ void CModelCylinder::Render(GLuint framebuffer_object, int width, int height)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CCL_GLThread::CheckOpenGLError("CModelCylinder.Render()");
+	CCL_GLThread::CheckOpenGLError("CModel.Render()");
 }

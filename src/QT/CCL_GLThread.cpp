@@ -339,7 +339,7 @@ void CCL_GLThread::run()
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	// Set to flat (non-interpolated) shading:
 	glShadeModel(GL_FLAT);
-	glDisable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
+	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
 	glEnable(GL_POLYGON_SMOOTH);
 	glDisable(GL_DITHER);
 	glEnable (GL_BLEND);

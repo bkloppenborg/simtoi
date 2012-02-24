@@ -141,6 +141,28 @@ void CModel::Color()
 	glColor4d(mParams[3], 0.0, 0.0, 1.0);
 }
 
+/// Creates a lookup table of sine and cosine values for use in drawing
+/// Taken from http://openglut.cvs.sourceforge.net/viewvc/openglut/openglut/lib/src/og_geometry.c
+void CModel::CircleTable( double * sint, double * cost, const int n )
+{
+    int i;
+    const int size = abs( n );
+    double angle;
+
+    assert( n );
+    angle = 2 * PI / ( double )n;
+
+    for( i = 0; i < size; i++ )
+    {
+        sint[ i ] = sin( angle * i );
+        cost[ i ] = cos( angle * i );
+    }
+
+    /* Last sample is duplicate of the first */
+    sint[ size ] = sint[ 0 ];
+    cost[ size ] = cost[ 0 ];
+}
+
 void CModel::Rotate()
 {
 	// Rotations are implemented in the standard way, namely
