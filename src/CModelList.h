@@ -37,6 +37,7 @@ public:
 		NONE,
 		SPHERE,
 		DISK,
+		DISK_A,
 		LAST_VALUE // must be the last value in this list.
 	};
 

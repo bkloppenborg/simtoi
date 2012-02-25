@@ -28,17 +28,17 @@ public:
 	CModelDisk(int additional_params);
 	virtual ~CModelDisk();
 
-	void Draw();
-	void DrawDisk(double radius, double height);
-	void DrawSides(double radius, double height);
+	virtual void Draw();
+	virtual void DrawDisk(double radius, double height);
+	virtual void DrawSides(double radius, double height);
 
-	double GetRadius(double height, double rim_radius);
+	virtual double GetRadius(double half_height, double h, double dh, double rim_radius);
 
 	void InitMembers();
 
 	void Render(GLuint framebuffer_object, int width, int height);
 
-	double Transparency(double half_height, double at_z);
+	virtual double Transparency(double half_height, double at_z);
 };
 
 #endif /* CMODELDISK_GAUSS_H_ */

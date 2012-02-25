@@ -77,8 +77,8 @@ void CModelDisk::DrawSides(double radius, double total_height)
 	while(z0 < half_height)
 	{
 		glColor4d(mParams[3], 0.0, 0.0, Transparency(half_height, z0));
-		r0 = GetRadius(z0, radius);
-		r1 = GetRadius(z1, radius);
+		r0 = GetRadius(half_height, z0, zStep, radius);
+		r1 = GetRadius(half_height, z1, zStep, radius);
 
 		// Draw the top half
 		glBegin( GL_QUAD_STRIP );
@@ -103,7 +103,7 @@ double CModelDisk::Transparency(double total_height, double z)
 
 /// Returns the radius as a function of height for the outer edge of the disk
 /// Specify r0 to indicate the radius of the outer rim.
-double CModelDisk::GetRadius(double height, double rim_radius)
+double CModelDisk::GetRadius(double half_height, double h, double dh, double rim_radius)
 {
 	return rim_radius;
 }
