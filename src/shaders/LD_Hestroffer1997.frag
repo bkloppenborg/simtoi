@@ -10,5 +10,5 @@ void main(void)
     float mu = dot(normal, vec3(0.0, 0.0, 1.0));
     float intensity = pow(mu, alpha);
 
-    gl_FragColor = vec4(color.x, color.y, color.z, color.w * intensity);
+    gl_FragColor = color * intensity;
 }
