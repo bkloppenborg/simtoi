@@ -59,6 +59,7 @@ protected:
 
 	CGLShaderWrapper * mShader;
 	bool mShaderLoaded;
+	double mScale;
 
 protected:
 	void Color();

@@ -36,8 +36,7 @@ public:
 	{
 		NONE,
 		SPHERE,
-		CYLINDER,
-		DISK_GAUSS,
+		DISK,
 		LAST_VALUE // must be the last value in this list.
 	};
 

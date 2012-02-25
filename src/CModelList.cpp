@@ -16,8 +16,7 @@
 // Models
 #include "CModel.h"
 #include "CModelSphere.h"
-#include "CModelCylinder.h"
-#include "CModelDisk_Gauss.h"
+#include "CModelDisk.h"
 
 using namespace std;
 
@@ -38,12 +37,8 @@ CModel * CModelList::AddNewModel(ModelTypes model_id)
 	CModel * tmp;
 	switch(model_id)
 	{
-	case CYLINDER:
-		tmp = new CModelCylinder();
-		break;
-
-	case DISK_GAUSS:
-		tmp = new CModelDisk_Gauss();
+	case DISK:
+		tmp = new CModelDisk();
 		break;
 
 	case SPHERE:
@@ -131,8 +126,7 @@ vector< pair<CModelList::ModelTypes, string> > CModelList::GetTypes(void)
 {
 	vector< pair<ModelTypes, string> > tmp;
 	tmp.push_back(pair<ModelTypes, string> (CModelList::SPHERE, "Sphere"));
-	tmp.push_back(pair<ModelTypes, string> (CModelList::CYLINDER, "Cylinder"));
-	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_GAUSS, "Disk - Gauss"));
+	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK, "Disk - Cylinder"));
 
 	return tmp;
 }
