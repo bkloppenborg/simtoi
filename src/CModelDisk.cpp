@@ -7,14 +7,16 @@
 
 #include "CModelDisk.h"
 
+int CModelDisk::mDiskParams = 2;
+
 CModelDisk::CModelDisk()
-	: CModel(2)
+	: CModel(mDiskParams)
 {
 	InitMembers();
 }
 
 CModelDisk::CModelDisk(int additional_params)
-	: CModel(2 + additional_params)
+	: CModel(mDiskParams + additional_params)
 {
 	InitMembers();
 }

@@ -17,6 +17,7 @@
 class CModelDisk : public CModel
 {
 protected:
+	static int mDiskParams;
 	int mSlices;
 	int mStacks;
 	double * mSinT;

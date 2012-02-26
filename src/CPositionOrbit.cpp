@@ -23,7 +23,7 @@ CPositionOrbit::CPositionOrbit()
 	mTime = 0;
 	mName = "Orbit";
 
-	mParamNames.push_back("Inc");
+	mParamNames.push_back("Inc");	// Inclination, keep as element 0 for CModel::SetParams to function correctly.
 	mParamNames.push_back("Omega");
 	mParamNames.push_back("omega");
 	mParamNames.push_back("Alpha");

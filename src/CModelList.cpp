@@ -18,6 +18,8 @@
 #include "CModelSphere.h"
 #include "CModelDisk.h"
 #include "CModelDisk_A.h"
+#include "CModelDisk_B.h"
+#include "CModelDisk_C.h"
 
 using namespace std;
 
@@ -44,6 +46,14 @@ CModel * CModelList::AddNewModel(ModelTypes model_id)
 
 	case DISK_A:
 		tmp = new CModelDisk_A();
+		break;
+
+	case DISK_B:
+		tmp = new CModelDisk_B();
+		break;
+
+	case DISK_C:
+		tmp = new CModelDisk_C();
 		break;
 
 	case SPHERE:
@@ -133,6 +143,8 @@ vector< pair<CModelList::ModelTypes, string> > CModelList::GetTypes(void)
 	tmp.push_back(pair<ModelTypes, string> (CModelList::SPHERE, "Sphere"));
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK, "Disk - Cylinder"));
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_A, "Disk - A"));
+	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_B, "Disk - B"));
+	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_C, "Disk - C"));
 
 	return tmp;
 }

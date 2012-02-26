@@ -38,6 +38,8 @@ public:
 		SPHERE,
 		DISK,
 		DISK_A,
+		DISK_B,
+		DISK_C,
 		LAST_VALUE // must be the last value in this list.
 	};
 

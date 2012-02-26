@@ -5,13 +5,13 @@
  *      Author: bkloppenborg
  */
 
-#include "CModelDisk_A.h"
+#include "CModelDisk_B.h"
 
-CModelDisk_A::CModelDisk_A()
+CModelDisk_B::CModelDisk_B()
 	:CModelDisk(1)
 {
-	mName = "Disk A";
-	mType = CModelList::DISK_A;
+	mName = "Disk B";
+	mType = CModelList::DISK_B;
 
 	mParamNames.push_back("Decay Factor");
 	SetParam(mBaseParams + mDiskParams + 1, 0.05);
@@ -20,13 +20,13 @@ CModelDisk_A::CModelDisk_A()
 	SetMin(mBaseParams + mDiskParams + 1, 0.01);
 }
 
-CModelDisk_A::~CModelDisk_A()
+CModelDisk_B::~CModelDisk_B()
 {
 	// TODO Auto-generated destructor stub
 }
 
 /// Returns the radius for the specified height following exponential decay
-double CModelDisk_A::GetRadius(double half_height, double h, double dh, double rim_radius)
+double CModelDisk_B::GetRadius(double half_height, double h, double dh, double rim_radius)
 {
 	const double h_r = mParams[mBaseParams + mDiskParams + 1];
 	h = fabs(h);
@@ -34,5 +34,5 @@ double CModelDisk_A::GetRadius(double half_height, double h, double dh, double r
 	if(h < dh)
 		h = dh;
 
-	return rim_radius - h_r * log(h/half_height);
+	return rim_radius + sqrt(-2*h_r*h_r * log(h/half_height));
 }
