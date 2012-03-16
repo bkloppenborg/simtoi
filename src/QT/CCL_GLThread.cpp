@@ -38,10 +38,24 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
     mCLValue = 0;
     mCLArrayValue = NULL;
     mCLArrayN = 0;
+
+    mFBO = 0;
+ 	mFBO_texture = 0;
+ 	mFBO_depth = 0;
+    mFBO_storage = 0;
+	mFBO_storage_texture = 0;
+ 	mSamples = 4;
 }
 
 CCL_GLThread::~CCL_GLThread()
 {
+	// Free OpenGL memory buffers
+	glDeleteFramebuffers(1, &mFBO);
+	glDeleteFramebuffers(1, &mFBO_texture);
+	glDeleteFramebuffers(1, &mFBO_depth);
+	glDeleteFramebuffers(1, &mFBO_storage);
+	glDeleteFramebuffers(1, &mFBO_storage_texture);
+
 	delete mCL;
 	delete mModelList;
 	delete mShaderList;
@@ -214,17 +228,27 @@ vector< pair<CGLShaderList::ShaderTypes, string> > CCL_GLThread::GetShaderNames(
 	return mShaderList->GetTypes();
 }
 
-void CCL_GLThread::InitFrameBuffer(void)
+void CCL_GLThread::InitFrameBuffers(void)
 {
-    InitFrameBufferDepthBuffer();
-    InitFrameBufferTexture();
+	InitMultisampleRenderBuffer();
+	InitStorageBuffer();
+}
 
-    glGenFramebuffers(1, &mFBO); // Generate one frame buffer and store the ID in mFBO
-    glBindFramebuffer(GL_FRAMEBUFFER, mFBO); // Bind our frame buffer
+void CCL_GLThread::InitMultisampleRenderBuffer(void)
+{
+	glGenFramebuffers(1, &mFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 
-    // Attach the depth and texture buffer to the frame buffer
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFBO_texture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
+	glGenRenderbuffers(1, &mFBO_texture);
+	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_texture);
+	// Create a 2D multisample texture, use GL_RGBA 8-bit GL_BYTE format 4 subsamples
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA8, mWidth, mHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mFBO_texture);
+
+	glGenRenderbuffers(1, &mFBO_depth);
+	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_depth);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_DEPTH_COMPONENT, mWidth, mHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -232,33 +256,22 @@ void CCL_GLThread::InitFrameBuffer(void)
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
         string errorstring = (char *) gluErrorString(status);
-        printf("Couldn't create frame buffer: %x %s\n", status, errorstring.c_str());
+        printf("Couldn't create multisample frame buffer: %x %s\n", status, errorstring.c_str());
         exit(0); // Exit the application
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
 }
 
-void CCL_GLThread::InitFrameBufferDepthBuffer(void)
+void CCL_GLThread::InitStorageBuffer(void)
 {
-    glGenRenderbuffers(1, &mFBO_depth); // Generate one render buffer and store the ID in mFBO_depth
-    glBindRenderbuffer(GL_RENDERBUFFER, mFBO_depth); // Bind the mFBO_depth render buffer
-
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mWidth, mHeight); // Set the render buffer storage to be a depth component, with a width and height of the window
-
-    CheckOpenGLError("initFrameBufferDepthBuffer");
-
-    glBindRenderbuffer(GL_RENDERBUFFER, 0); // Unbind the render buffer
-}
-
-void CCL_GLThread::InitFrameBufferTexture(void)
-{
-    glGenTextures(1, &mFBO_texture); // Generate one texture
-    glBindTexture(GL_TEXTURE_2D, mFBO_texture); // Bind the texture mFBOtexture
+    glGenTextures(1, &mFBO_storage_texture); // Generate one texture
+    glBindTexture(GL_TEXTURE_2D, mFBO_storage_texture); // Bind the texture mFBOtexture
 
     // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+    // Enable this one for alpha blending:
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
     // These other formats might work, check that GL_BYTE is still correct for the higher precision.
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
@@ -274,7 +287,27 @@ void CCL_GLThread::InitFrameBufferTexture(void)
 
     // Unbind the texture
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    glGenFramebuffers(1, &mFBO_storage); // Generate one frame buffer and store the ID in mFBO
+    glBindFramebuffer(GL_FRAMEBUFFER, mFBO_storage); // Bind our frame buffer
+
+    // Attach the depth and texture buffer to the frame buffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFBO_storage_texture, 0);
+//    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    // Check that status of our generated frame buffer
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        string errorstring = (char *) gluErrorString(status);
+        printf("Couldn't create storage frame buffer: %x %s\n", status, errorstring.c_str());
+        exit(0); // Exit the application
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
 }
+
 
 /// Loads data.
 void CCL_GLThread::LoadData(string filename)
@@ -339,23 +372,21 @@ void CCL_GLThread::run()
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	// Set to flat (non-interpolated) shading:
 	glShadeModel(GL_FLAT);
-	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
-	glEnable(GL_POLYGON_SMOOTH);
 	glDisable(GL_DITHER);
-	glEnable (GL_BLEND);
+	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
+	glEnable(GL_MULTISAMPLE);
 
 	// Now setup the projection system to be orthographic
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
 	// Note, the coordinates here are in object-space, not coordinate space.
-	double half_width = mWidth * mScale;// / 2;
+	double half_width = mWidth * mScale;
 	glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
 
-    // Init the off-screen frame buffer.
-    InitFrameBuffer();
+    // Init the off-screen frame buffers.
+    InitFrameBuffers();
 
     // Start the thread
     mRun = true;
@@ -366,9 +397,9 @@ void CCL_GLThread::run()
 	CCL_GLThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
 	// Now setup the OpenCL device.
-	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
-	mCL->SetImage_GLTB(mFBO);
-	mCL->SetKernelSourcePath(mKernelSourceDir);
+//	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
+//	mCL->SetImage_GLTB(mFBO);
+//	mCL->SetKernelSourcePath(mKernelSourceDir);
 ////	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
     // Main thread loop
@@ -399,7 +430,7 @@ void CCL_GLThread::run()
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
         	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
-        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
+//        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
         	mPermitResize = false;
 
         default:
@@ -422,49 +453,49 @@ void CCL_GLThread::run()
         	EnqueueOperation(GLT_RenderModels);
         	break;
 
-        case CLT_Chi:
-        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-        	// local value.
-        	mCL->CopyImageToBuffer(0);
-        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Chi2:
-        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-        	// TODO: Note the spectral data will need something special here.
-        	mCL->CopyImageToBuffer(0);
-        	mCLValue = mCL->ImageToChi2(mCLDataSet);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Flux:
-        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-        	// local value.
-        	mCL->CopyImageToBuffer(0);
-        	mCLValue = mCL->TotalFlux(true);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Init:
-        	// Init all LibOI routines
-        	mCL->Init();
-        	mCLInitalized = true;
-        	break;
-
-        case CLT_LogLike:
-        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-        	// TODO: Note the spectral data will need something special here.
-        	mCL->CopyImageToBuffer(0);
-        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
-        	mCLOpSemaphore.release(1);
-        	break;
-
-        case CLT_Tests:
-        	// Runs the LibOI test sequence on the zeroth data set
-        	mCL->CopyImageToBuffer(0);
-        	mCL->RunVerification(0);
-        	break;
+//        case CLT_Chi:
+//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+//        	// local value.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Chi2:
+//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+//        	// TODO: Note the spectral data will need something special here.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCLValue = mCL->ImageToChi2(mCLDataSet);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Flux:
+//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+//        	// local value.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCLValue = mCL->TotalFlux(true);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Init:
+//        	// Init all LibOI routines
+//        	mCL->Init();
+//        	mCLInitalized = true;
+//        	break;
+//
+//        case CLT_LogLike:
+//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+//        	// TODO: Note the spectral data will need something special here.
+//        	mCL->CopyImageToBuffer(0);
+//        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
+//        	mCLOpSemaphore.release(1);
+//        	break;
+//
+//        case CLT_Tests:
+//        	// Runs the LibOI test sequence on the zeroth data set
+//        	mCL->CopyImageToBuffer(0);
+//        	mCL->RunVerification(0);
+//        	break;
         }
     }
 }

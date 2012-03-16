@@ -29,6 +29,7 @@ protected:
     CMinimizerThread mMinThread;
     QStandardItemModel * mOpenFileModel;
     CTreeModel * mTreeModel;
+    static QGLFormat mFormat;
 
 public:
     CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);

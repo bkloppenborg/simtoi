@@ -91,6 +91,10 @@ protected:
     GLuint mFBO;
 	GLuint mFBO_texture;
 	GLuint mFBO_depth;
+    GLuint mFBO_storage;
+	GLuint mFBO_storage_texture;
+
+	GLsizei mSamples;
 
     // OpenCL:
     CLibOI * mCL;
@@ -148,9 +152,9 @@ public:
 
 
 protected:
-    void InitFrameBuffer(void);
-    void InitFrameBufferDepthBuffer(void);
-    void InitFrameBufferTexture(void);
+    void InitFrameBuffers(void);
+    void InitMultisampleRenderBuffer(void);
+    void InitStorageBuffer(void);
 
 public:
     void LoadData(string filename);

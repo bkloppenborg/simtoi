@@ -8,7 +8,6 @@
 #include "CTreeModel.h"
 #include "CParameterItem.h"
 
-
 CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
     : QGLWidget(widget_parent), mGLT(this, shader_source_dir, cl_kernel_dir), mMinThread()
 { 

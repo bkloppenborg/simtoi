@@ -149,7 +149,7 @@ void CModelDisk::Render(GLuint framebuffer_object, int width, int height)
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	// Disable depth testing temporarily.
-    glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_DEPTH_TEST);
 
 	glPushMatrix();
 		SetupMatrix();
@@ -166,7 +166,7 @@ void CModelDisk::Render(GLuint framebuffer_object, int width, int height)
 
 	glPopMatrix();
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

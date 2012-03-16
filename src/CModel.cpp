@@ -231,6 +231,23 @@ Json::Value CModel::Serialize()
 	return output;
 }
 
+/// Copies inc and Omega from the position object iff it's type is CPosition::ORBIT
+/// and the angular parameter is not free.
+void CModel::SetAnglesFromPosition()
+{
+	if(mPosition->GetType() == CPosition::ORBIT)
+	{
+		// Inclination
+		if(!this->IsFree(0))
+			mParams[0] = mPosition->GetParam(0);
+
+		// Omega / Position angle
+		// TODO: Is this right?
+		if(!this->IsFree(1))
+			mParams[1] = mPosition->GetParam(1) - 90;
+	}
+}
+
 /// Sets the parameters for this model, the position, shader, and all features.
 void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_params)
 {
@@ -250,6 +267,9 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	}
 	// Lastly the features
 	//features->SetParams(in_params + n, n_params - n);
+
+	// Now copy angles over from the orbit object (if they are not free)
+	SetAnglesFromPosition();
 }
 
 /// Assigns and initializes a position type.

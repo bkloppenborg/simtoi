@@ -15,7 +15,6 @@ CParameterItem::CParameterItem(CParameters * item_parent, int id)
 {
 	mParent = item_parent;
 	mID = id;
-
 }
 
 CParameterItem::~CParameterItem()

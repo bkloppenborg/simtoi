@@ -66,6 +66,15 @@ gui_main::gui_main(QWidget *parent_widget)
 	mDataDir = "./";
 
 	SetupComboBoxes();
+
+	QGLFormat format;
+	format.setDoubleBuffer(true);
+	format.setDepth(false);
+	format.setAlpha(false);
+	format.setSampleBuffers(true);
+	format.setSamples(4);
+	QGLFormat::setDefaultFormat(format);
+
 }
 
 gui_main::~gui_main()
