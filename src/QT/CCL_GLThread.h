@@ -75,10 +75,11 @@ protected:
 
     // Window-related items:
     bool mPermitResize;
-    unsigned int mWidth;
-    unsigned int mHeight;
+    // NOTE: these must be ints, not unsigned ints, for OpenGL.
+    int mWidth;
+    int mHeight;
+    int mDepth;
     double mScale;
-    unsigned int mDepth;
 
     // Queue:
 	priority_queue<CL_GLT_Operations, vector<CL_GLT_Operations>, GLQueueComparision> mQueue;
