@@ -49,7 +49,8 @@ enum CL_GLT_Operations
 	CLT_Chi2,
 	CLT_LogLike,
 	CLT_Tests,
-	CLT_CopyImage
+	CLT_CopyImage,
+	CLT_SaveImage
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
@@ -76,9 +77,10 @@ protected:
     // Window-related items:
     bool mPermitResize;
     // NOTE: these must be ints, not unsigned ints, for OpenGL.
-    int mWidth;
-    int mHeight;
-    int mDepth;
+    int mImageWidth;
+    int mImageHeight;
+    int mImageDepth;
+    double mAreaDepth;
     double mScale;
 
     // Queue:
@@ -108,6 +110,7 @@ protected:
     double mCLValue;
     float * mCLArrayValue;
     int mCLArrayN;
+    string mCLString;
 
     // Misc datamembers:
 	bool mRun;
@@ -134,10 +137,10 @@ public:
 	void GetChi(int data_num, float * output, int & n);
     double GetChi2(int data_num);
     double GetDataAveJD(int data_num);
-    unsigned int GetDepth() { return mDepth; };
+    unsigned int GetImageDepth() { return mImageDepth; };
     double GetFlux();
     void GetFreeParameters(double * params, int n_params, bool scale_params) { mModelList->GetFreeParameters(params, n_params, scale_params); };
-    unsigned int GetHeight() { return mHeight; };
+    unsigned int GetImageHeight() { return mImageHeight; };
     void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth);
 	double GetLogLike(int data_num);
 	CModelList * GetModelList() { return mModelList; };
@@ -151,7 +154,7 @@ public:
 	int GetNDataSets();
 	double GetScale() { return mScale; };
 	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
-	unsigned int GetWidth() { return mWidth; };
+	unsigned int GetImageWidth() { return mImageWidth; };
 
     vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mModelList->GetTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
@@ -176,6 +179,7 @@ public:
     void run();
 
     void Save(string filename);
+    void SaveImage(string filename);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetScale(double scale);

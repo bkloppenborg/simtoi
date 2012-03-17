@@ -56,9 +56,9 @@ public:
 
     double GetFlux() { return mGLT.GetFlux(); };
     void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth) { mGLT.GetImage(image, width, height, depth); };
-    unsigned int GetImageDepth() { return mGLT.GetDepth(); };
-    unsigned int GetImageHeight() { return mGLT.GetHeight(); };
-    unsigned int GetImageWidth() { return mGLT.GetWidth(); };
+    unsigned int GetImageDepth() { return mGLT.GetImageDepth(); };
+    unsigned int GetImageHeight() { return mGLT.GetImageHeight(); };
+    unsigned int GetImageWidth() { return mGLT.GetImageWidth(); };
     float GetImageScale() { return mGLT.GetScale(); };
     int GetNData() { return mGLT.GetNData(); };
     int GetNDataSets() { return mGLT.GetNDataSets(); };
@@ -88,6 +88,7 @@ public:
 
 public:
     void Save(string location) { mGLT.Save(location); };
+    void SaveImage(string filename) { mGLT.SaveImage(filename); };
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);

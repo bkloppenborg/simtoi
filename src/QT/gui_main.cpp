@@ -59,6 +59,9 @@ gui_main::gui_main(QWidget *parent_widget)
 	// Flux simulation
 	connect(ui.btnSavePhotometry, SIGNAL(clicked(void)), this, SLOT(ExportPhotometry(void)));
 
+	// FITS exporting:
+	connect(ui.btnSaveFITS, SIGNAL(clicked(void)), this, SLOT(ExportFITS(void)));
+
 	// Get the application path,
 	string app_path = QCoreApplication::applicationDirPath().toStdString();
 	mShaderSourceDir = app_path + "/shaders/";
@@ -249,6 +252,7 @@ void gui_main::ButtonCheck()
 	ui.btnRunMinimizer->setEnabled(false);
 	ui.btnStopMinimizer->setEnabled(false);
 	ui.btnSavePhotometry->setEnabled(false);
+	ui.btnSaveFITS->setEnabled(false);
 
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -261,6 +265,7 @@ void gui_main::ButtonCheck()
 	ui.btnRunMinimizer->setEnabled(true);
 	ui.btnStopMinimizer->setEnabled(true);
 	ui.btnSavePhotometry->setEnabled(true);
+	ui.btnSaveFITS->setEnabled(true);
 
 	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 	if(widget->GetOpenFileModel()->rowCount() > 0)
@@ -321,19 +326,14 @@ void gui_main::DeleteGLArea()
 }
 
 /// Exports the current rendered model to a floating point FITS file
-void gui_main::ExportFits()
+void gui_main::ExportFITS()
 {
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-
-	unsigned int width = widget->GetImageWidth();
-	unsigned int height = widget->GetImageHeight();
-	unsigned int depth = widget->GetImageDepth();
-	float scale = widget->GetImageScale();
-	float image[width * height * depth];
+	widget->EnqueueOperation(CLT_Init);
 
     string filename;
     QStringList fileNames;
@@ -345,55 +345,19 @@ void gui_main::ExportFits()
 
 	if (dialog.exec())
 	{
-		widget->GetImage(image, width, height, depth);
 
 		fileNames = dialog.selectedFiles();
 		filename = fileNames.first().toStdString();
-		string tmp =filename.substr(filename.size() - 4, 4);
 
-		if(filename.substr(filename.size() - 4, 4) != ".txt")
-			filename += ".txt";
+		// Add an extension if it doesn't already exist
+		if(filename.substr(filename.size() - 5, 5) != ".fits")
+			filename += ".fits";
+
+		// Automatically overwrite files if they already exist.  The dialog should prompt for us.
+		filename = "!" + filename;
+
+		widget->SaveImage(filename);
 	}
-
-
-	// write out the FITS file:
-	fitsfile *fptr;
-	int error = 0;
-	int* status = &error;
-	long fpixel = 1, naxis = 2, nelements;
-	long naxes[2];
-
-	/*Initialise storage*/
-	naxes[0] = (long) width;
-	naxes[1] = (long) height;
-	nelements = width * height;
-
-	/*Create new file*/
-	if (*status == 0)
-		fits_create_file(&fptr, filename.c_str(), status);
-
-	/*Create primary array image*/
-	if (*status == 0)
-		fits_create_img(fptr, DOUBLE_IMG, naxis, naxes, status);
-	/*Write a keywords (datafile, target, image pixelation) */
-//	if (*status == 0)
-//		fits_update_key(fptr, TSTRING, "DATAFILE", "SIMTOI Simulation", "Data File Name", status);
-//	if (*status == 0)
-//		fits_update_key(fptr, TSTRING, "TARGET", "SIMTOI Simulation", "Target Name", status);
-//	if (*status == 0)
-//		fits_update_key(fptr, TFLOAT, "SCALE", &scale, "Scale (mas/pixel)", status);
-
-
-	/*Write image*/
-	if (*status == 0)
-		fits_write_img(fptr, TFLOAT, fpixel, nelements, &image[0], status);
-
-	/*Close file*/
-	if (*status == 0)
-		fits_close_file(fptr, status);
-
-	/*Report any errors*/
-	fits_report_error(stderr, *status);
 }
 
 /// Animates the display, exporting the photometry at specified intervals
@@ -436,7 +400,6 @@ void gui_main::ExportPhotometry()
 
 		fileNames = dialog.selectedFiles();
 		filename = fileNames.first().toStdString();
-		string tmp =filename.substr(filename.size() - 4, 4);
 
 		if(filename.substr(filename.size() - 4, 4) != ".txt")
 			filename += ".txt";

@@ -22,14 +22,14 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
 
     mRun = true;
     mPermitResize = true;
-    mWidth = 1;
-    mHeight = 1;
-    mDepth = 0;
+    mImageWidth = 1;
+    mImageHeight = 1;
+    mImageDepth = 1;
     mScale = 0.01;	// init to some value > 0.
+    mAreaDepth = 100; // +mDepth to -mDepth is the viewing region, in coordinate system units.
 
     mModelList = new CModelList();
     mShaderList = new CGLShaderList(shader_source_dir);
-    mDepth = 100; // +mDepth to -mDepth is the viewing region, in coordinate system units.
 
     mKernelSourceDir = kernel_source_dir;
     mCL = NULL;
@@ -86,7 +86,7 @@ void CCL_GLThread::BlitToScreen()
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO_storage);
 	/// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
     //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
-    glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     glFinish();
     mGLWidget->swapBuffers();
@@ -100,7 +100,7 @@ void CCL_GLThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned in
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, in_buffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, out_buffer);
 	//glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, out_buffer, 0, out_layer);
-	glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	glFinish();
 
   	CCL_GLThread::CheckOpenGLError("CGLThread BlitToBuffer");
@@ -186,7 +186,7 @@ double CCL_GLThread::GetFlux()
 void CCL_GLThread::GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth)
 {
 	// Image size must match exactly:
-	if(width != mWidth || height != mHeight || depth != mDepth)
+	if(width != mImageWidth || height != mImageHeight || depth != mImageDepth)
 		return;
 
 	// Enqueue the copy operation, block until it has completed.
@@ -269,12 +269,12 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
 	glGenRenderbuffers(1, &mFBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_texture);
 	// Create a 2D multisample texture, use GL_RGBA 8-bit GL_BYTE format 4 subsamples
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA8, mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA8, mImageWidth, mImageHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mFBO_texture);
 
 	glGenRenderbuffers(1, &mFBO_depth);
 	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_depth);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_DEPTH_COMPONENT, mWidth, mHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_DEPTH_COMPONENT, mImageWidth, mImageHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -296,7 +296,7 @@ void CCL_GLThread::InitStorageBuffer(void)
     glBindTexture(GL_TEXTURE_2D, mFBO_storage_texture); // Bind the texture mFBOtexture
 
     // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mImageWidth, mImageHeight, 0, GL_RED, GL_BYTE, NULL);
     // Enable this one for alpha blending:
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
     // These other formats might work, check that GL_BYTE is still correct for the higher precision.
@@ -379,8 +379,8 @@ void CCL_GLThread::resizeViewport(int width, int height)
 {
 	if(mPermitResize)
 	{
-		mWidth = width;
-		mHeight = height;
+		mImageWidth = width;
+		mImageHeight = height;
 		EnqueueOperation(GLT_Resize);
 	}
 }   
@@ -409,8 +409,8 @@ void CCL_GLThread::run()
 	glLoadIdentity();
 
 	// Note, the coordinates here are in object-space, not coordinate space.
-	double half_width = mWidth * mScale;
-	glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
+	double half_width = mImageWidth * mScale;
+	glOrtho(-half_width, half_width, -half_width, half_width, -mAreaDepth, mAreaDepth);
 
     // Init the off-screen frame buffers.
     InitFrameBuffers();
@@ -447,24 +447,24 @@ void CCL_GLThread::run()
         case GLT_Resize:
         	// Resize the screen, then cascade to a render and a blit.
 #ifdef DEBUG
-    		printf("Resizing to %i %i\n.", mWidth, mHeight);
+    		printf("Resizing to %i %i\n.", mImageWidth, mImageHeight);
 #endif //DEBUG
-            glViewport(0, 0, mWidth, mHeight);
+            glViewport(0, 0, mImageWidth, mImageHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            half_width = mWidth * mScale / 2;
-			glOrtho(-half_width, half_width, -half_width, half_width, -mDepth, mDepth);
+            half_width = mImageWidth * mScale / 2;
+			glOrtho(-half_width, half_width, -half_width, half_width, -mAreaDepth, mAreaDepth);
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
         	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
-        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
+        	mCL->SetImageInfo(mImageWidth, mImageHeight, 1, double(mScale));
         	mPermitResize = false;
 
         default:
         case GLT_RenderModels:
             // Render the models, then cascade to a blit to screen.
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_RenderModels Entry");
-            mModelList->Render(mFBO, mWidth, mHeight);
+            mModelList->Render(mFBO, mImageWidth, mImageHeight);
             BlitToBuffer(mFBO, mFBO_storage, 0);
 
      	case GLT_BlitToScreen:
@@ -527,7 +527,15 @@ void CCL_GLThread::run()
 
         case CLT_CopyImage:
         	// Copy the current OpenCL image into the mCLArrayValue CPU buffer
-        	mCL->ExportImage(mCLArrayValue, mWidth, mHeight, mDepth);
+        	mCL->CopyImageToBuffer(0);
+        	mCL->ExportImage(mCLArrayValue, mImageWidth, mImageHeight, mImageDepth);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_SaveImage:
+        	// Copy the current OpenCL image into the mCLArrayValue CPU buffer
+        	mCL->CopyImageToBuffer(0);
+        	mCL->SaveImage(mCLString);
         	mCLOpSemaphore.release(1);
         	break;
         }
@@ -542,6 +550,14 @@ void CCL_GLThread::Save(string filename)
 	Json::Value output = mModelList->Serialize();
 	std::ofstream outfile(filename.c_str());
 	writer.write(outfile, output);
+}
+
+void CCL_GLThread::SaveImage(string filename)
+{
+	// Enqueue the copy operation, block until it has completed.
+	mCLString = filename;
+	EnqueueOperation(CLT_SaveImage);
+	mCLOpSemaphore.acquire();
 }
 
 /// Sets the scale for the model.
