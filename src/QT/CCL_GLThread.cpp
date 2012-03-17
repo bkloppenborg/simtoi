@@ -44,7 +44,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
  	mFBO_depth = 0;
     mFBO_storage = 0;
 	mFBO_storage_texture = 0;
- 	mSamples = 4;
+ 	mSamples = 16;
 }
 
 CCL_GLThread::~CCL_GLThread()
@@ -82,7 +82,7 @@ void CCL_GLThread::BlitToScreen()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Blit the application-defined render buffer to the on-screen render buffer.
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, mFBO_storage);
 	/// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
     //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
     glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
@@ -90,6 +90,21 @@ void CCL_GLThread::BlitToScreen()
     glFinish();
     mGLWidget->swapBuffers();
 	CCL_GLThread::CheckOpenGLError("CGLThread::BlitToScreen()");
+}
+
+/// Blits the input buffer to the out_layer of the output buffer
+void CCL_GLThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned int out_layer)
+{
+	// TODO: Need to figure out how to use the layer
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, in_buffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, out_buffer);
+  	CCL_GLThread::CheckOpenGLError("CGLThread BlitToBuffer A");
+	//glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, out_buffer, 0, out_layer);
+  	CCL_GLThread::CheckOpenGLError("CGLThread BlitToBuffer B");
+	glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glFinish();
+
+  	CCL_GLThread::CheckOpenGLError("CGLThread BlitToBuffer");
 }
 
 void CCL_GLThread::ClearQueue()
@@ -397,10 +412,10 @@ void CCL_GLThread::run()
 	CCL_GLThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
 	// Now setup the OpenCL device.
-//	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
-//	mCL->SetImage_GLTB(mFBO);
-//	mCL->SetKernelSourcePath(mKernelSourceDir);
-////	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
+	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
+	mCL->SetImage_GLTB(mFBO_storage_texture);
+	mCL->SetKernelSourcePath(mKernelSourceDir);
+//	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
     // Main thread loop
     while (mRun)
@@ -430,14 +445,15 @@ void CCL_GLThread::run()
             glMatrixMode(GL_MODELVIEW);
         	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
         	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
-//        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
+        	mCL->SetImageInfo(mWidth, mHeight, 1, double(mScale));
         	mPermitResize = false;
 
         default:
         case GLT_RenderModels:
             // Render the models, then cascade to a blit to screen.
-        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_RenderModels");
+        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_RenderModels Entry");
             mModelList->Render(mFBO, mWidth, mHeight);
+            BlitToBuffer(mFBO, mFBO_storage, 0);
 
      	case GLT_BlitToScreen:
 			BlitToScreen();
@@ -453,49 +469,49 @@ void CCL_GLThread::run()
         	EnqueueOperation(GLT_RenderModels);
         	break;
 
-//        case CLT_Chi:
-//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-//        	// local value.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Chi2:
-//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-//        	// TODO: Note the spectral data will need something special here.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCLValue = mCL->ImageToChi2(mCLDataSet);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Flux:
-//        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
-//        	// local value.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCLValue = mCL->TotalFlux(true);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Init:
-//        	// Init all LibOI routines
-//        	mCL->Init();
-//        	mCLInitalized = true;
-//        	break;
-//
-//        case CLT_LogLike:
-//        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
-//        	// TODO: Note the spectral data will need something special here.
-//        	mCL->CopyImageToBuffer(0);
-//        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
-//        	mCLOpSemaphore.release(1);
-//        	break;
-//
-//        case CLT_Tests:
-//        	// Runs the LibOI test sequence on the zeroth data set
-//        	mCL->CopyImageToBuffer(0);
-//        	mCL->RunVerification(0);
-//        	break;
+        case CLT_Chi:
+        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+        	// local value.
+        	mCL->CopyImageToBuffer(0);
+        	mCL->ImageToChi(mCLDataSet, mCLArrayValue, mCLArrayN);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Chi2:
+        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+        	// TODO: Note the spectral data will need something special here.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->ImageToChi2(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Flux:
+        	// Copy the image to the buffer, compute the chi values, and initiate a copy to the
+        	// local value.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->TotalFlux(true);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Init:
+        	// Init all LibOI routines
+        	mCL->Init();
+        	mCLInitalized = true;
+        	break;
+
+        case CLT_LogLike:
+        	// Copy the image into the buffer, compute the chi2, set the value, release the operation semaphore.
+        	// TODO: Note the spectral data will need something special here.
+        	mCL->CopyImageToBuffer(0);
+        	mCLValue = mCL->ImageToLogLike(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_Tests:
+        	// Runs the LibOI test sequence on the zeroth data set
+        	mCL->CopyImageToBuffer(0);
+        	mCL->RunVerification(0);
+        	break;
         }
     }
 }

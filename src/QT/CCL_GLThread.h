@@ -122,6 +122,8 @@ protected:
     void BlitToScreen();
     void ClearQueue();
 public:
+
+    void BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned int out_layer);
     static void CheckOpenGLError(string function_name);
 
     void EnqueueOperation(CL_GLT_Operations op);
