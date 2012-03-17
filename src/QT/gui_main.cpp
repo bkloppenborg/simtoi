@@ -320,6 +320,82 @@ void gui_main::DeleteGLArea()
     ButtonCheck();
 }
 
+/// Exports the current rendered model to a floating point FITS file
+void gui_main::ExportFits()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
+	unsigned int width = widget->GetImageWidth();
+	unsigned int height = widget->GetImageHeight();
+	unsigned int depth = widget->GetImageDepth();
+	float scale = widget->GetImageScale();
+	float image[width * height * depth];
+
+    string filename;
+    QStringList fileNames;
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setNameFilter(tr("FITS Files (*.fits)"));
+    dialog.setViewMode(QFileDialog::Detail);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+
+	if (dialog.exec())
+	{
+		widget->GetImage(image, width, height, depth);
+
+		fileNames = dialog.selectedFiles();
+		filename = fileNames.first().toStdString();
+		string tmp =filename.substr(filename.size() - 4, 4);
+
+		if(filename.substr(filename.size() - 4, 4) != ".txt")
+			filename += ".txt";
+	}
+
+
+	// write out the FITS file:
+	fitsfile *fptr;
+	int error = 0;
+	int* status = &error;
+	long fpixel = 1, naxis = 2, nelements;
+	long naxes[2];
+
+	/*Initialise storage*/
+	naxes[0] = (long) width;
+	naxes[1] = (long) height;
+	nelements = width * height;
+
+	/*Create new file*/
+	if (*status == 0)
+		fits_create_file(&fptr, filename.c_str(), status);
+
+	/*Create primary array image*/
+	if (*status == 0)
+		fits_create_img(fptr, DOUBLE_IMG, naxis, naxes, status);
+	/*Write a keywords (datafile, target, image pixelation) */
+//	if (*status == 0)
+//		fits_update_key(fptr, TSTRING, "DATAFILE", "SIMTOI Simulation", "Data File Name", status);
+//	if (*status == 0)
+//		fits_update_key(fptr, TSTRING, "TARGET", "SIMTOI Simulation", "Target Name", status);
+//	if (*status == 0)
+//		fits_update_key(fptr, TFLOAT, "SCALE", &scale, "Scale (mas/pixel)", status);
+
+
+	/*Write image*/
+	if (*status == 0)
+		fits_write_img(fptr, TFLOAT, fpixel, nelements, &image[0], status);
+
+	/*Close file*/
+	if (*status == 0)
+		fits_close_file(fptr, status);
+
+	/*Report any errors*/
+	fits_report_error(stderr, *status);
+}
+
 /// Animates the display, exporting the photometry at specified intervals
 void gui_main::ExportPhotometry()
 {
@@ -364,9 +440,6 @@ void gui_main::ExportPhotometry()
 
 		if(filename.substr(filename.size() - 4, 4) != ".txt")
 			filename += ".txt";
-
-		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-		widget->Save(filename);
 	}
 
 	ofstream outfile;

@@ -48,7 +48,8 @@ enum CL_GLT_Operations
 	CLT_Chi,
 	CLT_Chi2,
 	CLT_LogLike,
-	CLT_Tests
+	CLT_Tests,
+	CLT_CopyImage
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
@@ -74,10 +75,10 @@ protected:
 
     // Window-related items:
     bool mPermitResize;
-    int mWidth;
-    int mHeight;
+    unsigned int mWidth;
+    unsigned int mHeight;
     double mScale;
-    double mDepth;
+    unsigned int mDepth;
 
     // Queue:
 	priority_queue<CL_GLT_Operations, vector<CL_GLT_Operations>, GLQueueComparision> mQueue;
@@ -101,6 +102,7 @@ protected:
     string mKernelSourceDir;
     bool mCLInitalized;
     QSemaphore mCLOpSemaphore;
+    // TODO: We should serialize access to these variables:
     int mCLDataSet;
     double mCLValue;
     float * mCLArrayValue;
@@ -131,9 +133,11 @@ public:
 	void GetChi(int data_num, float * output, int & n);
     double GetChi2(int data_num);
     double GetDataAveJD(int data_num);
+    unsigned int GetDepth() { return mDepth; };
     double GetFlux();
     void GetFreeParameters(double * params, int n_params, bool scale_params) { mModelList->GetFreeParameters(params, n_params, scale_params); };
-    int GetHeight() { return mHeight; };
+    unsigned int GetHeight() { return mHeight; };
+    void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth);
 	double GetLogLike(int data_num);
 	CModelList * GetModelList() { return mModelList; };
     CL_GLT_Operations GetNextOperation(void);
@@ -146,7 +150,7 @@ public:
 	int GetNDataSets();
 	double GetScale() { return mScale; };
 	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
-	int GetWidth() { return mWidth; };
+	unsigned int GetWidth() { return mWidth; };
 
     vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mModelList->GetTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };

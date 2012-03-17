@@ -43,6 +43,7 @@ private slots:
     void DeleteModel(void);
     void DeleteGLArea();
     void ExportPhotometry();
+    void ExportFits();
     void render();
     void open();
     void RunMinimizer();

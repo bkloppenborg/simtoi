@@ -24,6 +24,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
     mPermitResize = true;
     mWidth = 1;
     mHeight = 1;
+    mDepth = 0;
     mScale = 0.01;	// init to some value > 0.
 
     mModelList = new CModelList();
@@ -98,9 +99,7 @@ void CCL_GLThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned in
 	// TODO: Need to figure out how to use the layer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, in_buffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, out_buffer);
-  	CCL_GLThread::CheckOpenGLError("CGLThread BlitToBuffer A");
 	//glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, out_buffer, 0, out_layer);
-  	CCL_GLThread::CheckOpenGLError("CGLThread BlitToBuffer B");
 	glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	glFinish();
 
@@ -181,6 +180,19 @@ double CCL_GLThread::GetFlux()
 	EnqueueOperation(CLT_Flux);
 	mCLOpSemaphore.acquire();
 	return mCLValue;
+}
+
+/// Returns the current rendered image, including depth, as a floating point array of size width * height * depth
+void CCL_GLThread::GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth)
+{
+	// Image size must match exactly:
+	if(width != mWidth || height != mHeight || depth != mDepth)
+		return;
+
+	// Enqueue the copy operation, block until it has completed.
+	mCLArrayValue = image;
+	EnqueueOperation(CLT_CopyImage);
+	mCLOpSemaphore.acquire();
 }
 
 /// Returns the chi2 for the specified data set
@@ -511,6 +523,12 @@ void CCL_GLThread::run()
         	// Runs the LibOI test sequence on the zeroth data set
         	mCL->CopyImageToBuffer(0);
         	mCL->RunVerification(0);
+        	break;
+
+        case CLT_CopyImage:
+        	// Copy the current OpenCL image into the mCLArrayValue CPU buffer
+        	mCL->ExportImage(mCLArrayValue, mWidth, mHeight, mDepth);
+        	mCLOpSemaphore.release(1);
         	break;
         }
     }
