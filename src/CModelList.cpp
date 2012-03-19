@@ -149,6 +149,17 @@ vector< pair<CModelList::ModelTypes, string> > CModelList::GetTypes(void)
 	return tmp;
 }
 
+/// Returns the product of priors from all models
+double CModelList::GetFreeParameterPriorProduct()
+{
+	double tmp = 1;
+
+    for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    	tmp *= (*it)->GetFreePriorProd();
+
+    return tmp;
+}
+
 /// Increments the time by the set timestep value.
 void CModelList::IncrementTime()
 {

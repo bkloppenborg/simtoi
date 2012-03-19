@@ -93,6 +93,14 @@ void CParameters::GetParams(double * out_params, unsigned int n_params)
 	}
 }
 
+/// Returns the prior for the i-th parameter:
+/// NOTE: at the moment all parameters have uniform priors.
+double CParameters::GetPrior(int i)
+{
+	// compute a uniform prior.
+	return 1.0 / (mMinMax[i].second - mMinMax[i].first);
+}
+
 /// Returns a vector of pairs containing the min/max values for the parameters.
 vector< pair<double, double> > CParameters::GetFreeMinMaxes()
 {
@@ -126,6 +134,19 @@ void CParameters::GetFreeParams(double * out_params, int n_params, bool scale_pa
 			j++;
 		}
 	}
+}
+
+/// Returns the product of the priors for the free parameters
+double CParameters::GetFreePriorProd()
+{
+	double tmp = 1;
+	for(int i = 0; i < mNParams; i++)
+	{
+		if(mFreeParams[i])
+			tmp *= GetPrior(i);
+	}
+
+	return tmp;
 }
 
 /// Returns a vector of strings containing the names of the free parameters.

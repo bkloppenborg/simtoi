@@ -45,10 +45,10 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 	int n_data_sets = minimizer->mCLThread->GetNDataSets();
 	double tmp = 0;
 
-	// See if we have been requested to exit.  If so, give MultiNest an invalid result
+	// See if we have been requested to exit.  If so, give MultiNest a very positive result
 	if(!minimizer->mRun)
 	{
-		lnew = 0;
+		lnew = 1E99;
 		return;
 	}
 
@@ -62,6 +62,9 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 		minimizer->mCLThread->EnqueueOperation(GLT_RenderModels);
 		tmp += minimizer->mCLThread->GetLogLike(data_set);
 	}
+
+	// Add in the priors.
+	tmp += minimizer->mCLThread->GetFreeParameterPriorProduct();
 
 	// Get the scaled parameter values
 	minimizer->mCLThread->GetFreeParameters(params, npars, true);;

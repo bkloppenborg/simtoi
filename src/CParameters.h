@@ -42,6 +42,7 @@ protected:
 public:
 	void GetFreeParams(double * params, int n_param, bool scale_params);
 	vector<string> GetFreeParamNames();
+	double GetFreePriorProd();
 	string GetName(void) { return mName; };
 	int GetNFreeParams(void) { return mNFreeParams; };
 	int GetNParams(void) { return mNParams; };
@@ -50,6 +51,7 @@ public:
 	vector< pair<double, double> > GetFreeMinMaxes();
 	void GetParams(double * params, unsigned int n_params);
 	double GetParam(int i);
+	double GetPrior(int i);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
 	string GetParamName(unsigned int param_num);

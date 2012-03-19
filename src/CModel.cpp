@@ -108,7 +108,6 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 		mShader->GetFreeParams(params + n, n_params - n, scale_params);
 		n += mShader->GetNFreeParams();
 	}
-
 }
 
 
@@ -128,6 +127,20 @@ vector<string> CModel::GetFreeParameterNames()
 	}
 
 	return tmp1;
+}
+
+/// Returns the product of priors for all free model parameters.
+/// NOTICE: This intentially overrides, but still calls, the GetFreePriorProd derived
+/// by inheritance from CParameters.
+double CModel::GetFreePriorProd()
+{
+	int tmp = CParameters::GetFreePriorProd();
+	tmp *= mPosition->GetFreePriorProd();
+
+	if(mShader != NULL)
+		tmp *= mShader->GetFreePriorProd();
+
+	return tmp;
 }
 
 int CModel::GetTotalFreeParameters()
