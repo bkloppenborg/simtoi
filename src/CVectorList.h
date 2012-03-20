@@ -34,15 +34,18 @@ public:
 	void Clear()
 	{
 		for(int i = mList.size() - 1; i > -1; i--)
-			delete mList[i];
+			Remove(i);
+
 	}
 
 	void Remove(int i)
 	{
+		T tmp;
 		if(i < mList.size())
 		{
-			delete mList[i];
+			tmp = mList[i];
 			mList.erase(mList.begin() + i);
+			delete tmp;
 		}
 	}
 
