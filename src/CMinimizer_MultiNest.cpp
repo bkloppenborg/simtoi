@@ -37,6 +37,11 @@ void CMinimizer_MultiNest::dumper(int &nSamples, int &nlive, int &nPar, double *
 //
 //	for(int i = 0; i < *nPar + 1; i++)
 //		printf("%s: %e %e %e\n", param_names[i].c_str(), paramConstr[i], paramConstr[2* (*nPar) + i], paramConstr[3* (*nPar) + i]);
+
+//	// Copy the best-fit parameters into a save-able array:
+//	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
+//	for(int i = 0; i < nPar; i++)
+//		minimizer->mParams[i] = paramConstr[0][i];
 }
 
 void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
@@ -77,7 +82,7 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 int CMinimizer_MultiNest::run()
 {
 	// Init MultiNest:
-	int nParams = mCLThread->GetNFreeParameters();
+	mNParams = mCLThread->GetNFreeParameters();
 	//string tmp_output = mCLThread->GetTempOutputDir();
 
 	void * misc = reinterpret_cast<void*>(this);
@@ -88,9 +93,9 @@ int CMinimizer_MultiNest::run()
 	int nlive = 200;				// number of live points
 	double efr = 1.0;				// set the required efficiency
 	double tol = 0.9;				// tol, defines the stopping criteria
-	int ndims = nParams;			// dimensionality (no. of free parameters)
-	int nPar = nParams;				// total no. of parameters including free & derived parameters
-	int nClsPar = nParams;			// no. of parameters to do mode separation on
+	int ndims = mNParams;			// dimensionality (no. of free parameters)
+	int nPar = mNParams;				// total no. of parameters including free & derived parameters
+	int nClsPar = mNParams;			// no. of parameters to do mode separation on
 	int updInt = 10;				// after how many iterations feedback is required & the output files should be updated
 									// note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	double Ztol = -1E90;			// all the modes with logZ < Ztol are ignored
@@ -122,7 +127,9 @@ int CMinimizer_MultiNest::run()
         CMinimizer_MultiNest::dumper,
         misc);
 
+
     mIsRunning = false;
+    ExportResults(NULL, 0, true);
 
     return 0;
 }

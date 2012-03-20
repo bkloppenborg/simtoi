@@ -71,7 +71,7 @@ public:
 	void Restore(Json::Value input, CGLShaderList * shader_list);
 
 	Json::Value Serialize();
-	void SetFreeParameters(double * params, int n_params, bool scale_params);
+	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
 	void SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type);
 	void SetShader(unsigned int model_id, CGLShaderWrapper * shader);
 	void SetTime(double t);

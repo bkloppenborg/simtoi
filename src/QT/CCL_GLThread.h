@@ -50,7 +50,8 @@ enum CL_GLT_Operations
 	CLT_LogLike,
 	CLT_Tests,
 	CLT_CopyImage,
-	CLT_SaveImage
+	CLT_SaveImage,
+	CLT_GetData
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
@@ -133,6 +134,7 @@ public:
     static void CheckOpenGLError(string function_name);
 
     void EnqueueOperation(CL_GLT_Operations op);
+    void ExportResults(string base_filename);
 
 	void GetChi(int data_num, float * output, int & n);
     double GetChi2(int data_num);
@@ -181,7 +183,7 @@ public:
 
     void Save(string filename);
     void SaveImage(string filename);
-    void SetFreeParameters(double * params, int n_params, bool scale_params);
+    void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
     void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);

@@ -16,14 +16,29 @@ CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 {
 	mCLThread = cl_gl_thread;
 	mParams = NULL;
+	mNParams = 0;
 	mType = NONE;
 	mRun = true;
 	mIsRunning = true;
+	mResultsBaseFilename = "/tmp/min_output";
 }
 
 CMinimizer::~CMinimizer()
 {
 	delete[] mParams;
+}
+
+/// Saves the V2, and T3 data along with best-fit model simulated data
+/// for each epoch.
+void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
+{
+	if(!no_setparams)
+	{
+		n_params = min(n_params, int(mNParams));
+		mCLThread->SetFreeParameters(params, n_params, true);
+	}
+
+	mCLThread->ExportResults(mResultsBaseFilename);
 }
 
 CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread)
@@ -64,7 +79,7 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 
 void CMinimizer::Init()
 {
-	mParams = new float[mCLThread->GetNFreeParameters()];
+	mParams = new double[mCLThread->GetNFreeParameters()];
 }
 
 bool CMinimizer::IsRunning()

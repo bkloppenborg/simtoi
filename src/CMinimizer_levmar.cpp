@@ -134,11 +134,11 @@ int CMinimizer_levmar::run()
 	// Create a member function pointer
 	int iterations = 0;
 	int max_iterations = 1000;
-	int nParams = mCLThread->GetNFreeParameters();
+	int mNParams = mCLThread->GetNFreeParameters();
 	int nData = mCLThread->GetNDataAllocated();
 	double x[nData];
-	double lb[nParams];
-	double ub[nParams];
+	double lb[mNParams];
+	double ub[mNParams];
 	double info[LM_INFO_SZ];
 	double opts[LM_OPTS_SZ];
 
@@ -156,13 +156,13 @@ int CMinimizer_levmar::run()
 	opts[4]= 1E-6;
 
 	// Copy out the initial values for the parameters:
-	double params[nParams];
-	mCLThread->GetFreeParameters(params, nParams, true);
+	double params[mNParams];
+	mCLThread->GetFreeParameters(params, mNParams, true);
 	vector<string> names = mCLThread->GetFreeParamNames();
 	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
 
 	// Init parameter values
-	for(int i = 0; i < nParams; i++)
+	for(int i = 0; i < mNParams; i++)
 	{
 		lb[i] = min_max[i].first;
 		ub[i] = min_max[i].second;
@@ -171,15 +171,16 @@ int CMinimizer_levmar::run()
 	mIsRunning = true;
 
 	// Call levmar:
-	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, nParams, nData, lb, ub, opts, max_iterations, NULL, info, NULL, NULL, (void*)this);
+	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, mNParams, nData, lb, ub, opts, max_iterations, NULL, info, NULL, NULL, (void*)this);
 
-	mCLThread->SetFreeParameters(params, nParams, false);
+	mCLThread->SetFreeParameters(params, mNParams, false);
 	mCLThread->EnqueueOperation(GLT_RenderModels);
 
 	mIsRunning = false;
 
 	printf("Levmar executed %i iterations.\n", iterations);
-	printresult(params, nParams, nData, names, info);
+	printresult(params, mNParams, nData, names, info);
+	ExportResults(params, mNParams);
 
 	return 0;
 }

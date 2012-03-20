@@ -41,13 +41,17 @@ public:
 
 public:
 	CCL_GLThread * mCLThread;
-	float * mParams;
+	double * mParams;
+	unsigned int mNParams;
 	bool mRun;
+	string mResultsBaseFilename;;
 
 	CMinimizer::MinimizerTypes mType;
 
 	CMinimizer(CCL_GLThread * cl_gl_thread);
 	virtual ~CMinimizer();
+
+	void ExportResults(double * params, int n_params, bool no_setparams=false);
 
 	static CMinimizer * GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread);
 	static vector< pair<CMinimizer::MinimizerTypes, string> > GetTypes(void);

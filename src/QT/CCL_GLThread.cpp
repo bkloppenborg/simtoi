@@ -144,6 +144,85 @@ void CCL_GLThread::EnqueueOperation(CL_GLT_Operations op)
 	mQueueSemaphore.release();
 }
 
+// Exports the simulated and real data for all currently loaded data
+// to files whose starting bit is specified by base_filename
+void CCL_GLThread::ExportResults(string base_filename)
+{
+	// Allocate memory
+	mCLArrayN = mCL->GetMaxDataSize();
+	float tmp_out[mCLArrayN];
+	mCLArrayValue = tmp_out;
+	stringstream filename;
+	ofstream outfile;
+	CVectorList<CT3Data*> t3;
+	CVectorList<CV2Data*> v2;
+
+	// Set the time, render the model, simulate the data
+	unsigned int n_data_sets = mCL->GetNDataSets();
+	for(unsigned int data_set = 0; data_set < n_data_sets; data_set++)
+	{
+		mCLDataSet = data_set;
+		SetTime(GetDataAveJD(data_set));
+		EnqueueOperation(GLT_RenderModels);
+
+		// Kick off a kernel to compute the data.
+		EnqueueOperation(CLT_GetData);
+
+		// Meanwhile grab the V2 and T3 (read-only operation from CPU memory)
+		mCL->GetT3(data_set, t3);
+		mCL->GetV2(data_set, v2);
+		unsigned int n_v2 = v2.size();
+		unsigned int n_t3 = t3.size();
+
+		// Wait for the OpenCL operation to complete
+		mCLOpSemaphore.acquire();
+
+		// export v2
+		filename.str("");
+		filename << base_filename << "_" << data_set << "_v2.txt";
+		outfile.open(filename.str().c_str());
+		outfile.width(15);
+		outfile.precision(8);
+		outfile << "# U V V2 V2_err V2_sim" << endl;
+		for(int j = 0; j < n_v2; j++)
+		{
+			outfile << v2[j]->u << " " << v2[j]->v << " "
+					<< v2[j]->v2 << " " << v2[j]->v2_err << " "
+					<< tmp_out[j] << endl;
+		}
+		outfile.close();
+
+		// export t3
+		filename.str("");
+		filename << base_filename << "_" << data_set << "_t3.txt";
+		outfile.open(filename.str().c_str());
+		outfile.width(15);
+		outfile.precision(8);
+		outfile << "U1 V1 U2 V2 U3 V3 t3_amp t3_amp_err t3_phi t3_phi_err t3_amp_sim t3_phi_sim" << endl;
+		float tmp1 = 0;
+		float tmp2 = 0;
+		complex<float> phase;
+		for(unsigned int j = 0; j < n_t3; j++)
+		{
+			tmp1 = t3[j]->t3_phi * PI / 180;
+			tmp2 = tmp_out[n_v2 + 2*j + 1];
+
+			phase = complex<float>(cos(tmp2), -sin(tmp2)) / complex<float>(cos(tmp1), -sin(tmp1));
+
+			outfile << t3[j]->u1 << " " << t3[j]->v1 << " "
+					<< t3[j]->u2 << " " << t3[j]->v2 << " "
+					<< t3[j]->u3 << " " << t3[j]->v3 << " "
+					<< t3[j]->t3_amp << " " << t3[j]->t3_amp_err << " "
+					<< t3[j]->t3_phi << " " << t3[j]->t3_phi_err << " "
+					<< tmp_out[n_v2 + 2*j] << " " << arg(phase) * 180/PI << endl;
+		}
+		outfile.close();
+	}
+
+	// Unset the array value.
+	mCLArrayValue = NULL;
+}
+
 /// Returns the chi values in output for the specified data set and the current image.
 void CCL_GLThread::GetChi(int data_num, float * output, int & n)
 {
@@ -538,6 +617,14 @@ void CCL_GLThread::run()
         	mCL->SaveImage(mCLString);
         	mCLOpSemaphore.release(1);
         	break;
+
+        case CLT_GetData:
+        	mCL->CopyImageToBuffer(0);
+        	mCL->ImageToData(mCLArrayN);
+        	mCL->GetSimulatedData(mCLArrayValue, mCLArrayN);
+        	mCLOpSemaphore.release(1);
+        	break;
+
         }
     }
 }
@@ -561,7 +648,7 @@ void CCL_GLThread::SaveImage(string filename)
 }
 
 /// Sets the scale for the model.
-void CCL_GLThread::SetFreeParameters(double * params, int n_params, bool scale_params)
+void CCL_GLThread::SetFreeParameters(double * params, unsigned int n_params, bool scale_params)
 {
 	mModelList->SetFreeParameters(params, n_params, scale_params);
 	EnqueueOperation(GLT_RenderModels);

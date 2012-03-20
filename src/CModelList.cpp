@@ -234,9 +234,9 @@ Json::Value CModelList::Serialize()
 }
 
 /// Sets all of the free parameter values
-void CModelList::SetFreeParameters(double * params, int n_params, bool scale_params)
+void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool scale_params)
 {
-    int n = 0;
+	unsigned int n = 0;
 
     // Now call render on all of the models:
     for(vector<CModel*>::iterator it = mList.begin(); it != mList.end(); ++it)
