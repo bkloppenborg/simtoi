@@ -35,6 +35,11 @@ void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 	if(!no_setparams)
 	{
 		n_params = min(n_params, int(mNParams));
+
+	    printf("Generating Plots using best-fit parameters:\n");
+		for(int i = 0; i < n_params; i++)
+			printf("%i: %e \n", i, params[i]);
+
 		mCLThread->SetFreeParameters(params, n_params, true);
 	}
 

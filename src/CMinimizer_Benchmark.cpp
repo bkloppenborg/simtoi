@@ -46,6 +46,7 @@ int CMinimizer_Benchmark::GetMilliSpan( int nTimeStart )
 /// and reporting it to the user.
 int CMinimizer_Benchmark::run()
 {
+	mIsRunning = true;
 	// only the first loaded data set is used.
 	float chi2 = 0;
 	double chi_cpu = 0;
@@ -71,6 +72,7 @@ int CMinimizer_Benchmark::run()
 	time = double(GetMilliSpan(start)) / 1000;
 	printf("Benchmark Test completed!\n %i iterations in %f seconds, throughput %f iterations/sec.\n", n_iterations, time, n_iterations/time);
 
+	mIsRunning = false;
 	return 0;
 }
 

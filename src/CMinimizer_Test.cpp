@@ -23,7 +23,10 @@ CMinimizer_Test::~CMinimizer_Test()
 /// Run the Verification functions
 int CMinimizer_Test::run()
 {
+	mIsRunning = true;
 	mCLThread->EnqueueOperation(GLT_RenderModels);
 	mCLThread->EnqueueOperation(CLT_Tests);
+
+	mIsRunning = false;
 	return 0;
 }

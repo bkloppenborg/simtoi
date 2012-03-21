@@ -35,13 +35,13 @@ void CMinimizer_MultiNest::dumper(int &nSamples, int &nlive, int &nPar, double *
 //
 //	printf("maxLogLike %f, logZ %f, logZerr %f\n", 	*maxLogLike, *logZ, *logZerr);
 //
-//	for(int i = 0; i < *nPar + 1; i++)
-//		printf("%s: %e %e %e\n", param_names[i].c_str(), paramConstr[i], paramConstr[2* (*nPar) + i], paramConstr[3* (*nPar) + i]);
+	for(int i = 0; i < nPar; i++)
+		printf("%i: %e \n", i, paramConstr[0][i]); //*(paramConstr[2* (nPar) + i]), *(paramConstr[3* (nPar) + i]));
 
-//	// Copy the best-fit parameters into a save-able array:
-//	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
-//	for(int i = 0; i < nPar; i++)
-//		minimizer->mParams[i] = paramConstr[0][i];
+	// Copy the best-fit parameters into a save-able array:
+	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
+	for(int i = 0; i < nPar; i++)
+		minimizer->mParams[i] = paramConstr[0][i];
 }
 
 void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
@@ -75,6 +75,7 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 	minimizer->mCLThread->GetFreeParameters(params, npars, true);;
 
 	lnew = tmp;
+	printf("%e\n", tmp);
 }
 
 
@@ -91,8 +92,8 @@ int CMinimizer_MultiNest::run()
 	int mmodal = 1;					// do mode separation?
 	int ceff = 0;					// run in constant efficiency mode?
 	int nlive = 200;				// number of live points
-	double efr = 1.0;				// set the required efficiency
-	double tol = 0.9;				// tol, defines the stopping criteria
+	double efr = 0.8;				// set the required efficiency
+	double tol = 1000;				// tol, defines the stopping criteria
 	int ndims = mNParams;			// dimensionality (no. of free parameters)
 	int nPar = mNParams;				// total no. of parameters including free & derived parameters
 	int nClsPar = mNParams;			// no. of parameters to do mode separation on
@@ -127,9 +128,11 @@ int CMinimizer_MultiNest::run()
         CMinimizer_MultiNest::dumper,
         misc);
 
-
     mIsRunning = false;
-    ExportResults(NULL, 0, true);
+
+    // TODO: For some reason the parameters are getting mangled when they come from MultiNest
+    // resulting in a mangled image for data exportin.
+    ExportResults(mParams, mNParams, true);
 
     return 0;
 }
