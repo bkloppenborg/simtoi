@@ -35,8 +35,8 @@ void CMinimizer_MultiNest::dumper(int &nSamples, int &nlive, int &nPar, double *
 //
 //	printf("maxLogLike %f, logZ %f, logZerr %f\n", 	*maxLogLike, *logZ, *logZerr);
 //
-	for(int i = 0; i < nPar; i++)
-		printf("%i: %e \n", i, paramConstr[0][i]); //*(paramConstr[2* (nPar) + i]), *(paramConstr[3* (nPar) + i]));
+//	for(int i = 0; i < nPar; i++)
+//		printf("%i: %e \n", i, paramConstr[0][i]); //*(paramConstr[2* (nPar) + i]), *(paramConstr[3* (nPar) + i]));
 
 	// Copy the best-fit parameters into a save-able array:
 	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
@@ -75,7 +75,6 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 	minimizer->mCLThread->GetFreeParameters(params, npars, true);;
 
 	lnew = tmp;
-	printf("%e\n", tmp);
 }
 
 
@@ -115,6 +114,7 @@ int CMinimizer_MultiNest::run()
 
 	double logZero = -DBL_MAX;		// points with loglike < logZero will be ignored by MultiNest
 	int context = 0;				// not required by MultiNest, any additional information user wants to pass
+	int maxIterations = 1E6;
 
 	mIsRunning = true;
 
@@ -123,7 +123,7 @@ int CMinimizer_MultiNest::run()
         efr, ndims, nPar, nClsPar,
         maxModes, updInt, Ztol, path,
         seed, pWrap, fb, resume,
-        outfile, initMPI, logZero,
+        outfile, initMPI, logZero, maxIterations,
         CMinimizer_MultiNest::log_likelihood,
         CMinimizer_MultiNest::dumper,
         misc);
