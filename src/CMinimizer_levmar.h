@@ -25,7 +25,7 @@ public:
 
 	void Init();
 
-	void printresult(double * x, int n_pars, int n_data, vector<string> names, double * info);
+	void printresult(double * x, int n_pars, int n_data, vector<string> names, double * info, double * covar);
 
 	int run();
 };

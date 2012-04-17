@@ -183,7 +183,7 @@ void CModel::Rotate()
 	// where gamma = pitch, beta = roll, alpha = yaw.
 
 	glRotatef(mParams[0], 1, 0, 0);	// inclination
-	glRotatef(-mParams[1], 0, 1, 0); // position angle
+	glRotatef(mParams[1], 0, 1, 0); // position angle
 	glRotatef(mParams[2], 0, 0, 1); // roll
 	CCL_GLThread::CheckOpenGLError("CModel::Rotate()");
 }
@@ -219,10 +219,12 @@ void CModel::Restore(Json::Value input, CGLShaderList * shader_list)
 /// Sets up the matrix mode for rendering models.
 void CModel::SetupMatrix()
 {
-	// Load the matrix mode, and identity, then flip x -> -x to correspond with astronomical notation.
+    // Rotate from (x,y,z) to (North, East, Away).  Note, we are following the (x,y,z)
+    // convention of the orbital equations here.
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glScalef(-1, 1, 1);
+	glRotatef(90, 0, 0, 1);
+	glScalef(1, 1, -1);
 
 }
 
@@ -257,7 +259,7 @@ void CModel::SetAnglesFromPosition()
 		// Omega / Position angle
 		// TODO: Is this right?
 		if(!this->IsFree(1))
-			mParams[1] = mPosition->GetParam(1) - 90;
+			mParams[1] = mPosition->GetParam(1);
 	}
 }
 

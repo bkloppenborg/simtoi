@@ -2,6 +2,7 @@
 #include <QTime>
 #include <QtDebug>
 #include <fstream>
+#include <stdexcept>
 
 #include "CCL_GLThread.h"
 #include "CGLWidget.h"
@@ -45,7 +46,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
  	mFBO_depth = 0;
     mFBO_storage = 0;
 	mFBO_storage_texture = 0;
- 	mSamples = 16;
+ 	mSamples = 0;
 }
 
 CCL_GLThread::~CCL_GLThread()
@@ -349,8 +350,8 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
 
 	glGenRenderbuffers(1, &mFBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_texture);
-	// Create a 2D multisample texture, use GL_RGBA 8-bit GL_BYTE format 4 subsamples
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA8, mImageWidth, mImageHeight);
+	// Create a 2D multisample texture
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA16, mImageWidth, mImageHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mFBO_texture);
 
 	glGenRenderbuffers(1, &mFBO_depth);
@@ -363,10 +364,16 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
     // Check that status of our generated frame buffer
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        string errorstring = (char *) gluErrorString(status);
-        printf("Couldn't create multisample frame buffer: %x %s\n", status, errorstring.c_str());
+        string errorstring = string( reinterpret_cast<const char *>(gluErrorString(status)) );
+        printf("Couldn't create storage frame buffer: %x %s\n", status, errorstring.c_str());
         exit(0); // Exit the application
     }
+
+    GLint bufs;
+    GLint samples;
+    glGetIntegerv(GL_SAMPLE_BUFFERS, &bufs);
+    glGetIntegerv(GL_SAMPLES, &samples);
+    qDebug("Have %d buffers and %d samples", bufs, samples);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
 }
@@ -377,7 +384,7 @@ void CCL_GLThread::InitStorageBuffer(void)
     glBindTexture(GL_TEXTURE_2D, mFBO_storage_texture); // Bind the texture mFBOtexture
 
     // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, mImageWidth, mImageHeight, 0, GL_RED, GL_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mImageWidth, mImageHeight, 0, GL_RED, GL_FLOAT, NULL);
     // Enable this one for alpha blending:
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
     // These other formats might work, check that GL_BYTE is still correct for the higher precision.
@@ -484,6 +491,7 @@ void CCL_GLThread::run()
 	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
+	//glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 
 	// Now setup the projection system to be orthographic
 	glMatrixMode(GL_PROJECTION);

@@ -14,8 +14,8 @@ CPositionXY::CPositionXY()
 	mName = "XY";
 
 	// Init the position variables, set them to be fixed.
-	mParamNames.push_back("X");
-	mParamNames.push_back("Y");
+	mParamNames.push_back("N");
+	mParamNames.push_back("E");
 
 	SetAllFree(false);
 }

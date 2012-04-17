@@ -75,23 +75,23 @@ string CMinimizer_levmar::GetExitString(int exit_num)
 		tmp = "1 - stopped by small gradient J^T e";
 		break;
 	case 2:
-		tmp =  "2 - stopped by small Dp";
+		tmp = "2 - stopped by small Dp";
 		break;
 	case 3:
-		tmp =  "3 - stopped by itmax";
+		tmp = "3 - stopped by itmax";
 		break;
 	case 4:
-		tmp =  "4 - singular matrix. Restart from current p with increased mu";
+		tmp = "4 - singular matrix. Restart from current p with increased mu";
 		break;
 	case 5:
-		tmp =  "5 - no further error reduction is possible. Restart with increased mu";
+		tmp = "5 - no further error reduction is possible. Restart with increased mu";
 		break;
 	case 6:
-		tmp =  "6 - stopped by small ||e||_2";
+		tmp = "6 - stopped by small ||e||_2";
 		break;
 	case 7:
 		if(mRun)
-			tmp =  "7 - stopped by invalid (i.e. NaN or Inf) 'func' values; a user error";
+			tmp = "7 - stopped by invalid (i.e. NaN or Inf) 'func' values; a user error";
 		else
 			tmp = "Terminated by User Request.";
 
@@ -105,7 +105,7 @@ string CMinimizer_levmar::GetExitString(int exit_num)
 }
 
 /// Prints out cmpfit results (from testmpfit.c)
-void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, double * info)
+void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, double * info, double * covar)
 {
 	if ((x == 0) || (n_pars == 0))
 		return;
@@ -117,8 +117,21 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 
 	printf("Reason for exiting:\n %s\n", GetExitString(int(info[6])).c_str());
 
+	printf("Best-fit parameters:\n");
 	for(int i=0; i < n_pars; i++)
+	{
+		err = sqrt(covar[n_pars * i + i]);
 		printf("  P[%d] = %f +/- %f (%s)\n", i, x[i], err, names[i].c_str());
+	}
+
+	printf("Covariance Matrix:\n");
+	for(int i = 0; i < n_pars; i++)
+	{
+		for(int j = 0; j < n_pars; j++)
+			printf("%1.5e ", covar[n_pars * i + j]);
+
+		printf("\n");
+	}
 
 	if(int(info[6]) == 7 && mRun)
 	{
@@ -133,14 +146,15 @@ int CMinimizer_levmar::run()
 {
 	// Create a member function pointer
 	int iterations = 0;
-	int max_iterations = 1000;
-	int mNParams = mCLThread->GetNFreeParameters();
+	int max_iterations = 1E4;
 	int nData = mCLThread->GetNDataAllocated();
+	mNParams = mCLThread->GetNFreeParameters();
 	double x[nData];
 	double lb[mNParams];
 	double ub[mNParams];
 	double info[LM_INFO_SZ];
 	double opts[LM_OPTS_SZ];
+	double covar[mNParams * mNParams];
 
 	// Setup the options (LM_* from levmar.h):
 	// info[1-4]=[ ||e||_2, ||J^T e||_inf,  ||Dp||_2, mu/max[J^T J]_ii ], all computed at estimated p.
@@ -161,25 +175,24 @@ int CMinimizer_levmar::run()
 	vector<string> names = mCLThread->GetFreeParamNames();
 	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
 
-	// Init parameter values
+	// Init parameter500 values
 	for(int i = 0; i < mNParams; i++)
 	{
 		lb[i] = min_max[i].first;
 		ub[i] = min_max[i].second;
 	}
 
+	printf("Starting levmar...\n");
+
 	mIsRunning = true;
 
 	// Call levmar:
-	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, mNParams, nData, lb, ub, opts, max_iterations, NULL, info, NULL, NULL, (void*)this);
-
-	mCLThread->SetFreeParameters(params, mNParams, false);
-	mCLThread->EnqueueOperation(GLT_RenderModels);
+	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, mNParams, nData, lb, ub, NULL, max_iterations, opts, info, NULL, covar, (void*)this);
 
 	mIsRunning = false;
 
 	printf("Levmar executed %i iterations.\n", iterations);
-	printresult(params, mNParams, nData, names, info);
+	printresult(params, mNParams, nData, names, info, covar);
 	ExportResults(params, mNParams);
 
 	return 0;

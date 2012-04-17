@@ -70,13 +70,13 @@ gui_main::gui_main(QWidget *parent_widget)
 
 	SetupComboBoxes();
 
-	QGLFormat format;
-	format.setDoubleBuffer(true);
-	format.setDepth(false);
-	format.setAlpha(false);
-	format.setSampleBuffers(true);
-	format.setSamples(4);
-	QGLFormat::setDefaultFormat(format);
+//	QGLFormat format;
+//	format.setDoubleBuffer(true);
+//	format.setDepth(false);
+//	format.setAlpha(false);
+//	format.setSampleBuffers(true);
+//	format.setSamples(32);
+//	QGLFormat::setDefaultFormat(format);
 
 }
 

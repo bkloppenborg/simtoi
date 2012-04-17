@@ -72,7 +72,7 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 	tmp += minimizer->mCLThread->GetFreeParameterPriorProduct();
 
 	// Get the scaled parameter values
-	minimizer->mCLThread->GetFreeParameters(params, npars, true);;
+	minimizer->mCLThread->GetFreeParameters(params, npars, true);
 
 	lnew = tmp;
 }
@@ -88,18 +88,18 @@ int CMinimizer_MultiNest::run()
 	void * misc = reinterpret_cast<void*>(this);
 
 	// set the MultiNest sampling parameters
-	int mmodal = 1;					// do mode separation?
+	int mmodal = 0;					// do mode separation?
 	int ceff = 0;					// run in constant efficiency mode?
 	int nlive = 200;				// number of live points
 	double efr = 0.8;				// set the required efficiency
-	double tol = 1000;				// tol, defines the stopping criteria
+	double tol = 100;				// tol, defines the stopping criteria
 	int ndims = mNParams;			// dimensionality (no. of free parameters)
 	int nPar = mNParams;				// total no. of parameters including free & derived parameters
-	int nClsPar = mNParams;			// no. of parameters to do mode separation on
+	int nClsPar = 1;			// no. of parameters to do mode separation on
 	int updInt = 10;				// after how many iterations feedback is required & the output files should be updated
 									// note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	double Ztol = -1E90;			// all the modes with logZ < Ztol are ignored
-	int maxModes = 100;				// expected max no. of modes (used only for memory allocation)
+	int maxModes = 1;				// expected max no. of modes (used only for memory allocation)
 	int pWrap[ndims];				// which parameters to have periodic boundary conditions?
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
@@ -107,14 +107,14 @@ int CMinimizer_MultiNest::run()
 	const std::string path = "/tmp/mn";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
-	int resume = 0;					// resume from a previous job?
+	int resume = 1;					// resume from a previous job?
 	int outfile = 1;				// write output files?
 	int initMPI = 0;				// initialize MPI routines?, relevant only if compiling with MPI
 							        // set it to F if you want your main program to handle MPI initialization
 
 	double logZero = -DBL_MAX;		// points with loglike < logZero will be ignored by MultiNest
-	int context = 0;				// not required by MultiNest, any additional information user wants to pass
-	int maxIterations = 1E6;
+//	int context = 0;				// not required by MultiNest, any additional information user wants to pass
+	int maxIterations = 1E9;
 
 	mIsRunning = true;
 

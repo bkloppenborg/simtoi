@@ -97,28 +97,22 @@ def WriteHistogram(filename, hist_data):
     outfile.close()
 
 def main():
-
-    n_bins = 500  
+ 
     filename = ""  
 
     usage = "Usage: %prog [options] filename"
     parser = OptionParser(usage=usage)
-    parser.add_option("-n", dest="n_bins", action="store", type="float",
-                      help="Number of Bins for the Histogram")
+    parser.add_option("-n", dest="nbins", action="store", type="float", default=500,
+                      help="Number of Bins for the Histogram  [default: '%default']")
 
     (options, args) = parser.parse_args()
-    
-    if(options.n_bins):
-        n_bins = options.n_bins
-        
-    print "Using " + str(n_bins)
 
     # now read the filenames
     filename = args[0]
     base_filename = filename[0:len(filename)-4]
 
     data = ReadMultinestOutput(filename)
-    hist = Multinest_PosteriorProbDist(data, n_bins)
+    hist = Multinest_PosteriorProbDist(data, options.nbins)
     WriteHistogram(base_filename + ".hist", hist)
     
     
