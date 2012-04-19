@@ -62,6 +62,9 @@ gui_main::gui_main(QWidget *parent_widget)
 	// FITS exporting:
 	connect(ui.btnSaveFITS, SIGNAL(clicked(void)), this, SLOT(ExportFITS(void)));
 
+	// Set time button
+	connect(ui.btnSetTime, SIGNAL(clicked(void)), this, SLOT(SetTime(void)));
+
 	// Get the application path,
 	string app_path = QCoreApplication::applicationDirPath().toStdString();
 	mShaderSourceDir = app_path + "/shaders/";
@@ -253,6 +256,7 @@ void gui_main::ButtonCheck()
 	ui.btnStopMinimizer->setEnabled(false);
 	ui.btnSavePhotometry->setEnabled(false);
 	ui.btnSaveFITS->setEnabled(false);
+	ui.btnSetTime->setEnabled(false);
 
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -266,6 +270,7 @@ void gui_main::ButtonCheck()
 	ui.btnStopMinimizer->setEnabled(true);
 	ui.btnSavePhotometry->setEnabled(true);
 	ui.btnSaveFITS->setEnabled(true);
+	ui.btnSetTime->setEnabled(true);
 
 	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 	if(widget->GetOpenFileModel()->rowCount() > 0)
@@ -551,6 +556,27 @@ void gui_main::StopMinimizer()
     CMinimizer::MinimizerTypes minimizer;
 
 	widget->StopMinimizer();
+}
+
+/// Sets the time from the current selected datafile.
+void gui_main::SetTime(void)
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    // Get access to the current widget, and QStandardItemModel list
+    CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
+
+    // Get the selected indicies:
+    QModelIndexList list = ui.treeOpenFiles->selectionModel()->selectedIndexes();
+    QStandardItemModel * model = widget->GetOpenFileModel();
+
+    QList<QModelIndex>::iterator it = list.begin();
+    int id = (*it).row();
+    double t = widget->GetDataAveJD(id);
+    widget->SetTime(t);
+    widget->EnqueueOperation(GLT_RenderModels);
 }
 
 void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
