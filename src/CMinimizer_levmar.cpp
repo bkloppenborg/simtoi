@@ -6,8 +6,11 @@
  */
 
 #include "CMinimizer_levmar.h"
+#include <cmath>
+
 #include "levmar.h"
 #include "CCL_GLThread.h"
+
 
 CMinimizer_levmar::CMinimizer_levmar(CCL_GLThread * cl_gl_thread)
 : CMinimizer(cl_gl_thread)

@@ -24,7 +24,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/QT ${CMAKE_CURRENT_BINARY_DIR}/Q
 add_subdirectory(QT) 
 
 # Assemble all of the source to build simtoi.
-file(GLOB SOURCE *.cpp)
+file(GLOB SOURCE *.cpp models/*.cpp)
 add_executable(simtoi ${SOURCE})
 SET_TARGET_PROPERTIES(simtoi PROPERTIES LINKER_LANGUAGE Fortran)
 target_link_libraries(simtoi QT_files textio jsoncpp oi multinest levmar ${QT_LIBRARIES} ${OPENGL_LIBRARIES})

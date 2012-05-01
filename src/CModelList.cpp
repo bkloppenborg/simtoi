@@ -15,11 +15,11 @@
 
 // Models
 #include "CModel.h"
-#include "CModelSphere.h"
-#include "CModelDisk.h"
-#include "CModelDisk_A.h"
-#include "CModelDisk_B.h"
-#include "CModelDisk_C.h"
+#include "models/CModelSphere.h"
+#include "models/CModelDisk.h"
+#include "models/CModelDisk_A.h"
+#include "models/CModelDisk_B.h"
+#include "models/CModelDisk_C.h"
 
 using namespace std;
 

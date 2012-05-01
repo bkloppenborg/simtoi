@@ -23,7 +23,6 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "CModel.h"
 #include "CModelList.h"
 #include "CGLShaderList.h"
 
