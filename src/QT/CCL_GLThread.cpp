@@ -490,7 +490,7 @@ void CCL_GLThread::run()
 	glDisable(GL_DITHER);
 	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
 	//glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
 	//glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 
