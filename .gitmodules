@@ -1,0 +1,6 @@
+[submodule "lib/liboi"]
+	path = lib/liboi
+	url = git://github.com/bkloppenborg/liboi.git
+[submodule "lib/textio"]
+	path = lib/textio
+	url = git://github.com/bkloppenborg/textio.git

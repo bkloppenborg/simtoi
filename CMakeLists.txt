@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O0")
 
 # Call CMake on the subdirectories
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
 
 # Include jsoncpp
@@ -24,8 +25,8 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/getoifits)
 include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/oifitslib)
 
 # Include multinest
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/multinest)
-include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/lib/multinest)
+#include_directories(${CMAKE_SOURCE_DIR}/lib/multinest)
 
 # Include levmar
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/levmar)
