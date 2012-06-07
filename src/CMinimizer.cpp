@@ -33,7 +33,11 @@
 #include "CMinimizer.h"
 #include "CCL_GLThread.h"
 #include "CMinimizer_Benchmark.h"
+
+#ifdef MULTINEST_H
 #include "CMinimizer_MultiNest.h"
+#endif // MULTINEST_H
+
 #include "CMinimizer_levmar.h"
 #include "CMinimizer_Test.h"
 
@@ -76,9 +80,11 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 	CMinimizer * tmp;
 	switch(type)
 	{
+#ifdef MULTINEST_H
 	case MULTINEST:
 		tmp = new CMinimizer_MultiNest(cl_gl_thread);
 		break;
+#endif // MULTINEST_H
 
 	case LEVMAR:
 		tmp = new CMinimizer_levmar(cl_gl_thread);
@@ -101,7 +107,11 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 {
 	vector< pair<CMinimizer::MinimizerTypes, string> > tmp;
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BENCHMARK, "Benchmark"));
+
+#ifdef MULTINEST_H
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::MULTINEST, "MultiNest"));
+#endif // MULTINEST_H
+
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::LEVMAR, "Levmar"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::TEST, "Tests"));
 	return tmp;

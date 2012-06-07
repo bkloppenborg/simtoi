@@ -25,6 +25,18 @@ add_subdirectory(QT)
 
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp models/*.cpp)
+
+# Find MultiNest.  If the library isn't found, simply remove it from the compilation list.
+find_package(MultiNest)
+if(MULTINEST_FOUND)
+    include_directories(${MULTINEST_INCLUDE_DIR})
+    target_link_libraries(simtoi ${MULTINEST_LIBRARIES})
+else(MULTINEST_FOUND)
+    message(STATUS "MultiNest not found, SIMTOI compiled without support for this minimizer.")
+    file(GLOB REMOVE_MULTINEST "CMinimizer_MultiNest.cpp")
+    list(REMOVE_ITEM SOURCE ${REMOVE_MULTINEST})
+endif(MULTINEST_FOUND)
+
 add_executable(simtoi ${SOURCE})
 SET_TARGET_PROPERTIES(simtoi PROPERTIES LINKER_LANGUAGE Fortran)
-target_link_libraries(simtoi QT_files textio jsoncpp oi multinest levmar ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(simtoi QT_files textio jsoncpp oi levmar ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
