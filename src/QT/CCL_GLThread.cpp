@@ -70,7 +70,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
  	mFBO_depth = 0;
     mFBO_storage = 0;
 	mFBO_storage_texture = 0;
- 	mSamples = 0;
+ 	mSamples = 16;
 }
 
 CCL_GLThread::~CCL_GLThread()
