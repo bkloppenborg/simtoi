@@ -32,8 +32,8 @@ uniform float alpha;
 
 void main(void)
 {
-    float mu = dot(normal, vec3(0.0, 0.0, 1.0));
+    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
     float intensity = pow(mu, alpha);
 
-    gl_FragColor = color * intensity;
+    gl_FragColor = vec4(intensity * color.x, 0, 0, 1.0);
 }
