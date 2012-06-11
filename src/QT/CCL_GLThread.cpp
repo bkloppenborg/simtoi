@@ -375,7 +375,7 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
 	glGenRenderbuffers(1, &mFBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_texture);
 	// Create a 2D multisample texture
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA16, mImageWidth, mImageHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA16F, mImageWidth, mImageHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mFBO_texture);
 
 	glGenRenderbuffers(1, &mFBO_depth);
@@ -513,10 +513,14 @@ void CCL_GLThread::run()
 	glShadeModel(GL_FLAT);
 	glDisable(GL_DITHER);
 	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
-	//glEnable (GL_BLEND);
+
+	// Enable alpha blending:
+	glEnable (GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Enable multisample anti-aliasing.
 	glEnable(GL_MULTISAMPLE);
-	//glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+	glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 
 	// Now setup the projection system to be orthographic
 	glMatrixMode(GL_PROJECTION);
