@@ -388,8 +388,9 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
     // Check that status of our generated frame buffer
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        string errorstring = string( reinterpret_cast<const char *>(gluErrorString(status)) );
-        printf("Couldn't create storage frame buffer: %x %s\n", status, errorstring.c_str());
+    	const GLubyte * errStr = gluErrorString(status);
+        printf("Couldn't create multisample frame buffer: %x %s\n", status, (char*)errStr);
+        delete errStr;
         exit(0); // Exit the application
     }
 
@@ -439,8 +440,9 @@ void CCL_GLThread::InitStorageBuffer(void)
     // Check that status of our generated frame buffer
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        string errorstring = (char *) gluErrorString(status);
-        printf("Couldn't create storage frame buffer: %x %s\n", status, errorstring.c_str());
+    	const GLubyte * errStr = gluErrorString(status);
+        printf("Couldn't create storage frame buffer: %x %s\n", status, (char*)errStr);
+        delete errStr;
         exit(0); // Exit the application
     }
 
