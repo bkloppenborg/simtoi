@@ -32,6 +32,7 @@
 
 #include "CPosition.h"
 #include "CPositionXY.h"
+#include "CPositionXYZ.h"
 #include "CPositionOrbit.h"
 
 CPosition::CPosition(int n_parameters)
@@ -57,6 +58,10 @@ CPosition * CPosition::GetPosition(CPosition::PositionTypes type)
 		tmp = new CPositionOrbit();
 		break;
 
+	case XYZ:
+		tmp = new CPositionXYZ();
+		break;
+
 	case XY:
 	default:
 		// By default models use XY position.
@@ -72,6 +77,7 @@ vector< pair<CPosition::PositionTypes, string> > CPosition::GetTypes(void)
 {
 	vector< pair<CPosition::PositionTypes, string> > tmp;
 	tmp.push_back(pair<CPosition::PositionTypes, string> (CPosition::XY, "XY"));
+	tmp.push_back(pair<CPosition::PositionTypes, string> (CPosition::XYZ, "XYZ"));
 	tmp.push_back(pair<CPosition::PositionTypes, string> (CPosition::ORBIT, "Orbit"));
 
 	return tmp;
