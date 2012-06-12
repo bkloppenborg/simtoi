@@ -70,7 +70,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
  	mFBO_depth = 0;
     mFBO_storage = 0;
 	mFBO_storage_texture = 0;
- 	mSamples = 4;
+ 	mSamples = 16;
 }
 
 CCL_GLThread::~CCL_GLThread()
@@ -375,7 +375,7 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
 	glGenRenderbuffers(1, &mFBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_texture);
 	// Create a 2D multisample texture
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA32F, mImageWidth, mImageHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA16F, mImageWidth, mImageHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mFBO_texture);
 
 	glGenRenderbuffers(1, &mFBO_depth);
