@@ -23,18 +23,19 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-// Power law limb darkening implemented according to Hestroffer (1997)
-// Implemented using alpha blending.
-varying out vec3 normal;
+
+// Simple scale height transparency.
 varying out vec4 color;
+varying out float transparency;
 
 uniform vec3 min_xyz;
 uniform vec3 max_xyz;
 
+uniform float Beta;
+
 void main(void)
 {
-    normal = gl_NormalMatrix * gl_Normal;
     color = gl_Color;
+    transparency = 1 - pow(abs(gl_Vertex.z) / max_xyz.z, Beta);
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }

@@ -59,8 +59,8 @@ CGLShaderWrapper::~CGLShaderWrapper()
 }
 
 // Executes the OpenGL shader
-void CGLShaderWrapper::UseShader()
+void CGLShaderWrapper::UseShader(double min_xyz[3], double max_xyz[3])
 {
 	if(mShader != NULL)
-		mShader->UseShader(mParams, mNParams);
+		mShader->UseShader(min_xyz, max_xyz, mParams, mNParams);
 }

@@ -55,6 +55,8 @@ protected:
 	GLuint mShader_vertex;
 	GLuint mShader_fragment;
 	GLuint * mParam_locations;
+	GLuint mMinXYZ_location;
+	GLuint mMaxXYZ_location;
 	string mBase_name;
 	string mShader_dir;
 	string mFriendlyName;
@@ -84,7 +86,7 @@ public:
 
 	void LinkProgram(GLuint program);
 
-	void UseShader(double * params, unsigned int in_params);
+	void UseShader(double min_xyz[3], double max_xyz[3], double * params, unsigned int in_params);
 
 };
 

@@ -173,13 +173,20 @@ void CModelDisk::Render(GLuint framebuffer_object, int width, int height)
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
-	// Disable depth testing temporarily.
-    //glDisable(GL_DEPTH_TEST);
+	// Rename a few variables for convenience:
+	const double radius = mParams[mBaseParams + 1] / 2;	// diameter / 2
+	const double total_height = mParams[mBaseParams + 2];
+	const double half_height = total_height/2;
+
+	double min_xyz[3] = {0, 0, 0};
+	double max_xyz[3] = {radius, radius, half_height};
+
+	glDisable(GL_DEPTH_TEST);
 
 	glPushMatrix();
 		SetupMatrix();
 		Color();
-		UseShader();
+		UseShader(min_xyz, max_xyz);
 
 		// Call base-class rotation and translation functions.
 		// NOTE: OpenGL applies these operations in a stack-like buffer so they are reversed
@@ -191,7 +198,8 @@ void CModelDisk::Render(GLuint framebuffer_object, int width, int height)
 
 	glPopMatrix();
 
-    //glEnable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

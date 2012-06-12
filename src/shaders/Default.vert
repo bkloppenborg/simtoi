@@ -27,6 +27,9 @@
 // Default (do nothing) shader.
 varying out vec4 color;
 
+uniform vec3 min_xyz;
+uniform vec3 max_xyz;
+
 void main() 
 { 
     color = gl_Color;

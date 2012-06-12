@@ -145,15 +145,15 @@ void CGLShaderList::LoadShaders()
 	tmp = new CGLShader(CGLShaderList::LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
 	Append(tmp);
 
-	// Simple scale height
-	base_name = "ScaleHeight";
-	friendly_name = "Scale Height - z";
+	// f(z) power law transparency
+	base_name = "PowerLawZ";
+	friendly_name = "Power Law Z";
 	n_params = 1;
 	param_names.clear();
 	starting_values.clear();
-	param_names.push_back("h_z");
+	param_names.push_back("Beta");
 	minmax.push_back(pair<float,float>(0.01, 1));
 	starting_values.push_back(0.1);
-	tmp = new CGLShader(CGLShaderList::SCALE_HEIGHT, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
+	tmp = new CGLShader(CGLShaderList::POWER_LAW_Z, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
 	Append(tmp);
 }

@@ -72,6 +72,9 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 	// Rename a few variables for convenience:
 	double radius = float(mParams[mBaseParams + 1] / 2);
 
+	double min_xyz[3] = {0, 0, 0};
+	double max_xyz[3] = {radius, radius, radius};
+
 	// Bind to the framebuffer and draw the sphere.
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
@@ -84,7 +87,7 @@ void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
 		Color();
 
 		// Use the shader (this is valid to call even if a shader hasn't been assigned to this object).
-		UseShader();
+		UseShader(min_xyz, max_xyz);
 
 		// Call base-class rotation and translation functions.
 		// NOTE: OpenGL applies these operations in a stack-like buffer so they are reversed

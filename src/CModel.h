@@ -133,7 +133,7 @@ public:
 	bool ShaderLoaded(void) { return mShaderLoaded; };
 
 protected:
-	void UseShader();
+	void UseShader(double min_xyz[3], double max_xyz[3]);
 
 
 };

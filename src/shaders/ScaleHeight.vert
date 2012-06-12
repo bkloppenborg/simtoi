@@ -26,13 +26,16 @@
 
 // Simple scale height transparency.
 varying out vec4 color;
-varying out float color_scale;
+varying out float transparency;
+
+uniform vec3 min_xyz;
+uniform vec3 max_xyz;
+
 uniform float h_z;
-uniform float max_z;
 
 void main(void)
 {
     color = gl_Color;
-    color_scale = exp(-abs(gl_Vertex.z)/h_z);
+    transparency = exp(-(max_xyz.z - abs(gl_Vertex.z))/h_z);
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
