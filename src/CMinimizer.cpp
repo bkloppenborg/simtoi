@@ -34,9 +34,10 @@
 #include "CCL_GLThread.h"
 #include "CMinimizer_Benchmark.h"
 
-#ifdef MULTINEST_H
+// Compiler directive to add support for MultiNest
+#ifdef _ADD_MULTINEST
 #include "CMinimizer_MultiNest.h"
-#endif // MULTINEST_H
+#endif // _ADD_MULTINEST
 
 #include "CMinimizer_levmar.h"
 #include "CMinimizer_Test.h"
