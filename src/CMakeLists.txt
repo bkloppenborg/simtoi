@@ -28,7 +28,7 @@ file(GLOB SOURCE *.cpp models/*.cpp)
 
 # Find MultiNest.  If MultiNest isn't installed to a standard location, provide a hint
 # to where it can be found:
-# SET(MULTINEST_HINT_ROOT path_to_multinest)
+SET(MULTINEST_ROOT_HINT /home/bkloppenborg/workspace/multinest)
 
 find_package(MultiNest)
 if(MULTINEST_FOUND)

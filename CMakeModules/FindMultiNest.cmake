@@ -10,7 +10,7 @@
 #   MPI - MULTINEST library with MPI enabled.
 #
 # You may provide a hint to where MULTINEST's root directory may be located
-# by setting MULTINEST_HINT_ROOT before calling this script.
+# by setting MULTINEST_ROOT_HINT before calling this script.
 #
 # Variables used by this module, they can change the default behaviour and
 # need to be set before calling find_package:
@@ -59,7 +59,7 @@ ENDIF (MULTINEST_INCLUDES)
 
 FIND_PATH(MULTINEST_ROOT_DIR
     NAMES includes/multinest.h
-    HINTS ${MULTINEST_HINT_ROOT}
+    HINTS /usr/local/multinest ${MULTINEST_ROOT_HINT} 
     DOC "MULTINEST root directory.")
     
 FIND_PATH(_MULTINEST_INCLUDE_DIRS
