@@ -250,7 +250,7 @@ void CModel::SetupMatrix()
     // convention of the orbital equations here.
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	//glRotatef(90, 0, 0, 1);
+	glRotatef(90, 0, 0, 1);
 	glScalef(1, 1, -1);
 
 }
