@@ -94,7 +94,10 @@ gui_main::gui_main(QWidget *parent_widget)
 	string app_path = QCoreApplication::applicationDirPath().toStdString();
 	mShaderSourceDir = app_path + "/shaders/";
 	mKernelSourceDir = app_path + "/kernels/";
-	mDataDir = "./";
+
+	mOpenDataDir = "./";
+	mOpenModelDir = "./";
+
 
 	SetupComboBoxes();
 
@@ -232,7 +235,7 @@ void gui_main::AddData()
 
     // Open a dialog, get a list of file that the user selected:
     QFileDialog dialog(this);
-    dialog.setDirectory(QString::fromStdString(mDataDir));
+    dialog.setDirectory(QString::fromStdString(mOpenDataDir));
     dialog.setNameFilter(tr("Data Files (*.fit *.fits *.oifits)"));
     dialog.setFileMode(QFileDialog::ExistingFiles);
 
@@ -245,18 +248,18 @@ void gui_main::AddData()
 
 	// Now pull out the data directory (to make file display cleaner)
 	if(filenames.size() > 0)
-		mDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
+		mOpenDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
 
 	for(int i = 0; i < filenames.size(); i++)
 	{
 		items.clear();
 		// Tell the widget to load the data file and append a row to its file list:
 		tmp = filenames[i].toStdString();
-		dir_size = tmp.size() - mDataDir.size();
+		dir_size = tmp.size() - mOpenDataDir.size();
 		widget->LoadData(tmp);
 
 		// Filename
-		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mDataDir.size() + 1, dir_size) )));
+		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
 		// Mean JD
 		time_str.str("");
 		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
@@ -459,6 +462,7 @@ void gui_main::open()
 
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setDirectory(QString::fromStdString(mOpenModelDir));
     dialog.setNameFilter(tr("SIMTOI Save Files (*.json)"));
     dialog.setViewMode(QFileDialog::Detail);
     QStringList fileNames;
@@ -468,6 +472,9 @@ void gui_main::open()
 
 		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 		widget->Open(fileNames.first().toStdString());
+
+		// Store the directory name for the next file open dialog.
+		mOpenModelDir = QFileInfo(fileNames[0]).absolutePath().toStdString();
 	}
 }
 

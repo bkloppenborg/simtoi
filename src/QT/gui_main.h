@@ -47,7 +47,8 @@ protected:
     string mKernelSourceDir;
     bool mAnimating;
 
-    string mDataDir;	// Stores the previously opened directory in the file dialog
+    string mOpenDataDir;	// Stores the previously opened directory for data files
+    string mOpenModelDir; 	// Stores the previously opened directory for models
 
 public:
     gui_main(QWidget *parent = 0);
