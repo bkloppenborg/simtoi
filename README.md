@@ -20,7 +20,7 @@ At a minimum, these libraries must be installed on your system:
 * Some OpenCL library
 
 SIMTOI includes the following libraries as part of its distribution:
-* [OpenCL Interferometry Library (liboi)](https://github.com/bkloppenborg/liboi_
+* [OpenCL Interferometry Library (liboi)](https://github.com/bkloppenborg/liboi)
 * [json-cpp](http://sourceforge.net/projects/jsoncpp/)
 * [levmar](http://www.ics.forth.gr/~lourakis/levmar/)
 
