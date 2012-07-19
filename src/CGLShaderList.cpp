@@ -114,7 +114,7 @@ CGLShader * CGLShaderList::FindShader(CGLShaderList::ShaderTypes shader)
 /// Loads all avaliable shaders into memory
 void CGLShaderList::LoadShaders()
 {
-	// TODO: Convert this to reading in a configuration file.
+	// TODO: Convert this to reading in a configuration file.  Update the documentation on the wiki.
 	string base_name;
 	string friendly_name;
 	int n_params;
@@ -134,15 +134,87 @@ void CGLShaderList::LoadShaders()
 	Append(tmp);
 
 	// Simple limb darkening.
-	base_name = "LD_Hestroffer1997";
-	friendly_name = "LDL - Hesteroffer";
+	base_name = "LDL_PowerLaw";
+	friendly_name = "LDL - PowerLaw";
 	n_params = 1;
 	param_names.clear();
 	starting_values.clear();
+	minmax.clear();
 	param_names.push_back("alpha");
 	minmax.push_back(pair<float,float>(0.1, 1));
 	starting_values.push_back(0.5);
-	tmp = new CGLShader(CGLShaderList::LD_HESTEROFFER1997, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
+	tmp = new CGLShader(CGLShaderList::LDL_POWERLAW, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
+	Append(tmp);
+
+	// Claret (2000) four-parameter limb darkening law
+	// NOTE: This law doesn't always conserve flux.  Use with caution.
+	base_name = "LDL_Claret2000";
+	friendly_name = "LDL - Claret (2000)";
+	n_params = 4;
+	param_names.clear();
+	starting_values.clear();
+	minmax.clear();
+	param_names.push_back("a1");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	param_names.push_back("a2");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	param_names.push_back("a3");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	param_names.push_back("a4");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	tmp = new CGLShader(CGLShaderList::LDL_CLARET2000, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
+	Append(tmp);
+
+	// Square root limb darkening.
+	base_name = "LDL_SquareRoot";
+	friendly_name = "LDL - Square Root";
+	n_params = 2;
+	param_names.clear();
+	starting_values.clear();
+	minmax.clear();
+	param_names.push_back("a1");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	param_names.push_back("a2");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	tmp = new CGLShader(CGLShaderList::LDL_SQUARE_ROOT, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
+	Append(tmp);
+
+	// Quadratic limb darkening
+	base_name = "LDL_Quadratic";
+	friendly_name = "LDL - Quadratic";
+	n_params = 2;
+	param_names.clear();
+	starting_values.clear();
+	minmax.clear();
+	param_names.push_back("a1");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	param_names.push_back("a2");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	tmp = new CGLShader(CGLShaderList::LDL_QUADRATIC, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
+	Append(tmp);
+
+	// Logarithmic limb darkening
+	base_name = "LDL_Logarithmic";
+	friendly_name = "LDL - Logarithmic";
+	n_params = 2;
+	param_names.clear();
+	starting_values.clear();
+	minmax.clear();
+	param_names.push_back("a1");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	param_names.push_back("a2");
+	starting_values.push_back(0.1);
+	minmax.push_back(pair<float,float>(0.001, 1));
+	tmp = new CGLShader(CGLShaderList::LDL_LOGARITHMIC, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
 	Append(tmp);
 
 	// f(z) power law transparency
@@ -151,6 +223,7 @@ void CGLShaderList::LoadShaders()
 	n_params = 1;
 	param_names.clear();
 	starting_values.clear();
+	minmax.clear();
 	param_names.push_back("Beta");
 	minmax.push_back(pair<float,float>(0.01, 1));
 	starting_values.push_back(0.1);

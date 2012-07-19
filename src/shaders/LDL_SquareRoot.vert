@@ -1,11 +1,5 @@
-/*
- * CGLShaderList.h
- *
- *  Created on: Nov 9, 2011
- *      Author: bkloppenborg
- */
- 
- /* 
+#version 120
+/* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
@@ -29,52 +23,18 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+// Square root limb darkening
+// Implemented using alpha blending.
+varying out vec3 normal;
+varying out vec4 color;
 
-#ifndef CGLSHADERLIST_H_
-#define CGLSHADERLIST_H_
+uniform vec3 min_xyz;
+uniform vec3 max_xyz;
 
-#include <vector>
-#include <string>
-#include <utility>
-#include "CVectorList.h"
-
-using namespace std;
-
-class CGLShader;
-class CGLShaderWrapper;
-
-class CGLShaderList: public CVectorList<CGLShader*>
+void main(void)
 {
-public:
-	/// Enumerated shader names
-	enum ShaderTypes
-	{
-		NONE = 0,
-		LDL_POWERLAW = 1,
-		POWER_LAW_Z = 2,
-		LDL_CLARET2000 = 3,
-		LDL_SQUARE_ROOT = 4,
-		LDL_QUADRATIC = 5,
-		LDL_LOGARITHMIC = 6,
-		LAST_VALUE // must be the last element
-	};
-
-protected:
-	string shader_dir;
-	bool SortModelPredicate(CGLShader * A, CGLShader * B);
-
-public:
-	CGLShaderList(string shader_dir);
-	~CGLShaderList();
-
-public:
-	CGLShaderWrapper * GetShader(ShaderTypes shader);
-	vector< pair<ShaderTypes, string> > GetTypes(void);
-
-protected:
-	CGLShader * FindShader(ShaderTypes shader);
-
-	void LoadShaders();
-};
-
-#endif /* CGLSHADERLIST_H_ */
+    normal = gl_NormalMatrix * gl_Normal;
+    color = gl_Color;
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
