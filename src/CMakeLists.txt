@@ -26,10 +26,6 @@ add_subdirectory(QT)
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp models/*.cpp)
 
-# Find MultiNest.  If MultiNest isn't installed to a standard location, provide a hint
-# to where it can be found:
-SET(MULTINEST_ROOT_HINT /home/bkloppenborg/workspace/multinest)
-
 find_package(MultiNest)
 if(MULTINEST_FOUND)
     include_directories(${MULTINEST_INCLUDE_DIRS})

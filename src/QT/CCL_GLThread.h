@@ -78,7 +78,8 @@ enum CL_GLT_Operations
 	CLT_Tests,
 	CLT_CopyImage,
 	CLT_SaveImage,
-	CLT_GetData
+	CLT_GetData,
+	CLT_GetChi2_Elements
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
