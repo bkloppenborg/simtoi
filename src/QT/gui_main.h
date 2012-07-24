@@ -52,32 +52,37 @@ protected:
 
 public:
     gui_main(QWidget *parent = 0);
+    gui_main(QStringList data_files, string model, int minimizer, int size, double scale, QWidget *parent = 0);
     ~gui_main();
 
 protected:
+    void ButtonCheck();
     void close();
     void closeEvent(QCloseEvent *evt);
-    void ButtonCheck();
+
+    void DataAdd(QStringList filenames, QMdiSubWindow * sw);
+
     void SetupComboBoxes();
+    void Init();
 
 private slots:
     void AddGLArea();
-    void AddData(void);
     void Animation_StartStop();
     void Animation_Reset();
+    void DataAdd(void);
+    void DataRemove();
     void DeleteGLArea();
     void ExportPhotometry();
     void ExportFITS();
     void render();
+    void MinimizerRun();
+    void MinimizerStop();
 	void ModelAdd(void);
 	void ModelDelete(void);
 	void ModelEdit(void);
     void open();
-    void RunMinimizer();
-    void RemoveData();
     void save();
     void SetTime();
-    void StopMinimizer();
 
 
 public slots:

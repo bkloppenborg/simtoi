@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
-    vector<string> data_files;
+    QStringList data_files;
     string model_file;
     int minimizer;
     int width;
@@ -68,13 +68,13 @@ int main(int argc, char *argv[])
     if(args.size() > 0)
     	ParseArgs(args, data_files, model_file, minimizer, width, scale);
 
-    gui_main main_window;
+    gui_main main_window(data_files, model_file, minimizer, width, scale);
     main_window.show();
     return app.exec();
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, vector<string> & files, string & model, int &  minimizer, int & size, double & scale)
+void ParseArgs(QStringList args, QStringList & filenames, string & model, int &  minimizer, int & size, double & scale)
 {
 	unsigned int n_items = args.size();
 
@@ -86,7 +86,7 @@ void ParseArgs(QStringList args, vector<string> & files, string & model, int &  
 
 		// data file(s)
 		if(value == "-d")
-			files.push_back(args.at(i + 1).toStdString());
+			filenames.append(args.at(i + 1));
 
 		// model file
 		if(value == "-m")

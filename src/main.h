@@ -38,7 +38,7 @@
 using namespace std;
 
 int main(int argc, char** argv);
-void ParseArgs(QStringList args, vector<string> & files, string & model, int &  minimizer, int & size, double & scale);
+void ParseArgs(QStringList args, QStringList & filenames, string & model, int &  minimizer, int & size, double & scale);
 void PrintHelp();
 
 
