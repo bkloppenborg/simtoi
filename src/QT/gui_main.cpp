@@ -99,7 +99,6 @@ gui_main::gui_main(QWidget *parent_widget)
 	mOpenDataDir = "./";
 	mOpenModelDir = "./";
 
-
 	SetupComboBoxes();
 
 //	QGLFormat format;

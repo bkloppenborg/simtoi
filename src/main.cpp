@@ -56,9 +56,63 @@ int main(int argc, char *argv[])
 
 	// Pass off to the GUI:
     QApplication app(argc, argv);
+
+    // get the list of command line arguments and parse them.
+    QStringList args = app.arguments();
+    vector<string> data_files;
+    string model_file;
+    int minimizer;
+    int width;
+    double scale;
+
+    if(args.size() > 0)
+    	ParseArgs(args, data_files, model_file, minimizer, width, scale);
+
     gui_main main_window;
     main_window.show();
     return app.exec();
+}
+
+/// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
+void ParseArgs(QStringList args, vector<string> & files, string & model, int &  minimizer, int & size, double & scale)
+{
+	unsigned int n_items = args.size();
+
+	string value;
+
+	for(int i = 0; i < n_items; i++)
+	{
+		value = args.at(i).toStdString();
+
+		// data file(s)
+		if(value == "-d")
+			files.push_back(args.at(i + 1).toStdString());
+
+		// model file
+		if(value == "-m")
+			model = args.at(i + 1).toStdString();
+
+		// minimization engine
+		if(value == "-e")
+			minimizer = args.at(i + 1).toInt();
+
+		// model area width
+		if(value == "-w")
+			size = args.at(i+1).toInt();
+
+		// model area scale
+		if(value == "-s")
+			scale = args.at(i+1).toDouble();
+
+		if(value == "-h")
+			PrintHelp();
+	}
+}
+
+void PrintHelp()
+{
+	printf("For command-line arguments see the wiki: \n https://github.com/bkloppenborg/simtoi/wiki/Command-Line \n");
+	exit(0);
 }
 
 
