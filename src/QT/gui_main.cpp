@@ -464,7 +464,40 @@ void gui_main::ModelDelete()
 /// Opens up an editing dialog for the currently selected model.
 void gui_main::ModelEdit()
 {
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
 
+    // see if an item is selected in the tree view, get it's ID
+    // then pull out the model's informatoin
+    // TODO: finish this.
+
+//	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+//    int id = 0;
+//    int n_features;
+//
+//    // setup the gui:
+//    gui_model tmp;
+//    tmp.SetModelTypes(CModelList::GetTypes());
+//    tmp.SetShaderTypes(widget->GetShaderTypes());
+//    tmp.SetPositionTypes(CPosition::GetTypes());
+//
+//    // set the specific information from the current selected model
+//
+//    tmp.show();
+//
+//    if(tmp.exec())
+//    {
+//		// Now setup the model, position type, and shader.
+//		widget->AddModel(tmp.GetModelType());
+//		id = widget->GetNModels() - 1;
+//		widget->SetPositionType(id, tmp.GetPositionType());
+//		widget->SetShader(id, tmp.GetShaderType());
+//
+//    }
+//
+//    // Now render the models:
+//    widget->EnqueueOperation(GLT_RenderModels);
 }
 
 void gui_main::open()

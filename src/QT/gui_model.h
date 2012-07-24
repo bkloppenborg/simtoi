@@ -58,10 +58,16 @@ public:
     CGLShaderList::ShaderTypes GetShaderType() { return mShaderType; };
     CPosition::PositionTypes GetPositionType() { return mPositionType; };
 
-
+    //void SetFeaturesType(vector<int> feature_ids);
     void SetFeatureTypes(vector< pair<int, string> > feature_info);
+
+    void SetModelType(CModelList::ModelTypes value);
     void SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info);
+
+    void SetPositionType(CPosition::PositionTypes value);
     void SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info);
+
+    void SetShaderType(CGLShaderList::ShaderTypes value);
     void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
 
     public slots:
