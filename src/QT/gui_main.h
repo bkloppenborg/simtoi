@@ -62,15 +62,16 @@ protected:
 
 private slots:
     void AddGLArea();
-    void AddModel(void);
     void AddData(void);
     void Animation_StartStop();
     void Animation_Reset();
-    void DeleteModel(void);
     void DeleteGLArea();
     void ExportPhotometry();
     void ExportFITS();
     void render();
+	void ModelAdd(void);
+	void ModelDelete(void);
+	void ModelEdit(void);
     void open();
     void RunMinimizer();
     void RemoveData();

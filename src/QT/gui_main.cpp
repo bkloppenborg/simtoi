@@ -74,8 +74,9 @@ gui_main::gui_main(QWidget *parent_widget)
 	connect(ui.btnRemoveData, SIGNAL(clicked(void)), this, SLOT(RemoveData(void)));
 
 	// Add/delete models
-	connect(ui.btnAddModel, SIGNAL(clicked(void)), this, SLOT(AddModel(void)));
-	connect(ui.btnDeleteModel, SIGNAL(clicked(void)), this, SLOT(DeleteModel(void)));
+	connect(ui.btnModelAdd, SIGNAL(clicked(void)), this, SLOT(ModelAdd(void)));
+	connect(ui.btnModelEdit, SIGNAL(clicked(void)), this, SLOT(ModelEdit(void)));
+	connect(ui.btnModelDelete, SIGNAL(clicked(void)), this, SLOT(ModelDelete(void)));
 
 	// File menu:
 	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(save(void)));
@@ -178,37 +179,6 @@ void gui_main::AddGLArea()
 	// If the load data button isn't enabled, turn it on
 	ButtonCheck();
 }
-
-void gui_main::AddModel(void)
-{
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    int id = 0;
-    int n_features;
-
-    gui_model tmp;
-    tmp.SetModelTypes(CModelList::GetTypes());
-    tmp.SetShaderTypes(widget->GetShaderTypes());
-    tmp.SetPositionTypes(CPosition::GetTypes());
-    tmp.show();
-
-    if(tmp.exec())
-    {
-		// Now setup the model, position type, and shader.
-		widget->AddModel(tmp.GetModelType());
-		id = widget->GetNModels() - 1;
-		widget->SetPositionType(id, tmp.GetPositionType());
-		widget->SetShader(id, tmp.GetShaderType());
-
-    }
-
-    // Now render the models:
-    widget->EnqueueOperation(GLT_RenderModels);
-}
-
 /// Loads OIFITS data into the current selected subwindow
 void gui_main::AddData()
 {
@@ -274,9 +244,11 @@ void gui_main::AddData()
 /// Checks to see which buttons can be enabled/disabled.
 void gui_main::ButtonCheck()
 {
-	ui.btnAddModel->setEnabled(false);
-	ui.btnDeleteModel->setEnabled(false);
+
 	ui.btnAddData->setEnabled(false);
+	ui.btnModelAdd->setEnabled(false);
+	ui.btnModelEdit->setEnabled(false);
+	ui.btnModelDelete->setEnabled(false);
 	ui.btnRemoveData->setEnabled(false);
 	ui.btnStartStop->setEnabled(false);
 	ui.btnReset->setEnabled(false);
@@ -290,8 +262,6 @@ void gui_main::ButtonCheck()
     if(!sw)
     	return;
 
-	ui.btnAddModel->setEnabled(true);
-	ui.btnAddData->setEnabled(true);
 	ui.btnStartStop->setEnabled(true);
 	ui.btnReset->setEnabled(true);
 	ui.btnRunMinimizer->setEnabled(true);
@@ -300,12 +270,19 @@ void gui_main::ButtonCheck()
 	ui.btnSaveFITS->setEnabled(true);
 	ui.btnSetTime->setEnabled(true);
 
+	// Buttons for add/delete data
+	ui.btnAddData->setEnabled(true);
 	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 	if(widget->GetOpenFileModel()->rowCount() > 0)
 		ui.btnRemoveData->setEnabled(true);
 
+	// Buttons for add/edit/delete model
+	ui.btnModelAdd->setEnabled(true);
 	if(widget->GetTreeModel()->rowCount() > 0)
-		ui.btnDeleteModel->setEnabled(true);
+	{
+		ui.btnModelEdit->setEnabled(true);
+		ui.btnModelDelete->setEnabled(true);
+	}
 }
 
 void gui_main::close()
@@ -327,19 +304,6 @@ void gui_main::closeEvent(QCloseEvent *evt)
 {
 	close();
     QMainWindow::closeEvent(evt);
-}
-
-/// Deletes the selected model from the model list
-void gui_main::DeleteModel()
-{
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-
-	// TODO: Finish this function
-
 }
 
 void gui_main::DeleteGLArea()
@@ -451,6 +415,55 @@ void gui_main::ExportPhotometry()
 	}
 
 	outfile.close();
+
+}
+
+void gui_main::ModelAdd(void)
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+    int id = 0;
+    int n_features;
+
+    gui_model tmp;
+    tmp.SetModelTypes(CModelList::GetTypes());
+    tmp.SetShaderTypes(widget->GetShaderTypes());
+    tmp.SetPositionTypes(CPosition::GetTypes());
+    tmp.show();
+
+    if(tmp.exec())
+    {
+		// Now setup the model, position type, and shader.
+		widget->AddModel(tmp.GetModelType());
+		id = widget->GetNModels() - 1;
+		widget->SetPositionType(id, tmp.GetPositionType());
+		widget->SetShader(id, tmp.GetShaderType());
+
+    }
+
+    // Now render the models:
+    widget->EnqueueOperation(GLT_RenderModels);
+}
+
+/// Deletes the selected model from the model list
+void gui_main::ModelDelete()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
+	// TODO: Finish this function
+
+}
+
+/// Opens up an editing dialog for the currently selected model.
+void gui_main::ModelEdit()
+{
 
 }
 
