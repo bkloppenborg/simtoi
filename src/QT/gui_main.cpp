@@ -221,12 +221,12 @@ void gui_main::DataAdd()
 	if (dialog.exec())
 	{
 		filenames = dialog.selectedFiles();
-//		DataAdd(filenames, sw);
+		DataAdd(filenames, sw);
 	}
-//}
-//
-//void gui_main::DataAdd(QStringList & filenames, QMdiSubWindow * sw)
-//{
+}
+
+void gui_main::DataAdd(QStringList & filenames, QMdiSubWindow * sw)
+{
 	string tmp;
 	int dir_size = 0;
 	stringstream time_str;

@@ -60,7 +60,7 @@ protected:
     void close();
     void closeEvent(QCloseEvent *evt);
 
-    void DataAdd(QStringList filenames, QMdiSubWindow * sw);
+    void DataAdd(QStringList & filenames, QMdiSubWindow * sw);
 
     void SetupComboBoxes();
     void Init();
