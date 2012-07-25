@@ -57,23 +57,6 @@ gui_main::gui_main(QWidget *parent_widget)
 	Init();
 }
 
-gui_main::gui_main(QStringList data_files, string model, int minimizer, int size, double scale, QWidget * parent_widget)
-	: QMainWindow(parent_widget)
-{
-	Init();
-
-	//if(data_files.size() > 0 && model.length() > 0 && minimizer != -1 && size > 0 && scale > 0)
-	if(size > 0 && scale > 0)
-	{
-		QMdiSubWindow * sw = AddGLArea(size, size, scale);
-		DataAdd(data_files, sw);
-	// Load the data
-	// Load the model
-	// Start the minimizer
-	}
-
-}
-
 gui_main::~gui_main()
 {
 	close();
@@ -216,6 +199,14 @@ void gui_main::closeEvent(QCloseEvent *evt)
 {
 	close();
     QMainWindow::closeEvent(evt);
+}
+
+void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale)
+{
+	QMdiSubWindow * sw = AddGLArea(size, size, scale);
+	DataAdd(data_files, sw);
+	ModelOpen(model_files, sw);
+	MinimizerRun(minimizer, sw);
 }
 
 /// Loads OIFITS data into the current selected subwindow
@@ -452,8 +443,8 @@ void gui_main::Init(void)
 	connect(ui.btnModelDelete, SIGNAL(clicked(void)), this, SLOT(ModelDelete(void)));
 
 	// File menu:
-	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(save(void)));
-	connect(ui.actionOpen, SIGNAL(triggered(void)), this, SLOT(open(void)));
+	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(ModelSave(void)));
+	connect(ui.actionOpen, SIGNAL(triggered(void)), this, SLOT(ModelOpen(void)));
 
 	// Flux simulation
 	connect(ui.btnSavePhotometry, SIGNAL(clicked(void)), this, SLOT(ExportPhotometry(void)));
@@ -482,10 +473,17 @@ void gui_main::Init(void)
 
 void gui_main::MinimizerRun()
 {
+	int minimizer = ui.cboMinimizers->itemData(ui.cboMinimizers->currentIndex()).toInt();
+
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
+    MinimizerRun(minimizer, sw);
+}
+
+void gui_main::MinimizerRun(int minimizer_id, QMdiSubWindow * sw)
+{
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     CMinimizer::MinimizerTypes minimizer;
 
@@ -499,14 +497,21 @@ void gui_main::MinimizerRun()
 
 	widget->EnqueueOperation(CLT_Init);
 
-    // Now determine which minimizer is selected:
-	int value = ui.cboMinimizers->itemData(ui.cboMinimizers->currentIndex()).toInt();
-	if(value > CMinimizer::NONE && value < CMinimizer::LAST_VALUE)
+    // Now determine which minimizer is selected.  The else case could be generated
+	// from a command-line execution of SIMTOI.
+	if(minimizer_id > CMinimizer::NONE && minimizer_id < CMinimizer::LAST_VALUE)
 	{
-		minimizer = CMinimizer::MinimizerTypes(value);
+		minimizer = CMinimizer::MinimizerTypes(minimizer_id);
 	    widget->LoadMinimizer(minimizer);
 	    widget->RunMinimizer();
 	}
+	else
+    {
+		QMessageBox msgBox;
+		msgBox.setText("Unknown minimizer.");
+		msgBox.exec();
+    	return;
+    }
 }
 
 /// Stops the minimizer
@@ -604,7 +609,7 @@ void gui_main::ModelEdit()
 //    widget->EnqueueOperation(GLT_RenderModels);
 }
 
-void gui_main::open()
+void gui_main::ModelOpen()
 {
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -620,28 +625,20 @@ void gui_main::open()
 	{
 		fileNames = dialog.selectedFiles();
 
-		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-		widget->Open(fileNames.first().toStdString());
-
-		// Store the directory name for the next file open dialog.
-		mOpenModelDir = QFileInfo(fileNames[0]).absolutePath().toStdString();
+		ModelOpen(fileNames, sw);
 	}
 }
 
-void gui_main::render()
+void gui_main::ModelOpen(QStringList & fileNames, QMdiSubWindow * sw)
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    if(widget)
-    {
-    	widget->EnqueueOperation(GLT_RenderModels);
-    }
+	widget->Open(fileNames.first().toStdString());
+
+	// Store the directory name for the next file open dialog.
+	mOpenModelDir = QFileInfo(fileNames[0]).absolutePath().toStdString();
 }
 
-void gui_main::save()
+void gui_main::ModelSave()
 {
     QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
     if(!sw)
@@ -666,6 +663,19 @@ void gui_main::save()
 		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 		widget->Save(filename);
 	}
+}
+
+void gui_main::render()
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+    if(widget)
+    {
+    	widget->EnqueueOperation(GLT_RenderModels);
+    }
 }
 
 void gui_main::SetupComboBoxes()

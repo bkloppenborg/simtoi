@@ -49,7 +49,7 @@ CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 	mNParams = 0;
 	mType = NONE;
 	mRun = true;
-	mIsRunning = true;
+	mIsRunning = false;
 	mResultsBaseFilename = "/tmp/min_output";
 }
 
@@ -121,6 +121,7 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 void CMinimizer::Init()
 {
 	mParams = new double[mCLThread->GetNFreeParameters()];
+	mRun = true;
 }
 
 bool CMinimizer::IsRunning()

@@ -52,7 +52,6 @@ protected:
 
 public:
     gui_main(QWidget *parent = 0);
-    gui_main(QStringList data_files, string model, int minimizer, int size, double scale, QWidget *parent = 0);
     ~gui_main();
 
 protected:
@@ -62,7 +61,14 @@ protected:
     void close();
     void closeEvent(QCloseEvent *evt);
 
+public:
+    void CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale);
+
+protected:
     void DataAdd(QStringList & filenames, QMdiSubWindow * sw);
+
+    void MinimizerRun(int minimizer_id, QMdiSubWindow * sw);
+    void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
 
     void SetupComboBoxes();
     void Init();
@@ -82,8 +88,8 @@ private slots:
 	void ModelAdd(void);
 	void ModelDelete(void);
 	void ModelEdit(void);
-    void open();
-    void save();
+    void ModelOpen();
+    void ModelSave();
     void SetTime();
 
 

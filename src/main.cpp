@@ -60,21 +60,28 @@ int main(int argc, char *argv[])
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
     QStringList data_files;
-    string model_file = "";
+    QStringList model_files;
     int minimizer = 0;
     int width = 0;
     double scale = 0;
 
-    if(args.size() > 0)
-    	ParseArgs(args, data_files, model_file, minimizer, width, scale);
-
-    gui_main main_window(data_files, model_file, minimizer, width, scale);
+    // Startup the GUI:
+    gui_main main_window;
     main_window.show();
+
+    // If there were command-line options, parse them
+    if(args.size() > 0)
+    	ParseArgs(args, data_files, model_files, minimizer, width, scale);
+
+    if(width > 0 && scale > 0)
+    	main_window.CommandLine(data_files, model_files, minimizer, width, scale);
+
+
     return app.exec();
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, QStringList & filenames, string & model, int &  minimizer, int & size, double & scale)
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, int &  minimizer, int & size, double & scale)
 {
 	unsigned int n_items = args.size();
 
@@ -90,7 +97,7 @@ void ParseArgs(QStringList args, QStringList & filenames, string & model, int & 
 
 		// model file
 		if(value == "-m")
-			model = args.at(i + 1).toStdString();
+			models.append(args.at(i + 1));
 
 		// minimization engine
 		if(value == "-e")
