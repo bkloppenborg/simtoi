@@ -123,6 +123,13 @@ public:
 
     void startRendering();
     void stopRendering();
+
+signals:
+	void MinimizationFinished(QWidget * parent_window);
+
+public slots:
+	void MinimizerExit();
+
 };
 
 #endif

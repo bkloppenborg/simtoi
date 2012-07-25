@@ -126,7 +126,7 @@ QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double mo
     widget->SetScale(model_scale);
     widget->startRendering();
 
-	// Now connect the slot
+	// Now connect signals and slots
 	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
 
 	// If the load data button isn't enabled, turn it on
@@ -180,6 +180,29 @@ void gui_main::ButtonCheck()
 	}
 }
 
+void gui_main::AutoClose(QWidget * widget)
+{
+	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow *>(sw->widget());
+	sw->close();
+
+	// If there are more open subwindows and auto-close is set, close the program.
+	if(mAutoClose && ui.mdiArea->subWindowList().size() == 0)
+		close();
+}
+
+void gui_main::AutoClose(bool auto_close, QMdiSubWindow * sw)
+{
+	// logically OR the two values:
+	mAutoClose = auto_close || mAutoClose;
+
+	if(!mAutoClose)
+		return;
+
+	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
+
+	connect(widget, SIGNAL(MinimizationFinished(QWidget *)), this, SLOT(AutoClose(QWidget *)));
+}
+
 void gui_main::close()
 {
 	CGLWidget * widget = NULL;
@@ -201,12 +224,15 @@ void gui_main::closeEvent(QCloseEvent *evt)
     QMainWindow::closeEvent(evt);
 }
 
-void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale)
+/// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
+/// SIMTOI will automatically exit when all minimization engines have completed execution.
+void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale, bool close_simtoi)
 {
 	QMdiSubWindow * sw = AddGLArea(size, size, scale);
 	DataAdd(data_files, sw);
 	ModelOpen(model_files, sw);
 	MinimizerRun(minimizer, sw);
+	AutoClose(close_simtoi, sw);
 }
 
 /// Loads OIFITS data into the current selected subwindow
@@ -458,6 +484,7 @@ void gui_main::Init(void)
 	// Now init variables:
 
 	mAnimating = false;
+	mAutoClose = false;
 
 	// Get the application path,
 	string app_path = QCoreApplication::applicationDirPath().toStdString();

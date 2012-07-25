@@ -140,6 +140,11 @@ void CGLWidget::LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type)
 	mMinThread.SetMinimizer(tmp);
 }
 
+void CGLWidget::MinimizerExit(void)
+{
+	emit( MinimizationFinished(dynamic_cast<QWidget*>(parent()) ) );
+}
+
 void CGLWidget::Open(string filename)
 {
 	mGLT.Open(filename);
@@ -203,6 +208,8 @@ void CGLWidget::resizeEvent(QResizeEvent *evt)
 void CGLWidget::RunMinimizer()
 {
 	mMinThread.start();
+
+	connect(&mMinThread, SIGNAL(finished(void)), this, SLOT(MinimizerExit(void)));
 }
 
 void CGLWidget::startRendering()

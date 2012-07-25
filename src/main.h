@@ -38,7 +38,7 @@
 using namespace std;
 
 int main(int argc, char** argv);
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & model, int &  minimizer, int & size, double & scale);
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & model, int &  minimizer, int & size, double & scale, bool & close_simtoi);
 void PrintHelp();
 
 #endif /* MAIN_H_ */

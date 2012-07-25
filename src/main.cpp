@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     int minimizer = 0;
     int width = 0;
     double scale = 0;
+    bool close_simtoi = false;
 
     // Startup the GUI:
     gui_main main_window;
@@ -71,17 +72,17 @@ int main(int argc, char *argv[])
 
     // If there were command-line options, parse them
     if(args.size() > 0)
-    	ParseArgs(args, data_files, model_files, minimizer, width, scale);
+    	ParseArgs(args, data_files, model_files, minimizer, width, scale, close_simtoi);
 
     if(width > 0 && scale > 0)
-    	main_window.CommandLine(data_files, model_files, minimizer, width, scale);
+    	main_window.CommandLine(data_files, model_files, minimizer, width, scale, close_simtoi);
 
 
     return app.exec();
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, int &  minimizer, int & size, double & scale)
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, int &  minimizer, int & size, double & scale, bool & close_simtoi)
 {
 	unsigned int n_items = args.size();
 
@@ -110,6 +111,9 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 		// model area scale
 		if(value == "-s")
 			scale = args.at(i+1).toDouble();
+
+		if(value == "-c")
+			close_simtoi = true;
 
 		if(value == "-h")
 			PrintHelp();

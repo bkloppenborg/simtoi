@@ -46,6 +46,7 @@ protected:
     string mShaderSourceDir;
     string mKernelSourceDir;
     bool mAnimating;
+    bool mAutoClose;
 
     string mOpenDataDir;	// Stores the previously opened directory for data files
     string mOpenModelDir; 	// Stores the previously opened directory for models
@@ -57,12 +58,16 @@ public:
 protected:
     QMdiSubWindow * AddGLArea(int model_width, int model_height, double model_scale);
 
+public:
+    void AutoClose(bool auto_close, QMdiSubWindow * sw);
+
+protected:
     void ButtonCheck();
     void close();
     void closeEvent(QCloseEvent *evt);
 
 public:
-    void CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale);
+    void CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale, bool close_simtoi);
 
 protected:
     void DataAdd(QStringList & filenames, QMdiSubWindow * sw);
@@ -77,6 +82,7 @@ private slots:
     void AddGLArea();
     void Animation_StartStop();
     void Animation_Reset();
+    void AutoClose(QWidget * widget);
     void DataAdd(void);
     void DataRemove();
     void DeleteGLArea();
