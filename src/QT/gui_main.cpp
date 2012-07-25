@@ -61,6 +61,17 @@ gui_main::gui_main(QStringList data_files, string model, int minimizer, int size
 	: QMainWindow(parent_widget)
 {
 	Init();
+
+	//if(data_files.size() > 0 && model.length() > 0 && minimizer != -1 && size > 0 && scale > 0)
+	if(size > 0 && scale > 0)
+	{
+		QMdiSubWindow * sw = AddGLArea(size, size, scale);
+		DataAdd(data_files, sw);
+	// Load the data
+	// Load the model
+	// Start the minimizer
+	}
+
 }
 
 gui_main::~gui_main()
@@ -106,6 +117,15 @@ void gui_main::Animation_Reset()
 
 void gui_main::AddGLArea()
 {
+    int width = ui.spinModelSize->value();
+    int height = ui.spinModelSize->value();
+    double scale = ui.spinModelScale->value();
+
+    AddGLArea(width, height, scale);
+}
+
+QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double model_scale)
+{
 	// Create a new subwindow with a title and close button:
     CGLWidget * widget = new CGLWidget(ui.mdiArea, mShaderSourceDir, mKernelSourceDir);
     QMdiSubWindow * sw = ui.mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
@@ -114,14 +134,13 @@ void gui_main::AddGLArea()
     // TODO: This is approximately right for my machine, probably not ok on other OSes.
     int frame_width = 8;
     int frame_height = 28;
-    int model_width = ui.spinModelSize->value();
-    int model_height = ui.spinModelSize->value();
+
     sw->setFixedSize(model_width + frame_width, model_height + frame_height);
     //sw->resize(model_width + frame_width, model_height + frame_height);
     sw->show();
 
     widget->resize(model_width, model_height);
-    widget->SetScale(ui.spinModelScale->value());
+    widget->SetScale(model_scale);
     widget->startRendering();
 
 	// Now connect the slot
@@ -129,6 +148,8 @@ void gui_main::AddGLArea()
 
 	// If the load data button isn't enabled, turn it on
 	ButtonCheck();
+
+	return sw;
 }
 
 

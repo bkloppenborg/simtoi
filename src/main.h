@@ -41,6 +41,4 @@ int main(int argc, char** argv);
 void ParseArgs(QStringList args, QStringList & filenames, string & model, int &  minimizer, int & size, double & scale);
 void PrintHelp();
 
-
-
 #endif /* MAIN_H_ */

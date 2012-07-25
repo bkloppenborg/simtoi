@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
     QStringList data_files;
-    string model_file;
-    int minimizer;
-    int width;
-    double scale;
+    string model_file = "";
+    int minimizer = 0;
+    int width = 0;
+    double scale = 0;
 
     if(args.size() > 0)
     	ParseArgs(args, data_files, model_file, minimizer, width, scale);
@@ -114,6 +114,5 @@ void PrintHelp()
 	printf("For command-line arguments see the wiki: \n https://github.com/bkloppenborg/simtoi/wiki/Command-Line \n");
 	exit(0);
 }
-
 
 #endif /* MAIN_CPP_ */

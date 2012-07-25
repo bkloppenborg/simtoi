@@ -143,6 +143,7 @@ protected:
 
     // Misc datamembers:
 	bool mRun;
+	bool mIsRunning;
 
     int id;
     static int count;
@@ -186,6 +187,8 @@ public:
 	double GetScale() { return mScale; };
 	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
 	unsigned int GetImageWidth() { return mImageWidth; };
+
+	bool IsRunning() { return mIsRunning; };
 
     vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mModelList->GetTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };

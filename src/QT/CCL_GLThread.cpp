@@ -46,6 +46,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
 	id = count++;
 
     mRun = true;
+    mIsRunning = false;
     mPermitResize = true;
     mImageWidth = 1;
     mImageHeight = 1;
@@ -593,6 +594,7 @@ void CCL_GLThread::run()
 //	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
     // Main thread loop
+	mIsRunning = true;
     while (mRun)
     {
         op = GetNextOperation();
@@ -716,6 +718,9 @@ void CCL_GLThread::run()
         	break;
         }
     }
+
+    // The thread is no longer running
+    mIsRunning = false;
 }
 
 /// Saves the list of models and their values to the specified location

@@ -56,6 +56,8 @@ public:
     ~gui_main();
 
 protected:
+    QMdiSubWindow * AddGLArea(int model_width, int model_height, double model_scale);
+
     void ButtonCheck();
     void close();
     void closeEvent(QCloseEvent *evt);
