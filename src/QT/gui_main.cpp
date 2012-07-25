@@ -182,7 +182,7 @@ void gui_main::ButtonCheck()
 
 void gui_main::AutoClose(QWidget * widget)
 {
-	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow *>(sw->widget());
+	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow *>(widget);
 	sw->close();
 
 	// If there are more open subwindows and auto-close is set, close the program.
@@ -216,6 +216,9 @@ void gui_main::close()
     	widget->stopRendering();
     	sw->close();
     }
+
+    // Now call the base-class close method.
+    QMainWindow::close();
 }
 
 void gui_main::closeEvent(QCloseEvent *evt)
