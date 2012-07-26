@@ -87,6 +87,7 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 	unsigned int n_items = args.size();
 
 	string value;
+	QDir tmp = QDir(".");
 
 	for(int i = 0; i < n_items; i++)
 	{
@@ -94,11 +95,11 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 
 		// data file(s)
 		if(value == "-d")
-			filenames.append(args.at(i + 1));
+			filenames.append(tmp.absoluteFilePath(args.at(i + 1)));
 
 		// model file
 		if(value == "-m")
-			models.append(args.at(i + 1));
+			models.append(tmp.absoluteFilePath(args.at(i + 1)));
 
 		// minimization engine
 		if(value == "-e")
