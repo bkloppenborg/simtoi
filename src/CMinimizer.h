@@ -57,10 +57,10 @@ public:
 	enum MinimizerTypes
 	{
 		NONE = 0,
-		BENCHMARK = 1,
-		MULTINEST = 2,
+		TEST = 1,
+		BENCHMARK = 2,
 		LEVMAR = 3,
-		TEST = 4,
+		MULTINEST = 4,
 		LAST_VALUE	// this must always be the last value in this enum.
 	};
 
