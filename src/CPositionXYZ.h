@@ -43,7 +43,7 @@ public:
 	CPositionXYZ();
 	virtual ~CPositionXYZ();
 
-	void GetXYZ(float & x, float & y, float & z);
+	virtual void GetXYZ(double & x, double & y, double & z);
 };
 
 #endif /* CPOSITIONXYZ_H_ */

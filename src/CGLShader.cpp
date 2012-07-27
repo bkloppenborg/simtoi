@@ -167,7 +167,13 @@ void CGLShader::Init()
 
     CCL_GLThread::CheckOpenGLError("Could not link shader mProgram.");
 
-    // Now look up the locations of the parameters
+    // Now look up the locations of the parameters, start with the min/max value locations:
+    mMinXYZ_location = glGetUniformLocation(mProgram, "min_xyz");
+	CCL_GLThread::CheckOpenGLError("Could find variable 'min_xyz' in shader source.");
+    mMaxXYZ_location = glGetUniformLocation(mProgram, "max_xyz");
+	CCL_GLThread::CheckOpenGLError("Could find variable 'max_xyz' in shader source.");
+
+    // Now the shader-specific parameters:
     for(int i = 0; i < mNParams; i++)
     {
     	mParam_locations[i] = glGetUniformLocation(mProgram, mParam_names[i].c_str());
@@ -194,7 +200,7 @@ void CGLShader::LinkProgram(GLuint program)
     }
 }
 
-void CGLShader::UseShader(double * params, unsigned int in_params)
+void CGLShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, unsigned int in_params)
 {
 	if(!mShaderLoaded)
 		Init();
@@ -205,8 +211,22 @@ void CGLShader::UseShader(double * params, unsigned int in_params)
 	// Tell OpenGL to use the mProgram
 	glUseProgram(mProgram);
 
-	// Set the parameters
-	// NOTE: we intentionally downcast from double to GLfloat, loss of precision unavoidable here.
+	// Init temporary storage and copy the XYZ min/max values into the corresponding array.
+	GLfloat min_tmp[3];
+	GLfloat max_tmp[3];
+
+	// Note: the downcast from double to GLfloat is intentional... GLSL doesn't do doubles.
+	for(int i = 0; i < 3; i++)
+	{
+		min_tmp[i] = GLfloat(min_xyz[i]);
+		max_tmp[i] = GLfloat(max_xyz[i]);
+	}
+
+	// Send the values off to the shader:
+	glUniform3fv(mMinXYZ_location, 1, min_tmp);
+	glUniform3fv(mMaxXYZ_location, 1, max_tmp);
+
+	// Set the shader-specific parameters.  Notice again the intentional downcast.
 	GLfloat tmp;
 	for(int i = 0; (i < mNParams && i < in_params); i++)
 	{

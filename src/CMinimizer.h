@@ -56,11 +56,11 @@ protected:
 public:
 	enum MinimizerTypes
 	{
-		NONE,
-		BENCHMARK,
-		MULTINEST,
-		LEVMAR,
-		TEST,
+		NONE = 0,
+		TEST = 1,
+		BENCHMARK = 2,
+		LEVMAR = 3,
+		MULTINEST = 4,
 		LAST_VALUE	// this must always be the last value in this enum.
 	};
 

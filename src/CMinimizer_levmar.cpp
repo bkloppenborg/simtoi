@@ -161,12 +161,12 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 		printf("\n");
 	}
 
-	if(int(info[6]) == 7 && mRun)
-	{
-		printf("Dumping Residuals Buffer:\n");
-		for(int i = 0; i < n_data; i++)
-			printf(" %i %f\n", i, mResiduals[i]);
-	}
+//	if(int(info[6]) == 7 && mRun)
+//	{
+//		printf("Dumping Residuals Buffer:\n");
+//		for(int i = 0; i < n_data; i++)
+//			printf(" %i %f\n", i, mResiduals[i]);
+//	}
 
 }
 
@@ -191,11 +191,11 @@ int CMinimizer_levmar::run()
 	//  opts[2] = ||Dp||_2 				= LM_STOP_THRESH = 1E-15;
 	//  opts[3] = mu/max[J^T J]_ii ] 	= LM_STOP_THRESH * LM_STOP_THRESH = 1E-17 * 1E-17;
 	//  opts[4]= LM_DIFF_DELTA;
-	opts[0]= 1E-3;
-	opts[1]= 1E-8;
-	opts[2]= 1E-6;
-	opts[3]= 1E-6;
-	opts[4]= 1E-6;
+	opts[0]= 1;
+	opts[1]= 1E-10;
+	opts[2]= 1E-12;
+	opts[3]= LM_STOP_THRESH * LM_STOP_THRESH; //1E-9;
+	opts[4]= LM_DIFF_DELTA; //1E-9;
 
 	// Copy out the initial values for the parameters:
 	double params[mNParams];

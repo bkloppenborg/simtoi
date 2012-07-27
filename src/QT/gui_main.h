@@ -46,36 +46,57 @@ protected:
     string mShaderSourceDir;
     string mKernelSourceDir;
     bool mAnimating;
+    bool mAutoClose;
 
-    string mDataDir;	// Stores the previously opened directory in the file dialog
+    string mOpenDataDir;	// Stores the previously opened directory for data files
+    string mOpenModelDir; 	// Stores the previously opened directory for models
 
 public:
     gui_main(QWidget *parent = 0);
     ~gui_main();
 
 protected:
+    QMdiSubWindow * AddGLArea(int model_width, int model_height, double model_scale);
+
+public:
+    void AutoClose(bool auto_close, QMdiSubWindow * sw);
+
+protected:
+    void ButtonCheck();
     void close();
     void closeEvent(QCloseEvent *evt);
-    void ButtonCheck();
+
+public:
+    void CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale, bool close_simtoi);
+
+protected:
+    void DataAdd(QStringList & filenames, QMdiSubWindow * sw);
+
+    void MinimizerRun(int minimizer_id, QMdiSubWindow * sw);
+    void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
+
     void SetupComboBoxes();
+    void Init();
 
 private slots:
     void AddGLArea();
-    void AddModel(void);
-    void AddData(void);
     void Animation_StartStop();
     void Animation_Reset();
-    void DeleteModel(void);
+    void AutoClose(QWidget * widget);
+    void DataAdd(void);
+    void DataRemove();
     void DeleteGLArea();
     void ExportPhotometry();
     void ExportFITS();
     void render();
-    void open();
-    void RunMinimizer();
-    void RemoveData();
-    void save();
+    void MinimizerRun();
+    void MinimizerStop();
+	void ModelAdd(void);
+	void ModelDelete(void);
+	void ModelEdit(void);
+    void ModelOpen();
+    void ModelSave();
     void SetTime();
-    void StopMinimizer();
 
 
 public slots:

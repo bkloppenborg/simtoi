@@ -49,7 +49,7 @@ public:
 
 	CGLShaderList::ShaderTypes GetType() { return mShader->GetType(); };
 
-	void UseShader();
+	void UseShader(double min_xyz[3], double max_xyz[3]);
 };
 
 #endif /* CGLSHADERWRAPPER_H_ */

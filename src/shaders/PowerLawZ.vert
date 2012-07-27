@@ -23,15 +23,19 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-// Default (do nothing) shader.
+
+// Simple scale height transparency.
 varying out vec4 color;
+varying out float transparency;
 
 uniform vec3 min_xyz;
 uniform vec3 max_xyz;
 
-void main() 
-{ 
+uniform float Beta;
+
+void main(void)
+{
     color = gl_Color;
+    transparency = 1 - pow(abs(gl_Vertex.z) / max_xyz.z, Beta);
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }

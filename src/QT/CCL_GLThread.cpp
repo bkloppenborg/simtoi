@@ -46,6 +46,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
 	id = count++;
 
     mRun = true;
+    mIsRunning = false;
     mPermitResize = true;
     mImageWidth = 1;
     mImageHeight = 1;
@@ -70,7 +71,7 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
  	mFBO_depth = 0;
     mFBO_storage = 0;
 	mFBO_storage_texture = 0;
- 	mSamples = 0;
+ 	mSamples = 4;
 }
 
 CCL_GLThread::~CCL_GLThread()
@@ -173,14 +174,26 @@ void CCL_GLThread::EnqueueOperation(CL_GLT_Operations op)
 // to files whose starting bit is specified by base_filename
 void CCL_GLThread::ExportResults(string base_filename)
 {
-	// Allocate memory
+	// Allocate memory for storing the data and chi values.
 	mCLArrayN = mCL->GetMaxDataSize();
-	float tmp_out[mCLArrayN];
-	mCLArrayValue = tmp_out;
+	float tmp_data[mCLArrayN];
+	float tmp_chi2[mCLArrayN];
+	float chi2_v2, chi2_t3, chi2_t3amp, chi2_t3phi;
+	int ndof = 0;
+
 	stringstream filename;
-	ofstream outfile;
+	ofstream outfile_data;
+	ofstream outfile_stats;
 	CVectorList<CT3Data*> t3;
 	CVectorList<CV2Data*> v2;
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << base_filename << "_stats.txt";
+	outfile_stats.open(filename.str().c_str());
+	outfile_data.width(15);
+	outfile_data.precision(8);
+	outfile_stats << "# Statistics for fitted data." << endl;
 
 	// Set the time, render the model, simulate the data
 	unsigned int n_data_sets = mCL->GetNDataSets();
@@ -190,60 +203,91 @@ void CCL_GLThread::ExportResults(string base_filename)
 		SetTime(GetDataAveJD(data_set));
 		EnqueueOperation(GLT_RenderModels);
 
-		// Meanwhile grab the V2 and T3 (read-only operation from CPU memory)
+		// Compute the corresponding interferometric data, wait for completion.
+		mCLArrayValue = tmp_data;
+		EnqueueOperation(CLT_GetData);
+
+		// Grab the V2 and T3 (read-only operation from CPU memory), asynchronous operation
 		mCL->GetT3(data_set, t3);
 		mCL->GetV2(data_set, v2);
 		unsigned int n_v2 = v2.size();
 		unsigned int n_t3 = t3.size();
 
-		// Kick off a kernel to compute the data.
-		EnqueueOperation(CLT_GetData);
-
-		// Wait for the OpenCL operation to complete
+		// Wait for CLT_GetData to complete
 		mCLOpSemaphore.acquire();
 
+		// Pull down the chi2 values (read-only operation)
+		mCLArrayValue = tmp_chi2;
+		EnqueueOperation(CLT_GetChi2_Elements);
+		mCLOpSemaphore.acquire();
+
+		// Now sum up the Chi2 elements on the CPU
+		// Do V2, T3, T3Amp, T3Phi:
+		chi2_v2 = chi2_t3 = chi2_t3amp = chi2_t3phi = 0;
+
+		for(int i = 0; i < n_v2; i++)
+			chi2_v2 += tmp_chi2[i];
+
+		for(int i = 0; i < n_t3; i++)
+		{
+			chi2_t3amp += tmp_chi2[n_v2 + 2*i];
+			chi2_t3phi += tmp_chi2[n_v2 + 2*i + 1];
+		}
+		chi2_t3 = chi2_t3amp + chi2_t3phi;
+
+		// Write the chi2 statistics out to a file:
+		ndof = n_v2;
+		outfile_stats << "Data Set: " << data_set << endl;
+		outfile_stats << " V2_dof: " << ndof << " V2_chi2r: " << chi2_v2/ndof << endl;
+		ndof = n_t3;
+		outfile_stats << " T3_dof: " << ndof << " T3_chi2r: " << chi2_t3/ndof << endl;
+		ndof = n_t3/2;
+		outfile_stats << " T3Amp_dof: " << ndof << " T3Amp_chi2r: " << chi2_t3amp/ndof << endl;
+		outfile_stats << " T3Phi_dof: " << ndof << " T3Phi_chi2r: " << chi2_t3phi/ndof << endl;
+
+		// Now for the data:
 		// export v2
 		filename.str("");
 		filename << base_filename << "_" << data_set << "_v2.txt";
-		outfile.open(filename.str().c_str());
-		outfile.width(15);
-		outfile.precision(8);
-		outfile << "# U V V2 V2_err V2_sim" << endl;
+		outfile_data.open(filename.str().c_str());
+		outfile_data.width(15);
+		outfile_data.precision(8);
+		outfile_data << "# U V V2 V2_err V2_sim" << endl;
 		for(int j = 0; j < n_v2; j++)
 		{
-			outfile << v2[j]->u << " " << v2[j]->v << " "
+			outfile_data << v2[j]->u << " " << v2[j]->v << " "
 					<< v2[j]->v2 << " " << v2[j]->v2_err << " "
-					<< tmp_out[j] << endl;
+					<< tmp_data[j] << endl;
 		}
-		outfile.close();
+		outfile_data.close();
 
 		// export t3
 		filename.str("");
 		filename << base_filename << "_" << data_set << "_t3.txt";
-		outfile.open(filename.str().c_str());
-		outfile.width(15);
-		outfile.precision(8);
-		outfile << "U1 V1 U2 V2 U3 V3 t3_amp t3_amp_err t3_phi t3_phi_err t3_amp_sim t3_phi_sim" << endl;
-		float tmp1 = 0;
-		float tmp2 = 0;
-		float t3_amp;
-		complex<float> phase;
+		outfile_data.open(filename.str().c_str());
+		outfile_data.width(15);
+		outfile_data.precision(8);
+		outfile_data << "U1 V1 U2 V2 U3 V3 t3_amp t3_amp_err t3_phi t3_phi_err t3_amp_sim t3_phi_sim" << endl;
+		float t3_amp_data = 0;
+		float t3_phi_data = 0;
+		float t3_amp_model = 0;
+		float t3_phi_model = 0;
+		float phase;
 		for(unsigned int j = 0; j < n_t3; j++)
 		{
-			t3_amp = tmp_out[n_v2 + 2*j];
-			tmp1 = t3[j]->t3_phi * PI / 180;
-			tmp2 = tmp_out[n_v2 + 2*j + 1];
+			t3_amp_data = t3[j]->t3_amp;
+			t3_phi_data = t3[j]->t3_phi * PI / 180;
+			t3_amp_model = tmp_data[n_v2 + 2*j];
+			t3_phi_model = tmp_data[n_v2 + 2*j + 1];
 
-			phase = complex<float>(cos(tmp2), -sin(tmp2)) / complex<float>(t3_amp * cos(tmp1), -t3_amp * sin(tmp1));
-
-			outfile << t3[j]->u1 << " " << t3[j]->v1 << " "
+			outfile_data << t3[j]->u1 << " " << t3[j]->v1 << " "
 					<< t3[j]->u2 << " " << t3[j]->v2 << " "
 					<< t3[j]->u3 << " " << t3[j]->v3 << " "
 					<< t3[j]->t3_amp << " " << t3[j]->t3_amp_err << " "
 					<< t3[j]->t3_phi << " " << t3[j]->t3_phi_err << " "
-					<< t3_amp << " " << arg(phase) * 180/PI << endl;
+					<< t3_amp_model << " " << t3_phi_model * 180/PI << endl;
 		}
-		outfile.close();
+		outfile_data.close();
 	}
 
 	// Unset the array value.
@@ -375,7 +419,7 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
 	glGenRenderbuffers(1, &mFBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, mFBO_texture);
 	// Create a 2D multisample texture
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA16, mImageWidth, mImageHeight);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, mSamples, GL_RGBA32F, mImageWidth, mImageHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mFBO_texture);
 
 	glGenRenderbuffers(1, &mFBO_depth);
@@ -388,8 +432,9 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
     // Check that status of our generated frame buffer
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        string errorstring = string( reinterpret_cast<const char *>(gluErrorString(status)) );
-        printf("Couldn't create storage frame buffer: %x %s\n", status, errorstring.c_str());
+    	const GLubyte * errStr = gluErrorString(status);
+        printf("Couldn't create multisample frame buffer: %x %s\n", status, (char*)errStr);
+        delete errStr;
         exit(0); // Exit the application
     }
 
@@ -439,8 +484,9 @@ void CCL_GLThread::InitStorageBuffer(void)
     // Check that status of our generated frame buffer
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        string errorstring = (char *) gluErrorString(status);
-        printf("Couldn't create storage frame buffer: %x %s\n", status, errorstring.c_str());
+    	const GLubyte * errStr = gluErrorString(status);
+        printf("Couldn't create storage frame buffer: %x %s\n", status, (char*)errStr);
+        delete errStr;
         exit(0); // Exit the application
     }
 
@@ -513,10 +559,14 @@ void CCL_GLThread::run()
 	glShadeModel(GL_FLAT);
 	glDisable(GL_DITHER);
 	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
-	//glEnable (GL_BLEND);
+
+	// Enable alpha blending:
+	glEnable (GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Enable multisample anti-aliasing.
 	glEnable(GL_MULTISAMPLE);
-	//glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+	glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 
 	// Now setup the projection system to be orthographic
 	glMatrixMode(GL_PROJECTION);
@@ -544,6 +594,7 @@ void CCL_GLThread::run()
 //	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
     // Main thread loop
+	mIsRunning = true;
     while (mRun)
     {
         op = GetNextOperation();
@@ -655,13 +706,21 @@ void CCL_GLThread::run()
 
         case CLT_GetData:
         	mCL->CopyImageToBuffer(0);
-        	mCL->ImageToData(mCLArrayN);
+        	mCL->ImageToData(mCLDataSet);
         	mCL->GetSimulatedData(mCLArrayValue, mCLArrayN);
         	mCLOpSemaphore.release(1);
         	break;
 
+        case CLT_GetChi2_Elements:
+        	mCL->CopyImageToBuffer(0);
+        	mCL->ImageToChi2(mCLDataSet, mCLArrayValue, mCLArrayN);
+        	mCLOpSemaphore.release(1);
+        	break;
         }
     }
+
+    // The thread is no longer running
+    mIsRunning = false;
 }
 
 /// Saves the list of models and their values to the specified location

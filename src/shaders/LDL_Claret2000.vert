@@ -24,10 +24,13 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Power law limb darkening implemented according to Hestroffer (1997)
+// Four-parameter limb darkening implemented according to Claret (2003)
 // Implemented using alpha blending.
 varying out vec3 normal;
 varying out vec4 color;
+
+uniform vec3 min_xyz;
+uniform vec3 max_xyz;
 
 void main(void)
 {

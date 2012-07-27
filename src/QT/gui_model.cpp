@@ -48,14 +48,36 @@ void gui_model::SetFeatureTypes(vector< pair<int, string> > feature_info)
 //	SetupComboOptions(ui.listFeatures, feature_info);
 }
 
+void gui_model::SetModelType(CModelList::ModelTypes value)
+{
+	int index = ui.cboModels->findData(value);
+	if (index != -1)
+		ui.cboModels->setCurrentIndex(index);
+}
+
 void gui_model::SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info)
 {
 	gui_general::SetupComboOptions(ui.cboModels, model_info);
 }
 
+void gui_model::SetPositionType(CPosition::PositionTypes value)
+{
+	int index = ui.cboPositions->findData(value);
+	if (index != -1)
+		ui.cboPositions->setCurrentIndex(index);
+}
+
+
 void gui_model::SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info)
 {
 	gui_general::SetupComboOptions(ui.cboPositions, position_info);
+}
+
+void gui_model::SetShaderType(CGLShaderList::ShaderTypes value)
+{
+	int index = ui.cboShaders->findData(value);
+	if (index != -1)
+		ui.cboShaders->setCurrentIndex(index);
 }
 
 void gui_model::SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info)

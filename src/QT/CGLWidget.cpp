@@ -140,6 +140,11 @@ void CGLWidget::LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type)
 	mMinThread.SetMinimizer(tmp);
 }
 
+void CGLWidget::MinimizerExit(void)
+{
+	emit( MinimizationFinished(dynamic_cast<QWidget*>(parent()) ) );
+}
+
 void CGLWidget::Open(string filename)
 {
 	mGLT.Open(filename);
@@ -203,11 +208,20 @@ void CGLWidget::resizeEvent(QResizeEvent *evt)
 void CGLWidget::RunMinimizer()
 {
 	mMinThread.start();
+
+	connect(&mMinThread, SIGNAL(finished(void)), this, SLOT(MinimizerExit(void)));
 }
 
 void CGLWidget::startRendering()
 {
+	// tell the thread to start
     mGLT.start();
+
+    // wait for the thread to be initialized before proceeding
+    // NOTE: if thread initialization fails, this could lead to deadlock!
+    while(!mGLT.IsRunning())
+    	usleep(5000);
+
 }
 
 void CGLWidget::stopRendering()

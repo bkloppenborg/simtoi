@@ -24,14 +24,25 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Default (do nothing) shader.
-varying out vec4 color;
+// Four-parameter limb darkening implemented according to Claret (2003)
+// Implemented using alpha blending.
+in vec3 normal;
+in vec4 color;
+uniform float a1;
+uniform float a2;
+uniform float a3; 
+uniform float a4;
 
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+void main(void)
+{
+    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
+    
+    // now compute the Claret 2003 limb darkening law.
+    float intensity = 1;
+	intensity -= a1 * (1 - pow(mu, 0.5));
+	intensity -= a2 * (1 - mu);
+	intensity -= a3 * (1 - pow(mu, 1.5));
+	intensity -= a4 * (1 - pow(mu, 2));
 
-void main() 
-{ 
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_FragColor = vec4(color.x, 0, 0, intensity * color.w);
 }

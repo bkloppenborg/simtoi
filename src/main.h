@@ -37,18 +37,8 @@
 
 using namespace std;
 
-void display(void);
-void reshape(int w, int h);
-void keyboard(unsigned char key, int x, int y);
-void idle(void);
 int main(int argc, char** argv);
-void CheckOpenGLError(string function_name);
-
-// OpenGL initialization routines:
-void OpenGL_init(void);
-void initFrameBuffer(void);
-void initFrameBufferDepthBuffer(void);
-void initFrameBufferTexture(void);
-
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & model, int &  minimizer, int & size, double & scale, bool & close_simtoi);
+void PrintHelp();
 
 #endif /* MAIN_H_ */

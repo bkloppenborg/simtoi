@@ -24,14 +24,16 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Default (do nothing) shader.
-varying out vec4 color;
+// Power law limb darkening implemented according to Hestroffer (1997)
+// Implemented using alpha blending.
+in vec3 normal;
+in vec4 color;
+uniform float alpha;
 
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+void main(void)
+{
+    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
+    float intensity = pow(mu, alpha);
 
-void main() 
-{ 
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_FragColor = vec4(color.x, 0, 0, intensity * color.w);
 }

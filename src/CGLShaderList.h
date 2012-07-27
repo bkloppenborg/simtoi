@@ -50,8 +50,12 @@ public:
 	enum ShaderTypes
 	{
 		NONE = 0,
-		LD_HESTEROFFER1997 = 1,
-		SCALE_HEIGHT = 2,
+		LDL_POWERLAW = 1,
+		POWER_LAW_Z = 2,
+		LDL_CLARET2000 = 3,
+		LDL_SQUARE_ROOT = 4,
+		LDL_QUADRATIC = 5,
+		LDL_LOGARITHMIC = 6,
 		LAST_VALUE // must be the last element
 	};
 

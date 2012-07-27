@@ -34,9 +34,10 @@
 #include "CCL_GLThread.h"
 #include "CMinimizer_Benchmark.h"
 
-#ifdef MULTINEST_H
+// Compiler directive to add support for MultiNest
+#ifdef _ADD_MULTINEST
 #include "CMinimizer_MultiNest.h"
-#endif // MULTINEST_H
+#endif // _ADD_MULTINEST
 
 #include "CMinimizer_levmar.h"
 #include "CMinimizer_Test.h"
@@ -48,7 +49,7 @@ CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 	mNParams = 0;
 	mType = NONE;
 	mRun = true;
-	mIsRunning = true;
+	mIsRunning = false;
 	mResultsBaseFilename = "/tmp/min_output";
 }
 
@@ -120,6 +121,7 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 void CMinimizer::Init()
 {
 	mParams = new double[mCLThread->GetNFreeParameters()];
+	mRun = true;
 }
 
 bool CMinimizer::IsRunning()

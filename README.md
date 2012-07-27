@@ -3,6 +3,23 @@ simtoi
 
 The SImulation and Modeling Tool for Optical Interferometry
 
+## Checkout Instructions
+
+SIMTOI includes [liboi](https://github.com/bkloppenborg/liboi) and [textio](https://github.com/bkloppenborg/textio) as git submodules.  Therefore when you checkout the project you will need to do it either recursively or init the modules later.  If you are doing an initial checkout of SIMTOI do:
+
+```
+git clone --recursive https://github.com/bkloppenborg/simtoi
+```
+
+Or if you already have a copy of SIMTOI
+
+```
+git clone https://github.com/bkloppenborg/simtoi
+cd simtoi
+git submodule update --init
+```
+
+
 ## Building instructions
 
 ```

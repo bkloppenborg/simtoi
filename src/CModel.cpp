@@ -349,10 +349,10 @@ void CModel::Translate()
 	CCL_GLThread::CheckOpenGLError("CModel::Translate()");
 }
 
-void CModel::UseShader()
+void CModel::UseShader(double min_xyz[3], double max_xyz[3])
 {
 	if(mShader != NULL)
-		mShader->UseShader();
+		mShader->UseShader(min_xyz, max_xyz);
 
 	CCL_GLThread::CheckOpenGLError("CModel::UseShader()");
 }

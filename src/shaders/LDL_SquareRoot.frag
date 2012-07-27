@@ -24,14 +24,21 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Default (do nothing) shader.
-varying out vec4 color;
+// Square root limb darkening
+// Implemented using alpha blending.
+in vec3 normal;
+in vec4 color;
+uniform float a1;
+uniform float a2;
 
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+void main(void)
+{
+    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
+    
+    // Simple quadratic limb darkening:
+    float intensity = 1;
+	intensity -= a1 * (1 - mu);
+	intensity -= a2 * (1 - sqrt(mu));
 
-void main() 
-{ 
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_FragColor = vec4(color.x, 0, 0, intensity * color.w);
 }
