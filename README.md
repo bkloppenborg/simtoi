@@ -22,6 +22,17 @@ git submodule update --init
 
 ## Building instructions
 
+Prior to building SIMTOI you will need to have the following installed:
+```
+Compilers: C, C++, Fortran
+Libraries: libblas, libblas-dev, lapack, lapack-dev, f2c, libatlas, libatlas-dev
+```
+
+The following are optional:
+```
+Libraries: MultiNest
+```
+
 ```
 cd build
 cmake ..

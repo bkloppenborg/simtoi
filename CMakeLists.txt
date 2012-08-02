@@ -3,7 +3,7 @@ project(simtoi)
 
 # If MultiNest isn't installed to a standard location, provide a hint
 # to where it can be found.  Comment out otherwise
-SET(MULTINEST_ROOT_HINT /homes/bkloppen/local/multinest)
+#SET(MULTINEST_ROOT_HINT /homes/bkloppen/local/multinest)
 
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
