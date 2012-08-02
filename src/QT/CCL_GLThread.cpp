@@ -706,8 +706,7 @@ void CCL_GLThread::run()
 
         case CLT_GetData:
         	mCL->CopyImageToBuffer(0);
-        	mCL->ImageToData(mCLDataSet);
-        	mCL->GetSimulatedData(mCLArrayValue, mCLArrayN);
+        	mCL->GetSimulatedData(mCLDataSet, mCLArrayValue, mCLArrayN);
         	mCLOpSemaphore.release(1);
         	break;
 
