@@ -566,7 +566,7 @@ void CCL_GLThread::run()
 
 	// Enable multisample anti-aliasing.
 	glEnable(GL_MULTISAMPLE);
-	glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+	//glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 
 	// Now setup the projection system to be orthographic
 	glMatrixMode(GL_PROJECTION);
