@@ -90,7 +90,7 @@ int CMinimizer_GridSearch::run()
 	mCLThread->GetFreeParameters(mParams, mNParams, true);
 	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
 
-	// Hard coded for the moment, results in 2500 iterations equally spaced in both dimentions.
+	// Hard coded for the moment, results in 2500 iterations equally spaced in both dimensions.
 	int nSteps = 50;
 
 	// Determine the size of each step.
