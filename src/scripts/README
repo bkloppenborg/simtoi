@@ -1,0 +1,9 @@
+
+InsertSpaces.awk 
+=================
+Inserts breaks into a file whenever the value in the first column changes.
+Useful for generating isosamples for plotting with gnuPlot's splot pm3d 
+environment.
+
+Usage:
+$ awk -f InsertSpaces.awk input.txt > output.txt
