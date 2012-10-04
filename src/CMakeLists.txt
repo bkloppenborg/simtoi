@@ -17,6 +17,9 @@ if (CMAKE_BUILD_TOOL MATCHES "make")
     #add_definitions(-Wall  -Wno-deprecated -Werror -Wshadow )
 endif (CMAKE_BUILD_TOOL MATCHES "make")
 
+# Compile with C++11 support
+ADD_DEFINITIONS("-std=c++0x")
+
 find_package(Qt4 COMPONENTS QtCore QtGui QtMain QtOpenGL REQUIRED)
 INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
