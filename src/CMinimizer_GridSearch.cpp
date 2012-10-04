@@ -1,0 +1,140 @@
+/*
+ * CMinimizer_GridSearch.cpp
+ *
+ *  Created on: Oct 4, 2012
+ *      Author: bkloppen
+ */
+
+ /*
+ * Copyright (c) 2012 Brian Kloppenborg
+ *
+ * If you use this software as part of a scientific publication, please cite as:
+ *
+ * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling
+ * Tool for Optical Interferometry" (Version X).
+ * Available from  <https://github.com/bkloppenborg/simtoi>.
+ *
+ * This file is part of the SImulation and Modeling Tool for Optical
+ * Interferometry (SIMTOI).
+ *
+ * SIMTOI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation version 3.
+ *
+ * SIMTOI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "CMinimizer_GridSearch.h"
+
+#include <tuple>
+#include <fstream>
+#include <sstream>
+
+#include "CCL_GLThread.h"
+
+using namespace std;
+
+CMinimizer_GridSearch::CMinimizer_GridSearch(CCL_GLThread * cl_gl_thread)
+: CMinimizer(cl_gl_thread)
+{
+	mType = CMinimizer::GRIDSEARCH;
+}
+
+CMinimizer_GridSearch::~CMinimizer_GridSearch() {
+	// TODO Auto-generated destructor stub
+}
+
+void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no_setparams)
+{
+	stringstream filename;
+	ofstream outfile;
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mResultsBaseFilename << "_gridsearch.txt";
+	outfile.open(filename.str().c_str());
+	outfile.width(15);
+	outfile.precision(8);
+	outfile << "# Param1 Param2 Chi2" << endl;
+
+	for(int i = 0; i < mResults.size(); i++)
+		outfile << get<0>(mResults[i]) << " " << get<1>(mResults[i]) << " " << get<2>(mResults[i]) << endl;
+
+	outfile.close();
+}
+
+void CMinimizer_GridSearch::Init()
+{
+	CMinimizer::Init();
+}
+
+
+int CMinimizer_GridSearch::run()
+{
+	// TODO: This minimizer only works on two-dimentional data.
+	if(mNParams > 2)
+		return 0;
+
+	int n_data_sets = mCLThread->GetNDataSets();
+	int n_data_alloc = 0;
+	int n_data_offset = 0;
+	double tmp_chi2 = 0;
+
+	// Get the min/max ranges for the parameters:
+	mCLThread->GetFreeParameters(mParams, mNParams, true);
+	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
+
+	// Hard coded for the moment, results in 2500 iterations equally spaced in both dimentions.
+	int nSteps = 50;
+
+	// Determine the size of each step.
+	double steps[mNParams];
+	for(int i = 0; i < mNParams; i++)
+		steps[i] = (min_max[i].second - min_max[i].first) / nSteps;
+
+	// Run the grid search.
+	for(int i = 0; i < nSteps; i++)
+	{
+		mParams[0] = i * steps[0] + min_max[0].first;
+
+		for(int j = 0; j < nSteps; j++)
+		{
+			// Permit termination in the middle of a run.
+			if(!mRun)
+				break;
+
+			mParams[1] = j * steps[1]  + min_max[1].first;
+
+			// Set the parameters (note, they are not scaled to unit magnitude).
+			this->mCLThread->SetFreeParameters(mParams, mNParams, true);
+
+			// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
+			for(int data_set = 0; data_set < n_data_sets; data_set++)
+			{
+				n_data_alloc = mCLThread->GetNDataAllocated(data_set);
+				mCLThread->SetTime(mCLThread->GetDataAveJD(data_set));
+				mCLThread->EnqueueOperation(GLT_RenderModels);
+
+				//mCLThread->GetChi(data_set, mResiduals + n_data_offset, n_data_alloc);
+				tmp_chi2 = mCLThread->GetChi2(data_set);
+				n_data_offset += n_data_alloc;
+			}
+
+			mResults.push_back( tuple<double, double, double>(mParams[0], mParams[1], tmp_chi2) );
+
+		}
+	}
+
+	// Export the results.  Note, mParams is set to the maximum value, not the minimum.
+	ExportResults(mParams, mNParams, true);
+	return 0;
+}
+
+
+

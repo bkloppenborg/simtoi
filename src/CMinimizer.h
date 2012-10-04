@@ -61,6 +61,7 @@ public:
 		BENCHMARK = 2,
 		LEVMAR = 3,
 		MULTINEST = 4,
+		GRIDSEARCH = 5,
 		LAST_VALUE	// this must always be the last value in this enum.
 	};
 
@@ -76,7 +77,7 @@ public:
 	CMinimizer(CCL_GLThread * cl_gl_thread);
 	virtual ~CMinimizer();
 
-	void ExportResults(double * params, int n_params, bool no_setparams=false);
+	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 
 	static CMinimizer * GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread);
 	static vector< pair<CMinimizer::MinimizerTypes, string> > GetTypes(void);

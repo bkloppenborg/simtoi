@@ -40,6 +40,7 @@
 #endif // _ADD_MULTINEST
 
 #include "CMinimizer_levmar.h"
+#include "CMinimizer_GridSearch.h"
 #include "CMinimizer_Test.h"
 
 CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
@@ -91,6 +92,10 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 		tmp = new CMinimizer_levmar(cl_gl_thread);
 		break;
 
+	case GRIDSEARCH:
+		tmp = new CMinimizer_GridSearch(cl_gl_thread);
+		break;
+
 	case TEST:
 		tmp = new CMinimizer_Test(cl_gl_thread);
 		break;
@@ -120,7 +125,8 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 
 void CMinimizer::Init()
 {
-	mParams = new double[mCLThread->GetNFreeParameters()];
+	mNParams = mCLThread->GetNFreeParameters();
+	mParams = new double[mNParams];
 	mRun = true;
 }
 
