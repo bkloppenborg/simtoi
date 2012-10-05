@@ -134,7 +134,7 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 void CMinimizer::GetResults(double * results, int n_params)
 {
 	// Copy the values
-	for(int i = 0; i < mNParams && i < nParams; i++)
+	for(int i = 0; i < mNParams && i < n_params; i++)
 		results[i] = mParams[i];
 }
 

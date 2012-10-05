@@ -117,7 +117,7 @@ int CMinimizer_Bootstrap::run()
 	}
 
 	// Save the results of the bootstrapper.
-	ExportResults();
+    ExportResults(mParams, mNParams, true);
 
 	return 0;
 }
