@@ -4,7 +4,11 @@
  *  Created on: Dec 8, 2011
  *      Author: bkloppenborg
  *
- *  A generic base class for minimization routines.
+ *  A generic base class for minimization routines.  All minimizers should have the following
+ *  behavior:
+ *  	1) If mRun == false, they should terminate gracefully, deallocating resources as needed
+ *  	2) Upon completion, the best-fit parameters should be stored in mParams
+ *  	3) Upon completion, results should be exported to a file.
  *
  *  NOTE: This class also maintains a static function for minimizer creation.  If you add a new
  *  minimizer, be sure to modify GetTypes() and GetMinimizer()
@@ -62,12 +66,13 @@ public:
 		LEVMAR = 3,
 		MULTINEST = 4,
 		GRIDSEARCH = 5,
+		BOOTSTRAP = 6,
 		LAST_VALUE	// this must always be the last value in this enum.
 	};
 
 public:
 	CCL_GLThread * mCLThread;
-	double * mParams;
+	double * mParams;	// Current parameter values. Set to best-fit parameters upon exit (required)
 	unsigned int mNParams;
 	bool mRun;
 	string mResultsBaseFilename;;
@@ -80,13 +85,14 @@ public:
 	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 
 	static CMinimizer * GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread);
+	virtual void GetResults(double * results, int n_params);
 	static vector< pair<CMinimizer::MinimizerTypes, string> > GetTypes(void);
 
 	virtual void Init();
 	bool IsRunning();
 
 	virtual int run() = 0;
-	void Stop();
+	virtual void Stop();
 };
 
 #endif /* CMINIMIZER_H_ */

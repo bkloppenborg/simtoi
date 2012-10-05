@@ -198,8 +198,7 @@ int CMinimizer_levmar::run()
 	opts[4]= LM_DIFF_DELTA; //1E-9;
 
 	// Copy out the initial values for the parameters:
-	double params[mNParams];
-	mCLThread->GetFreeParameters(params, mNParams, true);
+	mCLThread->GetFreeParameters(mParams, mNParams, true);
 	vector<string> names = mCLThread->GetFreeParamNames();
 	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
 
@@ -214,14 +213,14 @@ int CMinimizer_levmar::run()
 
 	mIsRunning = true;
 
-	// Call levmar:
-	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, mNParams, nData, lb, ub, NULL, max_iterations, opts, info, NULL, covar, (void*)this);
+	// Call levmar.  Note, the results are saved in mParams upon completion.
+	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, mParams, x, mNParams, nData, lb, ub, NULL, max_iterations, opts, info, NULL, covar, (void*)this);
 
 	mIsRunning = false;
 
 	printf("Levmar executed %i iterations.\n", iterations);
-	printresult(params, mNParams, nData, names, info, covar);
-	ExportResults(params, mNParams);
+	printresult(mParams, mNParams, nData, names, info, covar);
+	ExportResults(mParams, mNParams);
 
 	return 0;
 }

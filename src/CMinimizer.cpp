@@ -41,6 +41,7 @@
 
 #include "CMinimizer_levmar.h"
 #include "CMinimizer_GridSearch.h"
+#include "CMinimizer_Bootstrap.h"
 #include "CMinimizer_Test.h"
 
 CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
@@ -96,6 +97,10 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 		tmp = new CMinimizer_GridSearch(cl_gl_thread);
 		break;
 
+	case BOOTSTRAP:
+		tmp = new CMinimizer_Bootstrap(cl_gl_thread);
+		break;
+
 	case TEST:
 		tmp = new CMinimizer_Test(cl_gl_thread);
 		break;
@@ -119,8 +124,18 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 #endif // MULTINEST_H
 
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::LEVMAR, "Levmar"));
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::GRIDSEARCH, "Grid Search"));
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BOOTSTRAP, "Bootstrap (Levmar)"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::TEST, "Tests"));
 	return tmp;
+}
+
+/// Returns the best-fit parameters.
+void CMinimizer::GetResults(double * results, int n_params)
+{
+	// Copy the values
+	for(int i = 0; i < mNParams && i < nParams; i++)
+		results[i] = mParams[i];
 }
 
 void CMinimizer::Init()

@@ -54,6 +54,7 @@ void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no
 {
 	stringstream filename;
 	ofstream outfile;
+	double tmp[3];
 
 	// Open the statistics file for writing:
 	filename.str("");
@@ -63,6 +64,7 @@ void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no
 	outfile.precision(8);
 	outfile << "# Param1 Param2 Chi2" << endl;
 
+	// write the data to the file
 	for(int i = 0; i < mResults.size(); i++)
 		outfile << get<0>(mResults[i]) << " " << get<1>(mResults[i]) << " " << get<2>(mResults[i]) << endl;
 
