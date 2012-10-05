@@ -369,6 +369,8 @@ int CCL_GLThread::GetNDataAllocated()
 {
 	if(mCL != NULL)
 		return mCL->GetNDataAllocated();
+
+	return 0;
 }
 
 /// Returns the data allocation size for the data_num entry, returns zero if data_num is invalid.
@@ -376,6 +378,8 @@ int CCL_GLThread::GetNDataAllocated(int data_num)
 {
 	if(mCL != NULL)
 		return mCL->GetNDataAllocated(data_num);
+
+	return 0;
 }
 
 /// Returns the total number of data sets.
@@ -383,6 +387,8 @@ int CCL_GLThread::GetNDataSets()
 {
 	if(mCL != NULL)
 		return mCL->GetNDataSets();
+
+	return 0;
 }
 
 /// Get the next operation from the queue.  This is a blocking function.
