@@ -34,7 +34,7 @@
 #include "CGLShaderWrapper.h"
 #include "CModel.h"
 
-CGLShaderWrapper::CGLShaderWrapper(CGLShader * shader, int n_params)
+CGLShaderWrapper::CGLShaderWrapper(CGLShaderPtr shader, int n_params)
 	: CParameters(n_params)
 {
 	// Set variables
@@ -54,8 +54,7 @@ CGLShaderWrapper::CGLShaderWrapper(CGLShader * shader, int n_params)
 
 CGLShaderWrapper::~CGLShaderWrapper()
 {
-	// Set shader to null.  Don't delete it, the CGLShaderList takes care of that.
-	mShader = NULL;
+
 }
 
 // Executes the OpenGL shader

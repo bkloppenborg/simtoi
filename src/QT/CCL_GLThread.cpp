@@ -92,11 +92,11 @@ CCL_GLThread::~CCL_GLThread()
 void CCL_GLThread::AddModel(CModelList::ModelTypes model)
 {
 	// Create the model, load the shader.
-	CModel * tmp_model = mModelList->AddNewModel(model);
+	CModelPtr tmp_model = mModelList->AddNewModel(model);
 
 	// Initialize with default (XY) position and no shader.
 	tmp_model->SetPositionType(CPosition::XY);
-	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(CGLShaderList::NONE);
+	CGLShaderWrapperPtr tmp_shader = mShaderList->GetShader(CGLShaderList::NONE);
 	tmp_model->SetShader(tmp_shader);
 
 	EnqueueOperation(GLT_RenderModels);
@@ -184,8 +184,8 @@ void CCL_GLThread::ExportResults(string base_filename)
 	stringstream filename;
 	ofstream outfile_data;
 	ofstream outfile_stats;
-	CVectorList<CT3Data*> t3;
-	CVectorList<CV2Data*> v2;
+	vector<CT3DataPtr> t3;
+	vector<CV2DataPtr> v2;
 
 	// Open the statistics file for writing:
 	filename.str("");
@@ -767,7 +767,7 @@ void CCL_GLThread::SetScale(double scale)
 
 void CCL_GLThread::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
 {
-	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
+	CGLShaderWrapperPtr tmp_shader = mShaderList->GetShader(shader);
 	mModelList->SetShader(model_id, tmp_shader);
 }
 

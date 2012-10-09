@@ -38,7 +38,10 @@
 #include <string>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "CVectorList.h"
+#include <memory>
+#include <vector>
+using namespace std;
+
 #include "enumerations.h"
 #include "CPosition.h"
 
@@ -46,12 +49,11 @@ class CModel;
 class CGLShaderWrapper;
 class CGLShaderList;
 
-using namespace std;
-
-
+typedef shared_ptr<CModel> CModelPtr;
+typedef shared_ptr<CGLShaderWrapper> CGLShaderWrapperPtr;
 
 // A container for a list of models.
-class CModelList : public CVectorList<CModel*>
+class CModelList : public vector<CModelPtr>
 {
 public:
 	/// Enumerated Model Names.
@@ -76,7 +78,7 @@ public:
 	CModelList();
 	~CModelList();
 
-	CModel * AddNewModel(ModelTypes model_id);
+	CModelPtr AddNewModel(ModelTypes model_id);
 
 	int GetNFreeParameters();
 	void GetAllParameters(double * params, int n_params);
@@ -85,7 +87,7 @@ public:
 	void GetFreeParametersScaled(double * params, int n_params);
 	double GetFreeParameterPriorProduct();
 	vector<string> GetFreeParamNames();
-	CModel * GetModel(int i) { return mList[i]; };
+	CModelPtr GetModel(int i) { return this->at(i); };
 	double GetTime() { return mTime; };
 
 	static vector< pair<ModelTypes, string> > GetTypes(void);
@@ -98,7 +100,7 @@ public:
 	Json::Value Serialize();
 	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
 	void SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type);
-	void SetShader(unsigned int model_id, CGLShaderWrapper * shader);
+	void SetShader(unsigned int model_id, CGLShaderWrapperPtr shader);
 	void SetTime(double t);
 	void SetTimestep(double dt);
 
