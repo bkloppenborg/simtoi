@@ -45,6 +45,8 @@
 
 #include <string>
 #include <cstdio>
+#include <fstream>
+#include <sstream>
 #include <utility>
 #include <vector>
 
@@ -93,6 +95,24 @@ public:
 
 	virtual int run() = 0;
 	virtual void Stop();
+
+	template <class T>
+	void WriteTable(vector< vector<T> > & data, ofstream & output)
+	{
+		// write the data to the file
+		typename vector< vector<T> >::iterator row;
+		typename vector<T>::iterator cell;
+		int nEntries = data.size();
+		// iterate over each row
+		for (row = data.begin() ; row < data.end(); row++)
+		{
+			// iterate over each cell
+			for(cell = row->begin(); cell < row->end(); cell++)
+				output << *cell << " ";
+
+			output << endl;
+		}
+	}
 };
 
 #endif /* CMINIMIZER_H_ */

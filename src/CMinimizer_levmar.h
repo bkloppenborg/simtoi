@@ -48,11 +48,12 @@ public:
 
 	string GetExitString(int exit_num);
 
-	void Init();
+	virtual void Init();
 
 	void printresult(double * x, int n_pars, int n_data, vector<string> names, double * info, double * covar);
 
-	int run();
+	virtual int run();
+	int run(void (*error_func)(double *p, double *hx, int m, int n, void *adata));
 };
 
 #endif /* CMINIMIZER_LEVMAR_H_ */

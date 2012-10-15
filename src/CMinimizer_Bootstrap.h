@@ -4,10 +4,10 @@
  *  Created on: Oct 4, 2012
  *      Author: bkloppen
  *
- *  A basic bootstrap minimizer that selects a subset of n-data, possibly
- *  including repeats, from the original data of size n and runs a
- *  minimization engine.  The results of this procedure are saved to
- *  a file upon completion.
+ *  A re-implementation of the levmar minimizer that includes bootstrapping.
+ *  This minimizer runs levmar like normal, but applies a mask to the chi
+ *  which weights (potentially ignores) some chi elements. This, in effect
+ *  selects a random subset of the data.
  */
 
  /*
@@ -38,22 +38,28 @@
 #ifndef CMINIMIZER_BOOTSTRAP_H_
 #define CMINIMIZER_BOOTSTRAP_H_
 
-#include "CMinimizer.h"
+#include "CMinimizer_levmar.h"
 
-class CMinimizer_Bootstrap: public CMinimizer {
+class CMinimizer_Bootstrap: public CMinimizer_levmar
+{
+public:
+	unsigned int * mMask;
+
 public:
 	CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread);
 	virtual ~CMinimizer_Bootstrap();
 
-	CMinimizer * mMinimizer;
-
 	vector< vector<double> > mResults;
+	vector< vector<unsigned int> > mMasks;
 
+	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
 	virtual void ExportResults(double * params, int n_params, bool no_setparams);
 
 	void Init();
+
+	void NextMask();
+
 	int run();
-	virtual void Stop();
 };
 
 #endif /* CMINIMIZER_BOOTSTRAP_H_ */

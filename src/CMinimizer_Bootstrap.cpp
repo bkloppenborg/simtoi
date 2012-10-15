@@ -32,8 +32,9 @@
 
 #include "CMinimizer_Bootstrap.h"
 
-#include <fstream>
-#include <sstream>
+#include <random>
+#include <chrono>
+#include "levmar.h"
 
 #include "CCL_GLThread.h"
 
@@ -41,18 +42,28 @@ using namespace std;
 
 
 CMinimizer_Bootstrap::CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread)
-: CMinimizer(cl_gl_thread)
+: CMinimizer_levmar(cl_gl_thread)
 {
 	mType = CMinimizer::BOOTSTRAP;
+	mResiduals = NULL;
+	mMask = NULL;
 }
 
 CMinimizer_Bootstrap::~CMinimizer_Bootstrap()
 {
-	// Stop the minimizer and call it's destructor.
-	if(mMinimizer != NULL)
-		mMinimizer->Stop();
+	delete[] mMask;
+}
 
-	delete mMinimizer;
+///
+void CMinimizer_Bootstrap::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
+{
+	// First run the standard levmar minimizer:
+	CMinimizer_levmar::ErrorFunc(params, output, nParams, nOutput, misc);
+
+	// Now apply a mask to the output:
+	CMinimizer_Bootstrap * minimizer = reinterpret_cast<CMinimizer_Bootstrap*>(misc);
+	for(int i = 0; i < nOutput; i++)
+		output[i] *= minimizer->mMask[i];
 }
 
 void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_setparams)
@@ -70,45 +81,136 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 	outfile << "# Param1 Param2 ... ParamN Chi2" << endl;
 
 	// write the data to the file
-	vector< vector<double> >::iterator row;
-	vector<double>::iterator cell;
-	int nEntries = mResults.size();
-	// iterate over each row
-	for (row = mResults.begin() ; row < mResults.end(); row++)
-	{
-		// iterate over each cell
-		for(cell = row->begin(); cell < row->end(); cell++)
-			outfile << *cell;
-
-		outfile << endl;
-	}
-
+	WriteTable(mResults, outfile);
 	outfile.close();
+
+	// now write out the masks
+	filename.str("");
+	filename << mResultsBaseFilename << "_bootstrap_mask.txt";
+	outfile.open(filename.str().c_str());
+	outfile.width(3);
+	outfile.precision(0);
+	outfile << "# Mask1 Mask ... MaskN" << endl;
+	WriteTable(mMasks, outfile);
+	outfile.close();
+
 }
 
 void CMinimizer_Bootstrap::Init()
 {
-	CMinimizer::Init();
+	CMinimizer_levmar::Init();
+	int nData = mCLThread->GetNDataAllocated();
+	mMask = new unsigned int[nData];
+
+	for(int i = 0; i < nData; i++)
+		mMask[i] = 1;
+}
+
+void CMinimizer_Bootstrap::NextMask()
+{
+	// Init to all zeros:
+	int n_data = mCLThread->GetNDataAllocated();
+	int n_v2 = mCLThread->GetNV2(0);
+	int n_t3 = mCLThread->GetNT3(0);
+	int j = 0;
+
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	default_random_engine generator (seed);
+
+	uniform_int_distribution<int> v2_distribution(0, n_v2);
+	uniform_int_distribution<int> t3_distribution(0, n_t3);
+
+
+	for(int i = 0; i < n_data; i++)
+		mMask[i] = 0;
+
+	// Randomly select the V2 that will be activated:
+	for(int i = 0; i < n_v2; i++)
+	{
+		j = v2_distribution(generator);
+		mMask[j] += 1;
+	}
+
+	for(int i = 0; i < n_t3; i++)
+	{
+		j = t3_distribution(generator);
+		mMask[n_v2 + 2*j  ] += 1;
+		mMask[n_v2 + 2*j+1] += 1;
+	}
+
+	vector<unsigned int> tmp;
+	// Copy the mask for saving
+	for(int i = 0; i < n_data; i++)
+		tmp.push_back(mMask[i]);
+
+	mMasks.push_back(tmp);
 }
 
 int CMinimizer_Bootstrap::run()
 {
+//	// Ensure memory is initialized.
+//	if(mResiduals == NULL)
+//		return -1;
+
 	// init local storage
 	vector<double> tmp_vec;
-	double tmp_chi2 = 0;
-	int nBootstrap = 1000;
+	long double tmp_chi2 = 0;
+	int nBootstrap = 10;
+	int nData = mCLThread->GetNDataAllocated();
 
-	for(int i = 0; i < nBootstrap; i++)
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::default_random_engine generator (seed);
+	uniform_real_distribution<double> distribution (0.0,1.0);
+	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
+
+	for(int iteration = 0; iteration < nBootstrap; iteration++)
 	{
 		if(!mRun)
 			break;
 
+		// Get the next mask:
+		NextMask();
+
+		// Randomize the starting position:
+		for(int i = 0; i < mNParams; i++)
+			mParams[i] = distribution(generator);
+
+		// Set the starting position.  Note these values are [0...1] and need to be scaled.
+		mCLThread->SetFreeParameters(mParams, mNParams, true);
+
+//		// Print a status message:
+//		mCLThread->GetFreeParameters(mParams, mNParams, true);
+//		printf("Starting iteration %i with values: ", i);
+//		// Draw a random number between 0 and 1:
+//		for(int i = 0; i < mNParams; i++)
+//			printf("%f ", mParams[i]);
+//
+//		printf("\n");
+
+		// run the minimizer
+		int exit_value = CMinimizer_levmar::run(&CMinimizer_Bootstrap::ErrorFunc);
+
+		if(exit_value < 0)
+			break;
+
+		// Get the current chi2:
+		mCLThread->SetFreeParameters(mParams, mNParams, false);
+		mCLThread->SetTime(mCLThread->GetDataAveJD(0));
+		mCLThread->EnqueueOperation(GLT_RenderModels);
+
+		mCLThread->GetChi(0, mResiduals, nData);
+
+		tmp_chi2 = 0;
+		for(int i = 0; i < nData; i++)
+			tmp_chi2 += mResiduals[i] * mMask[i];
+		// convert to reduced chi2
+		tmp_chi2 /= mNParams;
 
 		// Save the results.  Start by copying the current entry to the temporary vector:
-		mMinimizer->GetResults(mParams, mNParams);
 		tmp_vec.clear();
 		for(int i = 0; i < mNParams; i++)
 			tmp_vec.push_back(mParams[i]);
+
 		// append the chi2
 		tmp_vec.push_back(tmp_chi2);
 
@@ -121,14 +223,3 @@ int CMinimizer_Bootstrap::run()
 
 	return 0;
 }
-
-/// Tells the thread to gracefully exit.
-/// The event loop of the minimization thread must mRun for this routine to work correctly.
-void CMinimizer_Bootstrap::Stop()
-{
-	mRun = false;
-	// Tell the corresponding minimizer to stop
-	if(mMinimizer != NULL)
-		mMinimizer->Stop();
-}
-

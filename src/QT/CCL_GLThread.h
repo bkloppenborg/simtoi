@@ -154,41 +154,45 @@ public:
 
     void AddModel(CModelList::ModelTypes model);
 
+    void BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned int out_layer);
 protected:
     void BlitToScreen();
-    void ClearQueue();
+
 public:
-
-    void BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned int out_layer);
     static void CheckOpenGLError(string function_name);
+protected:
+    void ClearQueue();
 
-    void EnqueueOperation(CL_GLT_Operations op);
-    void ExportResults(string base_filename);
+public:
+    void 	EnqueueOperation(CL_GLT_Operations op);
+    void 	ExportResults(string base_filename);
 
-	void GetChi(int data_num, float * output, int & n);
+	void 	GetChi(int data_num, float * output, int & n);
     double GetChi2(int data_num);
     double GetDataAveJD(int data_num);
     unsigned int GetImageDepth() { return mImageDepth; };
     double GetFlux();
-    void GetFreeParameters(double * params, int n_params, bool scale_params) { mModelList->GetFreeParameters(params, n_params, scale_params); };
+    void 	GetFreeParameters(double * params, int n_params, bool scale_params) { mModelList->GetFreeParameters(params, n_params, scale_params); };
     unsigned int GetImageHeight() { return mImageHeight; };
-    void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth);
+    void 	GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth);
 	double GetLogLike(int data_num);
 	CModelList * GetModelList() { return mModelList; };
     CL_GLT_Operations GetNextOperation(void);
-	int GetNFreeParameters() { return mModelList->GetNFreeParameters(); };
+	int 	GetNFreeParameters() { return mModelList->GetNFreeParameters(); };
 	vector< pair<double, double> > GetFreeParamMinMaxes() { return mModelList->GetFreeParamMinMaxes(); };
 	double GetFreeParameterPriorProduct() { return mModelList->GetFreeParameterPriorProduct(); };
 	vector<string> GetFreeParamNames() { return mModelList->GetFreeParamNames(); };
-	int GetNData();
-	int GetNDataAllocated();
-	int GetNDataAllocated(int data_num);
-	int GetNDataSets();
+	int 	GetNData();
+	int 	GetNDataAllocated();
+	int 	GetNDataAllocated(int data_num);
+	int 	GetNDataSets();
+	int		GetNT3(int data_num);
+	int		GetNV2(int data_num);
 	double GetScale() { return mScale; };
 	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
 	unsigned int GetImageWidth() { return mImageWidth; };
 
-	bool IsRunning() { return mIsRunning; };
+	bool 	IsRunning() { return mIsRunning; };
 
     vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mModelList->GetTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
@@ -196,9 +200,9 @@ public:
 
 
 protected:
-    void InitFrameBuffers(void);
-    void InitMultisampleRenderBuffer(void);
-    void InitStorageBuffer(void);
+    void 	InitFrameBuffers(void);
+    void 	InitMultisampleRenderBuffer(void);
+    void 	InitStorageBuffer(void);
 
 public:
     void LoadData(string filename);

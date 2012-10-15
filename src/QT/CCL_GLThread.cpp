@@ -391,6 +391,23 @@ int CCL_GLThread::GetNDataSets()
 	return 0;
 }
 
+int CCL_GLThread::GetNT3(int data_num)
+{
+	if(mCL != NULL)
+		return mCL->GetNT3(data_num);
+
+	return 0;
+}
+
+int CCL_GLThread::GetNV2(int data_num)
+{
+	if(mCL != NULL)
+		return mCL->GetNV2(data_num);
+
+	return 0;
+}
+
+
 /// Get the next operation from the queue.  This is a blocking function.
 CL_GLT_Operations CCL_GLThread::GetNextOperation(void)
 {

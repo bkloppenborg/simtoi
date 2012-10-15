@@ -82,7 +82,7 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 	for(int i = 0; i < nOutput; i++)
 	{
 		output[i] = double(minimizer->mResiduals[i]);
-//		printf("%i %f \n", i, deviates[i]);
+//		printf("%i %f \n", i, output[i]);
 	}
 }
 
@@ -92,6 +92,10 @@ void CMinimizer_levmar::Init()
 	int nData = mCLThread->GetNDataAllocated();
 
 	mResiduals = new float[nData];
+	for(int i = 0; i < nData; i++)
+	{
+		mResiduals[i] = 0;
+	}
 }
 
 string CMinimizer_levmar::GetExitString(int exit_num)
@@ -172,11 +176,21 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 
 int CMinimizer_levmar::run()
 {
+	// Run the minimizer using this instance of CMinimizer_levmar
+	run(&CMinimizer_levmar::ErrorFunc);
+}
+
+int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *adata))
+{
+	// Ensure memory is initialized.
+	if(mResiduals == NULL)
+		return -1;
+
 	// Create a member function pointer
 	int iterations = 0;
-	int max_iterations = 1E4;
+	int max_iterations = 100;
 	int nData = mCLThread->GetNDataAllocated();
-	mNParams = mCLThread->GetNFreeParameters();
+	int nParams = mCLThread->GetNFreeParameters();
 	double x[nData];
 	double lb[mNParams];
 	double ub[mNParams];
@@ -214,7 +228,7 @@ int CMinimizer_levmar::run()
 	mIsRunning = true;
 
 	// Call levmar.  Note, the results are saved in mParams upon completion.
-	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, mParams, x, mNParams, nData, lb, ub, NULL, max_iterations, opts, info, NULL, covar, (void*)this);
+	iterations = dlevmar_bc_dif(error_func, mParams, x, mNParams, nData, lb, ub, NULL, max_iterations, opts, info, NULL, covar, (void*)this);
 
 	mIsRunning = false;
 
@@ -222,5 +236,5 @@ int CMinimizer_levmar::run()
 	printresult(mParams, mNParams, nData, names, info, covar);
 	ExportResults(mParams, mNParams);
 
-	return 0;
+	return iterations;
 }
