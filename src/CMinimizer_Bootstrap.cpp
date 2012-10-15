@@ -78,7 +78,7 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);
-	outfile << "# Param1 Param2 ... ParamN Chi2" << endl;
+	outfile << "# Param1 Param2 ... ParamN Chi2/N(params)" << endl;
 
 	// write the data to the file
 	WriteTable(mResults, outfile);
@@ -155,7 +155,8 @@ int CMinimizer_Bootstrap::run()
 	// init local storage
 	vector<double> tmp_vec;
 	long double tmp_chi2 = 0;
-	int nBootstrap = 10;
+	double tmp = 0;
+	int nBootstrap = 1000;
 	int nData = mCLThread->GetNDataAllocated();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -180,7 +181,7 @@ int CMinimizer_Bootstrap::run()
 
 //		// Print a status message:
 //		mCLThread->GetFreeParameters(mParams, mNParams, true);
-//		printf("Starting iteration %i with values: ", i);
+//		printf("Starting iteration %i with values: ", iteration);
 //		// Draw a random number between 0 and 1:
 //		for(int i = 0; i < mNParams; i++)
 //			printf("%f ", mParams[i]);
@@ -201,8 +202,12 @@ int CMinimizer_Bootstrap::run()
 		mCLThread->GetChi(0, mResiduals, nData);
 
 		tmp_chi2 = 0;
+		tmp = 0;
 		for(int i = 0; i < nData; i++)
-			tmp_chi2 += mResiduals[i] * mMask[i];
+		{
+			tmp = mResiduals[i] * mMask[i];
+			tmp_chi2 += tmp*tmp;
+		}
 		// convert to reduced chi2
 		tmp_chi2 /= mNParams;
 
