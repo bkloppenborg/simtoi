@@ -78,7 +78,7 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);
-	outfile << "# Param1 Param2 ... ParamN Chi2/N(params)" << endl;
+	outfile << "# Param1 Param2 ... ParamN Chi2/(nData + nParams - 1)" << endl;
 
 	// write the data to the file
 	WriteTable(mResults, outfile);
@@ -208,8 +208,8 @@ int CMinimizer_Bootstrap::run()
 			tmp = mResiduals[i] * mMask[i];
 			tmp_chi2 += tmp*tmp;
 		}
-		// convert to reduced chi2
-		tmp_chi2 /= mNParams;
+		// convert to a reduced chi2
+		tmp_chi2 /= (nData + mNParams - 1);
 
 		// Save the results.  Start by copying the current entry to the temporary vector:
 		tmp_vec.clear();

@@ -73,12 +73,12 @@ int CMinimizer_Benchmark::run()
 {
 	mIsRunning = true;
 	// only the first loaded data set is used.
-	float chi2 = 0;
+	float chi2r = 0;
 	double chi_cpu = 0;
 	int n_iterations = 1000;
 	double time = 0;
-	int n_data_alloc = mCLThread->GetNDataAllocated(0);
-	float output[n_data_alloc];
+	int nData = mCLThread->GetNDataAllocated(0);
+	float output[nData];
 
 	int start = GetMilliCount();
 
@@ -87,10 +87,10 @@ int CMinimizer_Benchmark::run()
 		n_data_alloc = mCLThread->GetNDataAllocated(0);
 		mCLThread->SetTime(mCLThread->GetDataAveJD(0));
 		mCLThread->EnqueueOperation(GLT_RenderModels);
-		chi2 = mCLThread->GetChi2(0);
+		chi2r = mCLThread->GetChi2(0) / (nData + mNParams - 1);
 
 		if(i % 100 == 0)
-			printf("Iteration %i Chi2: %f\n", i, chi2);
+			printf("Iteration %i Chi2r: %f\n", i, chi2);
 	}
 
 	// Calculate the time, print out a nice message.
