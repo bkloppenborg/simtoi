@@ -142,6 +142,25 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 	if ((x == 0) || (n_pars == 0))
 		return;
 
+	// Print out some statistics:
+	printf("Chi2r for each data set:\n");
+	int nData = 0;
+	double chi2r_total = 0;
+	double chi2r = 0;
+	int nDataSets = mCLThread->GetNDataSets();
+	mCLThread->SetFreeParameters(mParams, mNParams, false);
+	for(int data_set = 0; data_set < nDataSets; data_set++)
+	{
+		nData = mCLThread->GetNDataAllocated(data_set);
+		mCLThread->SetTime(mCLThread->GetDataAveJD(data_set));
+		mCLThread->EnqueueOperation(GLT_RenderModels);
+		chi2r = mCLThread->GetChi2(data_set) / (nData + mNParams - 1);
+		chi2r_total += chi2r;
+		printf("  Data Set %i chi2r: %f\n", data_set, chi2r);
+	}
+	printf("  All data, average chi2r: %f\n", chi2r_total/nDataSets);
+
+
 	double value = 0;
 	double err = 0;
 	double scale;

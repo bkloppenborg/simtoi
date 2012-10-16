@@ -83,10 +83,10 @@ int CMinimizer_GridSearch::run()
 	if(mNParams > 2)
 		return 0;
 
-	int n_data_sets = mCLThread->GetNDataSets();
-	int n_data_alloc = 0;
+	int nData = 0;
+	int nDataSets = mCLThread->GetNDataSets();
 	int n_data_offset = 0;
-	double tmp_chi2 = 0;
+	double chi2r_sum = 0;
 
 	// Get the min/max ranges for the parameters:
 	mCLThread->GetFreeParameters(mParams, mNParams, true);
@@ -101,34 +101,29 @@ int CMinimizer_GridSearch::run()
 		steps[i] = (min_max[i].second - min_max[i].first) / nSteps;
 
 	// Run the grid search.
-	for(int i = 0; i < nSteps; i++)
+	for(mParams[0] = min_max[0].first; mParams[0] < min_max[0].second; mParams[0] += steps[0])
 	{
-		mParams[0] = i * steps[0] + min_max[0].first;
-
-		for(int j = 0; j < nSteps; j++)
+		for(mParams[1] = min_max[1].first; mParams[1] < min_max[1].second; mParams[1] += steps[1])
 		{
+			chi2r_sum = 0;
 			// Permit termination in the middle of a run.
 			if(!mRun)
 				break;
 
-			mParams[1] = j * steps[1]  + min_max[1].first;
-
 			// Set the parameters (note, they are not scaled to unit magnitude).
-			this->mCLThread->SetFreeParameters(mParams, mNParams, true);
+			mCLThread->SetFreeParameters(mParams, mNParams, false);
 
 			// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
-			for(int data_set = 0; data_set < n_data_sets; data_set++)
+			for(int data_set = 0; data_set < nDataSets; data_set++)
 			{
-				n_data_alloc = mCLThread->GetNDataAllocated(data_set);
+				nData = mCLThread->GetNDataAllocated(data_set);
 				mCLThread->SetTime(mCLThread->GetDataAveJD(data_set));
 				mCLThread->EnqueueOperation(GLT_RenderModels);
-
-				//mCLThread->GetChi(data_set, mResiduals + n_data_offset, n_data_alloc);
-				tmp_chi2 = mCLThread->GetChi2(data_set) / (nData + mNParams - 1);
-				n_data_offset += n_data_alloc;
+				chi2r_sum += mCLThread->GetChi2(data_set) / (nData + mNParams - 1);
+				n_data_offset += nData;
 			}
 
-			mResults.push_back( tuple<double, double, double>(mParams[0], mParams[1], tmp_chi2) );
+			mResults.push_back( tuple<double, double, double>(mParams[0], mParams[1], chi2r_sum/nDataSets) );
 
 		}
 	}

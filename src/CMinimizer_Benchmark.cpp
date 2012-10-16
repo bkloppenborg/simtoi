@@ -84,13 +84,12 @@ int CMinimizer_Benchmark::run()
 
 	for(int i = 0; i < n_iterations && mRun; i++)
 	{
-		n_data_alloc = mCLThread->GetNDataAllocated(0);
 		mCLThread->SetTime(mCLThread->GetDataAveJD(0));
 		mCLThread->EnqueueOperation(GLT_RenderModels);
 		chi2r = mCLThread->GetChi2(0) / (nData + mNParams - 1);
 
 		if(i % 100 == 0)
-			printf("Iteration %i Chi2r: %f\n", i, chi2);
+			printf("Iteration %i Chi2r: %f\n", i, chi2r);
 	}
 
 	// Calculate the time, print out a nice message.
