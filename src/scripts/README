@@ -1,4 +1,4 @@
-
+=================
 InsertSpaces.awk 
 =================
 Inserts breaks into a file whenever the value in the first column changes.
@@ -7,3 +7,15 @@ environment.
 
 Usage:
 $ awk -f InsertSpaces.awk input.txt > output.txt
+
+=================
+plot_histogram.py
+=================
+A python script to parse MultiNest or bootstrapped output and plot
+histograms using matplotlib.pyplot.hist().  The script distinguishes
+between these two data sources by looking for 'multinest' or 'bootstrap'
+in the filename.  If neither name is found, each column in the data file
+will be plotted as a histogram.
+
+Usage:
+python plot_histogram.py filename.txt
