@@ -4,10 +4,10 @@ from numpy import loadtxt
 from optparse import OptionParser
 import matplotlib.pyplot as plt
 import re
-from scipy.stats import norm
+from scipy.stats import norm, cauchy
 import matplotlib.mlab as mlab
 
-def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10):
+def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=False, save_basename='', save_format='svg'):
     """
     Plots a histogram formed from the columns of the specified file.
 
@@ -29,7 +29,8 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10):
     for column in range(0, len(skip_cols)):
         if skip_cols[column] < 0:
             skip_cols[column] = end_col + skip_cols[column]
-        
+       
+    namecol = 0 
     for column in range(0, end_col):
         # Skip the column if instructed to do so:
         if(column in skip_cols):
@@ -38,21 +39,42 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10):
         # extract the data column:
         temp = data[:,column]
         
-        try:
-            title = column_names[column]
-        except:
-            title = "Title"
-
-        [n, bins, patches] = plt.hist(temp, bins=nbins, normed=1)
+        # plot a histogram of the data:
+        [n, bins, patches] = plt.hist(temp, bins=nbins, normed=True, label='Binned data')
+        
+        # fit a normal distribution:
         [mu, sigma] = norm.fit(temp)
         y = mlab.normpdf(bins, mu, sigma)
-        l = plt.plot(bins, y, 'r--', linewidth=2)
+        legend_gauss = r'Normal: $\mu=%.3f,\ \sigma=%.3f$' % (mu, sigma)
+        l = plt.plot(bins, y, 'r--', linewidth=2, label=legend_gauss)
+        
+        # fit a Lorentz/Cauchy distribution:
+        # bug workaround for http://projects.scipy.org/scipy/ticket/1530
+        # - specify a starting centroid value for the fit
+        [mu, gamma] = cauchy.fit(temp, loc=mu)
+        y = cauchy.pdf(bins, loc=mu, scale=gamma)
+        legend_cauchy = r'Cauchy: $\mu=%.3f,\ \gamma=%.3f$' % (mu, gamma)
+        l = plt.plot(bins, y, 'g--', linewidth=2, label=legend_cauchy)
         
         # now setup the axes labels:
-        plt.title(r'$\mathrm{%s:}\ \mu=%.3f,\ \sigma=%.3f$' %(title, mu, sigma))
+        try:
+            title = column_names[namecol]
+            namecol += 1
+        except:
+            title = "Title"
+        
+        plt.title(title)
         plt.xlabel("Value")
         plt.ylabel("Frequency")
-        plt.show()
+        plt.legend(loc='best')
+        
+        if autosave:
+            plt.savefig(save_basename + 'hist_' + title + '.' + save_format, transparent=True, format=save_format)    
+            plt.close()        
+        else:
+            plt.show()
+
+
 
 def col_names(filename):
     infile = open(filename, 'r')
@@ -76,38 +98,41 @@ def main():
     usage = "Usage: %prog [options] filename"
     parser = OptionParser(usage=usage)
     parser.add_option("--nbins", dest="nbins", action="store", type="int", default=10,
-              help="Number of binning columns. [default: 10]")
+        help="Number of binning columns. [default: 10]")
+    parser.add_option("--autosave", dest="autosave", action="store_true", default=False,
+        help="Automatically save the plots. [default: False]")
+    parser.add_option("--savefmt", dest="savefmt", action="store", type="string", default="svg",
+        help="Automatic save file format.  [default: %default]")
 
     (options, args) = parser.parse_args()
 
     # now read the filenames
     filename = args[0]
-    base_filename = filename[0:len(filename)-4]
-    
-    offset_start = 0
-    offset_end = 0
     
     # Set parameters specifying columns that should not be plotted
     # and attempt to find the namefile:
     skip_cols=[]
-    namefile = ''
+    basename = ''
     if re.search('bootstrap', filename):
         tmp = re.split('bootstrap', filename)
-        namefile = tmp[0] + 'param_names.txt'
+        basename = tmp[0]
         skip_cols = [-1]
         print "Found bootstrap file."
     elif re.search('multinest', filename):
         tmp = re.split('multinest', filename)
-        namefile = tmp[0] + 'param_names.txt'
+        basename = tmp[0]
         skip_cols = [0,1]
-        print "MultiNest file."
+        print "Found MultiNest file."
+    else:
+        print "Unknown file format found, I'll do the best I can."
 
 
     column_names = []
-    if len(namefile) > 1:
-        column_names = col_names(namefile)
+    if len(basename) > 1:
+        column_names = col_names(basename + 'param_names.txt')
+        print column_names
 
-    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins)
+    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins, autosave=options.autosave, save_basename=basename, save_format=options.savefmt)
     
     
 # Run the main function if this is a top-level script:
