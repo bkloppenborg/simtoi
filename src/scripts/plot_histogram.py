@@ -4,13 +4,15 @@ from numpy import loadtxt
 from optparse import OptionParser
 import matplotlib.pyplot as plt
 import re
+from scipy.stats import norm
+import matplotlib.mlab as mlab
 
-def plot_histogram(filename, column_names=[], skip_cols=[]):
+def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10):
     """
     Plots a histogram formed from the columns of the specified file.
 
     If column_names is specified, the titles of the plots will be renamed
-    accordingly.  Otherwise "Histogram title" is inserted instead.
+    accordingly.  Otherwise "Title" is inserted instead.
 
     skip_cols specifies any columns in the data that should be skipped.
     Columns at the end of the line may be skipped by using negative numbers.
@@ -33,15 +35,21 @@ def plot_histogram(filename, column_names=[], skip_cols=[]):
         if(column in skip_cols):
             continue;
 
+        # extract the data column:
         temp = data[:,column]
         
         try:
             title = column_names[column]
         except:
-            title = "Histogram title"
+            title = "Title"
 
-        plt.hist(temp)
-        plt.title(title)
+        [n, bins, patches] = plt.hist(temp, bins=nbins, normed=1)
+        [mu, sigma] = norm.fit(temp)
+        y = mlab.normpdf(bins, mu, sigma)
+        l = plt.plot(bins, y, 'r--', linewidth=2)
+        
+        # now setup the axes labels:
+        plt.title(r'$\mathrm{%s:}\ \mu=%.3f,\ \sigma=%.3f$' %(title, mu, sigma))
         plt.xlabel("Value")
         plt.ylabel("Frequency")
         plt.show()
@@ -67,8 +75,8 @@ def main():
 
     usage = "Usage: %prog [options] filename"
     parser = OptionParser(usage=usage)
-#    parser.add_option("-type", dest="filetype", action="store", type="string", default='bootstrap',
-#              help="Type of data file being read. Options: [bootstrap,multinest]  [default: ' default']")
+    parser.add_option("--nbins", dest="nbins", action="store", type="int", default=10,
+              help="Number of binning columns. [default: 10]")
 
     (options, args) = parser.parse_args()
 
@@ -99,7 +107,7 @@ def main():
     if len(namefile) > 1:
         column_names = col_names(namefile)
 
-    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols)
+    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins)
     
     
 # Run the main function if this is a top-level script:
