@@ -105,13 +105,20 @@ public:
 		int nEntries = data.size();
 		// iterate over each row
 		for (row = data.begin() ; row < data.end(); row++)
-		{
-			// iterate over each cell
-			for(cell = row->begin(); cell < row->end(); cell++)
-				output << *cell << " ";
+			WriteRow(*row, output);
+	}
 
-			output << endl;
-		}
+	template <class T>
+	void WriteRow(vector<T> & data, ofstream & output)
+	{
+		// write the data to the file
+		typename vector<T>::iterator column;
+		int nEntries = data.size();
+		// iterate over each row
+		for (column = data.begin() ; column < data.end(); column++)
+			output << *column << " ";;
+
+		output << endl;
 	}
 };
 

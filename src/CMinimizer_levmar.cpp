@@ -209,7 +209,6 @@ int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int 
 	int iterations = 0;
 	int max_iterations = 100;
 	int nData = mCLThread->GetNDataAllocated();
-	int nParams = mCLThread->GetNFreeParameters();
 	double x[nData];
 	double lb[mNParams];
 	double ub[mNParams];
@@ -219,16 +218,21 @@ int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int 
 
 	// Setup the options (LM_* from levmar.h):
 	// info[1-4]=[ ||e||_2, ||J^T e||_inf,  ||Dp||_2, mu/max[J^T J]_ii ], all computed at estimated p.
+	// \tau: scale factor for initial \mu
 	//  opts[0] = |e||_2 				= LM_INIT_MU = 1E-03
+	// \epsilon1: stopping thresholds for ||J^T e||_inf
 	//  opts[1] = ||J^T e||_inf 		= LM_STOP_THRESH = 1E-15;
+	// \epsilon2: stopping thresholds for ||Dp||_2
 	//  opts[2] = ||Dp||_2 				= LM_STOP_THRESH = 1E-15;
+	// \epsilon3: stopping thresholds for ||e||_2
 	//  opts[3] = mu/max[J^T J]_ii ] 	= LM_STOP_THRESH * LM_STOP_THRESH = 1E-17 * 1E-17;
+	// \delta, step used in difference approximation to the Jacobian.  \delta < 0 => central difference instead of forward difference used
 	//  opts[4]= LM_DIFF_DELTA;
 	opts[0]= 1;
-	opts[1]= 1E-10;
-	opts[2]= 1E-12;
-	opts[3]= LM_STOP_THRESH * LM_STOP_THRESH; //1E-9;
-	opts[4]= LM_DIFF_DELTA; //1E-9;
+	opts[1]= 1E-4;
+	opts[2]= 1E-4;
+	opts[3]= 1E-12;
+	opts[4]= LM_DIFF_DELTA;
 
 	// Copy out the initial values for the parameters:
 	mCLThread->GetFreeParameters(mParams, mNParams, true);

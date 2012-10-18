@@ -64,6 +64,22 @@ CMinimizer::~CMinimizer()
 /// for each epoch.
 void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 {
+	stringstream filename;
+	ofstream outfile;
+
+	vector<string> names = mCLThread->GetFreeParamNames();
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mResultsBaseFilename << "_param_names.txt";
+	outfile.open(filename.str().c_str());
+	outfile.width(15);
+	outfile.precision(8);
+	outfile << "# Parameter names in a column." << endl;
+	outfile << "# Param0 ... ParamN" << endl;
+	WriteRow(names, outfile);
+	outfile.close();
+
 	if(!no_setparams)
 	{
 		n_params = min(n_params, int(mNParams));

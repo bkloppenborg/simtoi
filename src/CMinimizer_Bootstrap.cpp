@@ -63,7 +63,10 @@ void CMinimizer_Bootstrap::ErrorFunc(double * params, double * output, int nPara
 	// Now apply a mask to the output:
 	CMinimizer_Bootstrap * minimizer = reinterpret_cast<CMinimizer_Bootstrap*>(misc);
 	for(int i = 0; i < nOutput; i++)
+	{
 		output[i] *= minimizer->mMask[i];
+//		printf("%i %f \n", i, output[i]);
+	}
 }
 
 void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_setparams)
@@ -90,7 +93,8 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 	outfile.open(filename.str().c_str());
 	outfile.width(3);
 	outfile.precision(0);
-	outfile << "# Mask1 Mask ... MaskN" << endl;
+	outfile << "# Bootstrap masks on the data.  Each row is one mask designated by:" << endl;
+	outfile << "# Data0 ... DataN" << endl;
 	WriteTable(mMasks, outfile);
 	outfile.close();
 
@@ -156,7 +160,8 @@ int CMinimizer_Bootstrap::run()
 	vector<double> tmp_vec;
 	long double tmp_chi2 = 0;
 	double tmp = 0;
-	int nBootstrap = 1000;
+	int exit_value = 0;
+	int nBootstrap = 10000;
 	int nData = mCLThread->GetNDataAllocated();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -179,20 +184,12 @@ int CMinimizer_Bootstrap::run()
 		// Set the starting position.  Note these values are [0...1] and need to be scaled.
 		mCLThread->SetFreeParameters(mParams, mNParams, true);
 
-//		// Print a status message:
-//		mCLThread->GetFreeParameters(mParams, mNParams, true);
-//		printf("Starting iteration %i with values: ", iteration);
-//		// Draw a random number between 0 and 1:
-//		for(int i = 0; i < mNParams; i++)
-//			printf("%f ", mParams[i]);
-//
-//		printf("\n");
+		// Print a status message:
+		mCLThread->GetFreeParameters(mParams, mNParams, true);
+		cout << "Starting iteration " << iteration + 1 << endl;
 
 		// run the minimizer
-		int exit_value = CMinimizer_levmar::run(&CMinimizer_Bootstrap::ErrorFunc);
-
-		if(exit_value < 0)
-			break;
+		exit_value = CMinimizer_levmar::run(&CMinimizer_Bootstrap::ErrorFunc);
 
 		// Get the current chi2:
 		mCLThread->SetFreeParameters(mParams, mNParams, false);
