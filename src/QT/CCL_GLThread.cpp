@@ -27,6 +27,7 @@
 #include <QtDebug>
 #include <fstream>
 #include <stdexcept>
+#include "oi.hpp"
 
 #include "CCL_GLThread.h"
 #include "CGLWidget.h"
@@ -34,7 +35,6 @@
 #include "CModel.h"
 #include "CGLShaderList.h"
 #include "CPosition.h"
-#include "CLibOI.h"
 #include "json/json.h"
 #include "ReadTextFile.h"
 

@@ -1,21 +1,15 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi CXX C Fortran)
 
-# include directories for the oilib:
-include_directories(${OI_INCLUDE_DIRS})
+find_package(LIBOI REQUIRED)
+include_directories(LIBOI_INCLUDE_DIRS)
 
-# OpenGL is required
-if(NOT OpenGL_FOUND)
-	find_package(OpenGL REQUIRED)
-	if(OPENGL_FOUND)
-	    MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
-	endif(OPENGL_FOUND)
-endif(NOT OpenGL_FOUND)
+find_package(OpenGL REQUIRED)
+if(OPENGL_FOUND)
+    MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
+endif(OPENGL_FOUND)
+include_directories(OpenGL_INCLUDE_DIRS)
 add_definitions(-DGL_GLEXT_PROTOTYPES )
-
-if (CMAKE_BUILD_TOOL MATCHES "make")
-    #add_definitions(-Wall  -Wno-deprecated -Werror -Wshadow )
-endif (CMAKE_BUILD_TOOL MATCHES "make")
 
 find_package(Qt4 COMPONENTS QtCore QtGui QtMain QtOpenGL REQUIRED)
 INCLUDE(${QT_USE_FILE})

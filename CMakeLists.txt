@@ -20,14 +20,6 @@ SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/jsoncpp)
 include_directories(${CMAKE_SOURCE_DIR}/lib/jsoncpp/include)
 
-# Include liboi and other requirements(textio, getoifits, oifitslib)
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/textio)
-include_directories(${CMAKE_SOURCE_DIR}/lib/textio/include)
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/liboi)
-include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/src)
-include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/getoifits)
-include_directories(${CMAKE_SOURCE_DIR}/lib/liboi/lib/oifitslib)
-
 # Include levmar
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/levmar)
 include_directories(${CMAKE_SOURCE_DIR}/lib/levmar)

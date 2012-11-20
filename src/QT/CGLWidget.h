@@ -34,10 +34,10 @@
 #include <QStandardItemModel>
 #include <utility>
 #include <vector>
+#include "oi.hpp"
 
 #include "CCL_GLThread.h"
 #include "CMinimizerThread.h"
-#include "CLibOI.h"
 #include "CModelList.h"
 #include "CMinimizer.h"
 
