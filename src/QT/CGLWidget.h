@@ -37,7 +37,7 @@
 
 #include "CCL_GLThread.h"
 #include "CMinimizerThread.h"
-#include "CLibOI.h"
+#include "liboi.hpp"
 #include "CModelList.h"
 #include "CMinimizer.h"
 
