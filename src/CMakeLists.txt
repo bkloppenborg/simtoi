@@ -1,24 +1,9 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi CXX C Fortran)
 
-# include directories for the oilib:
-include_directories(${OI_INCLUDE_DIRS})
-
-# OpenGL is required
-if(NOT OpenGL_FOUND)
-	find_package(OpenGL REQUIRED)
-	if(OPENGL_FOUND)
-	    MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
-	endif(OPENGL_FOUND)
-endif(NOT OpenGL_FOUND)
+find_package(OpenGL REQUIRED)
+MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
 add_definitions(-DGL_GLEXT_PROTOTYPES )
-
-if (CMAKE_BUILD_TOOL MATCHES "make")
-    #add_definitions(-Wall  -Wno-deprecated -Werror -Wshadow )
-endif (CMAKE_BUILD_TOOL MATCHES "make")
-
-# Compile with C++11 support
-ADD_DEFINITIONS("-std=c++0x")
 
 find_package(Qt4 COMPONENTS QtCore QtGui QtMain QtOpenGL REQUIRED)
 INCLUDE(${QT_USE_FILE})
@@ -45,4 +30,4 @@ endif(MULTINEST_FOUND)
 add_executable(simtoi ${SOURCE})
 
 SET_TARGET_PROPERTIES(simtoi PROPERTIES LINKER_LANGUAGE Fortran)
-target_link_libraries(simtoi QT_files textio jsoncpp oi levmar ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${OPTIONAL_LIBS})
+target_link_libraries(simtoi QT_files jsoncpp levmar oi_static textio_static ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${OPTIONAL_LIBS})
