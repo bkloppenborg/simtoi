@@ -138,7 +138,7 @@ protected:
     int mCLDataSet;
     double mCLValue;
     float * mCLArrayValue;
-    int mCLArrayN;
+    unsigned int mCLArrayN;
     string mCLString;
 
     // Misc datamembers:
