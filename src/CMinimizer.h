@@ -63,12 +63,11 @@ public:
 	enum MinimizerTypes
 	{
 		NONE = 0,
-		TEST = 1,
-		BENCHMARK = 2,
-		LEVMAR = 3,
-		MULTINEST = 4,
-		GRIDSEARCH = 5,
-		BOOTSTRAP = 6,
+		BENCHMARK = 1,
+		LEVMAR = 2,
+		MULTINEST = 3,
+		GRIDSEARCH = 4,
+		BOOTSTRAP = 5,
 		LAST_VALUE	// this must always be the last value in this enum.
 	};
 

@@ -42,7 +42,6 @@
 #include "CMinimizer_levmar.h"
 #include "CMinimizer_GridSearch.h"
 #include "CMinimizer_Bootstrap.h"
-#include "CMinimizer_Test.h"
 
 CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 {
@@ -117,10 +116,6 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 		tmp = new CMinimizer_Bootstrap(cl_gl_thread);
 		break;
 
-	case TEST:
-		tmp = new CMinimizer_Test(cl_gl_thread);
-		break;
-
 	default:
 	case BENCHMARK:
 		tmp = new CMinimizer_Benchmark(cl_gl_thread);
@@ -142,7 +137,6 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::LEVMAR, "Levmar"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::GRIDSEARCH, "Grid Search"));
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BOOTSTRAP, "Bootstrap (Levmar)"));
-	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::TEST, "Tests"));
 	return tmp;
 }
 
