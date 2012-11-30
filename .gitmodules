@@ -4,3 +4,6 @@
 [submodule "lib/textio"]
 	path = lib/textio
 	url = git://github.com/bkloppenborg/textio.git
+[submodule "lib/ccoifits"]
+	path = lib/ccoifits
+	url = git://github.com/bkloppenborg/ccoifits.git
