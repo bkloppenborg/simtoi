@@ -154,12 +154,11 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 		nData = mCLThread->GetNDataAllocated(data_set);
 		mCLThread->SetTime(mCLThread->GetDataAveJD(data_set));
 		mCLThread->EnqueueOperation(GLT_RenderModels);
-		chi2r = mCLThread->GetChi2(data_set) / (nData + mNParams - 1);
+		chi2r = mCLThread->GetChi2(data_set) / (nData - mNParams - 1);
 		chi2r_total += chi2r;
 		printf("  Data Set %i chi2r: %f\n", data_set, chi2r);
 	}
 	printf("  All data, average chi2r: %f\n", chi2r_total/nDataSets);
-
 
 	double value = 0;
 	double err = 0;

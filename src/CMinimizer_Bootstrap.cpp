@@ -81,7 +81,7 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);
-	outfile << "# Param1 Param2 ... ParamN Chi2/(nData + nParams - 1)" << endl;
+	outfile << "# Param1 Param2 ... ParamN Chi2/(nData - nParams - 1)" << endl;
 
 	// write the data to the file
 	WriteTable(mResults, outfile);

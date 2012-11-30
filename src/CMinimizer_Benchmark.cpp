@@ -86,7 +86,7 @@ int CMinimizer_Benchmark::run()
 	{
 		mCLThread->SetTime(mCLThread->GetDataAveJD(0));
 		mCLThread->EnqueueOperation(GLT_RenderModels);
-		chi2r = mCLThread->GetChi2(0) / (nData + mNParams - 1);
+		chi2r = mCLThread->GetChi2(0) / (nData - mNParams - 1);
 
 		if(i % 100 == 0)
 			printf("Iteration %i Chi2r: %f\n", i, chi2r);

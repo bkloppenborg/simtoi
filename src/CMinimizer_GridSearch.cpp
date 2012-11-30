@@ -119,7 +119,7 @@ int CMinimizer_GridSearch::run()
 				nData = mCLThread->GetNDataAllocated(data_set);
 				mCLThread->SetTime(mCLThread->GetDataAveJD(data_set));
 				mCLThread->EnqueueOperation(GLT_RenderModels);
-				chi2r_sum += mCLThread->GetChi2(data_set) / (nData + mNParams - 1);
+				chi2r_sum += mCLThread->GetChi2(data_set) / (nData - mNParams - 1);
 				n_data_offset += nData;
 			}
 
