@@ -150,7 +150,7 @@ protected:
 
 public:
     CCL_GLThread(CGLWidget * glWidget, string shader_source_dir, string kernel_source_dir);
-    ~CCL_GLThread();
+    virtual ~CCL_GLThread();
 
     void AddModel(CModelList::ModelTypes model);
 

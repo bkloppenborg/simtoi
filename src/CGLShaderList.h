@@ -68,7 +68,7 @@ protected:
 
 public:
 	CGLShaderList(string shader_dir);
-	~CGLShaderList();
+	virtual ~CGLShaderList();
 
 public:
 	CGLShaderWrapperPtr GetShader(ShaderTypes shader);

@@ -76,7 +76,7 @@ protected:
 
 public:
 	CModelList();
-	~CModelList();
+	virtual ~CModelList();
 
 	CModelPtr AddNewModel(ModelTypes model_id);
 

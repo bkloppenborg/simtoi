@@ -635,7 +635,7 @@ void CCL_GLThread::run()
         case GLT_Resize:
         	// Resize the screen, then cascade to a render and a blit.
 #ifdef DEBUG
-    		printf("Resizing to %i %i\n.", mImageWidth, mImageHeight);
+    		printf("Resizing to %i %i\n", mImageWidth, mImageHeight);
 #endif //DEBUG
             glViewport(0, 0, mImageWidth, mImageHeight);
             glMatrixMode(GL_PROJECTION);

@@ -103,7 +103,7 @@ public:
 
 public:
 	CModel(int n_params);
-	~CModel();
+	virtual ~CModel();
 
 	//void AppendFeature(CFeature * feature);
 	//void DeleteFeature();

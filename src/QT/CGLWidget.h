@@ -57,7 +57,7 @@ protected:
 
 public:
     CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);
-    ~CGLWidget();
+    virtual ~CGLWidget();
 
     void AddModel(CModelList::ModelTypes model);
 protected:
