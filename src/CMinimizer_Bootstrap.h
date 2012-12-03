@@ -39,25 +39,27 @@
 #define CMINIMIZER_BOOTSTRAP_H_
 
 #include "CMinimizer_levmar.h"
+#include "oi_file.hpp"
+
+using namespace ccoifits;
 
 class CMinimizer_Bootstrap: public CMinimizer_levmar
 {
 public:
-	unsigned int * mMask;
+	OIDataList mData;	// A copy of the original data
 
 public:
 	CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread);
 	virtual ~CMinimizer_Bootstrap();
 
 	vector< vector<double> > mResults;
-	vector< vector<unsigned int> > mMasks;
 
 	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
 	virtual void ExportResults(double * params, int n_params, bool no_setparams);
 
 	void Init();
 
-	void NextMask();
+	void Next();
 
 	int run();
 };

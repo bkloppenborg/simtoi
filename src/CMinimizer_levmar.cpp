@@ -81,8 +81,8 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 //	printf("Residuals:\n");
 	for(int i = 0; i < nOutput; i++)
 	{
-		output[i] = double(minimizer->mResiduals[i]);
-//		printf("%i %f \n", i, output[i]);
+		output[i] = 0; //double(minimizer->mResiduals[i]);
+//		cout << i << " " << output[i] << endl;
 	}
 }
 
@@ -158,7 +158,7 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 		chi2r_total += chi2r;
 		printf("  Data Set %i chi2r: %f\n", data_set, chi2r);
 	}
-	printf("  All data, average chi2r: %f\n", chi2r_total/nDataSets);
+	printf("All data, average chi2r: %f\n", chi2r_total/nDataSets);
 
 	double value = 0;
 	double err = 0;

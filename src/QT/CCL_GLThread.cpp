@@ -315,6 +315,12 @@ double CCL_GLThread::GetChi2(int data_num)
 	return mCLValue;
 }
 
+/// Returns a copy of the ccoifits data loaded in index data_num.
+OIDataList CCL_GLThread::GetData(unsigned int data_num)
+{
+	return mCL->GetData(data_num);
+}
+
 /// Returns the average
 double CCL_GLThread::GetDataAveJD(int data_num)
 {
@@ -364,7 +370,7 @@ int CCL_GLThread::GetNData()
 	return 0;
 }
 
-/// Returns the total allocation size for all data points (V2 + 2 * T3)
+/// Returns the total allocation size for all data points
 int CCL_GLThread::GetNDataAllocated()
 {
 	if(mCL != NULL)
@@ -518,10 +524,19 @@ void CCL_GLThread::InitStorageBuffer(void)
 
 
 /// Loads data.
-void CCL_GLThread::LoadData(string filename)
+int CCL_GLThread::LoadData(string filename)
 {
 	if(mCL != NULL)
-		mCL->LoadData(filename);
+		return mCL->LoadData(filename);
+}
+
+/// Loads data to the OpenCL device. Returns the data id (>= 0) on success, -1 on failure.
+int CCL_GLThread::LoadData(const OIDataList & data)
+{
+	if(mCL != NULL)
+		return mCL->LoadData(data);
+
+	return -1;
 }
 
 /// Opens a save file

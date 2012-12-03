@@ -53,13 +53,14 @@
 #include <GL/glu.h>
 #include "CModelList.h"
 #include "CGLShaderList.h"
+#include "liboi.hpp"
 
 class CGLWidget;
 class CModel;
 class CGLShaderWrapper;
-class CLibOI;
 
 using namespace std;
+using namespace liboi;
 
 // A list of operations permitted.
 enum CL_GLT_Operations
@@ -169,6 +170,7 @@ public:
 
 	void 	GetChi(int data_num, float * output, int & n);
     double GetChi2(int data_num);
+    OIDataList GetData(unsigned int data_num);
     double GetDataAveJD(int data_num);
     unsigned int GetImageDepth() { return mImageDepth; };
     double GetFlux();
@@ -205,7 +207,8 @@ protected:
     void 	InitStorageBuffer(void);
 
 public:
-    void LoadData(string filename);
+    int LoadData(string filename);
+    int LoadData(const OIDataList & data);
 
     void Open(string filename);
     bool OpenCLInitialized() { return mCLInitalized; };

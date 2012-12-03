@@ -35,8 +35,10 @@
 #include <random>
 #include <chrono>
 #include "levmar.h"
-
 #include "CCL_GLThread.h"
+
+#include "oi_tools.hpp"
+#include "CUniformDisk.h"
 
 using namespace std;
 
@@ -46,12 +48,11 @@ CMinimizer_Bootstrap::CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread)
 {
 	mType = CMinimizer::BOOTSTRAP;
 	mResiduals = NULL;
-	mMask = NULL;
 }
 
 CMinimizer_Bootstrap::~CMinimizer_Bootstrap()
 {
-	delete[] mMask;
+
 }
 
 ///
@@ -59,14 +60,6 @@ void CMinimizer_Bootstrap::ErrorFunc(double * params, double * output, int nPara
 {
 	// First run the standard levmar minimizer:
 	CMinimizer_levmar::ErrorFunc(params, output, nParams, nOutput, misc);
-
-	// Now apply a mask to the output:
-	CMinimizer_Bootstrap * minimizer = reinterpret_cast<CMinimizer_Bootstrap*>(misc);
-	for(int i = 0; i < nOutput; i++)
-	{
-		output[i] *= minimizer->mMask[i];
-//		printf("%i %f \n", i, output[i]);
-	}
 }
 
 void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_setparams)
@@ -87,81 +80,59 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 	WriteTable(mResults, outfile);
 	outfile.close();
 
-	// now write out the masks
-	filename.str("");
-	filename << mResultsBaseFilename << "_bootstrap_mask.txt";
-	outfile.open(filename.str().c_str());
-	outfile.width(3);
-	outfile.precision(0);
-	outfile << "# Bootstrap masks on the data.  Each row is one mask designated by:" << endl;
-	outfile << "# Data0 ... DataN" << endl;
-	WriteTable(mMasks, outfile);
-	outfile.close();
+//	// now write out the masks
+//	filename.str("");
+//	filename << mResultsBaseFilename << "_bootstrap_mask.txt";
+//	outfile.open(filename.str().c_str());
+//	outfile.width(3);
+//	outfile.precision(0);
+//	outfile << "# Bootstrap masks on the data.  Each row is one mask designated by:" << endl;
+//	outfile << "# Data0 ... DataN" << endl;
+//	WriteTable(mMasks, outfile);
+//	outfile.close();
 
 }
 
 void CMinimizer_Bootstrap::Init()
 {
 	CMinimizer_levmar::Init();
-	int nData = mCLThread->GetNDataAllocated();
-	mMask = new unsigned int[nData];
 
-	for(int i = 0; i < nData; i++)
-		mMask[i] = 1;
+	// Get a copy of the zeroth data loaded in memory.
+	mData = mCLThread->GetData(0);
 }
 
-void CMinimizer_Bootstrap::NextMask()
+void CMinimizer_Bootstrap::Next()
 {
-	// Init to all zeros:
-	int n_data = mCLThread->GetNDataAllocated();
-	int n_v2 = mCLThread->GetNV2(0);
-	int n_t3 = mCLThread->GetNT3(0);
-	int j = 0;
 
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	default_random_engine generator (seed);
+// TODO: Calibrator information is hard-coded for eps Aur. This should be read in from elsewhere.
+	pair<double, double> cal_diam(0.419, 0.063);
 
-	uniform_int_distribution<int> v2_distribution(0, n_v2);
-	uniform_int_distribution<int> t3_distribution(0, n_t3);
+	std::default_random_engine generator;
+	std::normal_distribution<double> distribution(cal_diam.first, cal_diam.second);
 
+	// Setup the old calibrator
+	OICalibratorPtr old_cal = OICalibratorPtr( new ccoifits::CUniformDisk(cal_diam.first) );
+	OICalibratorPtr new_cal = OICalibratorPtr( new ccoifits::CUniformDisk(distribution(generator)) );
 
-	for(int i = 0; i < n_data; i++)
-		mMask[i] = 0;
+	// Recalibrate, bootstrap, then push to the OpenCL device:
+	cout << "Input data size: " << mData.size() << endl;
+	OIDataList temp = Recalibrate(mData, old_cal, new_cal);
+	temp = Bootstrap_Spectral(temp);
 
-	// Randomly select the V2 that will be activated:
-	for(int i = 0; i < n_v2; i++)
-	{
-		j = v2_distribution(generator);
-		mMask[j] += 1;
-	}
-
-	for(int i = 0; i < n_t3; i++)
-	{
-		j = t3_distribution(generator);
-		mMask[n_v2 + 2*j  ] += 1;
-		mMask[n_v2 + 2*j+1] += 1;
-	}
-
-	vector<unsigned int> tmp;
-	// Copy the mask for saving
-	for(int i = 0; i < n_data; i++)
-		tmp.push_back(mMask[i]);
-
-	mMasks.push_back(tmp);
+	cout << "Output data size: " << temp.size() << endl;
+	// Unload the data from memory
+	mCLThread->LoadData(temp);
+	mCLThread->RemoveData(0);
 }
 
 int CMinimizer_Bootstrap::run()
 {
-//	// Ensure memory is initialized.
-//	if(mResiduals == NULL)
-//		return -1;
-
 	// init local storage
 	vector<double> tmp_vec;
 	long double tmp_chi2 = 0;
 	double tmp = 0;
 	int exit_value = 0;
-	int nBootstrap = 10000;
+	int nBootstrap = 10;
 	int nData = mCLThread->GetNDataAllocated();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -174,10 +145,10 @@ int CMinimizer_Bootstrap::run()
 		if(!mRun)
 			break;
 
-		// Get the next mask:
-		NextMask();
+		// Get the next bootstrapped data set:
+		Next();
 
-		// Randomize the starting position:
+		// Randomize the starting position of the minimizer
 		for(int i = 0; i < mNParams; i++)
 			mParams[i] = distribution(generator);
 
@@ -185,7 +156,6 @@ int CMinimizer_Bootstrap::run()
 		mCLThread->SetFreeParameters(mParams, mNParams, true);
 
 		// Print a status message:
-		mCLThread->GetFreeParameters(mParams, mNParams, true);
 		cout << "Starting iteration " << iteration + 1 << endl;
 
 		// run the minimizer
@@ -195,18 +165,15 @@ int CMinimizer_Bootstrap::run()
 		mCLThread->SetFreeParameters(mParams, mNParams, false);
 		mCLThread->SetTime(mCLThread->GetDataAveJD(0));
 		mCLThread->EnqueueOperation(GLT_RenderModels);
-
 		mCLThread->GetChi(0, mResiduals, nData);
 
 		tmp_chi2 = 0;
 		tmp = 0;
 		for(int i = 0; i < nData; i++)
-		{
-			tmp = mResiduals[i] * mMask[i];
-			tmp_chi2 += tmp*tmp;
-		}
+			tmp_chi2 += mResiduals[i]*mResiduals[i];
+
 		// convert to a reduced chi2
-		tmp_chi2 /= (nData + mNParams - 1);
+		tmp_chi2 /= (nData - mNParams - 1);
 
 		// Save the results.  Start by copying the current entry to the temporary vector:
 		tmp_vec.clear();

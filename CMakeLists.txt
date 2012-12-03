@@ -37,6 +37,7 @@ include_directories(${PROJECT_SOURCE_DIR}/lib/textio/src)
 
 # ccoifits
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/ccoifits EXCLUDE_FROM_ALL)
+include_directories(${PROJECT_SOURCE_DIR}/lib/ccoifits/src/calibrators)
 include_directories(${PROJECT_SOURCE_DIR}/lib/ccoifits/src)
 include_directories(${CCOIFITS_INCLUDE_DIRS})
 
