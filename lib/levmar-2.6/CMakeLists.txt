@@ -15,7 +15,7 @@ ENDIF(HAVE_PLASMA)
 SET(LINSOLVERS_RETAIN_MEMORY 1 CACHE BOOL "Should linear solvers retain working memory between calls? (non-reentrant!)")
 SET(LM_DBL_PREC 1 CACHE BOOL "Build double precision routines?")
 SET(LM_SNGL_PREC 1 CACHE BOOL "Build single precision routines?")
-OPTION(BUILD_DEMO "Build demo program?" FALSE)
+OPTION(BUILD_DEMO "Build demo program?" TRUE)
 
 # actual names for the lapack/blas/f2c libraries
 SET(LAPACKBLAS_LIB_NAMES "lapack;blas" CACHE STRING "The name of the lapack & blas libraries")
@@ -65,16 +65,6 @@ ADD_LIBRARY(levmar STATIC
   levmar.h misc.h compiler.h
 )
 
-IF(HAVE_LAPACK)
-    IF(NEED_F2C)
-        SET(LIBS ${LIBS} ${LAPACKBLAS_LIB_NAMES} ${F2C_LIB_NAME})
-    ELSE(NEED_F2C)
-        SET(LIBS ${LIBS} ${LAPACKBLAS_LIB_NAMES})
-    ENDIF(NEED_F2C)
-ENDIF(HAVE_LAPACK)
-
-TARGET_LINK_LIBRARIES(levmar ${LIBS})
-
 # demo program
 IF(BUILD_DEMO)
   SET(LIBS levmar)
@@ -87,6 +77,14 @@ IF(BUILD_DEMO)
     LINK_DIRECTORIES(${PLASMA_DIR}/lib)
     SET(LIBS ${LIBS} ${PLASMA_LIB_NAMES})
   ENDIF(HAVE_PLASMA)
+
+  IF(HAVE_LAPACK)
+    IF(NEED_F2C)
+      SET(LIBS ${LIBS} ${LAPACKBLAS_LIB_NAMES} ${F2C_LIB_NAME})
+    ELSE(NEED_F2C)
+      SET(LIBS ${LIBS} ${LAPACKBLAS_LIB_NAMES})
+    ENDIF(NEED_F2C)
+  ENDIF(HAVE_LAPACK)
 
   ADD_EXECUTABLE(lmdemo lmdemo.c levmar.h)
   TARGET_LINK_LIBRARIES(lmdemo ${LIBS})

@@ -27,9 +27,9 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/jsoncpp EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_SOURCE_DIR}/lib/jsoncpp/include)
 
-# levmar
-add_subdirectory(${CMAKE_SOURCE_DIR}/lib/levmar EXCLUDE_FROM_ALL)
-include_directories(${CMAKE_SOURCE_DIR}/lib/levmar)
+# levmar (v. 2.6)
+add_subdirectory(${CMAKE_SOURCE_DIR}/lib/levmar-2.6 EXCLUDE_FROM_ALL)
+include_directories(${CMAKE_SOURCE_DIR}/lib/levmar-2.6)
 
 # textio
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/textio EXCLUDE_FROM_ALL)
