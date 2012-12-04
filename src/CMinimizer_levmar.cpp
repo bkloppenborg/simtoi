@@ -206,7 +206,7 @@ int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int 
 
 	// Create a member function pointer
 	int iterations = 0;
-	int max_iterations = 100;
+	int max_iterations = 50;
 	int nData = mCLThread->GetNDataAllocated();
 	valarray<double> x(nData);
 	valarray<double> lb(mNParams);

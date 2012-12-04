@@ -558,6 +558,13 @@ void CCL_GLThread::RemoveData(int data_num)
 		mCL->RemoveData(data_num);
 }
 
+/// Replaces the data set in ID old_data_id with new_data
+void CCL_GLThread::ReplaceData(unsigned int old_data_id, const OIDataList & new_data)
+{
+	if(mCL != NULL)
+		mCL->ReplaceData(old_data_id, new_data);
+}
+
 /// Resets any OpenGL errors by looping.
 void CCL_GLThread::ResetGLError()
 {

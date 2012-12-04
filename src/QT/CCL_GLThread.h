@@ -215,6 +215,7 @@ public:
 
     void RemoveData(int data_num);
     static void ResetGLError();
+	void ReplaceData(unsigned int old_data_id, const OIDataList & new_data);
     void resizeViewport(const QSize &size);
     void resizeViewport(int width, int height);
     void run();

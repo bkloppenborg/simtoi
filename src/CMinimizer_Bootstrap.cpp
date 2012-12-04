@@ -105,7 +105,7 @@ void CMinimizer_Bootstrap::Next()
 {
 
 // TODO: Calibrator information is hard-coded for eps Aur. This should be read in from elsewhere.
-	pair<double, double> cal_diam(0.419, 0.063);
+	pair<double, double> cal_diam(0.419 * MAS_TO_RAD, 0.063 * MAS_TO_RAD);
 
 	std::default_random_engine generator;
 	std::normal_distribution<double> distribution(cal_diam.first, cal_diam.second);
@@ -115,14 +115,11 @@ void CMinimizer_Bootstrap::Next()
 	OICalibratorPtr new_cal = OICalibratorPtr( new ccoifits::CUniformDisk(distribution(generator)) );
 
 	// Recalibrate, bootstrap, then push to the OpenCL device:
-	cout << "Input data size: " << mData.size() << endl;
 	OIDataList temp = Recalibrate(mData, old_cal, new_cal);
 	temp = Bootstrap_Spectral(temp);
 
-	cout << "Output data size: " << temp.size() << endl;
-	// Unload the data from memory
-	mCLThread->LoadData(temp);
-	mCLThread->RemoveData(0);
+	// Replace the 0th entry with temp.
+	mCLThread->ReplaceData(0, temp);
 }
 
 int CMinimizer_Bootstrap::run()
@@ -132,7 +129,7 @@ int CMinimizer_Bootstrap::run()
 	long double tmp_chi2 = 0;
 	double tmp = 0;
 	int exit_value = 0;
-	int nBootstrap = 10;
+	int nBootstrap = 1000;
 	int nData = mCLThread->GetNDataAllocated();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -144,9 +141,6 @@ int CMinimizer_Bootstrap::run()
 	{
 		if(!mRun)
 			break;
-
-		// Get the next bootstrapped data set:
-		Next();
 
 		// Randomize the starting position of the minimizer
 		for(int i = 0; i < mNParams; i++)
@@ -185,6 +179,9 @@ int CMinimizer_Bootstrap::run()
 
 		// push this vector onto the back of mResults
 		mResults.push_back(tmp_vec);
+
+		// Get the next bootstrapped data set:
+		Next();
 	}
 
 	// Save the results of the bootstrapper.
