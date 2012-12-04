@@ -33,6 +33,10 @@
 #ifndef CMINIMIZER_LEVMAR_H_
 #define CMINIMIZER_LEVMAR_H_
 
+#include <valarray>
+
+using namespace std;
+
 #include "CMinimizer.h"
 
 class CMinimizer_levmar: public CMinimizer
@@ -50,7 +54,7 @@ public:
 
 	virtual void Init();
 
-	void printresult(double * x, int n_pars, int n_data, vector<string> names, double * info, double * covar);
+	void printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar);
 
 	virtual int run();
 	int run(void (*error_func)(double *p, double *hx, int m, int n, void *adata));

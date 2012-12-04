@@ -81,7 +81,7 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 //	printf("Residuals:\n");
 	for(int i = 0; i < nOutput; i++)
 	{
-		output[i] = 0; //double(minimizer->mResiduals[i]);
+		output[i] = double(minimizer->mResiduals[i]);
 //		cout << i << " " << output[i] << endl;
 	}
 }
@@ -137,7 +137,7 @@ string CMinimizer_levmar::GetExitString(int exit_num)
 }
 
 /// Prints out cmpfit results (from testmpfit.c)
-void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, double * info, double * covar)
+void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar)
 {
 	if ((x == 0) || (n_pars == 0))
 		return;
@@ -208,12 +208,12 @@ int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int 
 	int iterations = 0;
 	int max_iterations = 100;
 	int nData = mCLThread->GetNDataAllocated();
-	double x[nData];
-	double lb[mNParams];
-	double ub[mNParams];
-	double info[LM_INFO_SZ];
-	double opts[LM_OPTS_SZ];
-	double covar[mNParams * mNParams];
+	valarray<double> x(nData);
+	valarray<double> lb(mNParams);
+	valarray<double> ub(mNParams);
+	valarray<double> info(LM_INFO_SZ);
+	valarray<double> opts(LM_INFO_SZ);
+	valarray<double> covar(mNParams * mNParams);
 
 	// Setup the options (LM_* from levmar.h):
 	// info[1-4]=[ ||e||_2, ||J^T e||_inf,  ||Dp||_2, mu/max[J^T J]_ii ], all computed at estimated p.
@@ -250,7 +250,7 @@ int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int 
 	mIsRunning = true;
 
 	// Call levmar.  Note, the results are saved in mParams upon completion.
-	iterations = dlevmar_bc_dif(error_func, mParams, x, mNParams, nData, lb, ub, NULL, max_iterations, opts, info, NULL, covar, (void*)this);
+	iterations = dlevmar_bc_dif(error_func, mParams, &x[0], mNParams, nData, &lb[0], &ub[0], NULL, max_iterations, &opts[0], &info[0], NULL, &covar[0], (void*)this);
 
 	mIsRunning = false;
 
