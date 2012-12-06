@@ -45,6 +45,10 @@ using namespace ccoifits;
 
 class CMinimizer_Bootstrap: public CMinimizer_levmar
 {
+protected:
+	unsigned int mBootstrapFailures;
+	unsigned int mMaxBootstrapFailures;
+
 public:
 	OIDataList mData;	// A copy of the original data
 

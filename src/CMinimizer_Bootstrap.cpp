@@ -34,9 +34,10 @@
 
 #include <random>
 #include <chrono>
+#include <stdexcept>
+
 #include "levmar.h"
 #include "CCL_GLThread.h"
-
 #include "oi_tools.hpp"
 #include "CUniformDisk.h"
 
@@ -48,6 +49,9 @@ CMinimizer_Bootstrap::CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread)
 {
 	mType = CMinimizer::BOOTSTRAP;
 	mResiduals = NULL;
+
+	mBootstrapFailures = 0;
+	mMaxBootstrapFailures = 10;
 }
 
 CMinimizer_Bootstrap::~CMinimizer_Bootstrap()
@@ -119,7 +123,25 @@ void CMinimizer_Bootstrap::Next()
 	temp = Bootstrap_Spectral(temp);
 
 	// Replace the 0th entry with temp.
-	mCLThread->ReplaceData(0, temp);
+	// Due to a bug in ccoifits the total data size may not be preserved, so we need to
+	// catch and repeat.
+	try
+	{
+		mCLThread->ReplaceData(0, temp);
+	}
+	catch(length_error& l)
+	{
+		// Generate an error message on stderr.
+		cerr << " Warning: " << l.what() << " " << "Generating a new bootstrapped data set." << endl;
+		mBootstrapFailures += 1;
+
+		if(mBootstrapFailures < mMaxBootstrapFailures)
+			Next();
+		else
+			throw "Too many bootstrap data generation failures.";
+
+		mBootstrapFailures = 0;
+	}
 }
 
 int CMinimizer_Bootstrap::run()
@@ -129,7 +151,7 @@ int CMinimizer_Bootstrap::run()
 	long double tmp_chi2 = 0;
 	double tmp = 0;
 	int exit_value = 0;
-	int nBootstrap = 1000;
+	int nBootstrap = 10000;
 	int nData = mCLThread->GetNDataAllocated();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
