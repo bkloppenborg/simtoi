@@ -471,7 +471,6 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
     GLint samples;
     glGetIntegerv(GL_SAMPLE_BUFFERS, &bufs);
     glGetIntegerv(GL_SAMPLES, &samples);
-    qDebug("Have %d buffers and %d samples", bufs, samples);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
 }
@@ -544,7 +543,7 @@ void CCL_GLThread::Open(string filename)
 {
 	Json::Reader reader;
 	Json::Value input;
-	string file_contents = ReadFile(filename, "Could not read save file.");
+	string file_contents = ReadFile(filename, "Could not read model save file.");
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(parsingSuccessful)
 		mModelList->Restore(input, mShaderList);
