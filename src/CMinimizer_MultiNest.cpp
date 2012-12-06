@@ -129,10 +129,10 @@ int CMinimizer_MultiNest::run()
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	const std::string path = "/tmp/mn";		// root for output files
+	const std::string path = mResultsBaseFilename + "_multinest";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
-	int resume = 1;					// resume from a previous job?
+	int resume = 0;					// resume from a previous job?
 	int outfile = 1;				// write output files?
 	int initMPI = 0;				// initialize MPI routines?, relevant only if compiling with MPI
 							        // set it to F if you want your main program to handle MPI initialization

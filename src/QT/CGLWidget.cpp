@@ -173,10 +173,13 @@ void CGLWidget::RebuildTree()
 	CGLShaderWrapper * shader;
 
 	// Now pull out the pertinent information
+	// NOTE: We drop the shared_ptrs here
+	// TODO: Propigate shared pointers
 	for(int i = 0; i < model_list->size(); i++)
 	{
 		// First pull out the model parameters
-		model = model_list->GetModel(i);
+		model = model_list->GetModel(i).get();
+
 		items = LoadParametersHeader(QString("Model"), model);
 		item_parent = items[0];
 		mTreeModel->appendRow(items);
@@ -190,7 +193,7 @@ void CGLWidget::RebuildTree()
 		LoadParameters(item, position);
 
 		// Lastly for the shader:
-		shader = model->GetShader();
+		shader = model->GetShader().get();
 		items = LoadParametersHeader(QString("Shader"), shader);
 		item = items[0];
 		item_parent->appendRow(items);

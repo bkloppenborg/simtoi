@@ -35,6 +35,11 @@ uniform vec3 max_xyz;
 void main(void)
 {
     normal = gl_NormalMatrix * gl_Normal;
+    
+    // exclude the back face of the object to ensure limb darkening is computed correctly.
+    if(normal.z < 0)
+        normal = vec3(0, 0, 0);
+        
     color = gl_Color;
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }

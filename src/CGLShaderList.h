@@ -36,14 +36,17 @@
 #include <vector>
 #include <string>
 #include <utility>
-#include "CVectorList.h"
-
+#include <memory>
+#include <vector>
 using namespace std;
 
 class CGLShader;
 class CGLShaderWrapper;
 
-class CGLShaderList: public CVectorList<CGLShader*>
+typedef shared_ptr<CGLShader> CGLShaderPtr;
+typedef shared_ptr<CGLShaderWrapper> CGLShaderWrapperPtr;
+
+class CGLShaderList: public vector<CGLShaderPtr>
 {
 public:
 	/// Enumerated shader names
@@ -61,18 +64,18 @@ public:
 
 protected:
 	string shader_dir;
-	bool SortModelPredicate(CGLShader * A, CGLShader * B);
+	bool SortModelPredicate(CGLShaderPtr A, CGLShaderPtr B);
 
 public:
 	CGLShaderList(string shader_dir);
-	~CGLShaderList();
+	virtual ~CGLShaderList();
 
 public:
-	CGLShaderWrapper * GetShader(ShaderTypes shader);
+	CGLShaderWrapperPtr GetShader(ShaderTypes shader);
 	vector< pair<ShaderTypes, string> > GetTypes(void);
 
 protected:
-	CGLShader * FindShader(ShaderTypes shader);
+	CGLShaderPtr FindShader(ShaderTypes shader);
 
 	void LoadShaders();
 };

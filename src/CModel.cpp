@@ -219,7 +219,7 @@ void CModel::Restore(Json::Value input, CGLShaderList * shader_list)
 {
 	// Restore the base parameters
 	CParameters::Restore(input["base"]);
-	CGLShaderWrapper * shader;
+	CGLShaderWrapperPtr shader;
 
 	// Now the position
 	if(input.isMember("position"))
@@ -334,7 +334,7 @@ void CModel::SetTime(double time)
 	}
 }
 
-void CModel::SetShader(CGLShaderWrapper * shader)
+void CModel::SetShader(CGLShaderWrapperPtr shader)
 {
 	mShader = shader;
 }

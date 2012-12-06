@@ -4,7 +4,11 @@
  *  Created on: Dec 8, 2011
  *      Author: bkloppenborg
  *
- *  A generic base class for minimization routines.
+ *  A generic base class for minimization routines.  All minimizers should have the following
+ *  behavior:
+ *  	1) If mRun == false, they should terminate gracefully, deallocating resources as needed
+ *  	2) Upon completion, the best-fit parameters should be stored in mParams
+ *  	3) Upon completion, results should be exported to a file.
  *
  *  NOTE: This class also maintains a static function for minimizer creation.  If you add a new
  *  minimizer, be sure to modify GetTypes() and GetMinimizer()
@@ -41,6 +45,8 @@
 
 #include <string>
 #include <cstdio>
+#include <fstream>
+#include <sstream>
 #include <utility>
 #include <vector>
 
@@ -57,16 +63,17 @@ public:
 	enum MinimizerTypes
 	{
 		NONE = 0,
-		TEST = 1,
-		BENCHMARK = 2,
-		LEVMAR = 3,
-		MULTINEST = 4,
+		BENCHMARK = 1,
+		LEVMAR = 2,
+		MULTINEST = 3,
+		GRIDSEARCH = 4,
+		BOOTSTRAP = 5,
 		LAST_VALUE	// this must always be the last value in this enum.
 	};
 
 public:
 	CCL_GLThread * mCLThread;
-	double * mParams;
+	double * mParams;	// Current parameter values. Set to best-fit parameters upon exit (required)
 	unsigned int mNParams;
 	bool mRun;
 	string mResultsBaseFilename;;
@@ -76,16 +83,42 @@ public:
 	CMinimizer(CCL_GLThread * cl_gl_thread);
 	virtual ~CMinimizer();
 
-	void ExportResults(double * params, int n_params, bool no_setparams=false);
+	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 
 	static CMinimizer * GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread);
+	virtual void GetResults(double * results, int n_params);
 	static vector< pair<CMinimizer::MinimizerTypes, string> > GetTypes(void);
 
 	virtual void Init();
 	bool IsRunning();
 
 	virtual int run() = 0;
-	void Stop();
+	virtual void Stop();
+
+	template <class T>
+	void WriteTable(vector< vector<T> > & data, ofstream & output)
+	{
+		// write the data to the file
+		typename vector< vector<T> >::iterator row;
+		typename vector<T>::iterator cell;
+		int nEntries = data.size();
+		// iterate over each row
+		for (row = data.begin() ; row < data.end(); row++)
+			WriteRow(*row, output);
+	}
+
+	template <class T>
+	void WriteRow(vector<T> & data, ofstream & output)
+	{
+		// write the data to the file
+		typename vector<T>::iterator column;
+		int nEntries = data.size();
+		// iterate over each row
+		for (column = data.begin() ; column < data.end(); column++)
+			output << *column << " ";;
+
+		output << endl;
+	}
 };
 
 #endif /* CMINIMIZER_H_ */

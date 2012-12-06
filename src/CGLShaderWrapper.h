@@ -35,16 +35,21 @@
 #ifndef CGLSHADERWRAPPER_H_
 #define CGLSHADERWRAPPER_H_
 
+#include <memory>
+using namespace std;
+
 #include "CParameters.h"
 #include "CGLShader.h"
+
+typedef shared_ptr<CGLShader> CGLShaderPtr;
 
 class CGLShaderWrapper : public CParameters
 {
 protected:
-	CGLShader * mShader;
+	CGLShaderPtr mShader;
 
 public:
-	CGLShaderWrapper(CGLShader * shader, int n_params);
+	CGLShaderWrapper(CGLShaderPtr shader, int n_params);
 	virtual ~CGLShaderWrapper();
 
 	CGLShaderList::ShaderTypes GetType() { return mShader->GetType(); };

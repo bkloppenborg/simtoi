@@ -1,14 +1,8 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi CXX C Fortran)
 
-find_package(LIBOI REQUIRED)
-include_directories(LIBOI_INCLUDE_DIRS)
-
 find_package(OpenGL REQUIRED)
-if(OPENGL_FOUND)
-    MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
-endif(OPENGL_FOUND)
-include_directories(OpenGL_INCLUDE_DIRS)
+MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
 add_definitions(-DGL_GLEXT_PROTOTYPES )
 
 find_package(Qt4 COMPONENTS QtCore QtGui QtMain QtOpenGL REQUIRED)
@@ -16,6 +10,8 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/QT ${CMAKE_CURRENT_BINARY_DIR}/QT)
 add_subdirectory(QT) 
+
+add_subdirectory(scripts)
 
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp models/*.cpp)
@@ -36,4 +32,4 @@ endif(MULTINEST_FOUND)
 add_executable(simtoi ${SOURCE})
 
 SET_TARGET_PROPERTIES(simtoi PROPERTIES LINKER_LANGUAGE Fortran)
-target_link_libraries(simtoi QT_files textio jsoncpp oi levmar ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${OPTIONAL_LIBS})
+target_link_libraries(simtoi QT_files jsoncpp levmar oi_static textio_static ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${OPTIONAL_LIBS})

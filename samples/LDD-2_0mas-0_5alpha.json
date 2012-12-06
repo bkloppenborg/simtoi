@@ -6,7 +6,7 @@
         "base" : 
         {
             "Color" : [ 1.0, 0.0, 0.0, false ],
-            "Diameter" : [ 3.0, 1.0, 3.0, true ],
+            "Diameter" : [ 2.0, 1.0, 3.0, true ],
             "Inclination" : [ 0.0, 0.0, 0.0, false ],
             "Pos. Angle" : [ 0.0, 0.0, 0.0, false ],
             "Rotation" : [ 0.0, 0.0, 0.0, false ],

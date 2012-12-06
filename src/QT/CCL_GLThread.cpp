@@ -35,8 +35,9 @@
 #include "CModel.h"
 #include "CGLShaderList.h"
 #include "CPosition.h"
+#include "liboi.hpp"
 #include "json/json.h"
-#include "ReadTextFile.h"
+#include "textio.hpp"
 
 int CCL_GLThread::count = 0;
 
@@ -92,11 +93,11 @@ CCL_GLThread::~CCL_GLThread()
 void CCL_GLThread::AddModel(CModelList::ModelTypes model)
 {
 	// Create the model, load the shader.
-	CModel * tmp_model = mModelList->AddNewModel(model);
+	CModelPtr tmp_model = mModelList->AddNewModel(model);
 
 	// Initialize with default (XY) position and no shader.
 	tmp_model->SetPositionType(CPosition::XY);
-	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(CGLShaderList::NONE);
+	CGLShaderWrapperPtr tmp_shader = mShaderList->GetShader(CGLShaderList::NONE);
 	tmp_model->SetShader(tmp_shader);
 
 	EnqueueOperation(GLT_RenderModels);
@@ -174,124 +175,124 @@ void CCL_GLThread::EnqueueOperation(CL_GLT_Operations op)
 // to files whose starting bit is specified by base_filename
 void CCL_GLThread::ExportResults(string base_filename)
 {
-	// Allocate memory for storing the data and chi values.
-	mCLArrayN = mCL->GetMaxDataSize();
-	float tmp_data[mCLArrayN];
-	float tmp_chi2[mCLArrayN];
-	float chi2_v2, chi2_t3, chi2_t3amp, chi2_t3phi;
-	int ndof = 0;
-
-	stringstream filename;
-	ofstream outfile_data;
-	ofstream outfile_stats;
-	CVectorList<CT3Data*> t3;
-	CVectorList<CV2Data*> v2;
-
-	// Open the statistics file for writing:
-	filename.str("");
-	filename << base_filename << "_stats.txt";
-	outfile_stats.open(filename.str().c_str());
-	outfile_data.width(15);
-	outfile_data.precision(8);
-	outfile_stats << "# Statistics for fitted data." << endl;
-
-	// Set the time, render the model, simulate the data
-	unsigned int n_data_sets = mCL->GetNDataSets();
-	for(unsigned int data_set = 0; data_set < n_data_sets; data_set++)
-	{
-		mCLDataSet = data_set;
-		SetTime(GetDataAveJD(data_set));
-		EnqueueOperation(GLT_RenderModels);
-
-		// Compute the corresponding interferometric data, wait for completion.
-		mCLArrayValue = tmp_data;
-		EnqueueOperation(CLT_GetData);
-
-		// Grab the V2 and T3 (read-only operation from CPU memory), asynchronous operation
-		mCL->GetT3(data_set, t3);
-		mCL->GetV2(data_set, v2);
-		unsigned int n_v2 = v2.size();
-		unsigned int n_t3 = t3.size();
-
-		// Wait for CLT_GetData to complete
-		mCLOpSemaphore.acquire();
-
-		// Pull down the chi2 values (read-only operation)
-		mCLArrayValue = tmp_chi2;
-		EnqueueOperation(CLT_GetChi2_Elements);
-		mCLOpSemaphore.acquire();
-
-		// Now sum up the Chi2 elements on the CPU
-		// Do V2, T3, T3Amp, T3Phi:
-		chi2_v2 = chi2_t3 = chi2_t3amp = chi2_t3phi = 0;
-
-		for(int i = 0; i < n_v2; i++)
-			chi2_v2 += tmp_chi2[i];
-
-		for(int i = 0; i < n_t3; i++)
-		{
-			chi2_t3amp += tmp_chi2[n_v2 + 2*i];
-			chi2_t3phi += tmp_chi2[n_v2 + 2*i + 1];
-		}
-		chi2_t3 = chi2_t3amp + chi2_t3phi;
-
-		// Write the chi2 statistics out to a file:
-		ndof = n_v2;
-		outfile_stats << "Data Set: " << data_set << endl;
-		outfile_stats << " V2_dof: " << ndof << " V2_chi2r: " << chi2_v2/ndof << endl;
-		ndof = n_t3;
-		outfile_stats << " T3_dof: " << ndof << " T3_chi2r: " << chi2_t3/ndof << endl;
-		ndof = n_t3/2;
-		outfile_stats << " T3Amp_dof: " << ndof << " T3Amp_chi2r: " << chi2_t3amp/ndof << endl;
-		outfile_stats << " T3Phi_dof: " << ndof << " T3Phi_chi2r: " << chi2_t3phi/ndof << endl;
-
-		// Now for the data:
-		// export v2
-		filename.str("");
-		filename << base_filename << "_" << data_set << "_v2.txt";
-		outfile_data.open(filename.str().c_str());
-		outfile_data.width(15);
-		outfile_data.precision(8);
-		outfile_data << "# U V V2 V2_err V2_sim" << endl;
-		for(int j = 0; j < n_v2; j++)
-		{
-			outfile_data << v2[j]->u << " " << v2[j]->v << " "
-					<< v2[j]->v2 << " " << v2[j]->v2_err << " "
-					<< tmp_data[j] << endl;
-		}
-		outfile_data.close();
-
-		// export t3
-		filename.str("");
-		filename << base_filename << "_" << data_set << "_t3.txt";
-		outfile_data.open(filename.str().c_str());
-		outfile_data.width(15);
-		outfile_data.precision(8);
-		outfile_data << "U1 V1 U2 V2 U3 V3 t3_amp t3_amp_err t3_phi t3_phi_err t3_amp_sim t3_phi_sim" << endl;
-		float t3_amp_data = 0;
-		float t3_phi_data = 0;
-		float t3_amp_model = 0;
-		float t3_phi_model = 0;
-		float phase;
-		for(unsigned int j = 0; j < n_t3; j++)
-		{
-			t3_amp_data = t3[j]->t3_amp;
-			t3_phi_data = t3[j]->t3_phi * PI / 180;
-			t3_amp_model = tmp_data[n_v2 + 2*j];
-			t3_phi_model = tmp_data[n_v2 + 2*j + 1];
-
-			outfile_data << t3[j]->u1 << " " << t3[j]->v1 << " "
-					<< t3[j]->u2 << " " << t3[j]->v2 << " "
-					<< t3[j]->u3 << " " << t3[j]->v3 << " "
-					<< t3[j]->t3_amp << " " << t3[j]->t3_amp_err << " "
-					<< t3[j]->t3_phi << " " << t3[j]->t3_phi_err << " "
-					<< t3_amp_model << " " << t3_phi_model * 180/PI << endl;
-		}
-		outfile_data.close();
-	}
-
-	// Unset the array value.
-	mCLArrayValue = NULL;
+//	// Allocate memory for storing the data and chi values.
+//	mCLArrayN = mCL->GetMaxDataSize();
+//	float tmp_data[mCLArrayN];
+//	float tmp_chi2[mCLArrayN];
+//	float chi2_v2, chi2_t3, chi2_t3amp, chi2_t3phi;
+//	int ndof = 0;
+//
+//	stringstream filename;
+//	ofstream outfile_data;
+//	ofstream outfile_stats;
+//	vector<CT3DataPtr> t3;
+//	vector<CV2DataPtr> v2;
+//
+//	// Open the statistics file for writing:
+//	filename.str("");
+//	filename << base_filename << "_stats.txt";
+//	outfile_stats.open(filename.str().c_str());
+//	outfile_data.width(15);
+//	outfile_data.precision(8);
+//	outfile_stats << "# Statistics for fitted data." << endl;
+//
+//	// Set the time, render the model, simulate the data
+//	unsigned int n_data_sets = mCL->GetNDataSets();
+//	for(unsigned int data_set = 0; data_set < n_data_sets; data_set++)
+//	{
+//		mCLDataSet = data_set;
+//		SetTime(GetDataAveJD(data_set));
+//		EnqueueOperation(GLT_RenderModels);
+//
+//		// Compute the corresponding interferometric data, wait for completion.
+//		mCLArrayValue = tmp_data;
+//		EnqueueOperation(CLT_GetData);
+//
+//		// Grab the V2 and T3 (read-only operation from CPU memory), asynchronous operation
+//		mCL->GetT3(data_set, t3);
+//		mCL->GetV2(data_set, v2);
+//		unsigned int n_v2 = v2.size();
+//		unsigned int n_t3 = t3.size();
+//
+//		// Wait for CLT_GetData to complete
+//		mCLOpSemaphore.acquire();
+//
+//		// Pull down the chi2 values (read-only operation)
+//		mCLArrayValue = tmp_chi2;
+//		EnqueueOperation(CLT_GetChi2_Elements);
+//		mCLOpSemaphore.acquire();
+//
+//		// Now sum up the Chi2 elements on the CPU
+//		// Do V2, T3, T3Amp, T3Phi:
+//		chi2_v2 = chi2_t3 = chi2_t3amp = chi2_t3phi = 0;
+//
+//		for(int i = 0; i < n_v2; i++)
+//			chi2_v2 += tmp_chi2[i];
+//
+//		for(int i = 0; i < n_t3; i++)
+//		{
+//			chi2_t3amp += tmp_chi2[n_v2 + 2*i];
+//			chi2_t3phi += tmp_chi2[n_v2 + 2*i + 1];
+//		}
+//		chi2_t3 = chi2_t3amp + chi2_t3phi;
+//
+//		// Write the chi2 statistics out to a file:
+//		ndof = n_v2;
+//		outfile_stats << "Data Set: " << data_set << endl;
+//		outfile_stats << " V2_dof: " << ndof << " V2_chi2r: " << chi2_v2/ndof << endl;
+//		ndof = n_t3;
+//		outfile_stats << " T3_dof: " << ndof << " T3_chi2r: " << chi2_t3/ndof << endl;
+//		ndof = n_t3/2;
+//		outfile_stats << " T3Amp_dof: " << ndof << " T3Amp_chi2r: " << chi2_t3amp/ndof << endl;
+//		outfile_stats << " T3Phi_dof: " << ndof << " T3Phi_chi2r: " << chi2_t3phi/ndof << endl;
+//
+//		// Now for the data:
+//		// export v2
+//		filename.str("");
+//		filename << base_filename << "_" << data_set << "_v2.txt";
+//		outfile_data.open(filename.str().c_str());
+//		outfile_data.width(15);
+//		outfile_data.precision(8);
+//		outfile_data << "# U V V2 V2_err V2_sim" << endl;
+//		for(int j = 0; j < n_v2; j++)
+//		{
+//			outfile_data << v2[j]->u << " " << v2[j]->v << " "
+//					<< v2[j]->v2 << " " << v2[j]->v2_err << " "
+//					<< tmp_data[j] << endl;
+//		}
+//		outfile_data.close();
+//
+//		// export t3
+//		filename.str("");
+//		filename << base_filename << "_" << data_set << "_t3.txt";
+//		outfile_data.open(filename.str().c_str());
+//		outfile_data.width(15);
+//		outfile_data.precision(8);
+//		outfile_data << "U1 V1 U2 V2 U3 V3 t3_amp t3_amp_err t3_phi t3_phi_err t3_amp_sim t3_phi_sim" << endl;
+//		float t3_amp_data = 0;
+//		float t3_phi_data = 0;
+//		float t3_amp_model = 0;
+//		float t3_phi_model = 0;
+//		float phase;
+//		for(unsigned int j = 0; j < n_t3; j++)
+//		{
+//			t3_amp_data = t3[j]->t3_amp;
+//			t3_phi_data = t3[j]->t3_phi * PI / 180;
+//			t3_amp_model = tmp_data[n_v2 + 2*j];
+//			t3_phi_model = tmp_data[n_v2 + 2*j + 1];
+//
+//			outfile_data << t3[j]->u1 << " " << t3[j]->v1 << " "
+//					<< t3[j]->u2 << " " << t3[j]->v2 << " "
+//					<< t3[j]->u3 << " " << t3[j]->v3 << " "
+//					<< t3[j]->t3_amp << " " << t3[j]->t3_amp_err << " "
+//					<< t3[j]->t3_phi << " " << t3[j]->t3_phi_err << " "
+//					<< t3_amp_model << " " << t3_phi_model * 180/PI << endl;
+//		}
+//		outfile_data.close();
+//	}
+//
+//	// Unset the array value.
+//	mCLArrayValue = NULL;
 }
 
 /// Returns the chi values in output for the specified data set and the current image.
@@ -313,6 +314,12 @@ double CCL_GLThread::GetChi2(int data_num)
 	EnqueueOperation(CLT_Chi2);
 	mCLOpSemaphore.acquire();
 	return mCLValue;
+}
+
+/// Returns a copy of the ccoifits data loaded in index data_num.
+OIDataList CCL_GLThread::GetData(unsigned int data_num)
+{
+	return mCL->GetData(data_num);
 }
 
 /// Returns the average
@@ -364,11 +371,13 @@ int CCL_GLThread::GetNData()
 	return 0;
 }
 
-/// Returns the total allocation size for all data points (V2 + 2 * T3)
+/// Returns the total allocation size for all data points
 int CCL_GLThread::GetNDataAllocated()
 {
 	if(mCL != NULL)
 		return mCL->GetNDataAllocated();
+
+	return 0;
 }
 
 /// Returns the data allocation size for the data_num entry, returns zero if data_num is invalid.
@@ -376,6 +385,8 @@ int CCL_GLThread::GetNDataAllocated(int data_num)
 {
 	if(mCL != NULL)
 		return mCL->GetNDataAllocated(data_num);
+
+	return 0;
 }
 
 /// Returns the total number of data sets.
@@ -383,7 +394,26 @@ int CCL_GLThread::GetNDataSets()
 {
 	if(mCL != NULL)
 		return mCL->GetNDataSets();
+
+	return 0;
 }
+
+int CCL_GLThread::GetNT3(int data_num)
+{
+	if(mCL != NULL)
+		return mCL->GetNT3(data_num);
+
+	return 0;
+}
+
+int CCL_GLThread::GetNV2(int data_num)
+{
+	if(mCL != NULL)
+		return mCL->GetNV2(data_num);
+
+	return 0;
+}
+
 
 /// Get the next operation from the queue.  This is a blocking function.
 CL_GLT_Operations CCL_GLThread::GetNextOperation(void)
@@ -442,7 +472,6 @@ void CCL_GLThread::InitMultisampleRenderBuffer(void)
     GLint samples;
     glGetIntegerv(GL_SAMPLE_BUFFERS, &bufs);
     glGetIntegerv(GL_SAMPLES, &samples);
-    qDebug("Have %d buffers and %d samples", bufs, samples);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // Unbind our frame buffer
 }
@@ -495,10 +524,19 @@ void CCL_GLThread::InitStorageBuffer(void)
 
 
 /// Loads data.
-void CCL_GLThread::LoadData(string filename)
+int CCL_GLThread::LoadData(string filename)
 {
 	if(mCL != NULL)
-		mCL->LoadData(filename);
+		return mCL->LoadData(filename);
+}
+
+/// Loads data to the OpenCL device. Returns the data id (>= 0) on success, -1 on failure.
+int CCL_GLThread::LoadData(const OIDataList & data)
+{
+	if(mCL != NULL)
+		return mCL->LoadData(data);
+
+	return -1;
 }
 
 /// Opens a save file
@@ -506,7 +544,7 @@ void CCL_GLThread::Open(string filename)
 {
 	Json::Reader reader;
 	Json::Value input;
-	string file_contents = ReadFile(filename, "Could not read save file.");
+	string file_contents = ReadFile(filename, "Could not read model save file.");
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(parsingSuccessful)
 		mModelList->Restore(input, mShaderList);
@@ -518,6 +556,13 @@ void CCL_GLThread::RemoveData(int data_num)
 {
 	if(mCL != NULL)
 		mCL->RemoveData(data_num);
+}
+
+/// Replaces the data set in ID old_data_id with new_data
+void CCL_GLThread::ReplaceData(unsigned int old_data_id, const OIDataList & new_data)
+{
+	if(mCL != NULL)
+		mCL->ReplaceData(old_data_id, new_data);
 }
 
 /// Resets any OpenGL errors by looping.
@@ -566,8 +611,7 @@ void CCL_GLThread::run()
 
 	// Enable multisample anti-aliasing.
 	glEnable(GL_MULTISAMPLE);
-	// Not supported on ATI hardware
-	//glHint(GL_MULTISAMPLE_FILTER_HINT, GL_NICEST);
+	//glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 
 	// Now setup the projection system to be orthographic
 	glMatrixMode(GL_PROJECTION);
@@ -590,7 +634,7 @@ void CCL_GLThread::run()
 
 	// Now setup the OpenCL device.
 	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
-	mCL->SetImage_GLTB(mFBO_storage_texture);
+	mCL->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
 	mCL->SetKernelSourcePath(mKernelSourceDir);
 //	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
@@ -613,7 +657,7 @@ void CCL_GLThread::run()
         case GLT_Resize:
         	// Resize the screen, then cascade to a render and a blit.
 #ifdef DEBUG
-    		printf("Resizing to %i %i\n.", mImageWidth, mImageHeight);
+    		printf("Resizing to %i %i\n", mImageWidth, mImageHeight);
 #endif //DEBUG
             glViewport(0, 0, mImageWidth, mImageHeight);
             glMatrixMode(GL_PROJECTION);
@@ -705,11 +749,11 @@ void CCL_GLThread::run()
         	mCLOpSemaphore.release(1);
         	break;
 
-        case CLT_GetData:
-        	mCL->CopyImageToBuffer(0);
-        	mCL->GetSimulatedData(mCLDataSet, mCLArrayValue, mCLArrayN);
-        	mCLOpSemaphore.release(1);
-        	break;
+//        case CLT_GetData:
+//        	mCL->CopyImageToBuffer(0);
+//        	mCL->GetSimulatedData(mCLDataSet, mCLArrayValue, mCLArrayN);
+//        	mCLOpSemaphore.release(1);
+//        	break;
 
         case CLT_GetChi2_Elements:
         	mCL->CopyImageToBuffer(0);
@@ -762,7 +806,7 @@ void CCL_GLThread::SetScale(double scale)
 
 void CCL_GLThread::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
 {
-	CGLShaderWrapper * tmp_shader = mShaderList->GetShader(shader);
+	CGLShaderWrapperPtr tmp_shader = mShaderList->GetShader(shader);
 	mModelList->SetShader(model_id, tmp_shader);
 }
 

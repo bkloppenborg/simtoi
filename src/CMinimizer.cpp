@@ -40,7 +40,8 @@
 #endif // _ADD_MULTINEST
 
 #include "CMinimizer_levmar.h"
-#include "CMinimizer_Test.h"
+#include "CMinimizer_GridSearch.h"
+#include "CMinimizer_Bootstrap.h"
 
 CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 {
@@ -62,11 +63,27 @@ CMinimizer::~CMinimizer()
 /// for each epoch.
 void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 {
+	stringstream filename;
+	ofstream outfile;
+
+	vector<string> names = mCLThread->GetFreeParamNames();
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mResultsBaseFilename << "_param_names.txt";
+	outfile.open(filename.str().c_str());
+	outfile.width(15);
+	outfile.precision(8);
+	outfile << "# Parameter names in a column." << endl;
+	outfile << "# Param0 ... ParamN" << endl;
+	WriteRow(names, outfile);
+	outfile.close();
+
 	if(!no_setparams)
 	{
 		n_params = min(n_params, int(mNParams));
 
-	    printf("Generating Plots using best-fit parameters:\n");
+	    //printf("Generating Plots using best-fit parameters:\n");
 		for(int i = 0; i < n_params; i++)
 			printf("%i: %e \n", i, params[i]);
 
@@ -91,8 +108,12 @@ CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThr
 		tmp = new CMinimizer_levmar(cl_gl_thread);
 		break;
 
-	case TEST:
-		tmp = new CMinimizer_Test(cl_gl_thread);
+	case GRIDSEARCH:
+		tmp = new CMinimizer_GridSearch(cl_gl_thread);
+		break;
+
+	case BOOTSTRAP:
+		tmp = new CMinimizer_Bootstrap(cl_gl_thread);
 		break;
 
 	default:
@@ -114,13 +135,23 @@ vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
 #endif // MULTINEST_H
 
 	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::LEVMAR, "Levmar"));
-	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::TEST, "Tests"));
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::GRIDSEARCH, "Grid Search"));
+	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BOOTSTRAP, "Bootstrap (Levmar)"));
 	return tmp;
+}
+
+/// Returns the best-fit parameters.
+void CMinimizer::GetResults(double * results, int n_params)
+{
+	// Copy the values
+	for(int i = 0; i < mNParams && i < n_params; i++)
+		results[i] = mParams[i];
 }
 
 void CMinimizer::Init()
 {
-	mParams = new double[mCLThread->GetNFreeParameters()];
+	mNParams = mCLThread->GetNFreeParameters();
+	mParams = new double[mNParams];
 	mRun = true;
 }
 

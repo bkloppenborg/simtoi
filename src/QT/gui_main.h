@@ -53,7 +53,7 @@ protected:
 
 public:
     gui_main(QWidget *parent = 0);
-    ~gui_main();
+    virtual ~gui_main();
 
 protected:
     QMdiSubWindow * AddGLArea(int model_width, int model_height, double model_scale);

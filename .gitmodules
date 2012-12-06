@@ -1,9 +1,9 @@
-[submodule "lib/liboi"]
-	path = lib/liboi
-	url = git://github.com/bkloppenborg/liboi.git
 [submodule "lib/textio"]
 	path = lib/textio
-	url = git://github.com/bkloppenborg/textio.git
+	url = https://github.com/bkloppenborg/textio
 [submodule "lib/ccoifits"]
 	path = lib/ccoifits
-	url = git://github.com/bkloppenborg/ccoifits.git
+	url = https://github.com/bkloppenborg/ccoifits
+[submodule "lib/liboi"]
+	path = lib/liboi
+	url = https://github.com/bkloppenborg/liboi

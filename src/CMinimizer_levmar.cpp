@@ -82,7 +82,7 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 	for(int i = 0; i < nOutput; i++)
 	{
 		output[i] = double(minimizer->mResiduals[i]);
-//		printf("%i %f \n", i, deviates[i]);
+//		cout << i << " " << output[i] << endl;
 	}
 }
 
@@ -92,6 +92,10 @@ void CMinimizer_levmar::Init()
 	int nData = mCLThread->GetNDataAllocated();
 
 	mResiduals = new float[nData];
+	for(int i = 0; i < nData; i++)
+	{
+		mResiduals[i] = 0;
+	}
 }
 
 string CMinimizer_levmar::GetExitString(int exit_num)
@@ -133,10 +137,28 @@ string CMinimizer_levmar::GetExitString(int exit_num)
 }
 
 /// Prints out cmpfit results (from testmpfit.c)
-void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, double * info, double * covar)
+void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar)
 {
 	if ((x == 0) || (n_pars == 0))
 		return;
+
+	// Print out some statistics:
+	printf("Chi2r for each data set:\n");
+	int nData = 0;
+	double chi2r_total = 0;
+	double chi2r = 0;
+	int nDataSets = mCLThread->GetNDataSets();
+	mCLThread->SetFreeParameters(mParams, mNParams, false);
+	for(int data_set = 0; data_set < nDataSets; data_set++)
+	{
+		nData = mCLThread->GetNDataAllocated(data_set);
+		mCLThread->SetTime(mCLThread->GetDataAveJD(data_set));
+		mCLThread->EnqueueOperation(GLT_RenderModels);
+		chi2r = mCLThread->GetChi2(data_set) / (nData - mNParams - 1);
+		chi2r_total += chi2r;
+		printf("  Data Set %i chi2r: %f\n", data_set, chi2r);
+	}
+	printf("All data, average chi2r: %f\n", chi2r_total/nDataSets);
 
 	double value = 0;
 	double err = 0;
@@ -172,34 +194,47 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 
 int CMinimizer_levmar::run()
 {
+	// Run the minimizer using this instance of CMinimizer_levmar
+	run(&CMinimizer_levmar::ErrorFunc);
+}
+
+int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *adata))
+{
+	// Ensure memory is initialized.
+	if(mResiduals == NULL)
+		return -1;
+
 	// Create a member function pointer
 	int iterations = 0;
-	int max_iterations = 1E4;
+	int max_iterations = 50;
 	int nData = mCLThread->GetNDataAllocated();
-	mNParams = mCLThread->GetNFreeParameters();
-	double x[nData];
-	double lb[mNParams];
-	double ub[mNParams];
-	double info[LM_INFO_SZ];
-	double opts[LM_OPTS_SZ];
-	double covar[mNParams * mNParams];
+	valarray<double> x(nData);
+	valarray<double> lb(mNParams);
+	valarray<double> ub(mNParams);
+	valarray<double> info(LM_INFO_SZ);
+	valarray<double> opts(LM_INFO_SZ);
+	valarray<double> covar(mNParams * mNParams);
 
 	// Setup the options (LM_* from levmar.h):
 	// info[1-4]=[ ||e||_2, ||J^T e||_inf,  ||Dp||_2, mu/max[J^T J]_ii ], all computed at estimated p.
+	// \tau: scale factor for initial \mu
 	//  opts[0] = |e||_2 				= LM_INIT_MU = 1E-03
+	// \epsilon1: stopping thresholds for ||J^T e||_inf
 	//  opts[1] = ||J^T e||_inf 		= LM_STOP_THRESH = 1E-15;
+	// \epsilon2: stopping thresholds for ||Dp||_2
 	//  opts[2] = ||Dp||_2 				= LM_STOP_THRESH = 1E-15;
+	// \epsilon3: stopping thresholds for ||e||_2
 	//  opts[3] = mu/max[J^T J]_ii ] 	= LM_STOP_THRESH * LM_STOP_THRESH = 1E-17 * 1E-17;
+	// \delta, step used in difference approximation to the Jacobian.  \delta < 0 => central difference instead of forward difference used
 	//  opts[4]= LM_DIFF_DELTA;
 	opts[0]= 1;
-	opts[1]= 1E-10;
-	opts[2]= 1E-12;
-	opts[3]= LM_STOP_THRESH * LM_STOP_THRESH; //1E-9;
-	opts[4]= LM_DIFF_DELTA; //1E-9;
+	opts[1]= 1E-4;
+	opts[2]= 1E-4;
+	opts[3]= 1E-12;
+	opts[4]= LM_DIFF_DELTA;
 
 	// Copy out the initial values for the parameters:
-	double params[mNParams];
-	mCLThread->GetFreeParameters(params, mNParams, true);
+	mCLThread->GetFreeParameters(mParams, mNParams, true);
 	vector<string> names = mCLThread->GetFreeParamNames();
 	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
 
@@ -214,14 +249,14 @@ int CMinimizer_levmar::run()
 
 	mIsRunning = true;
 
-	// Call levmar:
-	iterations = dlevmar_bc_dif(&CMinimizer_levmar::ErrorFunc, params, x, mNParams, nData, lb, ub, NULL, max_iterations, opts, info, NULL, covar, (void*)this);
+	// Call levmar.  Note, the results are saved in mParams upon completion.
+	iterations = dlevmar_bc_dif(error_func, mParams, &x[0], mNParams, nData, &lb[0], &ub[0], NULL, max_iterations, &opts[0], &info[0], NULL, &covar[0], (void*)this);
 
 	mIsRunning = false;
 
 	printf("Levmar executed %i iterations.\n", iterations);
-	printresult(params, mNParams, nData, names, info, covar);
-	ExportResults(params, mNParams);
+	printresult(mParams, mNParams, nData, names, info, covar);
+	ExportResults(mParams, mNParams);
 
-	return 0;
+	return iterations;
 }

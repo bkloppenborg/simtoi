@@ -81,7 +81,7 @@ protected:
 
 //	CFeatureList * features;
 
-	CGLShaderWrapper * mShader;
+	CGLShaderWrapperPtr mShader;
 	bool mShaderLoaded;
 	double mScale;
 
@@ -103,7 +103,7 @@ public:
 
 public:
 	CModel(int n_params);
-	~CModel();
+	virtual ~CModel();
 
 	//void AppendFeature(CFeature * feature);
 	//void DeleteFeature();
@@ -113,7 +113,7 @@ public:
 	int GetNPositionFreeParameters() { return mPosition->GetNFreeParams(); };
 	int GetNShaderFreeParameters() { return mShader->GetNFreeParams(); };
 	CPosition * GetPosition(void) { return mPosition; };
-	CGLShaderWrapper * GetShader(void) { return mShader; };
+	CGLShaderWrapperPtr GetShader(void) { return mShader; };
 	int GetTotalFreeParameters();
 	CModelList::ModelTypes GetType(void) { return mType; };
 
@@ -125,7 +125,7 @@ public:
 	Json::Value Serialize();
 	void SetAnglesFromPosition();
 	void SetPositionType(CPosition::PositionTypes type);
-	void SetShader(CGLShaderWrapper * shader);
+	void SetShader(CGLShaderWrapperPtr shader);
 	void SetTime(double time);
 protected:
 	void SetupMatrix();

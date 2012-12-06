@@ -48,7 +48,7 @@ CGLShaderList::~CGLShaderList()
 
 }
 
-bool CGLShaderList::SortModelPredicate(CGLShader * A, CGLShader * B)
+bool CGLShaderList::SortModelPredicate(CGLShaderPtr A, CGLShaderPtr B)
 {
 	if(A->GetType() < B->GetType())
 		return true;
@@ -58,17 +58,16 @@ bool CGLShaderList::SortModelPredicate(CGLShader * A, CGLShader * B)
 
 /// Finds the specified shader in the list, returns the (compiled) version wrapped
 /// into a CGLShaderWrapper.
-CGLShaderWrapper * CGLShaderList::GetShader(ShaderTypes shader)
+CGLShaderWrapperPtr CGLShaderList::GetShader(ShaderTypes shader)
 {
 	// First see if the shader is already loaded
-	CGLShader * tmp = NULL;
-	tmp = FindShader(shader);
+	CGLShaderPtr tmp = FindShader(shader);
 
-	CGLShaderWrapper * wrapper = NULL;
+	CGLShaderWrapperPtr wrapper;
 	if(tmp != NULL)
 	{
 		// Create the wrapper, init all data members to be free.
-		wrapper = new CGLShaderWrapper(tmp, tmp->GetNParams());
+		wrapper.reset(new CGLShaderWrapper(tmp, tmp->GetNParams()) );
 		wrapper->SetAllFree(true);
 	}
 
@@ -83,7 +82,7 @@ vector< pair<CGLShaderList::ShaderTypes, string> > CGLShaderList::GetTypes(void)
 	pair<ShaderTypes, string> tmp;
 
 	// Iterate through the list and append the shader information
-    for(vector<CGLShader*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    for(vector<CGLShaderPtr>::iterator it = this->begin(); it != this->end(); ++it)
     {
     	tmp.first = (*it)->GetType();
     	tmp.second = (*it)->GetName();
@@ -95,14 +94,14 @@ vector< pair<CGLShaderList::ShaderTypes, string> > CGLShaderList::GetTypes(void)
 }
 
 /// Finds the specified shader.
-CGLShader * CGLShaderList::FindShader(CGLShaderList::ShaderTypes shader)
+CGLShaderPtr CGLShaderList::FindShader(CGLShaderList::ShaderTypes shader)
 {
 	// There should be a small enough number of shaders that we can use find directly on the
 	// unsorted vector list.  If this becomes a problem, we can sort the values later.
 	if(shader < NONE || shader > LAST_VALUE)
 		shader = NONE;
 
-    for(vector<CGLShader*>::iterator it = mList.begin(); it != mList.end(); ++it)
+    for(vector<CGLShaderPtr>::iterator it = this->begin(); it != this->end(); ++it)
     {
     	if((*it)->GetType() == shader)
     		return (*it);
@@ -119,7 +118,6 @@ void CGLShaderList::LoadShaders()
 	string friendly_name;
 	int n_params;
 	vector<string> param_names;
-	CGLShader * tmp;
 	vector<pair<float, float> > minmax;
 	vector<float> starting_values;
 
@@ -130,8 +128,8 @@ void CGLShaderList::LoadShaders()
 	param_names.clear();
 	starting_values.clear();
 	minmax.clear();
-	tmp = new CGLShader(CGLShaderList::NONE, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
-	Append(tmp);
+	CGLShaderPtr tmp(new CGLShader(CGLShaderList::NONE, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax));
+	this->push_back(tmp);
 
 	// Simple limb darkening.
 	base_name = "LDL_PowerLaw";
@@ -143,8 +141,8 @@ void CGLShaderList::LoadShaders()
 	param_names.push_back("alpha");
 	minmax.push_back(pair<float,float>(0.1, 1));
 	starting_values.push_back(0.5);
-	tmp = new CGLShader(CGLShaderList::LDL_POWERLAW, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
-	Append(tmp);
+	tmp.reset(new CGLShader(CGLShaderList::LDL_POWERLAW, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax));
+	this->push_back(tmp);
 
 	// Claret (2000) four-parameter limb darkening law
 	// NOTE: This law doesn't always conserve flux.  Use with caution.
@@ -166,8 +164,8 @@ void CGLShaderList::LoadShaders()
 	param_names.push_back("a4");
 	starting_values.push_back(0.1);
 	minmax.push_back(pair<float,float>(0.001, 1));
-	tmp = new CGLShader(CGLShaderList::LDL_CLARET2000, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
-	Append(tmp);
+	tmp.reset(new CGLShader(CGLShaderList::LDL_CLARET2000, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax));
+	this->push_back(tmp);
 
 	// Square root limb darkening.
 	base_name = "LDL_SquareRoot";
@@ -182,8 +180,8 @@ void CGLShaderList::LoadShaders()
 	param_names.push_back("a2");
 	starting_values.push_back(0.1);
 	minmax.push_back(pair<float,float>(0.001, 1));
-	tmp = new CGLShader(CGLShaderList::LDL_SQUARE_ROOT, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
-	Append(tmp);
+	tmp.reset(new CGLShader(CGLShaderList::LDL_SQUARE_ROOT, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax));
+	this->push_back(tmp);
 
 	// Quadratic limb darkening
 	base_name = "LDL_Quadratic";
@@ -198,8 +196,8 @@ void CGLShaderList::LoadShaders()
 	param_names.push_back("a2");
 	starting_values.push_back(0.1);
 	minmax.push_back(pair<float,float>(0.001, 1));
-	tmp = new CGLShader(CGLShaderList::LDL_QUADRATIC, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
-	Append(tmp);
+	tmp.reset(new CGLShader(CGLShaderList::LDL_QUADRATIC, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax));
+	this->push_back(tmp);
 
 	// Logarithmic limb darkening
 	base_name = "LDL_Logarithmic";
@@ -214,8 +212,8 @@ void CGLShaderList::LoadShaders()
 	param_names.push_back("a2");
 	starting_values.push_back(0.1);
 	minmax.push_back(pair<float,float>(0.001, 1));
-	tmp = new CGLShader(CGLShaderList::LDL_LOGARITHMIC, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
-	Append(tmp);
+	tmp.reset(new CGLShader(CGLShaderList::LDL_LOGARITHMIC, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax));
+	this->push_back(tmp);
 
 	// f(z) power law transparency
 	base_name = "PowerLawZ";
@@ -227,6 +225,6 @@ void CGLShaderList::LoadShaders()
 	param_names.push_back("Beta");
 	minmax.push_back(pair<float,float>(0.01, 1));
 	starting_values.push_back(0.1);
-	tmp = new CGLShader(CGLShaderList::POWER_LAW_Z, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax);
-	Append(tmp);
+	tmp.reset(new CGLShader(CGLShaderList::POWER_LAW_Z, shader_dir, base_name, friendly_name, n_params, param_names, starting_values, minmax));
+	this->push_back(tmp);
 }

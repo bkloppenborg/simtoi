@@ -33,7 +33,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include "CGLShader.h"
-#include "ReadTextFile.h"
+#include "textio.hpp"
 #include "CCL_GLThread.h"
 
 CGLShader::CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax)

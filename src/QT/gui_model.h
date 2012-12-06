@@ -52,7 +52,7 @@ protected:
 
 public:
     gui_model(QWidget *parent = 0);
-    ~gui_model();
+    virtual ~gui_model();
 
     CModelList::ModelTypes GetModelType() { return mModelType; };
     CGLShaderList::ShaderTypes GetShaderType() { return mShaderType; };
