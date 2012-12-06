@@ -11,6 +11,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/QT ${CMAKE_CURRENT_BINARY_DIR}/QT)
 add_subdirectory(QT) 
 
+add_subdirectory(scripts)
+
 # Assemble all of the source to build simtoi.
 file(GLOB SOURCE *.cpp models/*.cpp)
 
