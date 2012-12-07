@@ -590,11 +590,9 @@ void CCL_GLThread::resizeViewport(int width, int height)
 /// Run the thread.
 void CCL_GLThread::run()
 {
-#ifdef DEBUG
-    printf("Starting Render Thread with ID %i\n", id);
-#endif // DEBUG
-
+	// Claim the OpenGL context.
     mGLWidget->makeCurrent();
+
 	// ########
 	// OpenGL initialization
 	// ########
@@ -631,11 +629,18 @@ void CCL_GLThread::run()
 
 	CCL_GLThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
-	// Now setup the OpenCL device.
+	// ########
+	// OpenCL initialization
+	// ########
 	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
 	mCL->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
 	mCL->SetKernelSourcePath(mKernelSourceDir);
-//	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
+
+	// ########
+	// Start the thread main body. Note, execution is driven by operations
+	// inserted into the queue via. CCL_GLThread::EnqueueOperation(...)
+	// commands.
+	// ########
 
     // Indicate that the thread is running
 	mIsRunning = true;
@@ -657,9 +662,6 @@ void CCL_GLThread::run()
 
         case GLT_Resize:
         	// Resize the screen, then cascade to a render and a blit.
-#ifdef DEBUG
-    		printf("Resizing to %i %i\n", mImageWidth, mImageHeight);
-#endif //DEBUG
             glViewport(0, 0, mImageWidth, mImageHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
@@ -819,21 +821,6 @@ void CCL_GLThread::SetTime(double t)
 void CCL_GLThread::SetTimestep(double dt)
 {
 	mModelList->SetTimestep(dt);
-}
-
-void CCL_GLThread::start()
-{
-	// start the thread
-	start();
-
-	// There is a lot of setup that happens before the thread is ready to go.
-	// Therefore we give the thread up to three second to start.
-	mCLOpSemaphore.tryAcquire(1, 3000);
-
-	// If the thread isn't running, throw an exception. Something bad likely
-	// happened.
-	if(!mIsRunning)
-		throw runtime_error("CL-GL Thread did not start");
 }
 
 /// Stop the thread.
