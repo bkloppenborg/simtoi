@@ -11,6 +11,7 @@ from subprocess import call
 import os
 import glob
 import shutil
+from datetime import datetime
 
 # Specify some global properties
 image_width = 128
@@ -29,14 +30,14 @@ simtoi_output_prefix = "min_output_"
 
 #
 epsAur_star = 'epsAur_star.json'
+epsAur_star_DiskB = 'epsAur_star_DiskB.json'
 
 run_info = [
 # nData = 40, falls under liboi issue 32
 #    ['2008-09-eps_Aur-avg5.oifits', epsAur_star, '2008-09'],
-# Generates exceptions
-#    ['2008-11-eps_Aur-avg5.oifits', epsAur_star, '2008-11'],
+    ['2008-11-eps_Aur-avg5.oifits', epsAur_star, '2008-11'],    
     ['2008-12-eps_Aur-avg5.oifits', epsAur_star, '2008-12'],
-#    ['2009-11-eps_Aur-avg5.oifits', epsAur_star, '2009-11'],
+#    ['2009-11-eps_Aur-avg5.oifits', epsAur_star_DiskB, '2009-11'],
 #    ['2009-12-eps_Aur-avg5.oifits', epsAur_star, '2009-12'],
 #    ['2010-02-eps_Aur-all-avg5.oifits', epsAur_star, '2010-02'],
 #    ['2010-08-eps_Aur-all-avg5.oifits', epsAur_star, '2010-08'],
@@ -56,7 +57,10 @@ for i in range(0, len(run_info)):
     # unpack the data/model/save_dir information:
     [data_file, model_file, save_dir] = run_info[i]
     
-    print "\nStarting bootstrap on " + data_file
+    print "\nStarting bootstrap " + data_file
+    t_start = datetime.now()
+    print "Start time: " + str(t_start)
+    
 
     stdout_file = open(simtoi_output_dir + simtoi_output_prefix + "log_cout.txt", 'w')
     
@@ -71,6 +75,10 @@ for i in range(0, len(run_info)):
     # run simtoi
     os.chdir(simtoi_path)
     call(simtoi_command, stdout=stdout_file)
+    
+    t_end = datetime.now()
+    print "Finish time: " + str(t_end)
+    print "Total execution time: " + str(t_end - t_start)
     
     # close output files
     stdout_file.close()

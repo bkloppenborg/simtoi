@@ -172,7 +172,7 @@ int CMinimizer_Bootstrap::run()
 		mCLThread->SetFreeParameters(mParams, mNParams, true);
 
 		// Print a status message:
-		cout << "Starting iteration " << iteration + 1 << endl;
+		cout << endl << "Starting iteration " << iteration + 1 << endl;
 
 		// run the minimizer
 		exit_value = CMinimizer_levmar::run(&CMinimizer_Bootstrap::ErrorFunc);
