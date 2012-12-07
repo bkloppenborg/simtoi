@@ -637,8 +637,10 @@ void CCL_GLThread::run()
 	mCL->SetKernelSourcePath(mKernelSourceDir);
 //	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
-    // Main thread loop
+    // Indicate that the thread is running
 	mIsRunning = true;
+	// and release the semaphore from the CCL_GLThread::start()
+	mCLOpSemaphore.release(1);
     while (mRun)
     {
         op = GetNextOperation();
@@ -817,6 +819,21 @@ void CCL_GLThread::SetTime(double t)
 void CCL_GLThread::SetTimestep(double dt)
 {
 	mModelList->SetTimestep(dt);
+}
+
+void CCL_GLThread::start()
+{
+	// start the thread
+	start();
+
+	// There is a lot of setup that happens before the thread is ready to go.
+	// Therefore we give the thread up to three second to start.
+	mCLOpSemaphore.tryAcquire(1, 3000);
+
+	// If the thread isn't running, throw an exception. Something bad likely
+	// happened.
+	if(!mIsRunning)
+		throw runtime_error("CL-GL Thread did not start");
 }
 
 /// Stop the thread.
