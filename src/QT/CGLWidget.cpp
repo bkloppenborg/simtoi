@@ -217,14 +217,8 @@ void CGLWidget::RunMinimizer()
 
 void CGLWidget::startRendering()
 {
-	// tell the thread to start
+	// Tell the thread to start.
     mGLT.start();
-
-    // wait for the thread to be initialized before proceeding
-    // NOTE: if thread initialization fails, this could lead to deadlock!
-    while(!mGLT.IsRunning())
-    	usleep(5000);
-
 }
 
 void CGLWidget::stopRendering()

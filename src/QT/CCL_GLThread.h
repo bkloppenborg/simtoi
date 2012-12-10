@@ -228,6 +228,7 @@ public:
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetTime(double t);
     void SetTimestep(double dt);
+public:
     void stop();
 
 };
