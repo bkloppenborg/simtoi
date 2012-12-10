@@ -29,27 +29,28 @@ simtoi_output_dir = "/tmp/"
 simtoi_output_prefix = "min_output_"
 
 #
-epsAur_star = 'epsAur_star.json'
+epsAur_star_udd = 'epsAur_star_udd.json'
+epsAur_star_ldd = 'epsAur_star_ldd.json'
 epsAur_star_DiskB = 'epsAur_star_DiskB.json'
 
 run_info = [
 # nData = 40, falls under liboi issue 32
-#    ['2008-09-eps_Aur-avg5.oifits', epsAur_star, '2008-09'],
-    ['2008-11-eps_Aur-avg5.oifits', epsAur_star, '2008-11'],    
-    ['2008-12-eps_Aur-avg5.oifits', epsAur_star, '2008-12'],
-#    ['2009-11-eps_Aur-avg5.oifits', epsAur_star_DiskB, '2009-11'],
-#    ['2009-12-eps_Aur-avg5.oifits', epsAur_star, '2009-12'],
-#    ['2010-02-eps_Aur-all-avg5.oifits', epsAur_star, '2010-02'],
-#    ['2010-08-eps_Aur-all-avg5.oifits', epsAur_star, '2010-08'],
-#    ['2010-09-eps_Aur-all-avg5.oifits', epsAur_star, '2010-09'],
-#    ['2010-10-eps_Aur-all-avg5.oifits', epsAur_star, '2010-10'],
-#    ['2010-11-eps_Aur-all-avg5.oifits', epsAur_star, '2010-11'],
-#    ['2010-12-eps_Aur-all-avg5.oifits', epsAur_star, '2010-12'],
+#    ['2008-09-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-09'],
+    ['2008-11-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-11'],    
+    ['2008-12-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-12'],
+    ['2009-11-eps_Aur-avg5.oifits', epsAur_star_DiskB, '2009-11'],
+#    ['2009-12-eps_Aur-avg5.oifits', not_ran, '2009-12'],
+#    ['2010-02-eps_Aur-all-avg5.oifits', not_ran, '2010-02'],
+#    ['2010-08-eps_Aur-all-avg5.oifits', not_ran, '2010-08'],
+#    ['2010-09-eps_Aur-all-avg5.oifits', not_ran, '2010-09'],
+#    ['2010-10-eps_Aur-all-avg5.oifits', not_ran, '2010-10'],
+#    ['2010-11-eps_Aur-all-avg5.oifits', not_ran, '2010-11'],
+#    ['2010-12-eps_Aur-all-avg5.oifits', not_ran, '2010-12'],
 #    ['2011-01-eps_Aur-avg5.oifits', epsAur_star, '2011-01'],
-    ['2011-09-18-eps_Aur-avg5.oifits', epsAur_star, '2011-09-18'],
-    ['2011-09-24-eps_Aur-avg5.oifits', epsAur_star, '2011-09-24'],
-    ['2011-10-eps_Aur-avg5.oifits', epsAur_star, '2011-10'],
-    ['2011-11-eps_Aur-avg5.oifits', epsAur_star, '2011-11'] 
+#    ['2011-09-18-eps_Aur-avg5.oifits', epsAur_star_ldd, '2011-09-18'],
+#    ['2011-09-24-eps_Aur-avg5.oifits', epsAur_star_ldd, '2011-09-24'],
+#    ['2011-10-eps_Aur-avg5.oifits', epsAur_star_ldd, '2011-10'],
+#    ['2011-11-eps_Aur-avg5.oifits', epsAur_star_ldd, '2011-11'] 
     ]
 
 
