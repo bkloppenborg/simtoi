@@ -95,6 +95,9 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 //	WriteTable(mMasks, outfile);
 //	outfile.close();
 
+	// Call the base class function to export the parameter names.
+	CMinimizer::ExportResults(params, n_params, no_setparams);
+
 }
 
 void CMinimizer_Bootstrap::Init()
