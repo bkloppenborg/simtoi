@@ -114,10 +114,10 @@ public:
 		typename vector<T>::iterator column;
 		int nEntries = data.size();
 		// iterate over each row
-		for (column = data.begin() ; column < data.end(); column++)
-			output << *column << " ";;
+		for(int i = 0; i < data.size() - 1; i++)
+			output << data[i] << ", ";
 
-		output << endl;
+		output << data[data.size() - 1] << endl;
 	}
 };
 
