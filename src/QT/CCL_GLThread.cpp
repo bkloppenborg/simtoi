@@ -26,6 +26,7 @@
 #include <QTime>
 #include <QtDebug>
 #include <fstream>
+#include <exception>
 #include <stdexcept>
 
 #include "CCL_GLThread.h"
@@ -562,10 +563,16 @@ void CCL_GLThread::RemoveData(int data_num)
 /// Replaces the data set in ID old_data_id with new_data
 void CCL_GLThread::ReplaceData(unsigned int old_data_id, const OIDataList & new_data)
 {
+	mCLException = NULL;
+
 	mCLDataSet = old_data_id;
 	mCLDataList = new_data;
 	EnqueueOperation(CLT_DataReplace);
 	mCLOpSemaphore.acquire();
+
+	// Pass any exceptions on to the calling thread
+	if(mCLException)
+		rethrow_exception(mCLException);
 }
 
 /// Resets any OpenGL errors by looping.
@@ -712,7 +719,14 @@ void CCL_GLThread::run()
         	break;
 
         case CLT_DataReplace:
-        	mCL->ReplaceData(mCLDataSet, mCLDataList);
+        	try
+        	{
+        		mCL->ReplaceData(mCLDataSet, mCLDataList);
+        	}
+        	catch(...)
+        	{
+        		mCLException = current_exception();
+        	}
         	mCLOpSemaphore.release(1);
         	break;
 

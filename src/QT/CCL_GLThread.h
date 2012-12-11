@@ -146,6 +146,7 @@ protected:
     unsigned int mCLArrayN;
     string mCLString;
     OIDataList mCLDataList;
+    exception_ptr mCLException;
 
     // Misc datamembers:
 	bool mRun;
