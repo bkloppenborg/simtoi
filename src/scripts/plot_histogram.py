@@ -19,7 +19,7 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
     In this scheme the last column in a row is -1.
     """
     infile = open(filename, 'r')
-    data = loadtxt(infile, dtype=float)
+    data = loadtxt(infile, dtype=float, delimiter=',')
     infile.close()
 
     end_col = data.shape[1]
@@ -92,7 +92,7 @@ def col_names(filename):
             continue
         
         line = line.strip()
-        columns = line.split(' ')
+        columns = line.split(',')
         break
         
     return columns

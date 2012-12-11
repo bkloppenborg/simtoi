@@ -36,8 +36,8 @@ epsAur_star_DiskB = 'epsAur_star_DiskB.json'
 run_info = [
 # nData = 40, falls under liboi issue 32
 #    ['2008-09-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-09'],
-    ['2008-11-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-11'],    
-    ['2008-12-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-12'],
+#    ['2008-11-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-11'],    
+#    ['2008-12-eps_Aur-avg5.oifits', epsAur_star_udd, '2008-12'],
     ['2009-11-eps_Aur-avg5.oifits', epsAur_star_DiskB, '2009-11'],
 #    ['2009-12-eps_Aur-avg5.oifits', not_ran, '2009-12'],
 #    ['2010-02-eps_Aur-all-avg5.oifits', not_ran, '2010-02'],
