@@ -155,6 +155,8 @@ int CMinimizer_Bootstrap::run()
 	double tmp = 0;
 	int exit_value = 0;
 	int nBootstrap = 10000;
+	// The maximum chi2r that will be accepted. Iterations exceeding this value will be repeated.
+	float chi2_threshold = 10;
 	int nData = mCLThread->GetNDataAllocated();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -193,6 +195,16 @@ int CMinimizer_Bootstrap::run()
 
 		// convert to a reduced chi2
 		tmp_chi2 /= (nData - mNParams - 1);
+
+		// If the reduced chi2 is too high (threshold set to 10) automatically redo the
+		// the bootstrap
+		if(tmp_chi2 > chi2_threshold)
+		{
+			cerr << " Chi2r = " << tmp_chi2 << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
+			cout << " Chi2r = " << tmp_chi2 << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
+			iteration--;
+			continue;
+		}
 
 		// Save the results.  Start by copying the current entry to the temporary vector:
 		tmp_vec.clear();
