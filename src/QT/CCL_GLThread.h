@@ -65,22 +65,26 @@ using namespace liboi;
 // A list of operations permitted.
 enum CL_GLT_Operations
 {
-	GLT_BlitToScreen,
-	GLT_Resize,
-	GLT_RenderModels,
-	GLT_Animate,
-	GLT_StopAnimate,
-	GLT_Stop,
-	CLT_Init,
-	CLT_Flux,
 	CLT_Chi,
 	CLT_Chi2,
-	CLT_LogLike,
-	CLT_Tests,
 	CLT_CopyImage,
-	CLT_SaveImage,
+	CLT_DataRemove,
+	CLT_DataReplace,
+	CLT_DataLoadFromString,
+	CLT_DataLoadFromList,
+	CLT_Flux,
 	CLT_GetData,
-	CLT_GetChi2_Elements
+	CLT_GetChi2_Elements,
+	CLT_Init,
+	CLT_LogLike,
+	CLT_SaveImage,
+	CLT_Tests,
+	GLT_Animate,
+	GLT_AnimateStop,
+	GLT_BlitToScreen,
+	GLT_RenderModels,
+	GLT_Resize,
+	GLT_Stop
 };
 
 /// A quick class for making priority queue comparisons.  Used for CCL_GLThread, mQueue
@@ -141,6 +145,7 @@ protected:
     float * mCLArrayValue;
     unsigned int mCLArrayN;
     string mCLString;
+    OIDataList mCLDataList;
 
     // Misc datamembers:
 	bool mRun;

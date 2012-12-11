@@ -525,17 +525,18 @@ void CCL_GLThread::InitStorageBuffer(void)
 /// Loads data.
 int CCL_GLThread::LoadData(string filename)
 {
-	if(mCL != NULL)
-		return mCL->LoadData(filename);
+	mCLString = filename;
+	EnqueueOperation(CLT_DataLoadFromString);
+	mCLOpSemaphore.acquire();
 }
 
 /// Loads data to the OpenCL device. Returns the data id (>= 0) on success, -1 on failure.
 int CCL_GLThread::LoadData(const OIDataList & data)
 {
-	if(mCL != NULL)
-		return mCL->LoadData(data);
-
-	return -1;
+	mCLDataList = data;
+	EnqueueOperation(CLT_DataLoadFromList);
+	mCLOpSemaphore.acquire();
+	return mCL->GetNData();
 }
 
 /// Opens a save file
@@ -553,15 +554,18 @@ void CCL_GLThread::Open(string filename)
 
 void CCL_GLThread::RemoveData(int data_num)
 {
-	if(mCL != NULL)
-		mCL->RemoveData(data_num);
+	mCLDataSet = data_num;
+	EnqueueOperation(CLT_DataRemove);
+	mCLOpSemaphore.acquire();
 }
 
 /// Replaces the data set in ID old_data_id with new_data
 void CCL_GLThread::ReplaceData(unsigned int old_data_id, const OIDataList & new_data)
 {
-	if(mCL != NULL)
-		mCL->ReplaceData(old_data_id, new_data);
+	mCLDataSet = old_data_id;
+	mCLDataList = new_data;
+	EnqueueOperation(CLT_DataReplace);
+	mCLOpSemaphore.acquire();
 }
 
 /// Resets any OpenGL errors by looping.
@@ -644,8 +648,6 @@ void CCL_GLThread::run()
 
     // Indicate that the thread is running
 	mIsRunning = true;
-	// and release the semaphore from the CCL_GLThread::start()
-	mCLOpSemaphore.release(1);
     while (mRun)
     {
         op = GetNextOperation();
@@ -689,9 +691,29 @@ void CCL_GLThread::run()
             mRun = false;
             break;
 
-        case GLT_StopAnimate:
+        case GLT_AnimateStop:
         	ClearQueue();
         	EnqueueOperation(GLT_RenderModels);
+        	break;
+
+        case CLT_DataLoadFromString:
+        	mCL->LoadData(mCLString);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_DataLoadFromList:
+        	mCL->LoadData(mCLDataList);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_DataRemove:
+        	mCL->RemoveData(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_DataReplace:
+        	mCL->ReplaceData(mCLDataSet, mCLDataList);
+        	mCLOpSemaphore.release(1);
         	break;
 
         case CLT_Chi:
