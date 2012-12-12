@@ -104,8 +104,10 @@ void CMinimizer_Bootstrap::Init()
 {
 	CMinimizer_levmar::Init();
 
-	// Get a copy of the zeroth data loaded in memory.
-	mData = mCLThread->GetData(0);
+	// Get a copy of the original data, load it into memory.
+	int nData = mCLThread->GetNData();
+	for(int data_set = 0; data_set < nData; data_set++)
+		mData.push_back(mCLThread->GetData(data_set));
 }
 
 void CMinimizer_Bootstrap::Next()
@@ -121,29 +123,42 @@ void CMinimizer_Bootstrap::Next()
 	OICalibratorPtr old_cal = OICalibratorPtr( new ccoifits::CUniformDisk(cal_diam.first) );
 	OICalibratorPtr new_cal = OICalibratorPtr( new ccoifits::CUniformDisk(distribution(generator)) );
 
-	// Recalibrate, bootstrap, then push to the OpenCL device:
-	OIDataList temp = Recalibrate(mData, old_cal, new_cal);
-	temp = Bootstrap_Spectral(temp);
-
-	// Replace the 0th entry with temp.
-	// Due to a bug in ccoifits the total data size may not be preserved, so we need to
-	// catch and repeat.
-	try
+	// Recalibrate the data.
+	// TODO: Note this function assumes the SAME calibrator is used on ALL data sets. This probably isn't true.
+	// This issue is listed in https://github.com/bkloppenborg/simtoi/issues/53.
+	for(int i = 0; i < mData.size(); i++)
 	{
-		mCLThread->ReplaceData(0, temp);
-	}
-	catch(length_error& l)
-	{
-		// Generate an error message on stderr.
-		cerr << " Warning: " << l.what() << " " << "Generating a new bootstrapped data set." << endl;
-		mBootstrapFailures += 1;
+		auto data = mData[i];
 
-		if(mBootstrapFailures < mMaxBootstrapFailures)
-			Next();
-		else
-			throw "Too many bootstrap data generation failures.";
+		// Recalibrate, bootstrap, then push to the OpenCL device:
+		OIDataList t_data = Recalibrate(data, old_cal, new_cal);
+		t_data = Bootstrap_Spectral(t_data);
 
-		mBootstrapFailures = 0;
+		// Replace the 0th entry with temp.
+		// Due to a bug in ccoifits the total data size may not be preserved, so we need to
+		// catch and repeat.
+		try
+		{
+			mCLThread->ReplaceData(i, t_data);
+		}
+		catch(length_error& l)
+		{
+			// Generate an error message on stderr.
+			cerr << " Warning: " << l.what() << " " << "Generating a new bootstrapped data set." << endl;
+			mBootstrapFailures += 1;
+
+			// If we haven't exceeded the maximum number of bootstrap failures, repeat
+			// this iteration.
+			if(mBootstrapFailures < mMaxBootstrapFailures)
+			{
+				i--;
+				continue;
+			}
+			else
+				throw "Too many bootstrap data generation failures.";
+
+			mBootstrapFailures = 0;
+		}
 	}
 }
 
@@ -154,17 +169,18 @@ int CMinimizer_Bootstrap::run()
 	long double tmp_chi2 = 0;
 	double tmp = 0;
 	int exit_value = 0;
-	int nBootstrap = 10000;
+	int iterations = 10000;
 	// The maximum chi2r that will be accepted. Iterations exceeding this value will be repeated.
 	float chi2_threshold = 10;
-	int nData = mCLThread->GetNDataAllocated();
+	int nData = 0;
 
+	// Setup the random number generator:
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine generator (seed);
 	uniform_real_distribution<double> distribution (0.0,1.0);
 	vector< pair<double, double> > min_max = mCLThread->GetFreeParamMinMaxes();
 
-	for(int iteration = 0; iteration < nBootstrap; iteration++)
+	for(int iteration = 0; iteration < iterations; iteration++)
 	{
 		if(!mRun)
 			break;
@@ -182,26 +198,32 @@ int CMinimizer_Bootstrap::run()
 		// run the minimizer
 		exit_value = CMinimizer_levmar::run(&CMinimizer_Bootstrap::ErrorFunc);
 
-		// Get the current chi2:
+		// Compute the average reduced chi2 per data set:
+		double chi2r_ave = 0;
 		mCLThread->SetFreeParameters(mParams, mNParams, false);
-		mCLThread->SetTime(mCLThread->GetDataAveJD(0));
-		mCLThread->EnqueueOperation(GLT_RenderModels);
-		mCLThread->GetChi(0, mResiduals, nData);
-
-		tmp_chi2 = 0;
-		tmp = 0;
-		for(int i = 0; i < nData; i++)
-			tmp_chi2 += mResiduals[i]*mResiduals[i];
-
-		// convert to a reduced chi2
-		tmp_chi2 /= (nData - mNParams - 1);
-
-		// If the reduced chi2 is too high (threshold set to 10) automatically redo the
-		// the bootstrap
-		if(tmp_chi2 > chi2_threshold)
+		for(int data_set = 0; data_set < mData.size(); data_set++)
 		{
-			cerr << " Chi2r = " << tmp_chi2 << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
-			cout << " Chi2r = " << tmp_chi2 << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
+			nData = mCLThread->GetNDataAllocated(data_set);
+			mCLThread->SetTime(mCLThread->GetDataAveJD(data_set));
+			mCLThread->EnqueueOperation(GLT_RenderModels);
+			mCLThread->GetChi(data_set, mResiduals, nData);
+
+			tmp_chi2 = 0;
+			tmp = 0;
+			for(int i = 0; i < nData; i++)
+				tmp_chi2 += mResiduals[i] * mResiduals[i];
+
+			// Compute the reduced chi2 for this data set and add it to the average
+			chi2r_ave += tmp_chi2 / (nData - mNParams - 1);
+		}
+		// Divide by the number of data sets to compute the average.
+		chi2r_ave /= mData.size();
+
+		// If the average reduced chi2 is too high automatically redo the bootstrap
+		if(chi2r_ave > chi2_threshold)
+		{
+			cerr << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
+			cout << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
 			iteration--;
 			continue;
 		}
@@ -217,7 +239,7 @@ int CMinimizer_Bootstrap::run()
 		// push this vector onto the back of mResults
 		mResults.push_back(tmp_vec);
 
-		// Get the next bootstrapped data set:
+		// Get the next bootstrapped data set and repeat.
 		Next();
 	}
 
