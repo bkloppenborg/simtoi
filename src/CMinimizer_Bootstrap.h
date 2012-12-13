@@ -50,7 +50,7 @@ protected:
 	unsigned int mMaxBootstrapFailures;
 
 public:
-	OIDataList mData;	// A copy of the original data
+	vector<OIDataList> mData;	// A copy of the original data
 
 public:
 	CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread);

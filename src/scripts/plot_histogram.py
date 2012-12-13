@@ -7,7 +7,7 @@ import re
 from scipy.stats import norm, cauchy
 import matplotlib.mlab as mlab
 
-def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=False, save_basename='', save_format='svg'):
+def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=False, save_basename='', save_format='svg', trimends=False):
     """
     Plots a histogram formed from the columns of the specified file.
 
@@ -19,13 +19,12 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
     In this scheme the last column in a row is -1.
     """
     infile = open(filename, 'r')
-    data = loadtxt(infile, dtype=float)
+    data = loadtxt(infile, dtype=float, delimiter=',')
     infile.close()
 
     end_col = data.shape[1]
 
-    # Reinterpret any negative numbers in skip_cols to be at the end
-    # of the line
+    # Reinterpret any negative numbers in skip_cols to be at the end of the line
     for column in range(0, len(skip_cols)):
         if skip_cols[column] < 0:
             skip_cols[column] = end_col + skip_cols[column]
@@ -38,6 +37,13 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
 
         # extract the data column:
         temp = data[:,column]
+        
+        if(trimends):
+            minval = min(temp)
+            maxval = max(temp)
+            
+            temp = filter(lambda x: x > minval, temp)
+            temp = filter(lambda x: x < maxval, temp)
         
         # plot a histogram of the data:
         [n, bins, patches] = plt.hist(temp, bins=nbins, normed=True, label='Binned data')
@@ -86,7 +92,7 @@ def col_names(filename):
             continue
         
         line = line.strip()
-        columns = line.split(' ')
+        columns = line.split(',')
         break
         
     return columns
@@ -103,6 +109,8 @@ def main():
         help="Automatically save the plots. [default: False]")
     parser.add_option("--savefmt", dest="savefmt", action="store", type="string", default="svg",
         help="Automatic save file format.  [default: %default]")
+    parser.add_option("--trimends", dest="trimends", action="store_true", default=False,
+        help="Remove the minimum and maximum bins from the histogram [default: %default]")
 
     (options, args) = parser.parse_args()
 
@@ -113,13 +121,13 @@ def main():
     # and attempt to find the namefile:
     skip_cols=[]
     basename = ''
-    if re.search('bootstrap', filename):
-        tmp = re.split('bootstrap', filename)
+    if re.search('_bootstrap', filename):
+        tmp = re.split('_bootstrap', filename)
         basename = tmp[0]
         skip_cols = [-1]
         print "Found bootstrap file."
-    elif re.search('multinest', filename):
-        tmp = re.split('multinest', filename)
+    elif re.search('_multinest', filename):
+        tmp = re.split('_multinest', filename)
         basename = tmp[0]
         skip_cols = [0,1]
         print "Found MultiNest file."
@@ -129,10 +137,10 @@ def main():
 
     column_names = []
     if len(basename) > 1:
-        column_names = col_names(basename + 'param_names.txt')
+        column_names = col_names(basename + '_param_names.txt')
         print column_names
 
-    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins, autosave=options.autosave, save_basename=basename, save_format=options.savefmt)
+    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins, autosave=options.autosave, save_basename=basename, save_format=options.savefmt, trimends=options.trimends)
     
     
 # Run the main function if this is a top-level script:

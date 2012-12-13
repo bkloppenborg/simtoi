@@ -72,7 +72,7 @@ void gui_main::Animation_StartStop()
 
 	if(mAnimating)
 	{
-		widget->EnqueueOperation(GLT_StopAnimate);
+		widget->EnqueueOperation(GLT_AnimateStop);
 		mAnimating = false;
 		ui.btnStartStop->setText("Start");
 	}

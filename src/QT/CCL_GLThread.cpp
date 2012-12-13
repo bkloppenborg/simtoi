@@ -26,6 +26,7 @@
 #include <QTime>
 #include <QtDebug>
 #include <fstream>
+#include <exception>
 #include <stdexcept>
 #include "oi.hpp"
 
@@ -526,17 +527,18 @@ void CCL_GLThread::InitStorageBuffer(void)
 /// Loads data.
 int CCL_GLThread::LoadData(string filename)
 {
-	if(mCL != NULL)
-		return mCL->LoadData(filename);
+	mCLString = filename;
+	EnqueueOperation(CLT_DataLoadFromString);
+	mCLOpSemaphore.acquire();
 }
 
 /// Loads data to the OpenCL device. Returns the data id (>= 0) on success, -1 on failure.
 int CCL_GLThread::LoadData(const OIDataList & data)
 {
-	if(mCL != NULL)
-		return mCL->LoadData(data);
-
-	return -1;
+	mCLDataList = data;
+	EnqueueOperation(CLT_DataLoadFromList);
+	mCLOpSemaphore.acquire();
+	return mCL->GetNData();
 }
 
 /// Opens a save file
@@ -554,15 +556,24 @@ void CCL_GLThread::Open(string filename)
 
 void CCL_GLThread::RemoveData(int data_num)
 {
-	if(mCL != NULL)
-		mCL->RemoveData(data_num);
+	mCLDataSet = data_num;
+	EnqueueOperation(CLT_DataRemove);
+	mCLOpSemaphore.acquire();
 }
 
 /// Replaces the data set in ID old_data_id with new_data
 void CCL_GLThread::ReplaceData(unsigned int old_data_id, const OIDataList & new_data)
 {
-	if(mCL != NULL)
-		mCL->ReplaceData(old_data_id, new_data);
+	mCLException = NULL;
+
+	mCLDataSet = old_data_id;
+	mCLDataList = new_data;
+	EnqueueOperation(CLT_DataReplace);
+	mCLOpSemaphore.acquire();
+
+	// Pass any exceptions on to the calling thread
+	if(mCLException)
+		rethrow_exception(mCLException);
 }
 
 /// Resets any OpenGL errors by looping.
@@ -591,11 +602,9 @@ void CCL_GLThread::resizeViewport(int width, int height)
 /// Run the thread.
 void CCL_GLThread::run()
 {
-#ifdef DEBUG
-    printf("Starting Render Thread with ID %i\n", id);
-#endif // DEBUG
-
+	// Claim the OpenGL context.
     mGLWidget->makeCurrent();
+
 	// ########
 	// OpenGL initialization
 	// ########
@@ -632,13 +641,20 @@ void CCL_GLThread::run()
 
 	CCL_GLThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
-	// Now setup the OpenCL device.
+	// ########
+	// OpenCL initialization
+	// ########
 	mCL = new CLibOI(CL_DEVICE_TYPE_GPU);
 	mCL->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
 	mCL->SetKernelSourcePath(mKernelSourceDir);
-//	mCL->SetRoutineType(ROUTINE_DFT, FT_DFT);
 
-    // Main thread loop
+	// ########
+	// Start the thread main body. Note, execution is driven by operations
+	// inserted into the queue via. CCL_GLThread::EnqueueOperation(...)
+	// commands.
+	// ########
+
+    // Indicate that the thread is running
 	mIsRunning = true;
     while (mRun)
     {
@@ -656,9 +672,6 @@ void CCL_GLThread::run()
 
         case GLT_Resize:
         	// Resize the screen, then cascade to a render and a blit.
-#ifdef DEBUG
-    		printf("Resizing to %i %i\n", mImageWidth, mImageHeight);
-#endif //DEBUG
             glViewport(0, 0, mImageWidth, mImageHeight);
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
@@ -686,9 +699,36 @@ void CCL_GLThread::run()
             mRun = false;
             break;
 
-        case GLT_StopAnimate:
+        case GLT_AnimateStop:
         	ClearQueue();
         	EnqueueOperation(GLT_RenderModels);
+        	break;
+
+        case CLT_DataLoadFromString:
+        	mCL->LoadData(mCLString);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_DataLoadFromList:
+        	mCL->LoadData(mCLDataList);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_DataRemove:
+        	mCL->RemoveData(mCLDataSet);
+        	mCLOpSemaphore.release(1);
+        	break;
+
+        case CLT_DataReplace:
+        	try
+        	{
+        		mCL->ReplaceData(mCLDataSet, mCLDataList);
+        	}
+        	catch(...)
+        	{
+        		mCLException = current_exception();
+        	}
+        	mCLOpSemaphore.release(1);
         	break;
 
         case CLT_Chi:

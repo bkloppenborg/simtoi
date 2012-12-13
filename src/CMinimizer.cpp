@@ -75,7 +75,7 @@ void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 	outfile.width(15);
 	outfile.precision(8);
 	outfile << "# Parameter names in a column." << endl;
-	outfile << "# Param0 ... ParamN" << endl;
+	outfile << "# Param0, ..., ParamN" << endl;
 	WriteRow(names, outfile);
 	outfile.close();
 
