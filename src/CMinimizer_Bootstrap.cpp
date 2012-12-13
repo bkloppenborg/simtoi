@@ -105,7 +105,7 @@ void CMinimizer_Bootstrap::Init()
 	CMinimizer_levmar::Init();
 
 	// Get a copy of the original data, load it into memory.
-	int nData = mCLThread->GetNData();
+	int nData = mCLThread->GetNDataSets();
 	for(int data_set = 0; data_set < nData; data_set++)
 		mData.push_back(mCLThread->GetData(data_set));
 }
@@ -146,19 +146,16 @@ void CMinimizer_Bootstrap::Next()
 			// Generate an error message on stderr.
 			cerr << " Warning: " << l.what() << " " << "Generating a new bootstrapped data set." << endl;
 			mBootstrapFailures += 1;
+			i--;
 
 			// If we haven't exceeded the maximum number of bootstrap failures, repeat
 			// this iteration.
 			if(mBootstrapFailures < mMaxBootstrapFailures)
-			{
-				i--;
 				continue;
-			}
 			else
-				throw "Too many bootstrap data generation failures.";
-
-			mBootstrapFailures = 0;
+				throw runtime_error("Too many bootstrap data generation failures.");
 		}
+		mBootstrapFailures = 0;
 	}
 }
 
@@ -167,11 +164,13 @@ int CMinimizer_Bootstrap::run()
 	// init local storage
 	vector<double> tmp_vec;
 	long double tmp_chi2 = 0;
+	double chi2r_ave = 0;
 	double tmp = 0;
 	int exit_value = 0;
 	int iterations = 10000;
 	// The maximum chi2r that will be accepted. Iterations exceeding this value will be repeated.
 	float chi2_threshold = 10;
+	int chi2r_exceeded = 0;
 	int nData = 0;
 
 	// Setup the random number generator:
@@ -199,7 +198,8 @@ int CMinimizer_Bootstrap::run()
 		exit_value = CMinimizer_levmar::run(&CMinimizer_Bootstrap::ErrorFunc);
 
 		// Compute the average reduced chi2 per data set:
-		double chi2r_ave = 0;
+		chi2r_ave = 0;
+		tmp_chi2 = 0;
 		mCLThread->SetFreeParameters(mParams, mNParams, false);
 		for(int data_set = 0; data_set < mData.size(); data_set++)
 		{
@@ -224,9 +224,15 @@ int CMinimizer_Bootstrap::run()
 		{
 			cerr << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
 			cout << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
+			chi2r_exceeded += 1;
 			iteration--;
-			continue;
+
+			if(chi2r_exceeded < mMaxBootstrapFailures)
+				continue;
+			else
+				throw runtime_error("Maximum chi2r trials exceeded.");
 		}
+		chi2r_exceeded = 0;
 
 		// Save the results.  Start by copying the current entry to the temporary vector:
 		tmp_vec.clear();
