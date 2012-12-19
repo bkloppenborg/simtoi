@@ -76,7 +76,7 @@ public:
 	double * mParams;	// Current parameter values. Set to best-fit parameters upon exit (required)
 	unsigned int mNParams;
 	bool mRun;
-	string mResultsBaseFilename;;
+	string mSaveFileBasename;
 
 	CMinimizer::MinimizerTypes mType;
 
@@ -93,6 +93,8 @@ public:
 	bool IsRunning();
 
 	virtual int run() = 0;
+
+	void SetSaveFileBasename(string filename);
 	virtual void Stop();
 
 	template <class T>

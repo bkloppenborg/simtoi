@@ -76,6 +76,11 @@ void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
 	mGLT.EnqueueOperation(op);
 }
 
+string CGLWidget::GetSaveFileBasename()
+{
+	return mMinThread.GetSaveFileBasename();
+}
+
 void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
 {
 	for(int j = 0; j < parameters->GetNParams(); j++)
@@ -230,6 +235,11 @@ void CGLWidget::stopRendering()
 void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	mGLT.SetFreeParameters(params, n_params, scale_params);
+}
+
+void CGLWidget::SetSaveFileBasename(string filename)
+{
+	mMinThread.SetSaveFileBasename(filename);
 }
 
 void CGLWidget::SetScale(double scale)

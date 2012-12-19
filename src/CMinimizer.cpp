@@ -51,7 +51,7 @@ CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
 	mType = NONE;
 	mRun = true;
 	mIsRunning = false;
-	mResultsBaseFilename = "/tmp/min_output";
+	mSaveFileBasename = "/tmp/model";
 }
 
 CMinimizer::~CMinimizer()
@@ -70,7 +70,7 @@ void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 
 	// Open the statistics file for writing:
 	filename.str("");
-	filename << mResultsBaseFilename << "_param_names.txt";
+	filename << mSaveFileBasename << "_param_names.txt";
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);
@@ -90,7 +90,7 @@ void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 		mCLThread->SetFreeParameters(params, n_params, true);
 	}
 
-	mCLThread->ExportResults(mResultsBaseFilename);
+	mCLThread->ExportResults(mSaveFileBasename);
 }
 
 CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread)
@@ -158,6 +158,14 @@ void CMinimizer::Init()
 bool CMinimizer::IsRunning()
 {
 	return mIsRunning;
+}
+
+
+void CMinimizer::SetSaveFileBasename(string filename)
+{
+	// Only permit non-empty save file names:
+	if(filename.size() > 0)
+		mSaveFileBasename = filename;
 }
 
 /// Tells the thread to gracefully exit.

@@ -51,7 +51,7 @@ CMinimizer_Bootstrap::CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread)
 	mResiduals = NULL;
 
 	mBootstrapFailures = 0;
-	mMaxBootstrapFailures = 10;
+	mMaxBootstrapFailures = 20;
 }
 
 CMinimizer_Bootstrap::~CMinimizer_Bootstrap()
@@ -74,7 +74,7 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 
 	// Open the statistics file for writing:
 	filename.str("");
-	filename << mResultsBaseFilename << "_bootstrap.txt";
+	filename << mSaveFileBasename << "_bootstrap.txt";
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);
