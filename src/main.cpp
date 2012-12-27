@@ -113,6 +113,9 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 		if(value == "-m")
 			models.append(tmp.absoluteFilePath(args.at(i + 1)));
 
+//		if(value == "-o")
+//			savefile.append(tmp.absoluteFilePath(args.at(i + 1)));
+
 		// model area scale
 		if(value == "-s")
 			scale = args.at(i+1).toDouble();
@@ -134,7 +137,7 @@ void PrintHelp()
 	cout << "  " << "-h, --help   : " << "Show this help message and exit" << endl;
 	cout << "  " << "-c           : " << "Close SIMTOI after minimization completes [default: off]" << endl;
 	cout << "  " << "-d           : " << "Input OIFITS data file. Specify multiple -d to include " << endl;
-	cout << "  " << "             : " << "many data files." << endl;
+	cout << "  " << "               " << "many data files." << endl;
 	cout << "  " << "-e           : " << "Minimization engine ID (see Wiki or CMinimizer.h)" << endl;
 	cout << "  " << "-m           : " << "Model input file" << endl;
 	cout << "  " << "-s           : " << "Scale for model in mas/pixel (float > 0)" << endl;
