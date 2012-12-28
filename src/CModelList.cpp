@@ -45,6 +45,7 @@
 #include "models/CModelDisk_A.h"
 #include "models/CModelDisk_B.h"
 #include "models/CModelDisk_C.h"
+#include "models/CModelDisk_ConcentricRings.h"
 
 using namespace std;
 
@@ -79,6 +80,10 @@ CModelPtr CModelList::AddNewModel(ModelTypes model_id)
 
 	case DISK_C:
 		tmp.reset(new CModelDisk_C());
+		break;
+
+	case DISK_CONCENTRIC_RINGS:
+		tmp.reset(new CModelDisk_ConcentricRings());
 		break;
 
 	case SPHERE:
@@ -170,6 +175,7 @@ vector< pair<CModelList::ModelTypes, string> > CModelList::GetTypes(void)
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_A, "Disk - A"));
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_B, "Disk - B"));
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_C, "Disk - C"));
+	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_CONCENTRIC_RINGS, "Disk - Concentric Rings"));
 
 	return tmp;
 }

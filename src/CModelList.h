@@ -67,6 +67,7 @@ public:
 		DISK_A,
 		DISK_B,
 		DISK_C,
+		DISK_CONCENTRIC_RINGS,
 		LAST_VALUE // must be the last value in this list.
 	};
 
