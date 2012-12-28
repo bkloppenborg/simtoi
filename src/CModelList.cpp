@@ -33,6 +33,7 @@
 #include "CModelList.h"
 
 #include <sstream>
+#include <algorithm>
 
 #include "CCL_GLThread.h"
 #include "CPosition.h"
@@ -200,15 +201,20 @@ void CModelList::IncrementTime()
 // Render the image to the specified OpenGL framebuffer object.
 void CModelList::Render(GLuint fbo, int width, int height)
 {
+	// We render the models in order by depth (i.e. z-direction).
+	// To do this, we do a shallow copy of the model vector, then sort by z.
+	vector<CModelPtr> models = mModels;
+	sort(models.begin(), models.end(), SortByZ);
+
 	// First clear the buffer.
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
+    for(auto model : models)
     {
-    	(*it)->Render(fbo, width, height);
+    	model->Render(fbo, width, height);
     }
 
     // Bind back to the default framebuffer and let OpenGL finish:
@@ -302,4 +308,18 @@ void CModelList::SetTime(double t)
 void CModelList::SetTimestep(double dt)
 {
 	mTimestep = dt;
+}
+
+bool CModelList::SortByZ(const CModelPtr & A, const CModelPtr & B)
+{
+	double ax, ay, az;
+	double bx, by, bz;
+
+	A->GetPosition()->GetXYZ(ax, ay, az);
+	B->GetPosition()->GetXYZ(bx, by, bz);
+
+	if(az > bz)
+		return true;
+
+	return false;
 }

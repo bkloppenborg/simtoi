@@ -109,6 +109,8 @@ public:
 	void SetTimestep(double dt);
 	unsigned int size() { return mModels.size(); };
 
+	static bool SortByZ(const CModelPtr & A, const CModelPtr & B);
+
 };
 
 #endif /* CMODELLIST_H_ */
