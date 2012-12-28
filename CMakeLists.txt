@@ -5,7 +5,7 @@ ADD_DEFINITIONS("-std=c++0x")
 
 # If MultiNest isn't installed to a standard location, provide a hint
 # to where it can be found.  Comment out otherwise
-SET(MULTINEST_ROOT_HINT /homes/bkloppen/local/multinest)
+#SET(MULTINEST_ROOT_HINT /homes/bkloppen/local/multinest)
 
 # If a library is in a non-standard location, add it to the search path here:
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/lib64/fglrx)
