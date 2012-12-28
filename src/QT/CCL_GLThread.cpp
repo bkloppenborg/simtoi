@@ -28,7 +28,6 @@
 #include <fstream>
 #include <exception>
 #include <stdexcept>
-#include "oi.hpp"
 
 #include "CCL_GLThread.h"
 #include "CGLWidget.h"
