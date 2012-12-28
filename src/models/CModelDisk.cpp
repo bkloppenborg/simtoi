@@ -61,25 +61,26 @@ void CModelDisk::Draw()
 	const double half_height = total_height/2;
 
 	// Draw the top, sides, and bottom
-	DrawDisk(radius, half_height);
+	DrawDisk(0, radius, half_height);
 	DrawSides(radius, total_height);
-	DrawDisk(radius, -half_height);
+	DrawDisk(0, radius, -half_height);
 }
 
 /// Draws a flat (planar) disk
-void CModelDisk::DrawDisk(double radius, double at_z)
+void CModelDisk::DrawDisk(double r_in, double r_out, double at_z)
 {
-    glColor4d(mParams[3], 0.0, 0.0, 1.0);
-	glBegin( GL_TRIANGLE_FAN );
+    glColor4d(MidplaneColor(r_in), 0.0, 0.0, 1.0);
+    glBegin( GL_TRIANGLE_FAN );
 
-	if(at_z < 0)
-		glNormal3d( 0.0, 0.0, -1.0 );
-	else
-		glNormal3d(0.0, 0.0, 1.0);
+		if(at_z < 0)
+			glNormal3d( 0.0, 0.0, -1.0 );
+		else
+			glNormal3d(0.0, 0.0, 1.0);
 
-	glVertex3d( 0.0, 0.0, at_z);
-	for(int j = 0; j <= mSlices; j++ )
-		glVertex3d( mCosT[ j ] * radius, mSinT[ j ] * radius, at_z);
+		glVertex3d( 0.0, 0.0, at_z);
+		for(int j = 0; j <= mSlices; j++ )
+			glVertex3d( mCosT[ j ] * r_out, mSinT[ j ] * r_out, at_z);
+
 	glEnd();
 }
 
@@ -94,6 +95,8 @@ void CModelDisk::DrawSides(double radius, double total_height)
     double r1 = 0;
     double half_height = total_height / 2;
 
+    double color = mParams[3];
+
     // Divide the z direction into mStacks equal steps
     // Stop when we get to mScale in height.
     zStep = total_height / mStacks;
@@ -103,7 +106,7 @@ void CModelDisk::DrawSides(double radius, double total_height)
 
 	while(z0 < half_height)
 	{
-		glColor4d(mParams[3], 0.0, 0.0, Transparency(half_height, z0));
+		glColor4d(color, 0.0, 0.0, MidplaneTransparency(radius) * Transparency(half_height, z0));
 		r0 = GetRadius(half_height, z0, zStep, radius);
 		r1 = GetRadius(half_height, z1, zStep, radius);
 
@@ -120,12 +123,6 @@ void CModelDisk::DrawSides(double radius, double total_height)
 		z0 = z1;
 		z1 += zStep;
 	}
-}
-
-/// Returns the transparency at the specified height.
-double CModelDisk::Transparency(double total_height, double z)
-{
-	return 1.0;
 }
 
 /// Returns the radius as a function of height for the outer edge of the disk
@@ -198,7 +195,7 @@ void CModelDisk::Render(GLuint framebuffer_object, int width, int height)
 
 	glPopMatrix();
 
-	glDisable(GL_DEPTH_TEST);
+//	glEnable(GL_DEPTH_TEST);
 
 
 	// Return to the default framebuffer before leaving.

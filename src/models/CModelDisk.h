@@ -57,16 +57,19 @@ public:
 	virtual ~CModelDisk();
 
 	virtual void Draw();
-	virtual void DrawDisk(double radius, double height);
+	virtual void DrawDisk(double r_in, double r_out, double z);
 	virtual void DrawSides(double radius, double height);
 
 	virtual double GetRadius(double half_height, double h, double dh, double rim_radius);
 
 	void InitMembers();
 
+	virtual double MidplaneColor(double radius) { return 1; };
+	virtual double MidplaneTransparency(double radius) { return 1; };
+
 	void Render(GLuint framebuffer_object, int width, int height);
 
-	virtual double Transparency(double half_height, double at_z);
+	virtual double Transparency(double half_height, double at_z) { return 1; };
 };
 
 #endif /* CMODELDISK_GAUSS_H_ */

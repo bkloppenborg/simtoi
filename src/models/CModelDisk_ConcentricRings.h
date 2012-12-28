@@ -13,6 +13,8 @@
  *  	alpha: the radial power law decay coefficient for midplane transparency
  *  	beta : the z power law decay coefficient for transparency
  *  	n_rings: the number of concentric rings between r_in and r_out (> 0)
+ *
+ *  WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
  */
 
 #ifndef CMODELDISK_CONCENTRICRINGS_H_
@@ -27,9 +29,14 @@ public:
 	CModelDisk_ConcentricRings();
 	virtual ~CModelDisk_ConcentricRings();
 
+
+	virtual double MidplaneTransparency(double radius);
+
 	void Render(GLuint framebuffer_object, int width, int height);
 
-	virtual void SetShader(CGLShaderWrapperPtr shader); // Overrides CModel::SetShader
+	virtual double Transparency(double half_height, double at_z);
+
+//	virtual void SetShader(CGLShaderWrapperPtr shader); // Overrides CModel::SetShader
 
 };
 
