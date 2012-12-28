@@ -125,7 +125,7 @@ public:
 	Json::Value Serialize();
 	void SetAnglesFromPosition();
 	void SetPositionType(CPosition::PositionTypes type);
-	void SetShader(CGLShaderWrapperPtr shader);
+	virtual void SetShader(CGLShaderWrapperPtr shader);
 	void SetTime(double time);
 protected:
 	void SetupMatrix();

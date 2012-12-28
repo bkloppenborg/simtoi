@@ -18,4 +18,4 @@ in the filename.  If neither name is found, each column in the data file
 will be plotted as a histogram.
 
 Usage:
-python plot_histogram.py filename.txt
+python plot_histogram.py [...] filename.txt

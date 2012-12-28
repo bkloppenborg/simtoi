@@ -35,6 +35,9 @@
 
 #include <QObject>
 #include <QThread>
+#include <string>
+
+using namespace std;
 
 class CMinimizer;
 
@@ -44,12 +47,16 @@ class CMinimizerThread: public QThread
 
 protected:
     CMinimizer * mMinimizer;
+    string mSaveFileBasename;
 
 public:
 	CMinimizerThread();
 	virtual ~CMinimizerThread();
 
+	string GetSaveFileBasename() { return mSaveFileBasename; };
+
 	void SetMinimizer(CMinimizer * minimizer);
+	void SetSaveFileBasename(string filename);
 
 	void run();
 	void stop();

@@ -23,6 +23,9 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
     infile.close()
 
     end_col = data.shape[1]
+    
+    norm_stats = list()
+    cauchy_stats = list()
 
     # Reinterpret any negative numbers in skip_cols to be at the end of the line
     for column in range(0, len(skip_cols)):
@@ -49,17 +52,17 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
         [n, bins, patches] = plt.hist(temp, bins=nbins, normed=True, label='Binned data')
         
         # fit a normal distribution:
-        [mu, sigma] = norm.fit(temp)
-        y = mlab.normpdf(bins, mu, sigma)
-        legend_gauss = r'Normal: $\mu=%.3f,\ \sigma=%.3f$' % (mu, sigma)
+        [norm_mu, norm_sigma] = norm.fit(temp)
+        y = mlab.normpdf(bins, norm_mu, norm_sigma)
+        legend_gauss = r'Normal: $\mu=%.3f,\ \sigma=%.3f$' % (norm_mu, norm_sigma)
         l = plt.plot(bins, y, 'r--', linewidth=2, label=legend_gauss)
         
         # fit a Lorentz/Cauchy distribution:
         # bug workaround for http://projects.scipy.org/scipy/ticket/1530
         # - specify a starting centroid value for the fit
-        [mu, gamma] = cauchy.fit(temp, loc=mu)
-        y = cauchy.pdf(bins, loc=mu, scale=gamma)
-        legend_cauchy = r'Cauchy: $\mu=%.3f,\ \gamma=%.3f$' % (mu, gamma)
+        [cauchy_mu, cauchy_gamma] = cauchy.fit(temp, loc=norm_mu)
+        y = cauchy.pdf(bins, loc=cauchy_mu, scale=cauchy_gamma)
+        legend_cauchy = r'Cauchy: $\mu=%.3f,\ \gamma=%.3f$' % (cauchy_mu, cauchy_gamma)
         l = plt.plot(bins, y, 'g--', linewidth=2, label=legend_cauchy)
         
         # now setup the axes labels:
@@ -76,10 +79,25 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
         
         if autosave:
             plt.savefig(save_basename + 'hist_' + title + '.' + save_format, transparent=True, format=save_format)    
-            plt.close()        
+            plt.close()
         else:
             plt.show()
+            
+        # Add in the statistical information.
+        norm_stats.append([title, norm_mu, norm_sigma])
+        cauchy_stats.append([title, cauchy_mu, cauchy_gamma])
 
+
+    # Now either print out or save the statistical information
+    if(not autosave):
+        print "Normal Statistics:"
+        
+    write_statistics(save_basename + '_stats_normal.txt', norm_stats, autosave)
+    
+    if(not autosave):
+        print "Cauchy Statistics:"
+        
+    write_statistics(save_basename + '_stats_cauchy.txt', cauchy_stats, autosave)
 
 
 def col_names(filename):
@@ -141,6 +159,45 @@ def main():
         print column_names
 
     plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins, autosave=options.autosave, save_basename=basename, save_format=options.savefmt, trimends=options.trimends)
+   
+   
+def write_statistics(filename, statistics, save_to_file):
+    """
+    Writes the statistical information as rows formatted as:
+        title, mu, sigma
+    to the specified file.
+    
+    statistics should be a list of triplets:
+        [[title, mu, sigma], ..., [title, mu, sigma] ]
+        
+    Data will be written as follows:
+        # col1, sig_col1, ..., colN, sig_colN
+        val1, sig_val1, ..., valN, sig_valN
+        
+    """ 
+    # first do the title line
+    titles = list()
+    values = list()
+    for [title, value, sigma] in statistics:
+        titles.append(title)
+        titles.append("sig_" + title)
+        values.append(value)
+        values.append(sigma)
+        
+    titles = map(str, titles)
+    values = map(str, values)
+    
+    title_line = "# " + ', '.join(titles)
+    value_line = ', '.join(values)
+    
+    if(save_to_file):
+        outfile = open(filename, 'w')
+        outfile.write(title_line + "\n")
+        outfile.write(value_line)
+        outfile.close()
+    else:
+        print title_line
+        print value_line
     
     
 # Run the main function if this is a top-level script:

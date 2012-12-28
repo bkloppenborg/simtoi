@@ -497,8 +497,14 @@ void gui_main::Init(void)
 	mOpenDataDir = "./";
 	mOpenModelDir = "./";
 
+	mDefaultSaveDir = "/tmp/model";
+	mNumMinimizations = 0;
+
 	// Setup the combo boxes.
 	SetupComboBoxes();
+
+	// Setup the text boxes
+	ui.textSavePath->setText(mDefaultSaveDir.c_str());
 }
 
 void gui_main::MinimizerRun()
@@ -533,7 +539,22 @@ void gui_main::MinimizerRun(int minimizer_id, QMdiSubWindow * sw)
 	{
 		minimizer = CMinimizer::MinimizerTypes(minimizer_id);
 	    widget->LoadMinimizer(minimizer);
+
+	    // set the save file base name
+	    string ui_savefile = ui.textSavePath->text().toStdString();
+	    if(ui_savefile == mDefaultSaveDir)
+	    {
+	    	std::stringstream savepath;
+	    	savepath << ui_savefile << mNumMinimizations;
+	    	widget->SetSaveFileBasename(savepath.str());
+	    }
+	    else
+	    {
+	    	widget->SetSaveFileBasename(ui_savefile);
+	    }
+
 	    widget->RunMinimizer();
+	    mNumMinimizations += 1;
 	}
 	else
     {
@@ -713,6 +734,31 @@ void gui_main::SetupComboBoxes()
 	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
 }
 
+void gui_main::SetSavePath(void)
+{
+    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
+    // set the save file base name
+    string ui_savefile = ui.textSavePath->text().toStdString();
+    if(ui_savefile == mDefaultSaveDir)
+    {
+    	std::stringstream savepath;
+    	savepath << ui_savefile << mNumMinimizations;
+    	widget->SetSaveFileBasename(savepath.str());
+    }
+    else
+    {
+    	widget->SetSaveFileBasename(ui_savefile);
+    }
+
+    widget->RunMinimizer();
+    mNumMinimizations += 1;
+}
+
 /// Sets the time from the current selected datafile.
 void gui_main::SetTime(void)
 {
@@ -734,6 +780,7 @@ void gui_main::SetTime(void)
     widget->EnqueueOperation(GLT_RenderModels);
 }
 
+/// Called when a subwindow is selected.
 void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
 {
 	ButtonCheck();
@@ -754,6 +801,7 @@ void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
 	ui.treeModels->setModel(widget->GetTreeModel());
 	ui.treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
 
-
+	// Configure the Minimizer box
+	ui.textSavePath->setText(widget->GetSaveFileBasename().c_str());
 }
 

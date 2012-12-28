@@ -39,6 +39,8 @@
 #include <X11/Xlib.h>
 #endif
 
+#include <iostream>
+
 #include "main.h"
 #include "gui_main.h"
 
@@ -66,13 +68,13 @@ int main(int argc, char *argv[])
     double scale = 0;
     bool close_simtoi = false;
 
-    // Startup the GUI:
-    gui_main main_window;
-    main_window.show();
-
     // If there were command-line options, parse them
     if(args.size() > 0)
     	ParseArgs(args, data_files, model_files, minimizer, width, scale, close_simtoi);
+
+    // Startup the GUI:
+    gui_main main_window;
+    main_window.show();
 
     if(width > 0 && scale > 0)
     	main_window.CommandLine(data_files, model_files, minimizer, width, scale, close_simtoi);
@@ -93,37 +95,60 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 	{
 		value = args.at(i).toStdString();
 
+		if(value == "-c")
+			close_simtoi = true;
+
 		// data file(s)
 		if(value == "-d")
 			filenames.append(tmp.absoluteFilePath(args.at(i + 1)));
-
-		// model file
-		if(value == "-m")
-			models.append(tmp.absoluteFilePath(args.at(i + 1)));
 
 		// minimization engine
 		if(value == "-e")
 			minimizer = args.at(i + 1).toInt();
 
-		// model area width
-		if(value == "-w")
-			size = args.at(i+1).toInt();
+		if(value == "-h" || value == "-help")
+			PrintHelp();
+
+		// model file
+		if(value == "-m")
+			models.append(tmp.absoluteFilePath(args.at(i + 1)));
+
+//		if(value == "-o")
+//			savefile.append(tmp.absoluteFilePath(args.at(i + 1)));
 
 		// model area scale
 		if(value == "-s")
 			scale = args.at(i+1).toDouble();
 
-		if(value == "-c")
-			close_simtoi = true;
+		// model area width
+		if(value == "-w")
+			size = args.at(i+1).toInt();
 
-		if(value == "-h")
-			PrintHelp();
 	}
 }
 
+/// Prints the command line options and exits.
 void PrintHelp()
 {
-	printf("For command-line arguments see the wiki: \n https://github.com/bkloppenborg/simtoi/wiki/Command-Line \n");
+	cout << "SIMTOI: The SImulation and Modeling Tool for Optical Interferometry" << endl;
+	cout << "Command line usage: simtoi [...]" << endl;
+	cout << endl;
+	cout << "Options:" << endl;
+	cout << "  " << "-h, --help   : " << "Show this help message and exit" << endl;
+	cout << "  " << "-c           : " << "Close SIMTOI after minimization completes [default: off]" << endl;
+	cout << "  " << "-d           : " << "Input OIFITS data file. Specify multiple -d to include " << endl;
+	cout << "  " << "               " << "many data files." << endl;
+	cout << "  " << "-e           : " << "Minimization engine ID (see Wiki or CMinimizer.h)" << endl;
+	cout << "  " << "-m           : " << "Model input file" << endl;
+	cout << "  " << "-s           : " << "Scale for model in mas/pixel (float > 0)" << endl;
+	cout << "  " << "-w           : " << "Width of model area in pixels (int > 0)" << endl;
+	cout << endl;
+	cout << "SIMTOI also supports QT commands. For instance you can run SIMTOI from a: " << endl;
+	cout << "remotely executed script (or from gnu screen) by adding: " << endl;
+	cout << "  " << "-display x:y : " << "Run SIMTOI on display 'y' of the computer named 'x'" << endl;
+	cout << "In all cases, SIMTOI must be executed on a valid display on a computer with a" << endl;
+	cout << "with a video card which supports OpenCL, OpenGL, and OpenCL-OpenGL interop." << endl;
+	cout << endl;
 	exit(0);
 }
 

@@ -46,8 +46,11 @@ class CGLShaderWrapper;
 typedef shared_ptr<CGLShader> CGLShaderPtr;
 typedef shared_ptr<CGLShaderWrapper> CGLShaderWrapperPtr;
 
-class CGLShaderList: public vector<CGLShaderPtr>
+class CGLShaderList
 {
+protected:
+	vector<CGLShaderPtr> mShaders;
+
 public:
 	/// Enumerated shader names
 	enum ShaderTypes

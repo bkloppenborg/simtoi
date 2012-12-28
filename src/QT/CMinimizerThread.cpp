@@ -36,6 +36,7 @@
 CMinimizerThread::CMinimizerThread()
 {
 	mMinimizer = NULL;
+	mSaveFileBasename = "/tmp/model";
 
 	// Get this thing to run as often as possible.
 	//Priority = QThread::TimeCriticalPriority;
@@ -54,6 +55,7 @@ void CMinimizerThread::run()
 
 	// Call init before running the minimzer to setup memory.
 	mMinimizer->Init();
+	mMinimizer->SetSaveFileBasename(mSaveFileBasename);
 	mMinimizer->run();
 	exit();
 }
@@ -69,6 +71,12 @@ void CMinimizerThread::SetMinimizer(CMinimizer * minimizer)
 	delete mMinimizer;
 	mMinimizer = minimizer;
 }
+
+void CMinimizerThread::SetSaveFileBasename(string filename)
+{
+	mSaveFileBasename = filename;
+}
+
 
 void CMinimizerThread::stop()
 {

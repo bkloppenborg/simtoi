@@ -32,7 +32,7 @@
 
 #include "CMinimizer_MultiNest.h"
 #include "CCL_GLThread.h"
-#include <float.h>
+#include <limits>
 
 CMinimizer_MultiNest::CMinimizer_MultiNest(CCL_GLThread * cl_gl_thread)
 	: CMinimizer(cl_gl_thread)
@@ -63,10 +63,13 @@ void CMinimizer_MultiNest::dumper(int &nSamples, int &nlive, int &nPar, double *
 //	for(int i = 0; i < nPar; i++)
 //		printf("%i: %e \n", i, paramConstr[0][i]); //*(paramConstr[2* (nPar) + i]), *(paramConstr[3* (nPar) + i]));
 
-	// Copy the best-fit parameters into a save-able array:
-	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
-	for(int i = 0; i < nPar; i++)
-		minimizer->mParams[i] = paramConstr[0][i];
+	// If we haven't been requested to stop, copy the values over to a saveable array:
+	if(maxLogLike < numeric_limits<double>::max())
+	{
+		CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
+		for(int i = 0; i < nPar; i++)
+			minimizer->mParams[i] = paramConstr[0][i];
+	}
 }
 
 void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
@@ -78,7 +81,7 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 	// See if we have been requested to exit.  If so, give MultiNest a very positive result
 	if(!minimizer->mRun)
 	{
-		lnew = 1E99;
+		lnew = numeric_limits<double>::max();
 		return;
 	}
 
@@ -113,23 +116,23 @@ int CMinimizer_MultiNest::run()
 	void * misc = reinterpret_cast<void*>(this);
 
 	// set the MultiNest sampling parameters
-	int mmodal = 0;					// do mode separation?
+	int mmodal = 1;					// do mode separation?
 	int ceff = 0;					// run in constant efficiency mode?
 	int nlive = 200;				// number of live points
 	double efr = 0.8;				// set the required efficiency
-	double tol = 100;				// tol, defines the stopping criteria
+	double tol = 1000;				// tol, defines the stopping criteria
 	int ndims = mNParams;			// dimensionality (no. of free parameters)
 	int nPar = mNParams;				// total no. of parameters including free & derived parameters
 	int nClsPar = 1;			// no. of parameters to do mode separation on
 	int updInt = 10;				// after how many iterations feedback is required & the output files should be updated
 									// note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	double Ztol = -1E90;			// all the modes with logZ < Ztol are ignored
-	int maxModes = 1;				// expected max no. of modes (used only for memory allocation)
+	int maxModes = 10;				// expected max no. of modes (used only for memory allocation)
 	int pWrap[ndims];				// which parameters to have periodic boundary conditions?
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	const std::string path = mResultsBaseFilename + "_multinest";		// root for output files
+	const std::string path = mSaveFileBasename + "_multinest";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
 	int resume = 0;					// resume from a previous job?
@@ -156,7 +159,7 @@ int CMinimizer_MultiNest::run()
     mIsRunning = false;
 
     // TODO: For some reason the parameters are getting mangled when they come from MultiNest
-    // resulting in a mangled image for data exportin.
+    // resulting in a mangled image for data exporting.
     ExportResults(mParams, mNParams, true);
 
     return 0;

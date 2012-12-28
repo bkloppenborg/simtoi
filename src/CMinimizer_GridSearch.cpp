@@ -58,7 +58,7 @@ void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no
 
 	// Open the statistics file for writing:
 	filename.str("");
-	filename << mResultsBaseFilename << "_gridsearch.txt";
+	filename << mSaveFileBasename << "_gridsearch.txt";
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);

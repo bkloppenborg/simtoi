@@ -33,6 +33,7 @@
 #include "CModelList.h"
 
 #include <sstream>
+#include <algorithm>
 
 #include "CCL_GLThread.h"
 #include "CPosition.h"
@@ -45,6 +46,7 @@
 #include "models/CModelDisk_A.h"
 #include "models/CModelDisk_B.h"
 #include "models/CModelDisk_C.h"
+#include "models/CModelDisk_ConcentricRings.h"
 
 using namespace std;
 
@@ -80,6 +82,10 @@ CModelPtr CModelList::AddNewModel(ModelTypes model_id)
 	case DISK_C:
 		tmp.reset(new CModelDisk_C());
 		break;
+// TODO: Enable once models have a default (NONE) shader.
+//	case DISK_CONCENTRIC_RINGS:
+//		tmp.reset(new CModelDisk_ConcentricRings());
+//		break;
 
 	case SPHERE:
 	default:
@@ -87,8 +93,8 @@ CModelPtr CModelList::AddNewModel(ModelTypes model_id)
 		break;
 	}
 
-	push_back(tmp);
-	return back();
+	mModels.push_back(tmp);
+	return mModels.back();
 }
 
 /// Returns the total number of free parameters in the models
@@ -97,7 +103,7 @@ int CModelList::GetNFreeParameters()
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	n +=(*it)->GetTotalFreeParameters();
     }
@@ -110,7 +116,7 @@ void CModelList::GetAllParameters(double * params, int n_params)
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->GetAllParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
@@ -123,7 +129,7 @@ vector< pair<double, double> > CModelList::GetFreeParamMinMaxes()
     vector< pair<double, double> > tmp2;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	tmp2 = (*it)->GetFreeParamMinMaxes();
     	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
@@ -138,7 +144,7 @@ void CModelList::GetFreeParameters(double * params, int n_params, bool scale_par
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->GetFreeParameters(params + n, n_params - n, scale_params);
     	n += (*it)->GetTotalFreeParameters();
@@ -152,7 +158,7 @@ vector<string> CModelList::GetFreeParamNames()
     vector<string> tmp2;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	tmp2 = (*it)->GetFreeParameterNames();
     	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
@@ -170,6 +176,7 @@ vector< pair<CModelList::ModelTypes, string> > CModelList::GetTypes(void)
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_A, "Disk - A"));
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_B, "Disk - B"));
 	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_C, "Disk - C"));
+	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_CONCENTRIC_RINGS, "Disk - Concentric Rings"));
 
 	return tmp;
 }
@@ -179,7 +186,7 @@ double CModelList::GetFreeParameterPriorProduct()
 {
 	double tmp = 1;
 
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     	tmp *= (*it)->GetFreePriorProd();
 
     return tmp;
@@ -194,15 +201,20 @@ void CModelList::IncrementTime()
 // Render the image to the specified OpenGL framebuffer object.
 void CModelList::Render(GLuint fbo, int width, int height)
 {
+	// We render the models in order by depth (i.e. z-direction).
+	// To do this, we do a shallow copy of the model vector, then sort by z.
+	vector<CModelPtr> models = mModels;
+	sort(models.begin(), models.end(), SortByZ);
+
 	// First clear the buffer.
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(auto model : models)
     {
-    	(*it)->Render(fbo, width, height);
+    	model->Render(fbo, width, height);
     }
 
     // Bind back to the default framebuffer and let OpenGL finish:
@@ -215,8 +227,8 @@ void CModelList::Render(GLuint fbo, int width, int height)
 void CModelList::Restore(Json::Value input, CGLShaderList * shader_list)
 {
 	// Clear the list if there are already models in it.
-	if(this->size() > 0)
-		this->clear();
+	if(mModels.size() > 0)
+		mModels.clear();
 
 	CModelList::ModelTypes type = CModelList::NONE;
 	CModelPtr model;
@@ -243,7 +255,7 @@ Json::Value CModelList::Serialize()
 
     // Now call render on all of the models:
 	int i = 0;
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	Json::Value tmp;
     	name.str("");
@@ -264,7 +276,7 @@ void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool 
 	unsigned int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->SetFreeParameters(params + n, n_params - n, scale_params);
     	n += (*it)->GetTotalFreeParameters();
@@ -273,12 +285,12 @@ void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool 
 
 void CModelList::SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type)
 {
-	this->at(model_id)->SetPositionType(pos_type);
+	mModels.at(model_id)->SetPositionType(pos_type);
 }
 
 void CModelList::SetShader(unsigned int model_id, CGLShaderWrapperPtr shader)
 {
-	this->at(model_id)->SetShader(shader);
+	mModels.at(model_id)->SetShader(shader);
 }
 
 /// Sets the time for all of the models
@@ -286,7 +298,7 @@ void CModelList::SetShader(unsigned int model_id, CGLShaderWrapperPtr shader)
 void CModelList::SetTime(double t)
 {
 	mTime = t;
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->SetTime(mTime);
     }
@@ -296,4 +308,18 @@ void CModelList::SetTime(double t)
 void CModelList::SetTimestep(double dt)
 {
 	mTimestep = dt;
+}
+
+bool CModelList::SortByZ(const CModelPtr & A, const CModelPtr & B)
+{
+	double ax, ay, az;
+	double bx, by, bz;
+
+	A->GetPosition()->GetXYZ(ax, ay, az);
+	B->GetPosition()->GetXYZ(bx, by, bz);
+
+	if(az > bz)
+		return true;
+
+	return false;
 }
