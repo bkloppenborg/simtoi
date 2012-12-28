@@ -174,14 +174,15 @@ double CParameters::GetFreePriorProd()
 	return tmp;
 }
 
-/// Returns a vector of strings containing the names of the free parameters.
+/// Returns a vector of strings containing the names of the free parameters
+/// prefixed with the name of the parent object.
 vector<string> CParameters::GetFreeParamNames()
 {
 	vector<string> tmp;
 	for(int i = 0; i < mNParams; i++)
 	{
 		if(mFreeParams[i])
-			tmp.push_back(GetParamName(i));
+			tmp.push_back(mName + '.' + GetParamName(i));
 	}
 
 	return tmp;
