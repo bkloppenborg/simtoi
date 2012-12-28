@@ -66,20 +66,28 @@ void CModelDisk::Draw()
 	DrawDisk(0, radius, -half_height);
 }
 
+void CModelDisk::DrawDisk(double radius, double at_z)
+{
+	DrawDisk(0, radius, at_z);
+}
+
 /// Draws a flat (planar) disk
 void CModelDisk::DrawDisk(double r_in, double r_out, double at_z)
 {
-    glColor4d(MidplaneColor(r_in), 0.0, 0.0, 1.0);
-    glBegin( GL_TRIANGLE_FAN );
+    double color = mParams[3];
+    glBegin(GL_QUAD_STRIP);
 
 		if(at_z < 0)
 			glNormal3d( 0.0, 0.0, -1.0 );
 		else
 			glNormal3d(0.0, 0.0, 1.0);
 
-		glVertex3d( 0.0, 0.0, at_z);
 		for(int j = 0; j <= mSlices; j++ )
-			glVertex3d( mCosT[ j ] * r_out, mSinT[ j ] * r_out, at_z);
+		{
+			glColor4d(color, 0.0, 0.0, MidplaneTransparency(r_in));
+			glVertex3d(mCosT[ j ] * r_in, mSinT[ j ] * r_in, at_z);
+			glVertex3d(mCosT[ j ] * r_out, mSinT[ j ] * r_out ,at_z);
+		}
 
 	glEnd();
 }
