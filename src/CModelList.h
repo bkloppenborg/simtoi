@@ -53,8 +53,11 @@ typedef shared_ptr<CModel> CModelPtr;
 typedef shared_ptr<CGLShaderWrapper> CGLShaderWrapperPtr;
 
 // A container for a list of models.
-class CModelList : public vector<CModelPtr>
+class CModelList
 {
+protected:
+	vector<CModelPtr> mModels;
+
 public:
 	/// Enumerated Model Names.
 	/// Note, when adding a new model, list it in this enum and add it to functions:
@@ -88,7 +91,7 @@ public:
 	void GetFreeParametersScaled(double * params, int n_params);
 	double GetFreeParameterPriorProduct();
 	vector<string> GetFreeParamNames();
-	CModelPtr GetModel(int i) { return this->at(i); };
+	CModelPtr GetModel(int i) { return mModels.at(i); };
 	double GetTime() { return mTime; };
 
 	static vector< pair<ModelTypes, string> > GetTypes(void);
@@ -104,6 +107,7 @@ public:
 	void SetShader(unsigned int model_id, CGLShaderWrapperPtr shader);
 	void SetTime(double t);
 	void SetTimestep(double dt);
+	unsigned int size() { return mModels.size(); };
 
 };
 

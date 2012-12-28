@@ -81,10 +81,10 @@ CModelPtr CModelList::AddNewModel(ModelTypes model_id)
 	case DISK_C:
 		tmp.reset(new CModelDisk_C());
 		break;
-
-	case DISK_CONCENTRIC_RINGS:
-		tmp.reset(new CModelDisk_ConcentricRings());
-		break;
+// TODO: Enable once models have a default (NONE) shader.
+//	case DISK_CONCENTRIC_RINGS:
+//		tmp.reset(new CModelDisk_ConcentricRings());
+//		break;
 
 	case SPHERE:
 	default:
@@ -92,8 +92,8 @@ CModelPtr CModelList::AddNewModel(ModelTypes model_id)
 		break;
 	}
 
-	push_back(tmp);
-	return back();
+	mModels.push_back(tmp);
+	return mModels.back();
 }
 
 /// Returns the total number of free parameters in the models
@@ -102,7 +102,7 @@ int CModelList::GetNFreeParameters()
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	n +=(*it)->GetTotalFreeParameters();
     }
@@ -115,7 +115,7 @@ void CModelList::GetAllParameters(double * params, int n_params)
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->GetAllParameters(params + n, n_params - n);
     	n += (*it)->GetTotalFreeParameters();
@@ -128,7 +128,7 @@ vector< pair<double, double> > CModelList::GetFreeParamMinMaxes()
     vector< pair<double, double> > tmp2;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	tmp2 = (*it)->GetFreeParamMinMaxes();
     	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
@@ -143,7 +143,7 @@ void CModelList::GetFreeParameters(double * params, int n_params, bool scale_par
     int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->GetFreeParameters(params + n, n_params - n, scale_params);
     	n += (*it)->GetTotalFreeParameters();
@@ -157,7 +157,7 @@ vector<string> CModelList::GetFreeParamNames()
     vector<string> tmp2;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	tmp2 = (*it)->GetFreeParameterNames();
     	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
@@ -185,7 +185,7 @@ double CModelList::GetFreeParameterPriorProduct()
 {
 	double tmp = 1;
 
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     	tmp *= (*it)->GetFreePriorProd();
 
     return tmp;
@@ -206,7 +206,7 @@ void CModelList::Render(GLuint fbo, int width, int height)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->Render(fbo, width, height);
     }
@@ -221,8 +221,8 @@ void CModelList::Render(GLuint fbo, int width, int height)
 void CModelList::Restore(Json::Value input, CGLShaderList * shader_list)
 {
 	// Clear the list if there are already models in it.
-	if(this->size() > 0)
-		this->clear();
+	if(mModels.size() > 0)
+		mModels.clear();
 
 	CModelList::ModelTypes type = CModelList::NONE;
 	CModelPtr model;
@@ -249,7 +249,7 @@ Json::Value CModelList::Serialize()
 
     // Now call render on all of the models:
 	int i = 0;
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	Json::Value tmp;
     	name.str("");
@@ -270,7 +270,7 @@ void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool 
 	unsigned int n = 0;
 
     // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->SetFreeParameters(params + n, n_params - n, scale_params);
     	n += (*it)->GetTotalFreeParameters();
@@ -279,12 +279,12 @@ void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool 
 
 void CModelList::SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type)
 {
-	this->at(model_id)->SetPositionType(pos_type);
+	mModels.at(model_id)->SetPositionType(pos_type);
 }
 
 void CModelList::SetShader(unsigned int model_id, CGLShaderWrapperPtr shader)
 {
-	this->at(model_id)->SetShader(shader);
+	mModels.at(model_id)->SetShader(shader);
 }
 
 /// Sets the time for all of the models
@@ -292,7 +292,7 @@ void CModelList::SetShader(unsigned int model_id, CGLShaderWrapperPtr shader)
 void CModelList::SetTime(double t)
 {
 	mTime = t;
-    for(vector<CModelPtr>::iterator it = this->begin(); it != this->end(); ++it)
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->SetTime(mTime);
     }
