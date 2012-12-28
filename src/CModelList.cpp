@@ -82,10 +82,10 @@ CModelPtr CModelList::AddNewModel(ModelTypes model_id)
 	case DISK_C:
 		tmp.reset(new CModelDisk_C());
 		break;
-// TODO: Enable once models have a default (NONE) shader.
-//	case DISK_CONCENTRIC_RINGS:
-//		tmp.reset(new CModelDisk_ConcentricRings());
-//		break;
+
+	case DISK_CONCENTRIC_RINGS:
+		tmp.reset(new CModelDisk_ConcentricRings());
+		break;
 
 	case SPHERE:
 	default:
