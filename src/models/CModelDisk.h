@@ -57,7 +57,8 @@ public:
 	virtual ~CModelDisk();
 
 	virtual void Draw();
-	virtual void DrawDisk(double r_in, double r_out, double z);
+	virtual void DrawDisk(double radius, double at_z);
+	virtual void DrawDisk(double r_in, double r_out, double at_z);
 	virtual void DrawSides(double radius, double height);
 
 	virtual double GetRadius(double half_height, double h, double dh, double rim_radius);

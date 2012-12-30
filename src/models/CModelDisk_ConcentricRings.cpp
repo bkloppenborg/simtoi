@@ -92,9 +92,8 @@ void CModelDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, in
 	if(n_rings < 1)
 		n_rings = 1;
 
-	const double dr = (r_out - r_in) / (n_rings);
+	const double dr = (r_out - r_in) / n_rings;
 	const double half_height = total_height/2;
-	double radius = r_in;
 
 	double min_xyz[3] = {r_in, r_in, 0};
 	double max_xyz[3] = {r_out, r_out, half_height};
@@ -113,12 +112,11 @@ void CModelDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, in
 		Rotate();
 
 		// Iterate over the rings, also increment the radius
-		for(; radius < r_out + dr; radius += dr)
+		for(double radius = r_in; radius < r_out + dr; radius += dr)
 		{
-//			DrawDisk(radius - dr, radius, 0);
+			DrawDisk(radius, radius + dr, 0);
 			DrawSides(radius, total_height);
 		}
-
 
 	glPopMatrix();
 
