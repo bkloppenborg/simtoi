@@ -773,6 +773,10 @@ void gui_main::SetTime(void)
     QModelIndexList list = ui.treeOpenFiles->selectionModel()->selectedIndexes();
     QStandardItemModel * model = widget->GetOpenFileModel();
 
+    // Ensure there is data present before continuing.
+    if(list.size() == 0)
+    	return;
+
     QList<QModelIndex>::iterator it = list.begin();
     int id = (*it).row();
     double t = widget->GetDataAveJD(id);
