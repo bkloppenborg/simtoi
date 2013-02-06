@@ -684,6 +684,7 @@ void gui_main::ModelOpen(QStringList & fileNames, QMdiSubWindow * sw)
 {
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 	widget->Open(fileNames.first().toStdString());
+	ui.treeModels->reset();
 
 	// Store the directory name for the next file open dialog.
 	mOpenModelDir = QFileInfo(fileNames[0]).absolutePath().toStdString();
