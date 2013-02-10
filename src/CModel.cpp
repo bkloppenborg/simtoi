@@ -41,10 +41,7 @@
 #include "CModel.h"
 // Header files for position objects.
 #include "CPosition.h"
-#include "CPositionXY.h"
-#include "CPositionOrbit.h"
-//#include "CFeature.h"
-//#include "CFeatureList.h"
+#include "CPositionFactory.h"
 
 CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
@@ -74,8 +71,7 @@ CModel::CModel(int n_params)
 
 CModel::~CModel()
 {
-	// Free up memory.
-	delete mPosition;
+
 }
 
 
@@ -217,23 +213,19 @@ void CModel::Rotate()
 void CModel::Restore(Json::Value input)
 {
 	// Restore the base parameters
-	CParameters::Restore(input["base"]);
-//	CGLShaderWrapperPtr shader;
+	CParameters::Restore(input["base_data"]);
+
+	auto positions = CPositionFactory::Instance();
+
+	// Look up the name of the position model:
+	string position_id = input["position_id"].asString();
+	auto position = positions.CreatePosition(position_id);
+	position->Restore(input["position_data"]);
+	SetPositionModel(position);
 
 	// TODO: Temporary code:
-	SetPositionType(CPosition::XYZ);
 	SetShader(0);
 
-//	// Now the position
-//	if(input.isMember("position"))
-//	{
-//		if(input["position"].isMember("type"))
-//		{
-//			SetPositionType( CPosition::PositionTypes(input["position"]["type"].asInt()) );
-//			mPosition->Restore(input["position"]);
-//		}
-//	}
-//
 //	// Now the shader
 //	if(input.isMember("shader"))
 //	{
@@ -262,11 +254,11 @@ void CModel::SetupMatrix()
 Json::Value CModel::Serialize()
 {
 	Json::Value output;
-	output["model_id"] = GetID();
-	output["base"] = CParameters::Serialize();
+	output["base_id"] = GetID();
+	output["base_data"] = CParameters::Serialize();
 
-	//	output["position"] = mPosition->Serialize();
-//	output["position"]["type"] = mPosition->GetType();
+	output["position_id"] = mPosition->GetID();
+	output["position_data"] = mPosition->Serialize();
 
 //	if(mShader != NULL)
 //	{
@@ -281,17 +273,18 @@ Json::Value CModel::Serialize()
 /// and the angular parameter is not free.
 void CModel::SetAnglesFromPosition()
 {
-	if(mPosition->GetType() == CPosition::ORBIT)
-	{
-		// Inclination
-		if(!this->IsFree(0))
-			mParams[0] = mPosition->GetParam(0);
-
-		// Omega / Position angle
-		// TODO: Is this right?
-		if(!this->IsFree(1))
-			mParams[1] = mPosition->GetParam(1);
-	}
+	// TODO: Fix this section:
+//	if(mPosition->GetID() == CPosition::ORBIT)
+//	{
+//		// Inclination
+//		if(!this->IsFree(0))
+//			mParams[0] = mPosition->GetParam(0);
+//
+//		// Omega / Position angle
+//		// TODO: Is this right?
+//		if(!this->IsFree(1))
+//			mParams[1] = mPosition->GetParam(1);
+//	}
 }
 
 /// Sets the parameters for this model, the position, shader, and all features.
@@ -319,23 +312,26 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 }
 
 /// Assigns and initializes a position type.
-void CModel::SetPositionType(CPosition::PositionTypes type)
+void CModel::SetPositionModel(string position_id)
 {
-	// If the position is already set and is of the current type, break.
-	if(mPosition != NULL && mPosition->GetType() == type)
-		return;
+	auto factory = CPositionFactory::Instance();
+	SetPositionModel( factory.CreatePosition(position_id));
+}
 
-	mPosition = CPosition::GetPosition(type);
+void CModel::SetPositionModel(CPositionPtr position)
+{
+	mPosition = position;
 }
 
 void CModel::SetTime(double time)
 {
-	CPositionOrbit * tmp;
-	if(mPosition->GetType() == CPosition::ORBIT)
-	{
-		tmp = reinterpret_cast<CPositionOrbit*>(mPosition);
-		tmp->SetTime(time);
-	}
+
+	// TODO: Fix this
+//	if(mPosition->GetID() == CPosition::ORBIT)
+//	{
+//		tmp = reinterpret_cast<CPositionOrbit*>(mPosition);
+//		tmp->SetTime(time);
+//	}
 }
 
 void CModel::SetShader(CGLShaderWrapperPtr shader)

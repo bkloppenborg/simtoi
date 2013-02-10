@@ -31,7 +31,7 @@ public:
 
 	static shared_ptr<CModel> Create();
 
-	static string GetID() { return "disk_concentric_rings"; };
+	virtual string GetID() { return "disk_concentric_rings"; };
 
 	virtual double MidplaneTransparency(double radius);
 

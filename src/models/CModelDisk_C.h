@@ -55,7 +55,7 @@ public:
 
 	static shared_ptr<CModel> Create();
 
-	static string GetID() { return "disk_c"; };
+	virtual string GetID() { return "disk_c"; };
 	double GetRadius(double half_height, double h, double dh, double rim_radius);
 };
 

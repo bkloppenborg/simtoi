@@ -197,7 +197,7 @@ void CModelList::Restore(Json::Value input)
 	for(unsigned int i = 0; i < members.size(); i++)
 	{
 		// Look up the type of model and create an object of that type:
-		model_id = input[members[i]]["model_id"].asString();
+		model_id = input[members[i]]["base_id"].asString();
 		model = factory.CreateModel(model_id);
 
 		// Now have the model restore the rest of itself, then push it onto the list.
@@ -219,11 +219,8 @@ Json::Value CModelList::Serialize()
     {
     	Json::Value tmp;
     	name.str("");
-    	name << "object_" << i;
+    	name << "model_" << i;
     	output[name.str()] = model->Serialize();
-//    	tmp[name.str()] = (*it)->Serialize();
-//    	tmp.setComment("// Next Model", Json::commentBefore);
-//    	output.append(tmp);
     	i++;
     }
 

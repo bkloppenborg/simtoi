@@ -18,12 +18,12 @@
 
 CModelFactory::CModelFactory()
 {
-	Register(CModelSphere::GetID(), &CModelSphere::Create);
-	Register(CModelDisk::GetID(), &CModelDisk::Create);
-	Register(CModelDisk_A::GetID(), &CModelDisk_A::Create);
-	Register(CModelDisk_B::GetID(), &CModelDisk_B::Create);
-	Register(CModelDisk_C::GetID(), &CModelDisk_C::Create);
-	Register(CModelDisk_ConcentricRings::GetID(), &CModelDisk_ConcentricRings::Create);
+	Register("sphere", &CModelSphere::Create);
+	Register("cylinder", &CModelDisk::Create);
+	Register("disk_a", &CModelDisk_A::Create);
+	Register("disk_b", &CModelDisk_B::Create);
+	Register("disk_c", &CModelDisk_C::Create);
+	Register("disk_concentric_rings", &CModelDisk_ConcentricRings::Create);
 }
 
 CModelFactory::~CModelFactory() \

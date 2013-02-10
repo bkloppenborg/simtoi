@@ -63,7 +63,7 @@ public:
 	virtual void DrawDisk(double r_in, double r_out, double at_z);
 	virtual void DrawSides(double radius, double height);
 
-	static string GetID() { return "cylinder"; };
+	virtual string GetID() { return "cylinder"; };
 	virtual double GetRadius(double half_height, double h, double dh, double rim_radius);
 
 	void InitMembers();

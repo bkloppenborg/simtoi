@@ -52,6 +52,9 @@
 #include <cmath>
 #include <cstdio>
 #include <cassert>
+#include <memory>
+
+using namespace std;
 
 #ifndef PI
 #ifdef M_PI
@@ -61,11 +64,9 @@
 #endif // M_PI
 #endif // PI
 
-using namespace std;
-
 class CPosition;
-//class CFeature;
-//class CFeatureList;
+typedef shared_ptr<CPosition> CPositionPtr;
+
 class CGLShaderWrapper;
 
 class CModel : public CParameters
@@ -75,7 +76,7 @@ protected:
 //	bool is_analytic;
 	int mBaseParams;
 
-	CPosition * mPosition;
+	CPositionPtr mPosition;
 
 //	CFeatureList * features;
 
@@ -91,13 +92,15 @@ protected:
 public:
 	static void CircleTable( double * sint, double * cost, const int n );
 
+	void GetAllParameters(double * params, int n_params);
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
 	void GetFreeParameters(double * params, int n_params, bool scale_params);
 	vector<string> GetFreeParameterNames();
 	double GetFreePriorProd();
 	vector< pair<double, double> > GetFreeParamMinMaxes();
+
 	void SetFreeParameters(double * params, int n_params, bool scale_params);
-	void GetAllParameters(double * params, int n_params);
+
 
 public:
 	CModel(int n_params);
@@ -106,12 +109,12 @@ public:
 	//void AppendFeature(CFeature * feature);
 	//void DeleteFeature();
 
-	static string GetID() { return "model_base_invalid"; };
+	virtual string GetID() { return "model_base_invalid"; };
 	int GetNFeatureFreeParameters() { return 0; };
 	int GetNModelFreeParameters() { return mNFreeParams; };
 	int GetNPositionFreeParameters() { return mPosition->GetNFreeParams(); };
 	int GetNShaderFreeParameters() { return mShader->GetNFreeParams(); };
-	CPosition * GetPosition(void) { return mPosition; };
+	CPositionPtr GetPosition(void) { return mPosition; };
 	CGLShaderWrapperPtr GetShader(void) { return mShader; };
 	int GetTotalFreeParameters();
 
@@ -122,7 +125,9 @@ public:
 public:
 	Json::Value Serialize();
 	void SetAnglesFromPosition();
-	void SetPositionType(CPosition::PositionTypes type);
+	void SetPositionModel(string position_id);
+	void SetPositionModel(CPositionPtr position);
+
 	virtual void SetShader(CGLShaderWrapperPtr shader);
 	void SetTime(double time);
 protected:

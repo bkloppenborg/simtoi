@@ -46,7 +46,7 @@ public:
 
 	static shared_ptr<CModel> Create();
 
-	static string GetID() { return "sphere"; };
+	virtual string GetID() { return "sphere"; };
 	double GetMaxHeight();
 
 	void Render(GLuint framebuffer_object, int width, int height);
