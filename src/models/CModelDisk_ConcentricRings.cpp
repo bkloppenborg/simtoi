@@ -11,7 +11,6 @@ CModelDisk_ConcentricRings::CModelDisk_ConcentricRings()
 : 	CModelDisk(6 - mDiskParams)
 {
 	mName = "Concentric Rings";
-	mModelID = "disk_concentric_rings";
 
 	// WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
 	for(int i = 0; i < 2; i++)

@@ -36,7 +36,6 @@ CModelDisk_B::CModelDisk_B()
 	:CModelDisk(1)
 {
 	mName = "Disk B";
-	mModelID = "disk_b";
 
 	mParamNames.push_back("Decay Factor");
 	SetParam(mBaseParams + mDiskParams + 1, 0.05);

@@ -74,7 +74,6 @@ protected:
 	// Datamembers
 //	bool is_analytic;
 	int mBaseParams;
-	string mModelID;
 
 	CPosition * mPosition;
 
@@ -107,6 +106,7 @@ public:
 	//void AppendFeature(CFeature * feature);
 	//void DeleteFeature();
 
+	static string GetID() { return "model_base_invalid"; };
 	int GetNFeatureFreeParameters() { return 0; };
 	int GetNModelFreeParameters() { return mNFreeParams; };
 	int GetNPositionFreeParameters() { return mPosition->GetNFreeParams(); };
@@ -114,11 +114,10 @@ public:
 	CPosition * GetPosition(void) { return mPosition; };
 	CGLShaderWrapperPtr GetShader(void) { return mShader; };
 	int GetTotalFreeParameters();
-	string GetType(void) { return mModelID; };
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 public:
-	void Restore(Json::Value input, CGLShaderList * shader_list);
+	void Restore(Json::Value input);
 
 public:
 	Json::Value Serialize();

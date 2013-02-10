@@ -158,7 +158,6 @@ void CModelDisk::InitMembers()
 	CircleTable(mSinT, mCosT, mSlices);
 
 	mName = "Cylinder";
-	mModelID = "cylinder";
 
 	mZeroThreshold = 1E-4;	// The zero point for flux
 

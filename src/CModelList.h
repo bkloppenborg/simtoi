@@ -46,11 +46,8 @@ using namespace std;
 #include "CPosition.h"
 
 class CModel;
-class CGLShaderWrapper;
-class CGLShaderList;
 
 typedef shared_ptr<CModel> CModelPtr;
-typedef shared_ptr<CGLShaderWrapper> CGLShaderWrapperPtr;
 
 // A container for a list of models.
 class CModelList
@@ -83,7 +80,7 @@ public:
 	void IncrementTime();
 
 	void Render(GLuint fbo, int width, int height);
-	void Restore(Json::Value input, CGLShaderList * shader_list);
+	void Restore(Json::Value input);
 
 	Json::Value Serialize();
 	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);

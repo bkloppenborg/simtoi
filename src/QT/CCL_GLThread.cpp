@@ -546,7 +546,7 @@ void CCL_GLThread::Open(string filename)
 	string file_contents = ReadFile(filename, "Could not read model save file.");
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(parsingSuccessful)
-		mModelList->Restore(input, mShaderList);
+		mModelList->Restore(input);
 
 	EnqueueOperation(GLT_RenderModels);
 }

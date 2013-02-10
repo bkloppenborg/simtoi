@@ -36,7 +36,6 @@ CModelDisk_C::CModelDisk_C()
 	:CModelDisk(1)
 {
 	mName = "Disk C";
-	mModelID = "disk_c";
 
 	mParamNames.push_back("Beta");
 	SetParam(mBaseParams + mDiskParams + 1, 0.05);

@@ -31,6 +31,8 @@ public:
 
 	static shared_ptr<CModel> Create();
 
+	static string GetID() { return "disk_concentric_rings"; };
+
 	virtual double MidplaneTransparency(double radius);
 
 	void Render(GLuint framebuffer_object, int width, int height);

@@ -37,8 +37,6 @@
 #include <algorithm>
 
 #include "CCL_GLThread.h"
-#include "CPosition.h"
-#include "CGLShaderList.h"
 
 // Models
 #include "CModel.h"
@@ -137,18 +135,7 @@ vector<string> CModelList::GetFreeParamNames()
 vector<string> CModelList::GetTypes(void)
 {
 	auto factory = CModelFactory::Instance();
-
 	return factory.GetModelList();
-
-//	vector< pair<ModelTypes, string> > tmp;
-//	tmp.push_back(pair<ModelTypes, string> (CModelList::SPHERE, "Sphere"));
-//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK, "Disk - Cylinder"));
-//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_A, "Disk - A"));
-//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_B, "Disk - B"));
-//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_C, "Disk - C"));
-//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_CONCENTRIC_RINGS, "Disk - Concentric Rings"));
-
-//	return tmp;
 }
 
 /// Returns the product of priors from all models
@@ -194,25 +181,29 @@ void CModelList::Render(GLuint fbo, int width, int height)
 }
 
 /// Restores the saved models
-void CModelList::Restore(Json::Value input, CGLShaderList * shader_list)
+void CModelList::Restore(Json::Value input)
 {
-//	// Clear the list:
-//	mModels.clear();
-//
-//	string model_id = "";
-//	CModelPtr model;
-//	Json::Value tmp;
-//	int value = 0;
-//
-//	Json::Value::Members members = input.getMemberNames();
-//	for(unsigned int i = 0; i < members.size(); i++)
-//	{
-//		value = input[members[i]]["base"]["type"].asInt();
-//		tmp = input[members[i]];
-//		type = CModelList::ModelTypes( value );
-//		model = AddNewModel(type);
-//		model->Restore(tmp, shader_list);
-//	}
+	auto factory = CModelFactory::Instance();
+	CModelPtr model;
+
+	// Clear the list:
+	mModels.clear();
+
+	string model_id = "";
+	Json::Value tmp;
+
+	// Iterate through the members in the file, get their model_id, and restore the objects.
+	Json::Value::Members members = input.getMemberNames();
+	for(unsigned int i = 0; i < members.size(); i++)
+	{
+		// Look up the type of model and create an object of that type:
+		model_id = input[members[i]]["model_id"].asString();
+		model = factory.CreateModel(model_id);
+
+		// Now have the model restore the rest of itself, then push it onto the list.
+		model->Restore(input[members[i]]);
+		AddModel(model);
+	}
 }
 
 /// Serializes the model list:
@@ -224,12 +215,12 @@ Json::Value CModelList::Serialize()
 
     // Now call render on all of the models:
 	int i = 0;
-    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
+    for(auto model: mModels)
     {
     	Json::Value tmp;
     	name.str("");
-    	name << "model_" << i;
-    	output[name.str()] = (*it)->Serialize();
+    	name << "object_" << i;
+    	output[name.str()] = model->Serialize();
 //    	tmp[name.str()] = (*it)->Serialize();
 //    	tmp.setComment("// Next Model", Json::commentBefore);
 //    	output.append(tmp);

@@ -49,7 +49,6 @@ CModelSphere::CModelSphere()
 
 	mSlices = 50;	// seems like a good number.
 	mName = "Sphere";
-	mModelID = "sphere";
 
 	// Set the radius to some useful value, make it free.
 	// NOTE: it is necessary to set max BEFORE setting min so logic test min < max works correctly.

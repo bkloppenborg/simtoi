@@ -50,7 +50,6 @@ CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
 {
 	mPosition = NULL;
-	mModelID = "";
 
 	mBaseParams = 3;	// Number of base params, less one (zero indexed).
 
@@ -215,32 +214,36 @@ void CModel::Rotate()
 	CCL_GLThread::CheckOpenGLError("CModel::Rotate()");
 }
 
-void CModel::Restore(Json::Value input, CGLShaderList * shader_list)
+void CModel::Restore(Json::Value input)
 {
 	// Restore the base parameters
 	CParameters::Restore(input["base"]);
-	CGLShaderWrapperPtr shader;
+//	CGLShaderWrapperPtr shader;
 
-	// Now the position
-	if(input.isMember("position"))
-	{
-		if(input["position"].isMember("type"))
-		{
-			SetPositionType( CPosition::PositionTypes(input["position"]["type"].asInt()) );
-			mPosition->Restore(input["position"]);
-		}
-	}
+	// TODO: Temporary code:
+	SetPositionType(CPosition::XYZ);
+	SetShader(0);
 
-	// Now the shader
-	if(input.isMember("shader"))
-	{
-		if(input["shader"].isMember("type"))
-		{
-			shader = shader_list->GetShader( CGLShaderList::ShaderTypes( input["shader"]["type"].asInt()) );
-			SetShader(shader);
-			mShader->Restore(input["shader"]);
-		}
-	}
+//	// Now the position
+//	if(input.isMember("position"))
+//	{
+//		if(input["position"].isMember("type"))
+//		{
+//			SetPositionType( CPosition::PositionTypes(input["position"]["type"].asInt()) );
+//			mPosition->Restore(input["position"]);
+//		}
+//	}
+//
+//	// Now the shader
+//	if(input.isMember("shader"))
+//	{
+//		if(input["shader"].isMember("type"))
+//		{
+//			shader = shader_list->GetShader( CGLShaderList::ShaderTypes( input["shader"]["type"].asInt()) );
+//			SetShader(shader);
+//			mShader->Restore(input["shader"]);
+//		}
+//	}
 }
 
 /// Sets up the matrix mode for rendering models.
@@ -259,16 +262,17 @@ void CModel::SetupMatrix()
 Json::Value CModel::Serialize()
 {
 	Json::Value output;
+	output["model_id"] = GetID();
 	output["base"] = CParameters::Serialize();
-	output["base"]["model_id"] = mModelID;
-	output["position"] = mPosition->Serialize();
-	output["position"]["type"] = mPosition->GetType();
 
-	if(mShader != NULL)
-	{
-		output["shader"] = mShader->Serialize();
-		output["shader"]["type"] = mShader->GetType();
-	}
+	//	output["position"] = mPosition->Serialize();
+//	output["position"]["type"] = mPosition->GetType();
+
+//	if(mShader != NULL)
+//	{
+//		output["shader"] = mShader->Serialize();
+//		output["shader"]["type"] = mShader->GetType();
+//	}
 
 	return output;
 }
