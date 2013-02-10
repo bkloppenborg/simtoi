@@ -56,10 +56,10 @@ CGLWidget::~CGLWidget()
 	delete mTreeModel;
 }
 
-void CGLWidget::AddModel(CModelList::ModelTypes model_type)
+void CGLWidget::AddModel(shared_ptr<CModel> model)
 {
 	// Instruct the thread to add the model to it's list:
-	mGLT.AddModel(model_type);
+	mGLT.AddModel(model);
 
 	RebuildTree();
 }
@@ -132,7 +132,8 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	items << item;
 	item = new QStandardItem(QString(""));
 	items << item;
-	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
+	item = new QStandardItem(QString("TODO"));
+//	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
 	items << item;
 
 	return items;
@@ -202,7 +203,9 @@ void CGLWidget::RebuildTree()
 		items = LoadParametersHeader(QString("Shader"), shader);
 		item = items[0];
 		item_parent->appendRow(items);
-		LoadParameters(item, shader);
+
+		// TODO:
+//		LoadParameters(item, shader);
 	}
 
 
@@ -245,18 +248,6 @@ void CGLWidget::SetSaveFileBasename(string filename)
 void CGLWidget::SetScale(double scale)
 {
 	mGLT.SetScale(scale);
-}
-
-void CGLWidget::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
-{
-	mGLT.SetShader(model_id, shader);
-	RebuildTree();
-}
-
-void CGLWidget::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
-{
-	mGLT.SetPositionType(model_id, pos_type);
-	RebuildTree();
 }
 
 void CGLWidget::StopMinimizer()

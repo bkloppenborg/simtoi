@@ -159,7 +159,7 @@ public:
     CCL_GLThread(CGLWidget * glWidget, string shader_source_dir, string kernel_source_dir);
     virtual ~CCL_GLThread();
 
-    void AddModel(CModelList::ModelTypes model);
+    void AddModel(shared_ptr<CModel> model);
 
     void BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned int out_layer);
 protected:
@@ -202,7 +202,7 @@ public:
 
 	bool 	IsRunning() { return mIsRunning; };
 
-    vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mModelList->GetTypes(); };
+    vector<string> GetModelTypes() { return mModelList->GetTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 

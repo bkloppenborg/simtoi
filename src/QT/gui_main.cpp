@@ -46,7 +46,6 @@
 #include "CMinimizer.h"
 #include "CTreeModel.h"
 #include "gui_model.h"
-#include "gui_general.h"
 
 //Q_DECLARE_METATYPE(ModelTypes);
 //Q_DECLARE_METATYPE(CGLShaderList::ShaderTypes);
@@ -596,12 +595,7 @@ void gui_main::ModelAdd(void)
 
     if(tmp.exec())
     {
-		// Now setup the model, position type, and shader.
-		widget->AddModel(tmp.GetModelType());
-		id = widget->GetNModels() - 1;
-		widget->SetPositionType(id, tmp.GetPositionType());
-		widget->SetShader(id, tmp.GetShaderType());
-
+    	widget->AddModel(tmp.GetModel());
     }
 
     // Now render the models:
@@ -732,7 +726,7 @@ void gui_main::render()
 
 void gui_main::SetupComboBoxes()
 {
-	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
+//	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
 }
 
 void gui_main::SetSavePath(void)

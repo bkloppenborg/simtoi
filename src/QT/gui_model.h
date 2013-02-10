@@ -37,6 +37,8 @@
 #include "CGLShaderList.h"
 #include "CModelList.h"
 
+class CModel;
+
 using namespace std;
 
 class gui_model : public QDialog
@@ -46,33 +48,41 @@ private:
     Ui::gui_addmodelClass ui;
 
 protected:
-    CGLShaderList::ShaderTypes mShaderType;
-    CModelList::ModelTypes mModelType;
-    CPosition::PositionTypes mPositionType;
+    string mShaderName;
+    string mModelName;
+    string mPositionName;
 
 public:
     gui_model(QWidget *parent = 0);
     virtual ~gui_model();
 
-    CModelList::ModelTypes GetModelType() { return mModelType; };
-    CGLShaderList::ShaderTypes GetShaderType() { return mShaderType; };
-    CPosition::PositionTypes GetPositionType() { return mPositionType; };
+    shared_ptr<CModel> GetModel();
 
     //void SetFeaturesType(vector<int> feature_ids);
     void SetFeatureTypes(vector< pair<int, string> > feature_info);
 
-    void SetModelType(CModelList::ModelTypes value);
-    void SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info);
+//    void SetModelType(CModelList::ModelTypes value);
+    void SetModelTypes(vector<string> model_names);
 
-    void SetPositionType(CPosition::PositionTypes value);
+//    void SetPositionType(CPosition::PositionTypes value);
     void SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info);
 
-    void SetShaderType(CGLShaderList::ShaderTypes value);
+//    void SetShaderType(CGLShaderList::ShaderTypes value);
     void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
 
-    public slots:
-    void ValuesAccepted();
 
+    void SetupComboOptions(QComboBox * combo_box, vector<string> values)
+    {
+    	QString tmp_str = "";
+
+    	for(unsigned int i = 0; i < values.size(); i++)
+    	{
+    		tmp_str = QString::fromStdString(values[i]);
+    		combo_box->addItem(tmp_str);
+    	}
+
+    	// TODO: Sort the combo box alphabetically.
+    }
 };
 
 #endif // GUI_ADDMODEL_H

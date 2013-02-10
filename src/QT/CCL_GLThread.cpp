@@ -28,6 +28,7 @@
 #include <fstream>
 #include <exception>
 #include <stdexcept>
+#include <memory>
 
 #include "CCL_GLThread.h"
 #include "CGLWidget.h"
@@ -40,6 +41,8 @@
 #include "textio.hpp"
 
 int CCL_GLThread::count = 0;
+
+using namespace std;
 
 CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string kernel_source_dir)
 	: QThread(), mGLWidget(glWidget)
@@ -90,15 +93,10 @@ CCL_GLThread::~CCL_GLThread()
 }
 
 /// Appends a model to the model list, importing shaders and features as necessary.
-void CCL_GLThread::AddModel(CModelList::ModelTypes model)
+void CCL_GLThread::AddModel(shared_ptr<CModel> model)
 {
 	// Create the model, load the shader.
-	CModelPtr tmp_model = mModelList->AddNewModel(model);
-
-	// Initialize with default (XY) position and no shader.
-	tmp_model->SetPositionType(CPosition::XY);
-	CGLShaderWrapperPtr tmp_shader = mShaderList->GetShader(CGLShaderList::NONE);
-	tmp_model->SetShader(tmp_shader);
+	mModelList->AddModel(model);
 
 	EnqueueOperation(GLT_RenderModels);
 }
@@ -831,22 +829,11 @@ void CCL_GLThread::SetFreeParameters(double * params, unsigned int n_params, boo
 	EnqueueOperation(GLT_RenderModels);
 }
 
-void CCL_GLThread::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
-{
-	mModelList->SetPositionType(model_id, pos_type);
-}
-
 /// Sets the scale for the model.
 void CCL_GLThread::SetScale(double scale)
 {
 	if(scale > 0)
 		mScale = scale;
-}
-
-void CCL_GLThread::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
-{
-	CGLShaderWrapperPtr tmp_shader = mShaderList->GetShader(shader);
-	mModelList->SetShader(model_id, tmp_shader);
 }
 
 void CCL_GLThread::SetTime(double t)

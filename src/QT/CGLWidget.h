@@ -59,7 +59,7 @@ public:
     CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);
     virtual ~CGLWidget();
 
-    void AddModel(CModelList::ModelTypes model);
+    void AddModel(shared_ptr<CModel> model);
 protected:
     void closeEvent(QCloseEvent *evt);
 public:
@@ -74,7 +74,7 @@ protected:
 
 public:
 
-    vector< pair<CModelList::ModelTypes, string> > GetModelTypes() { return mGLT.GetModelTypes(); };
+    vector<string> GetModelTypes() { return mGLT.GetModelTypes(); };
     vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
