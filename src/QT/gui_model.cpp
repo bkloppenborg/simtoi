@@ -26,11 +26,19 @@
 #include "gui_model.h"
 #include "CModel.h"
 #include "CModelFactory.h"
+#include "CPositionFactory.h"
 
 gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
 {
+	// setup the UI
 	ui.setupUi(this);
+
+	auto models = CModelFactory::Instance();
+	auto positions = CPositionFactory::Instance();
+
+	SetupComboOptions(ui.cboModels, models.GetModelList());
+	SetupComboOptions(ui.cboPositions, positions.GetPositionList());
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -41,48 +49,6 @@ gui_model::~gui_model()
 
 }
 
-void gui_model::SetFeatureTypes(vector< pair<int, string> > feature_info)
-{
-//	SetupComboOptions(ui.listFeatures, feature_info);
-}
-
-//void gui_model::SetModelType(CModelList::ModelTypes value)
-//{
-//	int index = ui.cboModels->findData(value);
-//	if (index != -1)
-//		ui.cboModels->setCurrentIndex(index);
-//}
-
-void gui_model::SetModelTypes(vector<string> model_names)
-{
-	SetupComboOptions(ui.cboModels, model_names);
-}
-
-//void gui_model::SetPositionType(CPosition::PositionTypes value)
-//{
-//	int index = ui.cboPositions->findData(value);
-//	if (index != -1)
-//		ui.cboPositions->setCurrentIndex(index);
-//}
-
-
-void gui_model::SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info)
-{
-//	gui_general::SetupComboOptions(ui.cboPositions, position_info);
-}
-
-//void gui_model::SetShaderType(CGLShaderList::ShaderTypes value)
-//{
-//	int index = ui.cboShaders->findData(value);
-//	if (index != -1)
-//		ui.cboShaders->setCurrentIndex(index);
-//}
-
-void gui_model::SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info)
-{
-//	gui_general::SetupComboOptions(ui.cboShaders, shader_info);
-}
-
 /// Returns a copy of the selected model.
 shared_ptr<CModel> gui_model::GetModel(void)
 {
@@ -91,15 +57,12 @@ shared_ptr<CModel> gui_model::GetModel(void)
 	string model_id = ui.cboModels->currentText().toStdString();
 	shared_ptr<CModel> model = factory.CreateModel(model_id);
 
+	string position_id = ui.cboPositions->currentText().toStdString();
+	model->SetPositionModel(position_id);
+
 	// TODO: Temporary code:
-	model->SetPositionType(CPosition::XYZ);
 	model->SetShader(0);
 
-//	// Position
-//	value = ui.cboPositions->itemData(ui.cboPositions->currentIndex()).toInt();
-//	if(value > CPosition::NONE && value < CPosition::LAST_VALUE)
-//		mPositionType = CPosition::PositionTypes(value);
-//
 //	// Shader
 //	value = ui.cboShaders->itemData(ui.cboShaders->currentIndex()).toInt();
 //	if(value > CGLShaderList::NONE && value < CGLShaderList::LAST_VALUE)

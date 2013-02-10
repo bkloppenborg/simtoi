@@ -229,7 +229,6 @@ public:
     void Save(string filename);
     void SaveImage(string filename);
     void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
-    void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetTime(double t);

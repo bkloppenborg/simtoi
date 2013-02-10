@@ -174,8 +174,8 @@ void CGLWidget::RebuildTree()
 	QList<QStandardItem *> items;
 	QStandardItem * item;
 	QStandardItem * item_parent;
-	CModel * model;
-	CPosition * position;
+	shared_ptr<CModel> model;
+	shared_ptr<CPosition> position;
 	CGLShaderWrapper * shader;
 
 	// Now pull out the pertinent information
@@ -184,19 +184,19 @@ void CGLWidget::RebuildTree()
 	for(int i = 0; i < model_list->size(); i++)
 	{
 		// First pull out the model parameters
-		model = model_list->GetModel(i).get();
+		model = model_list->GetModel(i);
 
-		items = LoadParametersHeader(QString("Model"), model);
+		items = LoadParametersHeader(QString("Model"), model.get());
 		item_parent = items[0];
 		mTreeModel->appendRow(items);
-		LoadParameters(item_parent, model);
+		LoadParameters(item_parent, model.get());
 
 		// Now for the Position Parameters
 		position = model->GetPosition();
-		items = LoadParametersHeader(QString("Position"), position);
+		items = LoadParametersHeader(QString("Position"), position.get());
 		item = items[0];
 		item_parent->appendRow(items);
-		LoadParameters(item, position);
+		LoadParameters(item, position.get());
 
 		// Lastly for the shader:
 		shader = model->GetShader().get();

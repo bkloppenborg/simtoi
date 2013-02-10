@@ -58,19 +58,6 @@ public:
 
     shared_ptr<CModel> GetModel();
 
-    //void SetFeaturesType(vector<int> feature_ids);
-    void SetFeatureTypes(vector< pair<int, string> > feature_info);
-
-//    void SetModelType(CModelList::ModelTypes value);
-    void SetModelTypes(vector<string> model_names);
-
-//    void SetPositionType(CPosition::PositionTypes value);
-    void SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info);
-
-//    void SetShaderType(CGLShaderList::ShaderTypes value);
-    void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
-
-
     void SetupComboOptions(QComboBox * combo_box, vector<string> values)
     {
     	QString tmp_str = "";

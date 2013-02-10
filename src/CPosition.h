@@ -39,32 +39,27 @@
 #include "CParameters.h"
 #include <vector>
 #include <utility>
+#include <memory>
+
+using namespace std;
+
+class CPosition;
+
+typedef shared_ptr<CPosition> CPositionPtr;
 
 class CPosition : public CParameters
 {
-public:
-	enum PositionTypes
-	{
-		NONE,
-		XY,
-		XYZ,
-		ORBIT,
-		LAST_VALUE
-	};
-
 protected:
-	CPosition::PositionTypes mType;
+	string mPositionID;
 
 public:
 	CPosition(int n_parameters);
 	virtual ~CPosition();
 
-	CPosition::PositionTypes GetType() { return mType; };
+	virtual string GetID() { return mPositionID; };
 
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
 	virtual void GetXYZ(double & x, double & y, double & z);
-	static CPosition * GetPosition(CPosition::PositionTypes type);
-	static vector< pair<CPosition::PositionTypes, string> > GetTypes();
 };
 
 #endif /* CPOSITION_H_ */

@@ -588,9 +588,6 @@ void gui_main::ModelAdd(void)
     int n_features;
 
     gui_model tmp;
-    tmp.SetModelTypes(CModelList::GetTypes());
-    tmp.SetShaderTypes(widget->GetShaderTypes());
-    tmp.SetPositionTypes(CPosition::GetTypes());
     tmp.show();
 
     if(tmp.exec())

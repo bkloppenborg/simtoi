@@ -117,7 +117,6 @@ public:
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetScale(double scale);
     void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
-    void SetPositionType(int model_id, CPosition::PositionTypes pos_type);
     void SetSaveFileBasename(string filename);
     void SetTime(double t) { mGLT.SetTime(t); };
     void SetTimestep(double dt) { mGLT.SetTimestep(dt); };
