@@ -58,22 +58,6 @@ class CModelList
 protected:
 	vector<CModelPtr> mModels;
 
-public:
-	/// Enumerated Model Names.
-	/// Note, when adding a new model, list it in this enum and add it to functions:
-	///       GetTypes() and in GetNewModel().  We want to change this, see issue #50.
-	enum ModelTypes
-	{
-		NONE,
-		SPHERE,
-		DISK,
-		DISK_A,
-		DISK_B,
-		DISK_C,
-		DISK_CONCENTRIC_RINGS,
-		LAST_VALUE // must be the last value in this list.
-	};
-
 protected:
 	double mTime;
 	double mTimestep;
@@ -82,7 +66,7 @@ public:
 	CModelList();
 	virtual ~CModelList();
 
-	CModelPtr AddNewModel(ModelTypes model_id);
+	void AddModel(CModelPtr model);
 
 	int GetNFreeParameters();
 	void GetAllParameters(double * params, int n_params);
@@ -94,7 +78,7 @@ public:
 	CModelPtr GetModel(int i) { return mModels.at(i); };
 	double GetTime() { return mTime; };
 
-	static vector< pair<ModelTypes, string> > GetTypes(void);
+	static vector<string> GetTypes(void);
 
 	void IncrementTime();
 
@@ -103,8 +87,6 @@ public:
 
 	Json::Value Serialize();
 	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
-	void SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type);
-	void SetShader(unsigned int model_id, CGLShaderWrapperPtr shader);
 	void SetTime(double t);
 	void SetTimestep(double dt);
 	unsigned int size() { return mModels.size(); };

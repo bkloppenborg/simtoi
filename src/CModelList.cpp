@@ -31,6 +31,7 @@
  */
 
 #include "CModelList.h"
+#include "CModelFactory.h"
 
 #include <sstream>
 #include <algorithm>
@@ -41,12 +42,6 @@
 
 // Models
 #include "CModel.h"
-#include "models/CModelSphere.h"
-#include "models/CModelDisk.h"
-#include "models/CModelDisk_A.h"
-#include "models/CModelDisk_B.h"
-#include "models/CModelDisk_C.h"
-#include "models/CModelDisk_ConcentricRings.h"
 
 using namespace std;
 
@@ -61,41 +56,12 @@ CModelList::~CModelList()
 
 }
 
-/// Creates a new model, appends it to the model list and returns a pointer to it.
-CModelPtr CModelList::AddNewModel(ModelTypes model_id)
+/// Adds a new model to the list
+void CModelList::AddModel(CModelPtr model)
 {
-	CModelPtr tmp;
-	switch(model_id)
-	{
-	case DISK:
-		tmp.reset(new CModelDisk());
-		break;
-
-	case DISK_A:
-		tmp.reset(new CModelDisk_A());
-		break;
-
-	case DISK_B:
-		tmp.reset(new CModelDisk_B());
-		break;
-
-	case DISK_C:
-		tmp.reset(new CModelDisk_C());
-		break;
-
-	case DISK_CONCENTRIC_RINGS:
-		tmp.reset(new CModelDisk_ConcentricRings());
-		break;
-
-	case SPHERE:
-	default:
-		tmp.reset(new CModelSphere());
-		break;
-	}
-
-	mModels.push_back(tmp);
-	return mModels.back();
+	mModels.push_back(model);
 }
+
 
 /// Returns the total number of free parameters in the models
 int CModelList::GetNFreeParameters()
@@ -168,17 +134,21 @@ vector<string> CModelList::GetFreeParamNames()
 }
 
 /// Returns a pair of model names, and their enumerated types
-vector< pair<CModelList::ModelTypes, string> > CModelList::GetTypes(void)
+vector<string> CModelList::GetTypes(void)
 {
-	vector< pair<ModelTypes, string> > tmp;
-	tmp.push_back(pair<ModelTypes, string> (CModelList::SPHERE, "Sphere"));
-	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK, "Disk - Cylinder"));
-	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_A, "Disk - A"));
-	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_B, "Disk - B"));
-	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_C, "Disk - C"));
-	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_CONCENTRIC_RINGS, "Disk - Concentric Rings"));
+	auto factory = CModelFactory::Instance();
 
-	return tmp;
+	return factory.GetModelList();
+
+//	vector< pair<ModelTypes, string> > tmp;
+//	tmp.push_back(pair<ModelTypes, string> (CModelList::SPHERE, "Sphere"));
+//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK, "Disk - Cylinder"));
+//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_A, "Disk - A"));
+//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_B, "Disk - B"));
+//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_C, "Disk - C"));
+//	tmp.push_back(pair<ModelTypes, string> (CModelList::DISK_CONCENTRIC_RINGS, "Disk - Concentric Rings"));
+
+//	return tmp;
 }
 
 /// Returns the product of priors from all models
@@ -226,23 +196,23 @@ void CModelList::Render(GLuint fbo, int width, int height)
 /// Restores the saved models
 void CModelList::Restore(Json::Value input, CGLShaderList * shader_list)
 {
-	// Clear the list:
-	mModels.clear();
-
-	CModelList::ModelTypes type = CModelList::NONE;
-	CModelPtr model;
-	Json::Value tmp;
-	int value = 0;
-
-	Json::Value::Members members = input.getMemberNames();
-	for(unsigned int i = 0; i < members.size(); i++)
-	{
-		value = input[members[i]]["base"]["type"].asInt();
-		tmp = input[members[i]];
-		type = CModelList::ModelTypes( value );
-		model = AddNewModel(type);
-		model->Restore(tmp, shader_list);
-	}
+//	// Clear the list:
+//	mModels.clear();
+//
+//	string model_id = "";
+//	CModelPtr model;
+//	Json::Value tmp;
+//	int value = 0;
+//
+//	Json::Value::Members members = input.getMemberNames();
+//	for(unsigned int i = 0; i < members.size(); i++)
+//	{
+//		value = input[members[i]]["base"]["type"].asInt();
+//		tmp = input[members[i]];
+//		type = CModelList::ModelTypes( value );
+//		model = AddNewModel(type);
+//		model->Restore(tmp, shader_list);
+//	}
 }
 
 /// Serializes the model list:
@@ -280,16 +250,6 @@ void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool 
     	(*it)->SetFreeParameters(params + n, n_params - n, scale_params);
     	n += (*it)->GetTotalFreeParameters();
     }
-}
-
-void CModelList::SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type)
-{
-	mModels.at(model_id)->SetPositionType(pos_type);
-}
-
-void CModelList::SetShader(unsigned int model_id, CGLShaderWrapperPtr shader)
-{
-	mModels.at(model_id)->SetShader(shader);
 }
 
 /// Sets the time for all of the models
