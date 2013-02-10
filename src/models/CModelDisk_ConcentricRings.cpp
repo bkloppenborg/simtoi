@@ -11,7 +11,7 @@ CModelDisk_ConcentricRings::CModelDisk_ConcentricRings()
 : 	CModelDisk(6 - mDiskParams)
 {
 	mName = "Concentric Rings";
-	mType = CModelList::DISK_CONCENTRIC_RINGS;
+	mModelID = "disk_concentric_rings";
 
 	// WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
 	for(int i = 0; i < 2; i++)
@@ -58,6 +58,11 @@ CModelDisk_ConcentricRings::CModelDisk_ConcentricRings()
 CModelDisk_ConcentricRings::~CModelDisk_ConcentricRings()
 {
 	// TODO Auto-generated destructor stub
+}
+
+shared_ptr<CModel> CModelDisk_ConcentricRings::Create()
+{
+	return shared_ptr<CModel>(new CModelDisk_ConcentricRings());
 }
 
 ///// Overrides the default CModel::SetShader function.

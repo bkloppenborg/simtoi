@@ -49,7 +49,7 @@ CModelSphere::CModelSphere()
 
 	mSlices = 50;	// seems like a good number.
 	mName = "Sphere";
-	mType = CModelList::SPHERE;
+	mModelID = "sphere";
 
 	// Set the radius to some useful value, make it free.
 	// NOTE: it is necessary to set max BEFORE setting min so logic test min < max works correctly.
@@ -63,6 +63,11 @@ CModelSphere::CModelSphere()
 CModelSphere::~CModelSphere()
 {
 	// TODO Auto-generated destructor stub
+}
+
+shared_ptr<CModel> CModelSphere::Create()
+{
+	return shared_ptr<CModel>(new CModelSphere());
 }
 
 void CModelSphere::Render(GLuint framebuffer_object, int width, int height)

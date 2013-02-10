@@ -50,7 +50,7 @@ CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
 {
 	mPosition = NULL;
-	mType = CModelList::NONE;
+	mModelID = "";
 
 	mBaseParams = 3;	// Number of base params, less one (zero indexed).
 
@@ -260,7 +260,7 @@ Json::Value CModel::Serialize()
 {
 	Json::Value output;
 	output["base"] = CParameters::Serialize();
-	output["base"]["type"] = mType;
+	output["base"]["model_id"] = mModelID;
 	output["position"] = mPosition->Serialize();
 	output["position"]["type"] = mPosition->GetType();
 

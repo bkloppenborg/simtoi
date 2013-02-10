@@ -36,13 +36,18 @@ CModelDisk_C::CModelDisk_C()
 	:CModelDisk(1)
 {
 	mName = "Disk C";
-	mType = CModelList::DISK_C;
+	mModelID = "disk_c";
 
 	mParamNames.push_back("Beta");
 	SetParam(mBaseParams + mDiskParams + 1, 0.05);
 	SetFree(mBaseParams + mDiskParams + 1, true);
 	SetMax(mBaseParams + mDiskParams + 1, 2.0);
 	SetMin(mBaseParams + mDiskParams + 1, 0.01);
+}
+
+shared_ptr<CModel> CModelDisk_C::Create()
+{
+	return shared_ptr<CModel>(new CModelDisk_C());
 }
 
 CModelDisk_C::~CModelDisk_C()

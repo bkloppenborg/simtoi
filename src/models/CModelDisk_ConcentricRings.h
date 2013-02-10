@@ -29,6 +29,7 @@ public:
 	CModelDisk_ConcentricRings();
 	virtual ~CModelDisk_ConcentricRings();
 
+	static shared_ptr<CModel> Create();
 
 	virtual double MidplaneTransparency(double radius);
 

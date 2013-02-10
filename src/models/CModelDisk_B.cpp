@@ -36,7 +36,7 @@ CModelDisk_B::CModelDisk_B()
 	:CModelDisk(1)
 {
 	mName = "Disk B";
-	mType = CModelList::DISK_B;
+	mModelID = "disk_b";
 
 	mParamNames.push_back("Decay Factor");
 	SetParam(mBaseParams + mDiskParams + 1, 0.05);
@@ -48,6 +48,11 @@ CModelDisk_B::CModelDisk_B()
 CModelDisk_B::~CModelDisk_B()
 {
 	// TODO Auto-generated destructor stub
+}
+
+shared_ptr<CModel> CModelDisk_B::Create()
+{
+	return shared_ptr<CModel>(new CModelDisk_B());
 }
 
 /// Returns the radius for the specified height following exponential decay

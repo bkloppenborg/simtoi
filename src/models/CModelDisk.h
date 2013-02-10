@@ -56,6 +56,8 @@ public:
 	CModelDisk(int additional_params);
 	virtual ~CModelDisk();
 
+	static shared_ptr<CModel> Create();
+
 	virtual void Draw();
 	virtual void DrawDisk(double radius, double at_z);
 	virtual void DrawDisk(double r_in, double r_out, double at_z);

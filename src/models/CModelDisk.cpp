@@ -52,6 +52,11 @@ CModelDisk::~CModelDisk()
 	delete[] mCosT;
 }
 
+shared_ptr<CModel> CModelDisk::Create()
+{
+	return shared_ptr<CModel>(new CModelDisk());
+}
+
 /// Baseclass routine, draws a cylinder with a top and bottom.
 void CModelDisk::Draw()
 {
@@ -152,8 +157,8 @@ void CModelDisk::InitMembers()
 	mCosT = new double[mSlices + 1];
 	CircleTable(mSinT, mCosT, mSlices);
 
-	mName = "Disk";
-	mType = CModelList::DISK;
+	mName = "Cylinder";
+	mModelID = "cylinder";
 
 	mZeroThreshold = 1E-4;	// The zero point for flux
 

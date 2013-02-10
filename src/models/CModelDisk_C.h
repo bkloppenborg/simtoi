@@ -53,6 +53,8 @@ public:
 	CModelDisk_C();
 	virtual ~CModelDisk_C();
 
+	static shared_ptr<CModel> Create();
+
 	double GetRadius(double half_height, double h, double dh, double rim_radius);
 };
 
