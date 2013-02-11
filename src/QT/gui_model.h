@@ -66,8 +66,6 @@ public:
     		tmp_str = QString::fromStdString(values[i]);
     		combo_box->addItem(tmp_str);
     	}
-
-    	// TODO: Sort the combo box alphabetically.
     }
 };
 

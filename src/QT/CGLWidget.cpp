@@ -132,8 +132,7 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	items << item;
 	item = new QStandardItem(QString(""));
 	items << item;
-	item = new QStandardItem(QString("TODO"));
-//	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
+	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
 	items << item;
 
 	return items;
@@ -203,9 +202,7 @@ void CGLWidget::RebuildTree()
 		items = LoadParametersHeader(QString("Shader"), shader);
 		item = items[0];
 		item_parent->appendRow(items);
-
-		// TODO:
-//		LoadParameters(item, shader);
+		LoadParameters(item, shader);
 	}
 
 

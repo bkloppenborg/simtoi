@@ -57,13 +57,18 @@ CShader::CShader(string json_config_file)
 	mFriendlyName = input["human_name"].asString();
 
 	// Now read in the parameters from the file
+	stringstream tmp;
 	string id = "";
 	vector<string> t_names;
 	vector<pair<float, float>> t_min_max;
 	vector<float> t_start_vals;
 	for(int i = 0; true; i++)
 	{
-		id = "param_" + i;
+		// reset the stringstream
+		tmp.str("");
+		tmp.clear();
+		tmp << "param_" << i;
+		id = tmp.str();
 		if(!input.isMember(id))
 			break;
 
