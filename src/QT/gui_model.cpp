@@ -27,6 +27,7 @@
 #include "CModel.h"
 #include "CModelFactory.h"
 #include "CPositionFactory.h"
+#include "CShaderFactory.h"
 
 gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
@@ -36,9 +37,11 @@ gui_model::gui_model(QWidget *parent)
 
 	auto models = CModelFactory::Instance();
 	auto positions = CPositionFactory::Instance();
+	auto shaders = CShaderFactory::Instance();
 
 	SetupComboOptions(ui.cboModels, models.GetModelList());
 	SetupComboOptions(ui.cboPositions, positions.GetPositionList());
+	SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -60,13 +63,8 @@ shared_ptr<CModel> gui_model::GetModel(void)
 	string position_id = ui.cboPositions->currentText().toStdString();
 	model->SetPositionModel(position_id);
 
-	// TODO: Temporary code:
-	model->SetShader(0);
-
-//	// Shader
-//	value = ui.cboShaders->itemData(ui.cboShaders->currentIndex()).toInt();
-//	if(value > CGLShaderList::NONE && value < CGLShaderList::LAST_VALUE)
-//		mShaderType = CGLShaderList::ShaderTypes(value);
+	string shader_id = ui.cboShaders->currentText().toStdString();
+	model->SetShader(shader_id);
 
 	return model;
 }
