@@ -6,6 +6,7 @@
  */
 
 #include "CModelDisk_ConcentricRings.h"
+#include "CShaderFactory.h"
 
 CModelDisk_ConcentricRings::CModelDisk_ConcentricRings()
 : 	CModelDisk(6 - mDiskParams)
@@ -52,6 +53,10 @@ CModelDisk_ConcentricRings::CModelDisk_ConcentricRings()
 	SetFree(mBaseParams + 6, false);
 	SetMax(mBaseParams + 6, 50);
 	SetMin(mBaseParams + 6, 50);
+
+	// This model ALWAYS uses the default (pass-through) shader.
+	auto shaders = CShaderFactory::Instance();
+	mShader = shaders.CreateShader("default");
 }
 
 CModelDisk_ConcentricRings::~CModelDisk_ConcentricRings()
@@ -64,12 +69,11 @@ shared_ptr<CModel> CModelDisk_ConcentricRings::Create()
 	return shared_ptr<CModel>(new CModelDisk_ConcentricRings());
 }
 
-///// Overrides the default CModel::SetShader function.
-//void CModelDisk_ConcentricRings::SetShader(CGLShaderWrapperPtr shader)
-//{
-//	// Inhibits arbitrary shader assignment to this model as the radial and z-shaders are pre-determined for this model.
-//	// Do nothing here.
-//}
+/// Overrides the default CModel::SetShader function.
+void CModelDisk_ConcentricRings::SetShader(CGLShaderWrapperPtr shader)
+{
+	// This mode does not accept different shaders, do nothing here.
+}
 
 double CModelDisk_ConcentricRings::MidplaneTransparency(double radius)
 {
