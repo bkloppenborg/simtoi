@@ -40,9 +40,9 @@
 
 CPositionFactory::CPositionFactory()
 {
-	Register(CPositionXY::GetID(), &CPositionXY::Create);
-	Register(CPositionXYZ::GetID(), &CPositionXYZ::Create);
-	Register(CPositionOrbit::GetID(), &CPositionOrbit::Create);
+	Register("xy", &CPositionXY::Create);
+	Register("xyz", &CPositionXYZ::Create);
+	Register("orbit_bound", &CPositionOrbit::Create);
 }
 
 CPositionFactory::~CPositionFactory() \
@@ -59,6 +59,8 @@ shared_ptr<CPosition> CPositionFactory::CreatePosition(string PositionID)
 		return it->second();
 
 	throw runtime_error("The position model with ID '" + PositionID + "' not registered with CPositionFactory");
+
+	return shared_ptr<CPosition>();
 }
 
 /// Returns a vector of the Position names that are loaded.

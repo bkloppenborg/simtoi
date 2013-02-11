@@ -65,6 +65,8 @@ shared_ptr<CModel> CModelFactory::CreateModel(string ModelID)
 		return it->second();
 
 	throw runtime_error("The model with ID '" + ModelID + "' not registered with CModelFactory");
+
+	return shared_ptr<CModel>();
 }
 
 /// Returns a vector of the model names that are loaded.
