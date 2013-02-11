@@ -46,6 +46,8 @@
 
 using namespace std;
 
+extern string EXE_FOLDER;
+
 // The main routine.
 int main(int argc, char *argv[])
 {
@@ -58,6 +60,9 @@ int main(int argc, char *argv[])
 
 	// Pass off to the GUI:
     QApplication app(argc, argv);
+
+    // determine the absolute directory from which SIMTOI is running
+    EXE_FOLDER = app.applicationDirPath().toStdString();
 
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();

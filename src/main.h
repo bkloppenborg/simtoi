@@ -37,6 +37,8 @@
 
 using namespace std;
 
+string EXE_FOLDER;
+
 int main(int argc, char** argv);
 void ParseArgs(QStringList args, QStringList & filenames, QStringList & model, int &  minimizer, int & size, double & scale, bool & close_simtoi);
 void PrintHelp();
