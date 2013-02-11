@@ -1,5 +1,5 @@
 /*
- * CGLShader.h
+ * CShader.h
  *
  *  Created on: Nov 8, 2011
  *      Author: bkloppenborg
@@ -35,8 +35,8 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CGLSHADER_H_
-#define CGLSHADER_H_
+#ifndef CSHADER_H_
+#define CSHADER_H_
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -44,11 +44,9 @@
 #include <vector>
 #include <utility>
 
-#include "CGLShaderList.h"
-
 using namespace std;
 
-class CGLShader
+class CShader
 {
 protected:
 	GLuint mProgram;
@@ -65,12 +63,14 @@ protected:
 	pair<float,float> * mMinMax;
 	float * mStartingValues;
 
-	CGLShaderList::ShaderTypes mType;
+	string mShaderID;
+
 	bool mShaderLoaded;
 
 public:
-	CGLShader(CGLShaderList::ShaderTypes type, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax);
-	virtual ~CGLShader();
+	CShader(string json_config_file);
+	CShader(string shader_id, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax);
+	virtual ~CShader();
 
 	void CompileShader(GLuint shader);
 
@@ -80,7 +80,7 @@ public:
 	int GetNParams() { return mNParams; }
 	string GetParamName(unsigned int i);
 	float GetStartingValue(unsigned int i);
-	CGLShaderList::ShaderTypes GetType() { return mType; };
+	string GetID() { return mShaderID; };
 
 	void Init();
 

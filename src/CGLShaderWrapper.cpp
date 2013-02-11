@@ -30,7 +30,7 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CGLShader.h"
+#include "CShader.h"
 #include "CGLShaderWrapper.h"
 #include "CModel.h"
 

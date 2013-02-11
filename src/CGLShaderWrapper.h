@@ -39,9 +39,9 @@
 using namespace std;
 
 #include "CParameters.h"
-#include "CGLShader.h"
+#include "CShader.h"
 
-typedef shared_ptr<CGLShader> CGLShaderPtr;
+typedef shared_ptr<CShader> CGLShaderPtr;
 
 class CGLShaderWrapper : public CParameters
 {
@@ -51,8 +51,6 @@ protected:
 public:
 	CGLShaderWrapper(CGLShaderPtr shader, int n_params);
 	virtual ~CGLShaderWrapper();
-
-	CGLShaderList::ShaderTypes GetType() { return mShader->GetType(); };
 
 	void UseShader(double min_xyz[3], double max_xyz[3]);
 };
