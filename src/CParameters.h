@@ -57,41 +57,42 @@ protected:
 	string mName;
 
 public:
-	CParameters(int n_params);
+	CParameters(const CParameters & other);
+	CParameters(unsigned int n_params);
 	virtual ~CParameters();
 
 protected:
 	void CountFree(void);
-	void CalculateScale(int param_num);
+	void CalculateScale(unsigned int param_num);
 
 public:
-	void GetFreeParams(double * params, int n_param, bool scale_params);
+	void GetFreeParams(double * params, unsigned int n_params, bool scale_params);
 	vector<string> GetFreeParamNames();
 	double GetFreePriorProd();
 	string GetName(void) { return mName; };
 	int GetNFreeParams(void) { return mNFreeParams; };
 	int GetNParams(void) { return mNParams; };
-	double GetMax(int param_num);
-	double GetMin(int param_num);
+	double GetMax(unsigned int param_num);
+	double GetMin(unsigned int param_num);
 	vector< pair<double, double> > GetFreeMinMaxes();
 	void GetParams(double * params, unsigned int n_params);
-	double GetParam(int i);
-	double GetPrior(int i);
+	double GetParam(unsigned int i);
+	double GetPrior(unsigned int i);
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
 	string GetParamName(unsigned int param_num);
 
-	bool IsFree(int param_num);
+	bool IsFree(unsigned int param_num);
 
 	virtual void Restore(Json::Value input);
 
 	void SetAllFree(bool is_free);
-	void SetFreeParams(double * in_params, int n_params, bool scale_params);
-	void SetFree(int param_num, bool is_free);
-	void SetMin(int param_num, double value);
-	void SetMax(int param_num, double value);
+	void SetFreeParams(double * in_params, unsigned int n_params, bool scale_params);
+	void SetFree(unsigned int param_num, bool is_free);
+	void SetMin(unsigned int param_num, double value);
+	void SetMax(unsigned int param_num, double value);
 	void SetName(string name) { mName = name; };
-	void SetParam(int n_param, double value);
+	void SetParam(unsigned int param_num, double value);
 	virtual Json::Value Serialize();
 };
 

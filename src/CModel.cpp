@@ -47,8 +47,6 @@
 CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
 {
-	mPosition = NULL;
-
 	mBaseParams = 3;	// Number of base params, less one (zero indexed).
 
 	// Shader storage location, boolean if it is loaded:
@@ -93,9 +91,6 @@ void CModel::GetAllParameters(double * params, int n_params)
 		mShader->GetParams(params + n, n_params - n);
 		n += mShader->GetNParams();
 	}
-
-	// TODO: Implement this function
-	//features->GetParams(params + n, n_params - n);
 }
 
 vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
@@ -236,17 +231,6 @@ void CModel::Restore(Json::Value input)
 	auto shader = shaders.CreateShader(shader_id);
 	shader->Restore(input["shader_data"]);
 	SetShader(shader);
-
-//	// Now the shader
-//	if(input.isMember("shader"))
-//	{
-//		if(input["shader"].isMember("type"))
-//		{
-//			shader = shader_list->GetShader( CGLShaderList::ShaderTypes( input["shader"]["type"].asInt()) );
-//			SetShader(shader);
-//			mShader->Restore(input["shader"]);
-//		}
-//	}
 }
 
 /// Sets up the matrix mode for rendering models.
@@ -271,11 +255,8 @@ Json::Value CModel::Serialize()
 	output["position_id"] = mPosition->GetID();
 	output["position_data"] = mPosition->Serialize();
 
-//	if(mShader != NULL)
-//	{
-//		output["shader"] = mShader->Serialize();
-//		output["shader"]["type"] = mShader->GetType();
-//	}
+	output["shader_id"] = mShader->GetID();
+	output["shader_data"] = mShader->Serialize();
 
 	return output;
 }
@@ -353,7 +334,7 @@ void CModel::SetShader(string shader_id)
 }
 
 /// Replaces the loaded shader with the specified shader
-void CModel::SetShader(CGLShaderWrapperPtr shader)
+void CModel::SetShader(CShaderPtr shader)
 {
 	mShader = shader;
 }

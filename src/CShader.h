@@ -44,9 +44,13 @@
 #include <vector>
 #include <utility>
 
+#include "CParameters.h"
+
 using namespace std;
 
-class CShader
+class CShader;
+
+class CShader : public CParameters
 {
 protected:
 	GLuint mProgram;
@@ -57,35 +61,26 @@ protected:
 	GLuint mMaxXYZ_location;
 	string mBase_name;
 	string mShader_dir;
-	string mFriendlyName;
-	unsigned int mNParams;
-	vector<string> mParam_names;
-	pair<float,float> * mMinMax;
-	float * mStartingValues;
 
 	string mShaderID;
 
 	bool mShaderLoaded;
 
 public:
+	CShader(const CShader & other);
 	CShader(string json_config_file);
 	CShader(string shader_id, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax);
 	virtual ~CShader();
 
 	void CompileShader(GLuint shader);
 
-	float GetMin(unsigned int i);
-	float GetMax(unsigned int i);
-	string GetName() { return mFriendlyName; };
-	int GetNParams() { return mNParams; }
-	string GetParamName(unsigned int i);
-	float GetStartingValue(unsigned int i);
 	string GetID() { return mShaderID; };
 
 	void Init();
 
 	void LinkProgram(GLuint program);
 
+	void UseShader(double min_xyz[3], double max_xyz[3]);
 	void UseShader(double min_xyz[3], double max_xyz[3], double * params, unsigned int in_params);
 
 };

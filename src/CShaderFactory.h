@@ -40,7 +40,6 @@
 using namespace std;
 
 class CShader;
-class CGLShaderWrapper;
 
 typedef shared_ptr<CShader> CShaderPtr;
 
@@ -55,7 +54,7 @@ public:
 	virtual ~CShaderFactory();
 
 public:
-	shared_ptr<CGLShaderWrapper> CreateShader(string GLShaderID);
+	shared_ptr<CShader> CreateShader(string GLShaderID);
 
 	static CShaderFactory Instance();
 

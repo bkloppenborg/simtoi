@@ -175,7 +175,7 @@ void CGLWidget::RebuildTree()
 	QStandardItem * item_parent;
 	shared_ptr<CModel> model;
 	shared_ptr<CPosition> position;
-	CGLShaderWrapper * shader;
+	CShader * shader;
 
 	// Now pull out the pertinent information
 	// NOTE: We drop the shared_ptrs here

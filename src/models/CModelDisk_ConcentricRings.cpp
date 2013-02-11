@@ -70,7 +70,7 @@ shared_ptr<CModel> CModelDisk_ConcentricRings::Create()
 }
 
 /// Overrides the default CModel::SetShader function.
-void CModelDisk_ConcentricRings::SetShader(CGLShaderWrapperPtr shader)
+void CModelDisk_ConcentricRings::SetShader(CShaderPtr shader)
 {
 	// This mode does not accept different shaders, do nothing here.
 }

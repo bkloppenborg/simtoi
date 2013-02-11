@@ -39,7 +39,7 @@ public:
 
 	virtual double Transparency(double half_height, double at_z);
 
-	virtual void SetShader(CGLShaderWrapperPtr shader); // Overrides CModel::SetShader
+	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
 
 };
 

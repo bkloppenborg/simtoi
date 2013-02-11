@@ -38,8 +38,36 @@
 #include "CCL_GLThread.h"
 #include "json/json.h"
 
-CShader::CShader(string json_config_file)
+CShader::CShader(const CShader & other)
+	: CParameters(other)
 {
+	mShaderID = other.mShaderID;
+	mShader_dir = other.mShader_dir;
+	mBase_name = other.mBase_name;
+	mNParams = other.mNParams;
+	mParam_locations = new GLuint[mNParams];
+	mShaderLoaded = false;
+	mProgram = 0;
+	mShader_vertex = 0;
+	mShader_fragment = 0;
+
+	for(int i = 0; i < mNParams; i++)
+	{
+		mParams[i] = other.mParams[i];
+		mMinMax[i].first = other.mMinMax[i].first;
+		mMinMax[i].second = other.mMinMax[i].second;
+	}
+}
+
+// Constructor from JSON save file
+CShader::CShader(string json_config_file)
+	: CParameters(0)
+{
+	// NOTE: because we do not know the number of parameters on construction
+	// we have to initialize all CParameter base variables here too.
+
+	// TODO: Try to simplify this constructor. It's a mess.
+
 	// Read in the JSON configuration file:
 	Json::Reader reader;
 	Json::Value input;
@@ -47,14 +75,6 @@ CShader::CShader(string json_config_file)
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(!parsingSuccessful)
 		throw runtime_error("JSON parse error in shader configuration file '" + json_config_file + "'. Shader not loaded.");
-
-	// Now init the datamembers.
-	mShaderID = input["shader_id"].asString();
-	// Shaders and configuration files must be in the same directory.
-	size_t folder_end = json_config_file.find_last_of("/\\");
-	mShader_dir = json_config_file.substr(0,folder_end+1);
-	mBase_name = input["filename"].asString();
-	mFriendlyName = input["human_name"].asString();
 
 	// Now read in the parameters from the file
 	stringstream tmp;
@@ -77,44 +97,62 @@ CShader::CShader(string json_config_file)
 		t_start_vals.push_back(input[id]["default"].asDouble());
 	}
 
-	// Copy the values into the data structures.
+	//
+	// Initialize base class variables.
+	//
 	mNParams = t_names.size();
-	mParam_names = t_names;
+	mNFreeParams = 0;
+	mParams = new double[mNParams];
+	mFreeParams = new bool[mNParams];
+	mScales = new double[mNParams];
+	mMinMax = new pair<double,double>[mNParams];
+	mName = input["human_name"].asString();
+
+	// Init parameter values.
+	for(int i = 0; i < mNParams; i++)
+	{
+		mParams[i] = t_start_vals[i];
+		mFreeParams[i] = false;
+		mScales[i] = 1;
+		mMinMax[i] = pair<double,double>(0.0, 0.0);
+		mMinMax[i].first = t_min_max[i].first;
+		mMinMax[i].second = t_min_max[i].second;
+		mParamNames.push_back(t_names[i]);
+	}
+
+	//
+	// Init remaining CShader members
+	//
 	mParam_locations = new GLuint[mNParams];
 	mShaderLoaded = false;
 	mProgram = 0;
 	mShader_vertex = 0;
 	mShader_fragment = 0;
-	mMinMax = new pair<float, float>[mNParams];
-	mStartingValues = new float[mNParams];
+	// Now init the datamembers.
+	mShaderID = input["shader_id"].asString();
+	// Shaders and configuration files must be in the same directory.
+	size_t folder_end = json_config_file.find_last_of("/\\");
+	mShader_dir = json_config_file.substr(0,folder_end+1);
+	mBase_name = input["filename"].asString();
 
-	for(int i = 0; i < mNParams; i++)
-	{
-		mStartingValues[i] = t_start_vals[i];
-		mMinMax[i].first = t_min_max[i].first;
-		mMinMax[i].second = t_min_max[i].second;
-	}
 }
 
 CShader::CShader(string shader_id, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax)
+	: CParameters(n_parameters)
 {
 	mShaderID = shader_id;
 	mShader_dir = shader_dir;
 	mBase_name = base_filename;
-	mFriendlyName = friendly_name;
-	mNParams = n_parameters;
-	mParam_names = parameter_names;
 	mParam_locations = new GLuint[mNParams];
 	mShaderLoaded = false;
 	mProgram = 0;
 	mShader_vertex = 0;
 	mShader_fragment = 0;
-	mMinMax = new pair<float, float>[mNParams];
-	mStartingValues = new float[mNParams];
+	mName = friendly_name;
 
 	for(int i = 0; i < mNParams; i++)
 	{
-		mStartingValues[i] = starting_values[i];
+		mParams[i] = starting_values[i];
 		mMinMax[i].first = minmax[i].first;
 		mMinMax[i].second = minmax[i].second;
 	}
@@ -129,8 +167,6 @@ CShader::~CShader()
 
 	// Now release object memory:
 	delete[] mParam_locations;
-	delete[] mMinMax;
-	delete[] mStartingValues;
 }
 
 /// Compiles an OpenGL shader, checking for errors.
@@ -147,41 +183,6 @@ void CShader::CompileShader(GLuint shader)
 		glGetShaderInfoLog(shader, 500, &length, infolog);
 		printf("%s\n", infolog);
     }
-}
-
-/// Returns the minimum parameter value, -1 if i is out of range.
-float CShader::GetMin(unsigned int i)
-{
-	if(i < mNParams)
-		return mMinMax[i].first;
-
-	return -1;
-}
-
-/// Returns the maximum parameter value, -1 if i is out of range.
-float CShader::GetMax(unsigned int i)
-{
-	if(i < mNParams)
-		return mMinMax[i].second;
-
-	return -1;
-}
-
-/// Returns the name of the specified parameter, if out of bounds returns an empty string.
-string CShader::GetParamName(unsigned int i)
-{
-	if(i < mNParams)
-		return mParam_names[i];
-
-	return "";
-}
-
-float CShader::GetStartingValue(unsigned int i)
-{
-	if(i < mNParams)
-		return mStartingValues[i];
-
-	return 0;
 }
 
 // Loads the shader from the source file and creates a binary for the current selected context.
@@ -236,7 +237,7 @@ void CShader::Init()
     // Now the shader-specific parameters:
     for(int i = 0; i < mNParams; i++)
     {
-    	mParam_locations[i] = glGetUniformLocation(mProgram, mParam_names[i].c_str());
+    	mParam_locations[i] = glGetUniformLocation(mProgram, mParamNames[i].c_str());
     	CCL_GLThread::CheckOpenGLError("Could find variable in shader source.");
     }
 
@@ -260,6 +261,11 @@ void CShader::LinkProgram(GLuint program)
     }
 }
 
+void CShader::UseShader(double min_xyz[3], double max_xyz[3])
+{
+	UseShader(min_xyz, max_xyz, mParams, mNParams);
+}
+
 void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, unsigned int in_params)
 {
 	if(!mShaderLoaded)
@@ -270,6 +276,7 @@ void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, u
 
 	// Tell OpenGL to use the mProgram
 	glUseProgram(mProgram);
+	CCL_GLThread::CheckOpenGLError("CShader::UseShader, glUseProgram");
 
 	// Init temporary storage and copy the XYZ min/max values into the corresponding array.
 	GLfloat min_tmp[3];
@@ -285,6 +292,7 @@ void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, u
 	// Send the values off to the shader:
 	glUniform3fv(mMinXYZ_location, 1, min_tmp);
 	glUniform3fv(mMaxXYZ_location, 1, max_tmp);
+	CCL_GLThread::CheckOpenGLError("CShader::UseShader, glUniform3fv");
 
 	// Set the shader-specific parameters.  Notice again the intentional downcast.
 	GLfloat tmp;
@@ -293,4 +301,5 @@ void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, u
 		tmp = GLfloat(params[i]);
 		glUniform1fv(mParam_locations[i], 1, &tmp);
 	}
+	CCL_GLThread::CheckOpenGLError("CShader::UseShader, glUniform1fv");
 }

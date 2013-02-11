@@ -41,9 +41,8 @@
 
 #include "CParameters.h"
 #include "CPosition.h"
-#include "CGLShaderWrapper.h"
+#include "CShader.h"
 #include "CCL_GLThread.h"
-//#include "enumerations.h"
 #include "CModelList.h"
 
 #include <cstdlib>
@@ -66,7 +65,8 @@ using namespace std;
 class CPosition;
 typedef shared_ptr<CPosition> CPositionPtr;
 
-class CGLShaderWrapper;
+class CShader;
+typedef shared_ptr<CShader> CShaderPtr;
 
 class CModel : public CParameters
 {
@@ -79,7 +79,7 @@ protected:
 
 //	CFeatureList * features;
 
-	CGLShaderWrapperPtr mShader;
+	CShaderPtr mShader;
 	bool mShaderLoaded;
 	double mScale;
 
@@ -114,7 +114,7 @@ public:
 	int GetNPositionFreeParameters() { return mPosition->GetNFreeParams(); };
 	int GetNShaderFreeParameters() { return mShader->GetNFreeParams(); };
 	CPositionPtr GetPosition(void) { return mPosition; };
-	CGLShaderWrapperPtr GetShader(void) { return mShader; };
+	CShaderPtr GetShader(void) { return mShader; };
 	int GetTotalFreeParameters();
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
@@ -128,7 +128,7 @@ public:
 	void SetPositionModel(CPositionPtr position);
 
 	virtual void SetShader(string shader_id);
-	virtual void SetShader(CGLShaderWrapperPtr shader);
+	virtual void SetShader(CShaderPtr shader);
 	void SetTime(double time);
 protected:
 	void SetupMatrix();

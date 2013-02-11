@@ -31,8 +31,10 @@
  */
 
 #include "CShaderFactory.h"
-#include "CGLShaderWrapper.h"
+#include "CShader.h"
 #include <stdexcept>
+
+using namespace std;
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
 //#include "GLShaders/CGLShaderSphere.h"
@@ -43,13 +45,13 @@ extern string EXE_FOLDER;
 CShaderFactory::CShaderFactory()
 {
 	// TODO: Call the register function from a GUI class via a plugin-like script.
-	Register(EXE_FOLDER + "/shaders/default.json");
-	Register(EXE_FOLDER + "/shaders/ldl_claret2000.json");
-	Register(EXE_FOLDER + "/shaders/ldl_logarithmic.json");
+//	Register(EXE_FOLDER + "/shaders/default.json");
+//	Register(EXE_FOLDER + "/shaders/ldl_claret2000.json");
+//	Register(EXE_FOLDER + "/shaders/ldl_logarithmic.json");
 	Register(EXE_FOLDER + "/shaders/ldl_power_law.json");
-	Register(EXE_FOLDER + "/shaders/ldl_quadratic.json");
-	Register(EXE_FOLDER + "/shaders/ldl_square_root.json");
-	Register(EXE_FOLDER + "/shaders/power_law_z.json");
+//	Register(EXE_FOLDER + "/shaders/ldl_quadratic.json");
+//	Register(EXE_FOLDER + "/shaders/ldl_square_root.json");
+//	Register(EXE_FOLDER + "/shaders/power_law_z.json");
 }
 
 CShaderFactory::~CShaderFactory() \
@@ -59,17 +61,18 @@ CShaderFactory::~CShaderFactory() \
 
 /// Create an instance of the specified GLShader inside of a CGLShaderWrapper object.
 /// Returns a shared_ptr<CGLShaderWrapper> to the object if found, or throws a runtime exception.
-shared_ptr<CGLShaderWrapper> CShaderFactory::CreateShader(string GLShaderID)
+shared_ptr<CShader> CShaderFactory::CreateShader(string GLShaderID)
 {
 	auto it = mFactory.find(GLShaderID);
 	if(it != mFactory.end())
 	{
-		return shared_ptr<CGLShaderWrapper>(new CGLShaderWrapper(it->second, it->second->GetNParams()));
+		// Return a deep-copy of the shader.
+		return shared_ptr<CShader>(new CShader(*it->second.get()));
 	}
 
 	throw runtime_error("The GLShader with ID '" + GLShaderID + "' not registered with CGLShaderFactory");
 
-	return shared_ptr<CGLShaderWrapper>();
+	return shared_ptr<CShader>();
 }
 
 /// Returns a vector of the GLShader names that are loaded.

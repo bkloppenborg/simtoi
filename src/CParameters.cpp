@@ -40,7 +40,31 @@
 // A number after which we consider a parameter to be zero.
 #define ZERO_COMP 1E-8
 
-CParameters::CParameters(int n_params)
+CParameters::CParameters(const CParameters & other)
+{
+	// Init the parameter storage location
+	mNParams = other.mNParams;
+	mNFreeParams = other.mNFreeParams;
+	mParams = new double[mNParams];
+	mFreeParams = new bool[mNParams];
+	mScales = new double[mNParams];
+	mMinMax = new pair<double,double>[mNParams];
+	mName = other.mName;
+
+	// Init parameter values.
+	for(int i = 0; i < mNParams; i++)
+	{
+		mParams[i] = other.mParams[i];
+		mFreeParams[i] = other.mFreeParams[i];
+		mScales[i] = other.mScales[i];
+		mMinMax[i] = pair<double,double>(0.0, 0.0);
+		mMinMax[i].first = other.mMinMax[i].first;
+		mMinMax[i].second = other.mMinMax[i].second;
+		mParamNames.push_back(other.mParamNames[i]);
+	}
+}
+
+CParameters::CParameters(unsigned int n_params)
 {
 	// Init the parameter storage location
 	mNParams = n_params;
@@ -81,7 +105,7 @@ void CParameters::CountFree(void)
 }
 
 /// Returns the maximum allowable value of the specified parameter, -1 if param_num is out of bounds.
-double CParameters::GetMax(int param_num)
+double CParameters::GetMax(unsigned int param_num)
 {
 	if(param_num < mNParams)
 		return mMinMax[param_num].second;
@@ -90,7 +114,7 @@ double CParameters::GetMax(int param_num)
 }
 
 /// Returns the minimum allowable value of the specified parameter, -1 if param_num is out of bounds.
-double CParameters::GetMin(int param_num)
+double CParameters::GetMin(unsigned int param_num)
 {
 	if(param_num < mNParams)
 		return mMinMax[param_num].first;
@@ -99,7 +123,7 @@ double CParameters::GetMin(int param_num)
 }
 
 /// Gets the vale of the specified parameter, returns -1 if outside of bounds:
-double CParameters::GetParam(int param_n)
+double CParameters::GetParam(unsigned int param_n)
 {
 	if(param_n < mNParams)
 		return mParams[param_n];
@@ -120,7 +144,7 @@ void CParameters::GetParams(double * out_params, unsigned int n_params)
 
 /// Returns the prior for the i-th parameter:
 /// NOTE: at the moment all parameters have uniform priors.
-double CParameters::GetPrior(int i)
+double CParameters::GetPrior(unsigned int i)
 {
 	// compute a uniform prior.
 	return 1.0 / (mMinMax[i].second - mMinMax[i].first);
@@ -141,7 +165,7 @@ vector< pair<double, double> > CParameters::GetFreeMinMaxes()
 
 /// Gets the values of the free parameters for this object, scales them into
 // If scale_params = false, parameters are returned within the interval x = [0...1] otherwise, x = [param.min ... param.max]
-void CParameters::GetFreeParams(double * out_params, int n_params, bool scale_params)
+void CParameters::GetFreeParams(double * out_params, unsigned int n_params, bool scale_params)
 {
 	// Get the scaled parameter values
 	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
@@ -213,7 +237,7 @@ string CParameters::GetParamName(unsigned int i)
 	return "! NotFound !";
 }
 
-bool CParameters::IsFree(int param_num)
+bool CParameters::IsFree(unsigned int param_num)
 {
 	if(param_num < mNParams)
 		return mFreeParams[param_num];
@@ -255,7 +279,7 @@ void CParameters::SetAllFree(bool is_free)
 /// Sets the values for the parameters for this object
 /// If scale_params = true then the values are scaled into their native interval, [param.min ... param.max],
 /// otherwise if scale_params = false the parameters are assumed to be scaled.
-void CParameters::SetFreeParams(double * in_params, int n_params, bool scale_params)
+void CParameters::SetFreeParams(double * in_params, unsigned int n_params, bool scale_params)
 {
 	// Set the parameter values
 	push_params(in_params, n_params, mParams, mNParams, mFreeParams);
@@ -275,7 +299,7 @@ void CParameters::SetFreeParams(double * in_params, int n_params, bool scale_par
 }
 
 /// Sets the specified parameter as free (is_free = true) or fixed (is_free = false)
-void CParameters::SetFree(int param_num, bool is_free)
+void CParameters::SetFree(unsigned int param_num, bool is_free)
 {
 	if(param_num <= mNParams)
 		mFreeParams[param_num] = is_free;
@@ -285,14 +309,14 @@ void CParameters::SetFree(int param_num, bool is_free)
 }
 
 /// Sets the specified parameter's minimum value.
-void CParameters::SetMin(int param_num, double value)
+void CParameters::SetMin(unsigned int param_num, double value)
 {
 	if(param_num < mNParams)
 		mMinMax[param_num].first = value;
 }
 
 /// Sets the specified paramter's maximum value.
-void CParameters::SetMax(int param_num, double value)
+void CParameters::SetMax(unsigned int param_num, double value)
 {
 	if(param_num < mNParams)
 		mMinMax[param_num].second = value;
@@ -300,10 +324,10 @@ void CParameters::SetMax(int param_num, double value)
 
 /// Sets the specified parameter to the indicated value.
 /// Note, scaling from the unit hypercube is not applied.
-void CParameters::SetParam(int n_param, double value)
+void CParameters::SetParam(unsigned int param_num, double value)
 {
-	if(n_param < mNParams)
-		mParams[n_param] = value;
+	if(param_num < mNParams)
+		mParams[param_num] = value;
 }
 
 /// Serializes the parameters to a Json::Value object
