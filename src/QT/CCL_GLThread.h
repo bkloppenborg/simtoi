@@ -52,7 +52,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "CModelList.h"
-#include "CGLShaderList.h"
 #include "liboi.hpp"
 
 class CGLWidget;
@@ -125,7 +124,6 @@ protected:
     // OpenGL / rendering / FBOs
     CGLWidget * mGLWidget;
     CModelList * mModelList;
-    CGLShaderList * mShaderList;
     GLuint mFBO;
 	GLuint mFBO_texture;
 	GLuint mFBO_depth;
@@ -197,13 +195,11 @@ public:
 	int		GetNT3(int data_num);
 	int		GetNV2(int data_num);
 	double GetScale() { return mScale; };
-	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void);
 	unsigned int GetImageWidth() { return mImageWidth; };
 
 	bool 	IsRunning() { return mIsRunning; };
 
     vector<string> GetModelTypes() { return mModelList->GetTypes(); };
-    vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mShaderList->GetTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
 
@@ -230,7 +226,6 @@ public:
     void SaveImage(string filename);
     void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
     void SetScale(double scale);
-    void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetTime(double t);
     void SetTimestep(double dt);
 public:

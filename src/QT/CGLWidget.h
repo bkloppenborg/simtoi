@@ -65,7 +65,6 @@ protected:
 public:
 
     void EnqueueOperation(CL_GLT_Operations op);
-	vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderNames(void) { return mGLT.GetShaderNames(); };
 
 protected:
 	void paintEvent(QPaintEvent * );
@@ -75,7 +74,6 @@ protected:
 public:
 
     vector<string> GetModelTypes() { return mGLT.GetModelTypes(); };
-    vector< pair<CGLShaderList::ShaderTypes, string> > GetShaderTypes() { return mGLT.GetShaderTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
     double GetFlux() { return mGLT.GetFlux(); };
@@ -116,7 +114,6 @@ public:
     void SaveImage(string filename) { mGLT.SaveImage(filename); };
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetScale(double scale);
-    void SetShader(int model_id, CGLShaderList::ShaderTypes shader);
     void SetSaveFileBasename(string filename);
     void SetTime(double t) { mGLT.SetTime(t); };
     void SetTimestep(double dt) { mGLT.SetTimestep(dt); };

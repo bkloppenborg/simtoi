@@ -43,7 +43,7 @@ CShader::CShader(string json_config_file)
 	// Read in the JSON configuration file:
 	Json::Reader reader;
 	Json::Value input;
-	string file_contents = ReadFile(json_config_file, "Could not read shader save file.");
+	string file_contents = ReadFile(json_config_file, "Could not read shader save file: '" + json_config_file + "'.");
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(!parsingSuccessful)
 		throw runtime_error("JSON parse error in shader configuration file '" + json_config_file + "'. Shader not loaded.");

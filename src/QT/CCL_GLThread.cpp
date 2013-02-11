@@ -34,7 +34,6 @@
 #include "CGLWidget.h"
 #include "CModelList.h"
 #include "CModel.h"
-#include "CGLShaderList.h"
 #include "CPosition.h"
 #include "liboi.hpp"
 #include "json/json.h"
@@ -59,7 +58,6 @@ CCL_GLThread::CCL_GLThread(CGLWidget *glWidget, string shader_source_dir, string
     mAreaDepth = 100; // +mDepth to -mDepth is the viewing region, in coordinate system units.
 
     mModelList = new CModelList();
-    mShaderList = new CGLShaderList(shader_source_dir);
 
     mKernelSourceDir = kernel_source_dir;
     mCL = NULL;
@@ -89,7 +87,6 @@ CCL_GLThread::~CCL_GLThread()
 
 	delete mCL;
 	delete mModelList;
-	delete mShaderList;
 }
 
 /// Appends a model to the model list, importing shaders and features as necessary.
@@ -424,13 +421,6 @@ CL_GLT_Operations CCL_GLThread::GetNextOperation(void)
 	mQueue.pop();
 	mQueueMutex.unlock();
 	return tmp;
-}
-
-/// Returns a list of pairs of <eGlShader, string> corresponding to the (enumerated_name, friendly_name)
-/// of the shaders stored in this object.
-vector< pair<CGLShaderList::ShaderTypes, string> > CCL_GLThread::GetShaderNames(void)
-{
-	return mShaderList->GetTypes();
 }
 
 void CCL_GLThread::InitFrameBuffers(void)

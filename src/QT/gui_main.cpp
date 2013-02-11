@@ -38,11 +38,11 @@
 #include <utility>
 #include <fstream>
 #include <cmath>
+#include <stdexcept>
 
 #include "enumerations.h"
 #include "CGLWidget.h"
 #include "CPosition.h"
-#include "CGLShaderList.h"
 #include "CMinimizer.h"
 #include "CTreeModel.h"
 #include "gui_model.h"
@@ -667,7 +667,18 @@ void gui_main::ModelOpen()
 	{
 		fileNames = dialog.selectedFiles();
 
-		ModelOpen(fileNames, sw);
+		// Try to open the savefile, catch any generated exceptions and display an
+		// error message to the user.
+		try
+		{
+			ModelOpen(fileNames, sw);
+		}
+		catch(runtime_error & e)
+		{
+			QMessageBox msgBox;
+			msgBox.setText(QString("Could not open savefile.\n") + QString(e.what()));
+			msgBox.exec();
+		}
 	}
 }
 

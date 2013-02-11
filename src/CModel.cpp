@@ -42,6 +42,7 @@
 // Header files for position objects.
 #include "CPosition.h"
 #include "CPositionFactory.h"
+#include "CShaderFactory.h"
 
 CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
@@ -216,15 +217,25 @@ void CModel::Restore(Json::Value input)
 	CParameters::Restore(input["base_data"]);
 
 	auto positions = CPositionFactory::Instance();
+	auto shaders = CShaderFactory::Instance();
 
-	// Look up the name of the position model:
+	// Look up the name of the position model, if none is specified use "xy" by default.
 	string position_id = input["position_id"].asString();
+	if(position_id.size() == 0)
+		position_id = "xy";
+
 	auto position = positions.CreatePosition(position_id);
 	position->Restore(input["position_data"]);
 	SetPositionModel(position);
 
-	// TODO: Temporary code:
-	SetShader(0);
+	// Find the shader
+	string shader_id = input["shader_id"].asString();
+	if(shader_id.size() == 0)
+		shader_id = "default";
+
+	auto shader = shaders.CreateShader(shader_id);
+	shader->Restore(input["shader_data"]);
+	SetShader(shader);
 
 //	// Now the shader
 //	if(input.isMember("shader"))
@@ -334,6 +345,14 @@ void CModel::SetTime(double time)
 //	}
 }
 
+/// Replaces the loaded shader with the one specified by shader_id
+void CModel::SetShader(string shader_id)
+{
+	auto shaders = CShaderFactory::Instance();
+	SetShader(shaders.CreateShader(shader_id));
+}
+
+/// Replaces the loaded shader with the specified shader
 void CModel::SetShader(CGLShaderWrapperPtr shader)
 {
 	mShader = shader;

@@ -42,8 +42,14 @@ extern string EXE_FOLDER;
 
 CShaderFactory::CShaderFactory()
 {
+	// TODO: Call the register function from a GUI class via a plugin-like script.
 	Register(EXE_FOLDER + "/shaders/default.json");
+	Register(EXE_FOLDER + "/shaders/ldl_claret2000.json");
+	Register(EXE_FOLDER + "/shaders/ldl_logarithmic.json");
 	Register(EXE_FOLDER + "/shaders/ldl_power_law.json");
+	Register(EXE_FOLDER + "/shaders/ldl_quadratic.json");
+	Register(EXE_FOLDER + "/shaders/ldl_square_root.json");
+	Register(EXE_FOLDER + "/shaders/power_law_z.json");
 }
 
 CShaderFactory::~CShaderFactory() \

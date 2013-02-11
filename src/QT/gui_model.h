@@ -34,7 +34,6 @@
 #include <utility>
 #include <vector>
 #include "CModelList.h"
-#include "CGLShaderList.h"
 #include "CModelList.h"
 
 class CModel;

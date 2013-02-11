@@ -41,7 +41,9 @@ using namespace std;
 #include "CParameters.h"
 #include "CShader.h"
 
+class CGLShaderWrapper;
 typedef shared_ptr<CShader> CGLShaderPtr;
+typedef shared_ptr<CGLShaderWrapper> CGLShaderWrapperPtr;
 
 class CGLShaderWrapper : public CParameters
 {

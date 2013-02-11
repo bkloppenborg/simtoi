@@ -41,7 +41,6 @@
 
 #include "CParameters.h"
 #include "CPosition.h"
-#include "CGLShaderList.h"
 #include "CGLShaderWrapper.h"
 #include "CCL_GLThread.h"
 //#include "enumerations.h"
@@ -128,12 +127,11 @@ public:
 	void SetPositionModel(string position_id);
 	void SetPositionModel(CPositionPtr position);
 
+	virtual void SetShader(string shader_id);
 	virtual void SetShader(CGLShaderWrapperPtr shader);
 	void SetTime(double time);
 protected:
 	void SetupMatrix();
-public:
-	bool ShaderLoaded(void) { return mShaderLoaded; };
 
 protected:
 	void UseShader(double min_xyz[3], double max_xyz[3]);
