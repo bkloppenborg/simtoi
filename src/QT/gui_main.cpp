@@ -60,56 +60,11 @@ gui_main::~gui_main()
 	close();
 }
 
-void gui_main::Animation_StartStop()
-{
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-
-	if(mAnimating)
-	{
-		widget->EnqueueOperation(GLT_AnimateStop);
-		mAnimating = false;
-		ui.btnStartStop->setText("Start");
-	}
-	else
-	{
-		widget->SetTimestep(ui.spinTimeStep->value());
-		widget->EnqueueOperation(GLT_Animate);
-		mAnimating = true;
-		ui.btnStartStop->setText("Stop");
-	}
-}
-
-void gui_main::Animation_Reset()
-{
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-
-	widget->SetTime(ui.spinTimeStart->value());
-	widget->EnqueueOperation(GLT_RenderModels);
-
-}
-
-void gui_main::AddGLArea()
-{
-    int width = ui.spinModelSize->value();
-    int height = ui.spinModelSize->value();
-    double scale = ui.spinModelScale->value();
-
-    AddGLArea(width, height, scale);
-}
-
 QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double model_scale)
 {
 	// Create a new subwindow with a title and close button:
-    CGLWidget * widget = new CGLWidget(ui.mdiArea, mShaderSourceDir, mKernelSourceDir);
-    QMdiSubWindow * sw = ui.mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
+    CGLWidget * widget = new CGLWidget(this->mdiArea, mShaderSourceDir, mKernelSourceDir);
+    QMdiSubWindow * sw = this->mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
     sw->setWindowTitle("Model Area");
 
     // TODO: This is approximately right for my machine, probably not ok on other OSes.
@@ -133,64 +88,98 @@ QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double mo
 	return sw;
 }
 
+void gui_main::Animation_StartStop()
+{
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
 
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
+	if(mAnimating)
+	{
+		widget->EnqueueOperation(GLT_AnimateStop);
+		mAnimating = false;
+		this->btnStartStop->setText("Start");
+	}
+	else
+	{
+		widget->SetTimestep(this->spinTimeStep->value());
+		widget->EnqueueOperation(GLT_Animate);
+		mAnimating = true;
+		this->btnStartStop->setText("Stop");
+	}
+}
+
+void gui_main::Animation_Reset()
+{
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
+	widget->SetTime(this->spinTimeStart->value());
+	widget->EnqueueOperation(GLT_RenderModels);
+
+}
 /// Checks to see which buttons can be enabled/disabled.
 void gui_main::ButtonCheck()
 {
 
-	ui.btnAddData->setEnabled(false);
-	ui.btnModelAdd->setEnabled(false);
-	ui.btnModelEdit->setEnabled(false);
-	ui.btnModelDelete->setEnabled(false);
-	ui.btnRemoveData->setEnabled(false);
-	ui.btnStartStop->setEnabled(false);
-	ui.btnReset->setEnabled(false);
-	ui.btnRunMinimizer->setEnabled(false);
-	ui.btnStopMinimizer->setEnabled(false);
-	ui.btnSavePhotometry->setEnabled(false);
-	ui.btnSaveFITS->setEnabled(false);
-	ui.btnSetTime->setEnabled(false);
+	this->btnAddData->setEnabled(false);
+	this->btnModelAdd->setEnabled(false);
+	this->btnModelEdit->setEnabled(false);
+	this->btnModelDelete->setEnabled(false);
+	this->btnRemoveData->setEnabled(false);
+	this->btnStartStop->setEnabled(false);
+	this->btnReset->setEnabled(false);
+	this->btnMinimizerStart->setEnabled(false);
+	this->btnMinimizerStop->setEnabled(false);
+	this->btnSavePhotometry->setEnabled(false);
+	this->btnSaveFITS->setEnabled(false);
+	this->btnSetTime->setEnabled(false);
 
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
     // Animation / data export area
-	ui.btnStartStop->setEnabled(true);
-	ui.btnReset->setEnabled(true);
-	ui.btnSavePhotometry->setEnabled(true);
-	ui.btnSaveFITS->setEnabled(true);
-	ui.btnSetTime->setEnabled(true);
+	this->btnStartStop->setEnabled(true);
+	this->btnReset->setEnabled(true);
+	this->btnSavePhotometry->setEnabled(true);
+	this->btnSaveFITS->setEnabled(true);
+	this->btnSetTime->setEnabled(true);
 
 	// Buttons for add/delete data
-	ui.btnAddData->setEnabled(true);
+	this->btnAddData->setEnabled(true);
 	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 	if(widget->GetOpenFileModel()->rowCount() > 0)
-		ui.btnRemoveData->setEnabled(true);
+		this->btnRemoveData->setEnabled(true);
 
 	// Buttons for add/edit/delete model
-	ui.btnModelAdd->setEnabled(true);
+	this->btnModelAdd->setEnabled(true);
 	if(widget->GetTreeModel()->rowCount() > 0)
 	{
-		ui.btnModelEdit->setEnabled(true);
-		ui.btnModelDelete->setEnabled(true);
+		this->btnModelEdit->setEnabled(true);
+		this->btnModelDelete->setEnabled(true);
 	}
 
 	// Buttons for minimizer area
 	// Look up the minimizer's ID in the combo box, select it.
-	int id = ui.cboMinimizers->findText(QString::fromStdString(widget->GetMinimizerID()));
+	int id = this->cboMinimizers->findText(QString::fromStdString(widget->GetMinimizerID()));
 	if(id > -1)
-		ui.cboMinimizers->setCurrentIndex(id);
+		this->cboMinimizers->setCurrentIndex(id);
 	// Toggle minimizer start/stop buttons
 	if(widget->GetMinimizerRunning())
 	{
-		ui.btnStopMinimizer->setEnabled(true);
-		ui.btnRunMinimizer->setEnabled(false);
+		this->btnMinimizerStop->setEnabled(true);
+		this->btnMinimizerStart->setEnabled(false);
 	}
 	else
 	{
-		ui.btnStopMinimizer->setEnabled(false);
-		ui.btnRunMinimizer->setEnabled(true);
+		this->btnMinimizerStop->setEnabled(false);
+		this->btnMinimizerStart->setEnabled(true);
 	}
 
 }
@@ -201,7 +190,7 @@ void gui_main::AutoClose(QWidget * widget)
 	sw->close();
 
 	// If there are more open subwindows and auto-close is set, close the program.
-	if(mAutoClose && ui.mdiArea->subWindowList().size() == 0)
+	if(mAutoClose && this->mdiArea->subWindowList().size() == 0)
 		close();
 }
 
@@ -223,7 +212,7 @@ void gui_main::close()
 	CGLWidget * widget = NULL;
 	QMdiSubWindow * sw = NULL;
 
-	QList<QMdiSubWindow *> windows = ui.mdiArea->subWindowList();
+	QList<QMdiSubWindow *> windows = this->mdiArea->subWindowList();
     for (int i = int(windows.count()) - 1; i > 0; i--)
     {
     	QMdiSubWindow * sw = windows.at(i);
@@ -246,18 +235,18 @@ void gui_main::closeEvent(QCloseEvent *evt)
 /// SIMTOI will automatically exit when all minimization engines have completed execution.
 void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale, bool close_simtoi)
 {
-	QMdiSubWindow * sw = AddGLArea(size, size, scale);
-	DataAdd(data_files, sw);
-	ModelOpen(model_files, sw);
-	MinimizerRun(minimizer, sw);
-	AutoClose(close_simtoi, sw);
+//	QMdiSubWindow * sw = AddGLArea(size, size, scale);
+//	DataAdd(data_files, sw);
+//	ModelOpen(model_files, sw);
+//	MinimizerRun(minimizer, sw);
+//	AutoClose(close_simtoi, sw);
 }
 
 /// Loads OIFITS data into the current selected subwindow
 void gui_main::DataAdd()
 {
 	// Ensure there is a selected widget, if not immediately return.
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     {
 		QMessageBox msgBox;
@@ -324,7 +313,7 @@ void gui_main::DataAdd(QStringList & filenames, QMdiSubWindow * sw)
 void gui_main::DataRemove()
 {
 	// Ensure there is a selected widget, if not immediately return.
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -332,7 +321,7 @@ void gui_main::DataRemove()
     CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 
     // Get the selected indicies:
-    QModelIndexList list = ui.treeOpenFiles->selectionModel()->selectedIndexes();
+    QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedIndexes();
     QStandardItemModel * model = widget->GetOpenFileModel();
 
     QList<QModelIndex>::iterator it;
@@ -347,7 +336,7 @@ void gui_main::DataRemove()
 
 void gui_main::DeleteGLArea()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -364,7 +353,7 @@ void gui_main::DeleteGLArea()
 /// Exports the current rendered model to a floating point FITS file
 void gui_main::ExportFITS()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -399,16 +388,16 @@ void gui_main::ExportFITS()
 /// Animates the display, exporting the photometry at specified intervals
 void gui_main::ExportPhotometry()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 	widget->EnqueueOperation(CLT_Init);
 
-    double t = ui.spinTimeStart->value();
-    double step = ui.spinTimeStep->value();
-    double duration = ui.spinTimeDuration->value();
+    double t = this->spinTimeStart->value();
+    double step = this->spinTimeStep->value();
+    double duration = this->spinTimeDuration->value();
     double stop = t + duration;
     vector< pair<float, float> > output;
     float flux;
@@ -457,47 +446,43 @@ void gui_main::ExportPhotometry()
 
 }
 
-/// Runs initialization routines for the main UI.
+/// Runs initialization routines for the main this->
 void gui_main::Init(void)
 {
 	// Init the UI
-	ui.setupUi(this);
+	this->setupUi(this);
 
 	// Setup signals and slots
 
-	// Model area
-	connect(ui.btnModelArea, SIGNAL(clicked(void)), this, SLOT(AddGLArea(void)));
-	connect(ui.mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
-
-	// Animiation buttons
-	connect(ui.btnStartStop, SIGNAL(clicked(void)), this, SLOT(Animation_StartStop(void)));
-	connect(ui.btnReset, SIGNAL(clicked(void)), this, SLOT(Animation_Reset(void)));
-
-	// Minimizer:
-	connect(ui.btnRunMinimizer, SIGNAL(clicked(void)), this, SLOT(MinimizerRun(void)));
-	connect(ui.btnStopMinimizer, SIGNAL(clicked(void)), this, SLOT(MinimizerStop(void)));
-
-	// Add/delete data
-	connect(ui.btnAddData, SIGNAL(clicked(void)), this, SLOT(DataAdd(void)));
-	connect(ui.btnRemoveData, SIGNAL(clicked(void)), this, SLOT(DataRemove(void)));
-
-	// Add/delete models
-	connect(ui.btnModelAdd, SIGNAL(clicked(void)), this, SLOT(ModelAdd(void)));
-	connect(ui.btnModelEdit, SIGNAL(clicked(void)), this, SLOT(ModelEdit(void)));
-	connect(ui.btnModelDelete, SIGNAL(clicked(void)), this, SLOT(ModelDelete(void)));
-
-	// File menu:
-	connect(ui.actionSave, SIGNAL(triggered(void)), this, SLOT(ModelSave(void)));
-	connect(ui.actionOpen, SIGNAL(triggered(void)), this, SLOT(ModelOpen(void)));
-
-	// Flux simulation
-	connect(ui.btnSavePhotometry, SIGNAL(clicked(void)), this, SLOT(ExportPhotometry(void)));
-
-	// FITS exporting:
-	connect(ui.btnSaveFITS, SIGNAL(clicked(void)), this, SLOT(ExportFITS(void)));
-
-	// Set time button
-	connect(ui.btnSetTime, SIGNAL(clicked(void)), this, SLOT(SetTime(void)));
+//	// Model area
+//	connect(this->btnModelArea, SIGNAL(clicked(void)), this, SLOT(AddGLArea(void)));
+//	connect(this->mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(subwindowSelected(QMdiSubWindow*)));
+//
+//	// Animiation buttons
+//	connect(this->btnStartStop, SIGNAL(clicked(void)), this, SLOT(Animation_StartStop(void)));
+//	connect(this->btnReset, SIGNAL(clicked(void)), this, SLOT(Animation_Reset(void)));
+//
+//	// Add/delete data
+//	connect(this->btnAddData, SIGNAL(clicked(void)), this, SLOT(DataAdd(void)));
+//	connect(this->btnRemoveData, SIGNAL(clicked(void)), this, SLOT(DataRemove(void)));
+//
+//	// Add/delete models
+//	connect(this->btnModelAdd, SIGNAL(clicked(void)), this, SLOT(ModelAdd(void)));
+//	connect(this->btnModelEdit, SIGNAL(clicked(void)), this, SLOT(ModelEdit(void)));
+//	connect(this->btnModelDelete, SIGNAL(clicked(void)), this, SLOT(ModelDelete(void)));
+//
+//	// File menu:
+//	connect(this->actionSave, SIGNAL(triggered(void)), this, SLOT(ModelSave(void)));
+//	connect(this->actionOpen, SIGNAL(triggered(void)), this, SLOT(ModelOpen(void)));
+//
+//	// Flux simulation
+//	connect(this->btnSavePhotometry, SIGNAL(clicked(void)), this, SLOT(ExportPhotometry(void)));
+//
+//	// FITS exporting:
+//	connect(this->btnSaveFITS, SIGNAL(clicked(void)), this, SLOT(ExportFITS(void)));
+//
+//	// Set time button
+//	connect(this->btnSetTime, SIGNAL(clicked(void)), this, SLOT(SetTime(void)));
 
 	// Now init variables:
 
@@ -517,31 +502,27 @@ void gui_main::Init(void)
 
 	// Setup the combo boxes.
 	auto minimizers = CMinimizerFactory::Instance();
-	gui_common::SetupComboOptions(ui.cboMinimizers, minimizers.GetMinimizerList());
+	gui_common::SetupComboOptions(this->cboMinimizers, minimizers.GetMinimizerList());
 
 	// Setup the text boxes
-	ui.textSavePath->setText(mDefaultSaveDir.c_str());
+	this->textSavePath->setText(mDefaultSaveDir.c_str());
 }
 
-void gui_main::MinimizerRun()
+void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
 {
+	// We have a valid subwindow, so cast it into a CGLWidget
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 
-}
-
-void gui_main::MinimizerRun(int minimizer_id, QMdiSubWindow * sw)
-{
-
-}
-
-/// Stops the minimizer
-void gui_main::MinimizerStop()
-{
-
+	// Look up the minimizer
+	auto minimizers = CMinimizerFactory::Instance();
+	CMinimizerPtr minimizer = minimizers.CreateMinimizer(MinimizerID);
+	widget->SetMinimizer(minimizer);
+	widget->startMinimizer();
 }
 
 void gui_main::ModelAdd(void)
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -564,7 +545,7 @@ void gui_main::ModelAdd(void)
 /// Deletes the selected model from the model list
 void gui_main::ModelDelete()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -577,7 +558,7 @@ void gui_main::ModelDelete()
 /// Opens up an editing dialog for the currently selected model.
 void gui_main::ModelEdit()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -615,7 +596,7 @@ void gui_main::ModelEdit()
 
 void gui_main::ModelOpen()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -648,7 +629,7 @@ void gui_main::ModelOpen(QStringList & fileNames, QMdiSubWindow * sw)
 {
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 	widget->Open(fileNames.first().toStdString());
-	ui.treeModels->reset();
+	this->treeModels->reset();
 
 	// Store the directory name for the next file open dialog.
 	mOpenModelDir = QFileInfo(fileNames[0]).absolutePath().toStdString();
@@ -656,7 +637,7 @@ void gui_main::ModelOpen(QStringList & fileNames, QMdiSubWindow * sw)
 
 void gui_main::ModelSave()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -681,9 +662,49 @@ void gui_main::ModelSave()
 	}
 }
 
+/// Starts the minimizer
+void gui_main::on_btnMinimizerStart_clicked()
+{
+	/// TODO: Handle thread-execution exceptions that might be thrown.
+
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	// We have a valid subwindow, so cast it into a CGLWidget
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+
+	// Look up the minimizer
+	string id = this->cboMinimizers->currentText().toStdString();
+	auto minimizers = CMinimizerFactory::Instance();
+	CMinimizerPtr minimizer = minimizers.CreateMinimizer(id);
+	widget->SetMinimizer(minimizer);
+	widget->startMinimizer();
+}
+
+/// Stops the minimizer running on the currently selected subwindow
+void gui_main::on_btnMinimizerStop_clicked()
+{
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+	widget->stopMinimizer();
+}
+
+void gui_main::on_btnNewModelArea_clicked()
+{
+	int width = this->spinModelSize->value();
+    int height = this->spinModelSize->value();
+    double scale = this->spinModelScale->value();
+
+    AddGLArea(width, height, scale);
+}
+
 void gui_main::render()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -702,7 +723,7 @@ void gui_main::SetSavePath(void)
 /// Sets the time from the current selected datafile.
 void gui_main::SetTime(void)
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
@@ -710,7 +731,7 @@ void gui_main::SetTime(void)
     CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 
     // Get the selected indicies:
-    QModelIndexList list = ui.treeOpenFiles->selectionModel()->selectedIndexes();
+    QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedIndexes();
     QStandardItemModel * model = widget->GetOpenFileModel();
 
     // Ensure there is data present before continuing.
@@ -728,21 +749,21 @@ void gui_main::SetTime(void)
 void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
 {
 	ButtonCheck();
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
     	return;
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 
 	// Configure the open file widget:
-	ui.treeOpenFiles->setHeaderHidden(false);
-    ui.treeOpenFiles->setModel(widget->GetOpenFileModel());
-	ui.treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
+	this->treeOpenFiles->setHeaderHidden(false);
+    this->treeOpenFiles->setModel(widget->GetOpenFileModel());
+	this->treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
 
 	// Configure the model tree
     CTreeModel * model = widget->GetTreeModel();
-	ui.treeModels->setHeaderHidden(false);
-	ui.treeModels->setModel(widget->GetTreeModel());
-	ui.treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
+	this->treeModels->setHeaderHidden(false);
+	this->treeModels->setModel(widget->GetTreeModel());
+	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
 }
 

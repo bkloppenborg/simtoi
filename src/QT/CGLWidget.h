@@ -48,8 +48,9 @@ class CGLWidget : public QGLWidget
     Q_OBJECT
     
 protected:
-    CCL_GLThread mGLT;
+    shared_ptr<CCL_GLThread> mGLT;
     CMinimizerPtr mMinimizer;
+    std::thread mMinimizerThread;
     QStandardItemModel * mOpenFileModel;
     CTreeModel * mTreeModel;
     static QGLFormat mFormat;
@@ -72,49 +73,52 @@ protected:
 
 public:
 
-    double GetFlux() { return mGLT.GetFlux(); };
-    void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth) { mGLT.GetImage(image, width, height, depth); };
-    unsigned int GetImageDepth() { return mGLT.GetImageDepth(); };
-    unsigned int GetImageHeight() { return mGLT.GetImageHeight(); };
-    unsigned int GetImageWidth() { return mGLT.GetImageWidth(); };
-    float GetImageScale() { return mGLT.GetScale(); };
-    int GetNData() { return mGLT.GetNData(); };
-    int GetNDataSets() { return mGLT.GetNDataSets(); };
-    double GetDataAveJD(int data_num) { return mGLT.GetDataAveJD(data_num); };
+    double GetFlux() { return mGLT->GetFlux(); };
+    void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth) { mGLT->GetImage(image, width, height, depth); };
+    unsigned int GetImageDepth() { return mGLT->GetImageDepth(); };
+    unsigned int GetImageHeight() { return mGLT->GetImageHeight(); };
+    unsigned int GetImageWidth() { return mGLT->GetImageWidth(); };
+    float GetImageScale() { return mGLT->GetScale(); };
+    int GetNData() { return mGLT->GetNData(); };
+    int GetNDataSets() { return mGLT->GetNDataSets(); };
+    double GetDataAveJD(int data_num) { return mGLT->GetDataAveJD(data_num); };
     string GetMinimizerID();
     bool GetMinimizerRunning();
 
-    int GetNModels() { return mGLT.GetModelList()->size(); };
-    CModelList * GetModelList() { return mGLT.GetModelList(); };
+    int GetNModels() { return mGLT->GetModelList()->size(); };
+    CModelList * GetModelList() { return mGLT->GetModelList(); };
     QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
-    double GetScale() { return mGLT.GetScale(); };
+    double GetScale() { return mGLT->GetScale(); };
     CTreeModel * GetTreeModel() { return mTreeModel; };
 
 
-    void LoadData(string filename) { mGLT.LoadData(filename); };
+    void LoadData(string filename) { mGLT->LoadData(filename); };
 protected:
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
 
 public:
     void Open(string filename);
-    bool OpenCLInitialized() { return mGLT.OpenCLInitialized(); };
+    bool OpenCLInitialized() { return mGLT->OpenCLInitialized(); };
 
 protected:
     void RebuildTree();
 public:
-    void RemoveData(int data_num) { mGLT.RemoveData(data_num); };
+    void RemoveData(int data_num) { mGLT->RemoveData(data_num); };
 
 public:
-    void Save(string location) { mGLT.Save(location); };
-    void SaveImage(string filename) { mGLT.SaveImage(filename); };
+    void Save(string location) { mGLT->Save(location); };
+    void SaveImage(string filename) { mGLT->SaveImage(filename); };
     void SetFreeParameters(double * params, int n_params, bool scale_params);
+    void SetMinimizer(CMinimizerPtr minimizer);
     void SetScale(double scale);
     void SetSaveFileBasename(string filename);
-    void SetTime(double t) { mGLT.SetTime(t); };
-    void SetTimestep(double dt) { mGLT.SetTimestep(dt); };
+    void SetTime(double t) { mGLT->SetTime(t); };
+    void SetTimestep(double dt) { mGLT->SetTimestep(dt); };
 
+    void startMinimizer();
     void startRendering();
+    void stopMinimizer();
     void stopRendering();
 };
 

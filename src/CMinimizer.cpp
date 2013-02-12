@@ -32,6 +32,9 @@
 
 #include "CMinimizer.h"
 #include "CCL_GLThread.h"
+#include <functional>
+
+using namespace std;
 
 CMinimizer::CMinimizer()
 {
@@ -46,6 +49,10 @@ CMinimizer::CMinimizer()
 
 CMinimizer::~CMinimizer()
 {
+	// Cleanly stop the thread
+	stop();
+
+	// Clear up memory
 	delete[] mParams;
 }
 
@@ -99,12 +106,6 @@ void CMinimizer::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 	mRun = true;
 }
 
-bool CMinimizer::IsRunning()
-{
-	return mIsRunning;
-}
-
-
 void CMinimizer::SetSaveFileBasename(string filename)
 {
 	// Only permit non-empty save file names:
@@ -112,9 +113,12 @@ void CMinimizer::SetSaveFileBasename(string filename)
 		mSaveFileBasename = filename;
 }
 
-/// Tells the thread to gracefully exit.
-/// The event loop of the minimization thread must mRun for this routine to work correctly.
-void CMinimizer::Stop()
+void CMinimizer::start(CMinimizerPtr minimizer)
+{
+	minimizer->run();
+}
+
+void CMinimizer::stop()
 {
 	mRun = false;
 }

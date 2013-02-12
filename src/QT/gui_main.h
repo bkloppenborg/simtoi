@@ -39,12 +39,10 @@ using namespace std;
 class CParameters;
 class CParameterItem;
 
-class gui_main : public QMainWindow
+class gui_main : public QMainWindow, private Ui::cmainguiClass
 {
     Q_OBJECT
 
-protected:
-    Ui::cmainguiClass ui;
     string mShaderSourceDir;
     string mKernelSourceDir;
     bool mAnimating;
@@ -76,13 +74,12 @@ public:
 protected:
     void DataAdd(QStringList & filenames, QMdiSubWindow * sw);
 
-    void MinimizerRun(int minimizer_id, QMdiSubWindow * sw);
+    void MinimizerRun(string MinimizerID, QMdiSubWindow * sw);
     void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
 
     void Init();
 
 private slots:
-    void AddGLArea();
     void Animation_StartStop();
     void Animation_Reset();
     void AutoClose(QWidget * widget);
@@ -92,8 +89,9 @@ private slots:
     void ExportPhotometry();
     void ExportFITS();
     void render();
-    void MinimizerRun();
-    void MinimizerStop();
+    void on_btnMinimizerStart_clicked();
+    void on_btnMinimizerStop_clicked();
+    void on_btnNewModelArea_clicked();
 	void ModelAdd(void);
 	void ModelDelete(void);
 	void ModelEdit(void);

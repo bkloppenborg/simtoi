@@ -41,7 +41,7 @@
        </widget>
       </item>
       <item row="0" column="4">
-       <widget class="QPushButton" name="btnModelArea">
+       <widget class="QPushButton" name="btnNewModelArea">
         <property name="text">
          <string>New Region</string>
         </property>
@@ -307,7 +307,7 @@
          <widget class="QComboBox" name="cboMinimizers"/>
         </item>
         <item row="3" column="0">
-         <widget class="QPushButton" name="btnRunMinimizer">
+         <widget class="QPushButton" name="btnMinimizerStart">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -317,7 +317,7 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QPushButton" name="btnStopMinimizer">
+         <widget class="QPushButton" name="btnMinimizerStop">
           <property name="enabled">
            <bool>false</bool>
           </property>

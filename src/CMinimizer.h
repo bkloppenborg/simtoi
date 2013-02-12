@@ -50,6 +50,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <thread>
 
 using namespace std;
 
@@ -61,6 +62,7 @@ class CMinimizer
 {
 protected:
 	bool mIsRunning;
+	std::thread mThread;
 
 public:
 	shared_ptr<CCL_GLThread> mCLThread;
@@ -83,10 +85,12 @@ public:
 	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
 	bool IsRunning();
 
+	// Pure virtual function, each minimizer must implement this.
 	virtual int run() = 0;
 
 	void SetSaveFileBasename(string filename);
-	virtual void Stop();
+	static void start(CMinimizerPtr minimizer);
+	virtual void stop();
 
 	template <class T>
 	void WriteTable(vector< vector<T> > & data, ofstream & output)
