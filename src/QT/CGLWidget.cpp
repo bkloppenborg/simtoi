@@ -206,8 +206,6 @@ void CGLWidget::RebuildTree()
 		item_parent->appendRow(items);
 		LoadParameters(item, shader);
 	}
-
-
 }
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)
@@ -219,6 +217,7 @@ void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
 {
 	stopMinimizer();
 	mMinimizer = minimizer;
+	mMinimizer->Init(mGLT);
 }
 
 void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_params)
@@ -248,6 +247,10 @@ void CGLWidget::startMinimizer()
 	if(!mMinimizer)
 		return;
 
+	// Initialize OpenCL
+	mGLT->EnqueueOperation(CLT_Init);
+
+	// Start the minimization thread
 	mMinimizerThread = std::thread(&CMinimizer::start, mMinimizer);
 }
 
@@ -256,7 +259,9 @@ void CGLWidget::stopMinimizer()
 	if(!mMinimizer)
 		return;
 
+	// Stop the thread. If it was running, join it.
 	mMinimizer->stop();
-	mMinimizerThread.join();
+	if(mMinimizerThread.joinable())
+		mMinimizerThread.join();
 }
 

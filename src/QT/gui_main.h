@@ -59,21 +59,19 @@ public:
 
 protected:
     QMdiSubWindow * AddGLArea(int model_width, int model_height, double model_scale);
-
+    void AddData(QStringList & filenames, QMdiSubWindow * sw);
 public:
     void AutoClose(bool auto_close, QMdiSubWindow * sw);
 
 protected:
     void ButtonCheck();
+
     void close();
     void closeEvent(QCloseEvent *evt);
-
 public:
     void CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale, bool close_simtoi);
 
 protected:
-    void DataAdd(QStringList & filenames, QMdiSubWindow * sw);
-
     void MinimizerRun(string MinimizerID, QMdiSubWindow * sw);
     void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
 
@@ -83,26 +81,24 @@ private slots:
     void Animation_StartStop();
     void Animation_Reset();
     void AutoClose(QWidget * widget);
-    void DataAdd(void);
-    void DataRemove();
     void DeleteGLArea();
     void ExportPhotometry();
     void ExportFITS();
     void render();
-    void on_btnMinimizerStart_clicked();
-    void on_btnMinimizerStop_clicked();
-    void on_btnNewModelArea_clicked();
-	void ModelAdd(void);
-	void ModelDelete(void);
-	void ModelEdit(void);
     void ModelOpen();
     void ModelSave();
     void SetSavePath();
     void SetTime();
 
-
-public slots:
-	void subwindowSelected(QMdiSubWindow * window);
+    void on_btnAddData_clicked();
+    void on_btnAddModel_clicked();
+    void on_btnEditModel_clicked();
+    void on_btnRemoveData_clicked();
+    void on_btnDeleteModel_clicked();
+    void on_btnMinimizerStart_clicked();
+    void on_btnMinimizerStop_clicked();
+    void on_btnNewModelArea_clicked();
+    void on_mdiArea_subWindowActivated();
 };
 
 #endif // CMAINGUI_H
