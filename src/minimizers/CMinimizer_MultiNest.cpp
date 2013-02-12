@@ -36,6 +36,7 @@
 
 CMinimizer_MultiNest::CMinimizer_MultiNest()
 {
+	mMinimizerID = "multinest";
 	mMinimizerName = "MultiNest";
 }
 

@@ -45,10 +45,9 @@
 #include "CPosition.h"
 #include "CMinimizer.h"
 #include "CTreeModel.h"
+#include "gui_common.h"
 #include "gui_model.h"
-
-//Q_DECLARE_METATYPE(ModelTypes);
-//Q_DECLARE_METATYPE(CGLShaderList::ShaderTypes);
+#include "CMinimizerFactory.h"
 
 gui_main::gui_main(QWidget *parent_widget)
     : QMainWindow(parent_widget)
@@ -156,10 +155,9 @@ void gui_main::ButtonCheck()
     if(!sw)
     	return;
 
+    // Animation / data export area
 	ui.btnStartStop->setEnabled(true);
 	ui.btnReset->setEnabled(true);
-	ui.btnRunMinimizer->setEnabled(true);
-	ui.btnStopMinimizer->setEnabled(true);
 	ui.btnSavePhotometry->setEnabled(true);
 	ui.btnSaveFITS->setEnabled(true);
 	ui.btnSetTime->setEnabled(true);
@@ -177,6 +175,24 @@ void gui_main::ButtonCheck()
 		ui.btnModelEdit->setEnabled(true);
 		ui.btnModelDelete->setEnabled(true);
 	}
+
+	// Buttons for minimizer area
+	// Look up the minimizer's ID in the combo box, select it.
+	int id = ui.cboMinimizers->findText(QString::fromStdString(widget->GetMinimizerID()));
+	if(id > -1)
+		ui.cboMinimizers->setCurrentIndex(id);
+	// Toggle minimizer start/stop buttons
+	if(widget->GetMinimizerRunning())
+	{
+		ui.btnStopMinimizer->setEnabled(true);
+		ui.btnRunMinimizer->setEnabled(false);
+	}
+	else
+	{
+		ui.btnStopMinimizer->setEnabled(false);
+		ui.btnRunMinimizer->setEnabled(true);
+	}
+
 }
 
 void gui_main::AutoClose(QWidget * widget)
@@ -500,7 +516,8 @@ void gui_main::Init(void)
 	mNumMinimizations = 0;
 
 	// Setup the combo boxes.
-	SetupComboBoxes();
+	auto minimizers = CMinimizerFactory::Instance();
+	gui_common::SetupComboOptions(ui.cboMinimizers, minimizers.GetMinimizerList());
 
 	// Setup the text boxes
 	ui.textSavePath->setText(mDefaultSaveDir.c_str());
@@ -508,73 +525,18 @@ void gui_main::Init(void)
 
 void gui_main::MinimizerRun()
 {
-	int minimizer = ui.cboMinimizers->itemData(ui.cboMinimizers->currentIndex()).toInt();
 
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-    MinimizerRun(minimizer, sw);
 }
 
 void gui_main::MinimizerRun(int minimizer_id, QMdiSubWindow * sw)
 {
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    CMinimizer::MinimizerTypes minimizer;
 
-    if(widget->GetNData() == 0)
-    {
-		QMessageBox msgBox;
-		msgBox.setText("You must load data before running a minimizer.");
-		msgBox.exec();
-    	return;
-    }
-
-	widget->EnqueueOperation(CLT_Init);
-
-    // Now determine which minimizer is selected.  The else case could be generated
-	// from a command-line execution of SIMTOI.
-	if(minimizer_id > CMinimizer::NONE && minimizer_id < CMinimizer::LAST_VALUE)
-	{
-		minimizer = CMinimizer::MinimizerTypes(minimizer_id);
-	    widget->LoadMinimizer(minimizer);
-
-	    // set the save file base name
-	    string ui_savefile = ui.textSavePath->text().toStdString();
-	    if(ui_savefile == mDefaultSaveDir)
-	    {
-	    	std::stringstream savepath;
-	    	savepath << ui_savefile << mNumMinimizations;
-	    	widget->SetSaveFileBasename(savepath.str());
-	    }
-	    else
-	    {
-	    	widget->SetSaveFileBasename(ui_savefile);
-	    }
-
-	    widget->RunMinimizer();
-	    mNumMinimizations += 1;
-	}
-	else
-    {
-		QMessageBox msgBox;
-		msgBox.setText("Unknown minimizer.");
-		msgBox.exec();
-    	return;
-    }
 }
 
 /// Stops the minimizer
 void gui_main::MinimizerStop()
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
 
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    CMinimizer::MinimizerTypes minimizer;
-
-	widget->StopMinimizer();
 }
 
 void gui_main::ModelAdd(void)
@@ -732,34 +694,9 @@ void gui_main::render()
     }
 }
 
-void gui_main::SetupComboBoxes()
-{
-//	gui_general::SetupComboOptions(ui.cboMinimizers, CMinimizer::GetTypes());
-}
-
 void gui_main::SetSavePath(void)
 {
-    QMdiSubWindow * sw = ui.mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
 
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-
-    // set the save file base name
-    string ui_savefile = ui.textSavePath->text().toStdString();
-    if(ui_savefile == mDefaultSaveDir)
-    {
-    	std::stringstream savepath;
-    	savepath << ui_savefile << mNumMinimizations;
-    	widget->SetSaveFileBasename(savepath.str());
-    }
-    else
-    {
-    	widget->SetSaveFileBasename(ui_savefile);
-    }
-
-    widget->RunMinimizer();
-    mNumMinimizations += 1;
 }
 
 /// Sets the time from the current selected datafile.
@@ -807,8 +744,5 @@ void gui_main::subwindowSelected(QMdiSubWindow * mdi_subwindow)
 	ui.treeModels->setHeaderHidden(false);
 	ui.treeModels->setModel(widget->GetTreeModel());
 	ui.treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
-
-	// Configure the Minimizer box
-	ui.textSavePath->setText(widget->GetSaveFileBasename().c_str());
 }
 

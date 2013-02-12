@@ -27,22 +27,23 @@
 #ifndef GUI_ADDMODEL_H
 #define GUI_ADDMODEL_H
 
+#include "ui_gui_model.h"
+#include "gui_common.h"
 
 #include <QtGui/QWidget>
-#include "ui_gui_model.h"
 #include <QDialog>
 #include <utility>
 #include <vector>
-#include "CModelList.h"
-#include "CModelList.h"
-
-class CModel;
+#include <memory>
 
 using namespace std;
+
+class CModel;
 
 class gui_model : public QDialog
 {
     Q_OBJECT
+
 private:
     Ui::gui_addmodelClass ui;
 
@@ -56,17 +57,6 @@ public:
     virtual ~gui_model();
 
     shared_ptr<CModel> GetModel();
-
-    void SetupComboOptions(QComboBox * combo_box, vector<string> values)
-    {
-    	QString tmp_str = "";
-
-    	for(unsigned int i = 0; i < values.size(); i++)
-    	{
-    		tmp_str = QString::fromStdString(values[i]);
-    		combo_box->addItem(tmp_str);
-    	}
-    }
 };
 
 #endif // GUI_ADDMODEL_H

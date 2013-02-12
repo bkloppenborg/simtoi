@@ -24,6 +24,7 @@
  */
 
 #include "gui_model.h"
+#include "gui_common.h"
 #include "CModel.h"
 #include "CModelFactory.h"
 #include "CPositionFactory.h"
@@ -39,9 +40,9 @@ gui_model::gui_model(QWidget *parent)
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
 
-	SetupComboOptions(ui.cboModels, models.GetModelList());
-	SetupComboOptions(ui.cboPositions, positions.GetPositionList());
-	SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
+	gui_common::SetupComboOptions(ui.cboModels, models.GetModelList());
+	gui_common::SetupComboOptions(ui.cboPositions, positions.GetPositionList());
+	gui_common::SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

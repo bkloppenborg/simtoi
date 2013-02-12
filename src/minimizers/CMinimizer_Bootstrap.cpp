@@ -46,6 +46,7 @@ using namespace std;
 
 CMinimizer_Bootstrap::CMinimizer_Bootstrap()
 {
+	mMinimizerID = "bootstrap";
 	mMinimizerName = "Bootstrap";
 
 	mResiduals = NULL;

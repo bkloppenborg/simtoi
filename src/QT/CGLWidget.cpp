@@ -34,7 +34,7 @@
 #include "CParameterItem.h"
 
 CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
-    : QGLWidget(widget_parent), mGLT(this, shader_source_dir, cl_kernel_dir), mMinThread()
+    : QGLWidget(widget_parent), mGLT(this, shader_source_dir, cl_kernel_dir)
 { 
     setAutoBufferSwap(false);
     this->doneCurrent();
@@ -66,7 +66,6 @@ void CGLWidget::AddModel(shared_ptr<CModel> model)
 
 void CGLWidget::closeEvent(QCloseEvent *evt)
 {
-	StopMinimizer();
     stopRendering();
     QGLWidget::closeEvent(evt);
 }
@@ -74,11 +73,6 @@ void CGLWidget::closeEvent(QCloseEvent *evt)
 void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
 {
 	mGLT.EnqueueOperation(op);
-}
-
-string CGLWidget::GetSaveFileBasename()
-{
-	return mMinThread.GetSaveFileBasename();
 }
 
 void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
@@ -138,16 +132,21 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	return items;
 }
 
-void CGLWidget::LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type)
+/// Returns the Minimizer's ID if one is loaded, otherwise an empty string.
+string CGLWidget::GetMinimizerID()
 {
-	// TODO: Permit loading of different minimizers here.
-	CMinimizer * tmp = CMinimizer::GetMinimizer(minimizer_type, &mGLT);
-	mMinThread.SetMinimizer(tmp);
+	if(mMinimizer)
+		return mMinimizer->GetID();
+
+	return "";
 }
 
-void CGLWidget::MinimizerExit(void)
+bool CGLWidget::GetMinimizerRunning()
 {
-	emit( MinimizationFinished(dynamic_cast<QWidget*>(parent()) ) );
+	if(mMinimizer)
+		return mMinimizer->IsRunning();
+
+	return false;
 }
 
 void CGLWidget::Open(string filename)
@@ -213,13 +212,6 @@ void CGLWidget::resizeEvent(QResizeEvent *evt)
     mGLT.resizeViewport(evt->size());
 }
 
-void CGLWidget::RunMinimizer()
-{
-	mMinThread.start();
-
-	connect(&mMinThread, SIGNAL(finished(void)), this, SLOT(MinimizerExit(void)));
-}
-
 void CGLWidget::startRendering()
 {
 	// Tell the thread to start.
@@ -237,17 +229,7 @@ void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_para
 	mGLT.SetFreeParameters(params, n_params, scale_params);
 }
 
-void CGLWidget::SetSaveFileBasename(string filename)
-{
-	mMinThread.SetSaveFileBasename(filename);
-}
-
 void CGLWidget::SetScale(double scale)
 {
 	mGLT.SetScale(scale);
-}
-
-void CGLWidget::StopMinimizer()
-{
-	mMinThread.stop();
 }

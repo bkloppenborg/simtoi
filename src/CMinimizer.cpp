@@ -40,6 +40,8 @@ CMinimizer::CMinimizer()
 	mRun = false;
 	mIsRunning = false;
 	mSaveFileBasename = "/tmp/model";
+	mMinimizerName = "";
+	mMinimizerID = "";
 }
 
 CMinimizer::~CMinimizer()

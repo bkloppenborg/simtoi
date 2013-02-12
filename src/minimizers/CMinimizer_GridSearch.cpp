@@ -42,6 +42,7 @@ using namespace std;
 
 CMinimizer_GridSearch::CMinimizer_GridSearch()
 {
+	mMinimizerID = "gridsearch";
 	mMinimizerName = "Gridsearch";
 }
 

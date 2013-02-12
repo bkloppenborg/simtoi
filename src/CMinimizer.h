@@ -70,12 +70,14 @@ public:
 	string mSaveFileBasename;
 
 	string mMinimizerName;
+	string mMinimizerID;
 
 	CMinimizer();
 	virtual ~CMinimizer();
 
 	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 
+	string GetID() { return mMinimizerID; };
 	virtual void GetResults(double * results, int n_params);
 
 	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);

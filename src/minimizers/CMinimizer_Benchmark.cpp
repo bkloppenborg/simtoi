@@ -37,6 +37,7 @@
 
 CMinimizer_Benchmark::CMinimizer_Benchmark()
 {
+	mMinimizerID = "benchmark";
 	mMinimizerName = "Benchmark";
 }
 

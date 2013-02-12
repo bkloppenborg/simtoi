@@ -39,6 +39,7 @@
 
 CMinimizer_levmar::CMinimizer_levmar()
 {
+	mMinimizerID = "levmar";
 	mMinimizerName = "Levmar";
 	mResiduals = NULL;
 }

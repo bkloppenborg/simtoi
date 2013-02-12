@@ -188,6 +188,8 @@ public:
 	vector< pair<double, double> > GetFreeParamMinMaxes() { return mModelList->GetFreeParamMinMaxes(); };
 	double GetFreeParameterPriorProduct() { return mModelList->GetFreeParameterPriorProduct(); };
 	vector<string> GetFreeParamNames() { return mModelList->GetFreeParamNames(); };
+    string  GetMinimizerID();
+    bool  	GetMinimizerRunning();
 	int 	GetNData();
 	int 	GetNDataAllocated();
 	int 	GetNDataAllocated(int data_num);

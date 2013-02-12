@@ -26,16 +26,18 @@
 #ifndef CMAINGUI_H
 #define CMAINGUI_H
 
+#include "ui_gui_main.h"
+#include "gui_common.h"
+
 #include <QtGui/QMainWindow>
-#include <string>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include "ui_gui_main.h"
+#include <string>
+
+using namespace std;
 
 class CParameters;
 class CParameterItem;
-
-using namespace std;
 
 class gui_main : public QMainWindow
 {
@@ -77,7 +79,6 @@ protected:
     void MinimizerRun(int minimizer_id, QMdiSubWindow * sw);
     void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
 
-    void SetupComboBoxes();
     void Init();
 
 private slots:

@@ -36,7 +36,6 @@
 #include <vector>
 
 #include "CCL_GLThread.h"
-#include "CMinimizerThread.h"
 #include "liboi.hpp"
 #include "CModelList.h"
 #include "CMinimizer.h"
@@ -50,7 +49,7 @@ class CGLWidget : public QGLWidget
     
 protected:
     CCL_GLThread mGLT;
-    CMinimizerThread mMinThread;
+    CMinimizerPtr mMinimizer;
     QStandardItemModel * mOpenFileModel;
     CTreeModel * mTreeModel;
     static QGLFormat mFormat;
@@ -73,9 +72,6 @@ protected:
 
 public:
 
-    vector<string> GetModelTypes() { return mGLT.GetModelTypes(); };
-//    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
-
     double GetFlux() { return mGLT.GetFlux(); };
     void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth) { mGLT.GetImage(image, width, height, depth); };
     unsigned int GetImageDepth() { return mGLT.GetImageDepth(); };
@@ -85,16 +81,17 @@ public:
     int GetNData() { return mGLT.GetNData(); };
     int GetNDataSets() { return mGLT.GetNDataSets(); };
     double GetDataAveJD(int data_num) { return mGLT.GetDataAveJD(data_num); };
+    string GetMinimizerID();
+    bool GetMinimizerRunning();
+
     int GetNModels() { return mGLT.GetModelList()->size(); };
     CModelList * GetModelList() { return mGLT.GetModelList(); };
     QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
-    string GetSaveFileBasename();
     double GetScale() { return mGLT.GetScale(); };
     CTreeModel * GetTreeModel() { return mTreeModel; };
 
 
     void LoadData(string filename) { mGLT.LoadData(filename); };
-    void LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type);
 protected:
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
@@ -103,7 +100,6 @@ public:
     void Open(string filename);
     bool OpenCLInitialized() { return mGLT.OpenCLInitialized(); };
 
-    void RunMinimizer();
 protected:
     void RebuildTree();
 public:
@@ -117,17 +113,9 @@ public:
     void SetSaveFileBasename(string filename);
     void SetTime(double t) { mGLT.SetTime(t); };
     void SetTimestep(double dt) { mGLT.SetTimestep(dt); };
-    void StopMinimizer();
 
     void startRendering();
     void stopRendering();
-
-signals:
-	void MinimizationFinished(QWidget * parent_window);
-
-public slots:
-	void MinimizerExit();
-
 };
 
 #endif
