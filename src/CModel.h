@@ -38,6 +38,7 @@
 // Headers for OpenGL functions
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <memory>
 
 #include "CParameters.h"
 #include "CPosition.h"
