@@ -44,10 +44,10 @@
 using namespace std;
 
 
-CMinimizer_Bootstrap::CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread)
-: CMinimizer_levmar(cl_gl_thread)
+CMinimizer_Bootstrap::CMinimizer_Bootstrap()
 {
-	mType = CMinimizer::BOOTSTRAP;
+	mMinimizerName = "Bootstrap";
+
 	mResiduals = NULL;
 
 	mBootstrapFailures = 0;
@@ -57,6 +57,11 @@ CMinimizer_Bootstrap::CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread)
 CMinimizer_Bootstrap::~CMinimizer_Bootstrap()
 {
 
+}
+
+CMinimizerPtr CMinimizer_Bootstrap::Create()
+{
+	return shared_ptr<CMinimizer>(new CMinimizer_Bootstrap());
 }
 
 ///
@@ -100,9 +105,9 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 
 }
 
-void CMinimizer_Bootstrap::Init()
+void CMinimizer_Bootstrap::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 {
-	CMinimizer_levmar::Init();
+	CMinimizer_levmar::Init(cl_gl_thread);
 
 	// Get a copy of the original data, load it into memory.
 	int nData = mCLThread->GetNDataSets();

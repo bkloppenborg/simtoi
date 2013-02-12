@@ -39,12 +39,13 @@
 
 class CMinimizer_GridSearch: public CMinimizer {
 public:
-	CMinimizer_GridSearch(CCL_GLThread * cl_gl_thread);
+	CMinimizer_GridSearch();
 	virtual ~CMinimizer_GridSearch();
+
+	static CMinimizerPtr Create();
 
 	vector< tuple<double,double,double> > mResults;
 
-	void Init();
 	virtual void ExportResults(double * params, int n_params, bool no_setparams);
 
 	int run();

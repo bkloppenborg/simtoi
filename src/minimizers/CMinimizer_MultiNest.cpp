@@ -34,15 +34,19 @@
 #include "CCL_GLThread.h"
 #include <limits>
 
-CMinimizer_MultiNest::CMinimizer_MultiNest(CCL_GLThread * cl_gl_thread)
-	: CMinimizer(cl_gl_thread)
+CMinimizer_MultiNest::CMinimizer_MultiNest()
 {
-	mType = CMinimizer::MULTINEST;
+	mMinimizerName = "MultiNest";
 }
 
 CMinimizer_MultiNest::~CMinimizer_MultiNest()
 {
 	// TODO Auto-generated destructor stub
+}
+
+CMinimizerPtr CMinimizer_MultiNest::Create()
+{
+	return shared_ptr<CMinimizer>(new CMinimizer_MultiNest());
 }
 
 /// Dumper (do nothing)

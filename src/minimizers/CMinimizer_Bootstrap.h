@@ -53,15 +53,17 @@ public:
 	vector<OIDataList> mData;	// A copy of the original data
 
 public:
-	CMinimizer_Bootstrap(CCL_GLThread * cl_gl_thread);
+	CMinimizer_Bootstrap();
 	virtual ~CMinimizer_Bootstrap();
 
 	vector< vector<double> > mResults;
 
+	static CMinimizerPtr Create();
+
 	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
 	virtual void ExportResults(double * params, int n_params, bool no_setparams);
 
-	void Init();
+	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
 
 	void Next();
 

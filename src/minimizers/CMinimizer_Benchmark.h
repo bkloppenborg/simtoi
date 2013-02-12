@@ -38,8 +38,10 @@
 class CMinimizer_Benchmark: public CMinimizer
 {
 public:
-	CMinimizer_Benchmark(CCL_GLThread * cl_gl_thread);
+	CMinimizer_Benchmark();
 	virtual ~CMinimizer_Benchmark();
+
+	static CMinimizerPtr Create();
 
 	static int GetMilliCount();
 	static int GetMilliSpan(int nTimeStart);

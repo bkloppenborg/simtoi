@@ -1,7 +1,7 @@
 /*
- * CMinimizerThread.h
+ * CMinimizer_levmar.h
  *
- *  Created on: Jan 30, 2012
+ *  Created on: Feb 13, 2012
  *      Author: bkloppenborg
  */
  
@@ -30,39 +30,36 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMINIMIZERTHREAD_H_
-#define CMINIMIZERTHREAD_H_
+#ifndef CMINIMIZER_LEVMAR_H_
+#define CMINIMIZER_LEVMAR_H_
 
-#include <QObject>
-#include <QThread>
-#include <string>
+#include <valarray>
 
 using namespace std;
 
-class CMinimizer;
+#include "CMinimizer.h"
 
-class CMinimizerThread: public QThread
+class CMinimizer_levmar: public CMinimizer
 {
-    Q_OBJECT
-
 protected:
-    CMinimizer * mMinimizer;
-    string mSaveFileBasename;
+	float * mResiduals;
 
 public:
-	CMinimizerThread();
-	virtual ~CMinimizerThread();
+	CMinimizer_levmar();
+	virtual ~CMinimizer_levmar();
 
-	string GetSaveFileBasename() { return mSaveFileBasename; };
+	static CMinimizerPtr Create();
 
-	void SetMinimizer(CMinimizer * minimizer);
-	void SetSaveFileBasename(string filename);
+	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
 
-	void run();
-	void stop();
+	string GetExitString(int exit_num);
 
-	signals:
-	void ParametersChanged();
+	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
+
+	void printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar);
+
+	virtual int run();
+	int run(void (*error_func)(double *p, double *hx, int m, int n, void *adata));
 };
 
-#endif /* CMINIMIZERTHREAD_H_ */
+#endif /* CMINIMIZER_LEVMAR_H_ */

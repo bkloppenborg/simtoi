@@ -32,24 +32,12 @@
 
 #include "CMinimizer.h"
 #include "CCL_GLThread.h"
-#include "CMinimizer_Benchmark.h"
 
-// Compiler directive to add support for MultiNest
-#ifdef _ADD_MULTINEST
-#include "CMinimizer_MultiNest.h"
-#endif // _ADD_MULTINEST
-
-#include "CMinimizer_levmar.h"
-#include "CMinimizer_GridSearch.h"
-#include "CMinimizer_Bootstrap.h"
-
-CMinimizer::CMinimizer(CCL_GLThread * cl_gl_thread)
+CMinimizer::CMinimizer()
 {
-	mCLThread = cl_gl_thread;
 	mParams = NULL;
 	mNParams = 0;
-	mType = NONE;
-	mRun = true;
+	mRun = false;
 	mIsRunning = false;
 	mSaveFileBasename = "/tmp/model";
 }
@@ -93,53 +81,6 @@ void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 	mCLThread->ExportResults(mSaveFileBasename);
 }
 
-CMinimizer * CMinimizer::GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread)
-{
-	CMinimizer * tmp;
-	switch(type)
-	{
-#ifdef MULTINEST_H
-	case MULTINEST:
-		tmp = new CMinimizer_MultiNest(cl_gl_thread);
-		break;
-#endif // MULTINEST_H
-
-	case LEVMAR:
-		tmp = new CMinimizer_levmar(cl_gl_thread);
-		break;
-
-	case GRIDSEARCH:
-		tmp = new CMinimizer_GridSearch(cl_gl_thread);
-		break;
-
-	case BOOTSTRAP:
-		tmp = new CMinimizer_Bootstrap(cl_gl_thread);
-		break;
-
-	default:
-	case BENCHMARK:
-		tmp = new CMinimizer_Benchmark(cl_gl_thread);
-		break;
-	}
-
-	return tmp;
-}
-
-vector< pair<CMinimizer::MinimizerTypes, string> > CMinimizer::GetTypes(void)
-{
-	vector< pair<CMinimizer::MinimizerTypes, string> > tmp;
-	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BENCHMARK, "Benchmark"));
-
-#ifdef MULTINEST_H
-	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::MULTINEST, "MultiNest"));
-#endif // MULTINEST_H
-
-	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::LEVMAR, "Levmar"));
-	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::GRIDSEARCH, "Grid Search"));
-	tmp.push_back(pair<CMinimizer::MinimizerTypes, string> (CMinimizer::BOOTSTRAP, "Bootstrap (Levmar)"));
-	return tmp;
-}
-
 /// Returns the best-fit parameters.
 void CMinimizer::GetResults(double * results, int n_params)
 {
@@ -148,8 +89,9 @@ void CMinimizer::GetResults(double * results, int n_params)
 		results[i] = mParams[i];
 }
 
-void CMinimizer::Init()
+void CMinimizer::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 {
+	mCLThread = cl_gl_thread;
 	mNParams = mCLThread->GetNFreeParameters();
 	mParams = new double[mNParams];
 	mRun = true;

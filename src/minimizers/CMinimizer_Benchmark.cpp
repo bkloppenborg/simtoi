@@ -35,16 +35,19 @@
 #include "CCL_GLThread.h"
 #include "misc.h"
 
-CMinimizer_Benchmark::CMinimizer_Benchmark(CCL_GLThread * cl_gl_thread)
-: CMinimizer(cl_gl_thread)
+CMinimizer_Benchmark::CMinimizer_Benchmark()
 {
-	mType = BENCHMARK;
-
+	mMinimizerName = "Benchmark";
 }
 
 CMinimizer_Benchmark::~CMinimizer_Benchmark()
 {
 	// TODO Auto-generated destructor stub
+}
+
+CMinimizerPtr CMinimizer_Benchmark::Create()
+{
+	return CMinimizerPtr(new CMinimizer_Benchmark());
 }
 
 int CMinimizer_Benchmark::GetMilliCount()

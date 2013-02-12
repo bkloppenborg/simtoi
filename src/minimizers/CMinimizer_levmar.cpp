@@ -37,16 +37,20 @@
 #include "CCL_GLThread.h"
 
 
-CMinimizer_levmar::CMinimizer_levmar(CCL_GLThread * cl_gl_thread)
-: CMinimizer(cl_gl_thread)
+CMinimizer_levmar::CMinimizer_levmar()
 {
-	mType = CMinimizer::LEVMAR;
+	mMinimizerName = "Levmar";
 	mResiduals = NULL;
 }
 
 CMinimizer_levmar::~CMinimizer_levmar()
 {
-	delete[] mResiduals;
+	if(mResiduals) delete[] mResiduals;
+}
+
+CMinimizerPtr CMinimizer_levmar::Create()
+{
+	return shared_ptr<CMinimizer>(new CMinimizer_levmar());
 }
 
 void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
@@ -86,9 +90,9 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 	}
 }
 
-void CMinimizer_levmar::Init()
+void CMinimizer_levmar::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 {
-	CMinimizer::Init();
+	CMinimizer::Init(cl_gl_thread);
 	int nData = mCLThread->GetNDataAllocated();
 
 	mResiduals = new float[nData];

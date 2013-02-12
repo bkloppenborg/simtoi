@@ -14,7 +14,7 @@ add_subdirectory(QT)
 add_subdirectory(scripts)
 
 # Assemble all of the source to build simtoi.
-file(GLOB SOURCE *.cpp models/*.cpp positions/*.cpp)
+file(GLOB SOURCE *.cpp models/*.cpp positions/*.cpp minimizers/*.cpp)
 
 # Levmar requires a linear algebra package, but it doesn't export a
 # LEVMAR_LIBRARIES. SIMTOI instructions say install Lapack, so we'll always
@@ -29,7 +29,7 @@ if(MULTINEST_FOUND)
     add_definitions(-D_ADD_MULTINEST)
 else(MULTINEST_FOUND)
     message(STATUS "MultiNest NOT found, SIMTOI compiled without support for this minimizer.")
-    file(GLOB REMOVE_MULTINEST "CMinimizer_MultiNest.cpp")
+    file(GLOB REMOVE_MULTINEST "minimizers/CMinimizer_MultiNest.cpp")
     list(REMOVE_ITEM SOURCE ${REMOVE_MULTINEST})
 endif(MULTINEST_FOUND)
 

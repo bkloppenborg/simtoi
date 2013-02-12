@@ -49,10 +49,13 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <memory>
 
 using namespace std;
 
 class CCL_GLThread;
+class CMinimizer;
+typedef shared_ptr<CMinimizer> CMinimizerPtr;
 
 class CMinimizer
 {
@@ -60,36 +63,22 @@ protected:
 	bool mIsRunning;
 
 public:
-	enum MinimizerTypes
-	{
-		NONE = 0,
-		BENCHMARK = 1,
-		LEVMAR = 2,
-		MULTINEST = 3,
-		GRIDSEARCH = 4,
-		BOOTSTRAP = 5,
-		LAST_VALUE	// this must always be the last value in this enum.
-	};
-
-public:
-	CCL_GLThread * mCLThread;
+	shared_ptr<CCL_GLThread> mCLThread;
 	double * mParams;	// Current parameter values. Set to best-fit parameters upon exit (required)
 	unsigned int mNParams;
 	bool mRun;
 	string mSaveFileBasename;
 
-	CMinimizer::MinimizerTypes mType;
+	string mMinimizerName;
 
-	CMinimizer(CCL_GLThread * cl_gl_thread);
+	CMinimizer();
 	virtual ~CMinimizer();
 
 	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 
-	static CMinimizer * GetMinimizer(CMinimizer::MinimizerTypes type, CCL_GLThread * cl_gl_thread);
 	virtual void GetResults(double * results, int n_params);
-	static vector< pair<CMinimizer::MinimizerTypes, string> > GetTypes(void);
 
-	virtual void Init();
+	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
 	bool IsRunning();
 
 	virtual int run() = 0;

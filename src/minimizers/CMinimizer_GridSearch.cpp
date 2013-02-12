@@ -40,14 +40,18 @@
 
 using namespace std;
 
-CMinimizer_GridSearch::CMinimizer_GridSearch(CCL_GLThread * cl_gl_thread)
-: CMinimizer(cl_gl_thread)
+CMinimizer_GridSearch::CMinimizer_GridSearch()
 {
-	mType = CMinimizer::GRIDSEARCH;
+	mMinimizerName = "Gridsearch";
 }
 
 CMinimizer_GridSearch::~CMinimizer_GridSearch() {
 	// TODO Auto-generated destructor stub
+}
+
+CMinimizerPtr CMinimizer_GridSearch::Create()
+{
+	return shared_ptr<CMinimizer>(new CMinimizer_GridSearch());
 }
 
 void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no_setparams)
@@ -69,11 +73,6 @@ void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no
 		outfile << get<0>(mResults[i]) << " " << get<1>(mResults[i]) << " " << get<2>(mResults[i]) << endl;
 
 	outfile.close();
-}
-
-void CMinimizer_GridSearch::Init()
-{
-	CMinimizer::Init();
 }
 
 
