@@ -233,13 +233,13 @@ void gui_main::closeEvent(QCloseEvent *evt)
 
 /// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
 /// SIMTOI will automatically exit when all minimization engines have completed execution.
-void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale, bool close_simtoi)
+void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, int size, double scale, bool close_simtoi)
 {
-//	QMdiSubWindow * sw = AddGLArea(size, size, scale);
-//	DataAdd(data_files, sw);
-//	ModelOpen(model_files, sw);
-//	MinimizerRun(minimizer, sw);
-//	AutoClose(close_simtoi, sw);
+	QMdiSubWindow * sw = AddGLArea(size, size, scale);
+	AddData(data_files, sw);
+	ModelOpen(model_files, sw);
+	MinimizerRun(minimizer, sw);
+	AutoClose(close_simtoi, sw);
 }
 
 void gui_main::AddData(QStringList & filenames, QMdiSubWindow * sw)
@@ -429,9 +429,19 @@ void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
 
 	// Look up the minimizer
 	auto minimizers = CMinimizerFactory::Instance();
-	CMinimizerPtr minimizer = minimizers.CreateMinimizer(MinimizerID);
-	widget->SetMinimizer(minimizer);
-	widget->startMinimizer();
+
+	try
+	{
+		CMinimizerPtr minimizer = minimizers.CreateMinimizer(MinimizerID);
+		widget->SetMinimizer(minimizer);
+		widget->startMinimizer();
+	}
+	catch(runtime_error & e)
+	{
+		QMessageBox msgBox;
+		msgBox.setText(QString("Could not start minimizer.\n") + QString(e.what()));
+		msgBox.exec();
+	}
 
 	ButtonCheck();
 }
@@ -580,11 +590,7 @@ void gui_main::on_btnMinimizerStart_clicked()
 
 	// Look up the minimizer
 	string id = this->cboMinimizers->currentText().toStdString();
-	auto minimizers = CMinimizerFactory::Instance();
-	CMinimizerPtr minimizer = minimizers.CreateMinimizer(id);
-	widget->SetMinimizer(minimizer);
-	widget->startMinimizer();
-	ButtonCheck();
+	MinimizerRun(id, sw);
 }
 
 /// Stops the minimizer running on the currently selected subwindow

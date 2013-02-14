@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     QStringList args = app.arguments();
     QStringList data_files;
     QStringList model_files;
-    int minimizer = 0;
+    string minimizer = "";
     int width = 0;
     double scale = 0;
     bool close_simtoi = false;
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, int &  minimizer, int & size, double & scale, bool & close_simtoi)
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, string &  minimizer, int & size, double & scale, bool & close_simtoi)
 {
 	unsigned int n_items = args.size();
 
@@ -109,7 +109,7 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 
 		// minimization engine
 		if(value == "-e")
-			minimizer = args.at(i + 1).toInt();
+			minimizer = args.at(i + 1).toStdString();
 
 		if(value == "-h" || value == "-help")
 			PrintHelp();
