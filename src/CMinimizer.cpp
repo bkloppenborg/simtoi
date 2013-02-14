@@ -32,7 +32,6 @@
 
 #include "CMinimizer.h"
 #include "CCL_GLThread.h"
-#include <functional>
 
 using namespace std;
 
