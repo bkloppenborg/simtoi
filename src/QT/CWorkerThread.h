@@ -52,10 +52,18 @@
 using namespace std;
 
 class CGLWidget;
-class CWorkerList;
+class CTaskList;
+typedef shared_ptr<CTaskList> CTaskListPtr;
+class CModel;
+typedef shared_ptr<CModel> CModelPtr;
+class CModelList;
+typedef shared_ptr<CModelList> CModelListPtr;
 
 enum WorkerOperations
 {
+	ANIMATE,
+	ANIMATE_STOP,
+	EXPORT,
 	GET_RESIDUALS,
 	GET_UNCERTAINTIES,
 	RENDER,
@@ -83,33 +91,63 @@ class CWorkerThread : public QThread
 protected:
     // OpenGL
     CGLWidget * mGLWidget;
+    unsigned int mImageDepth;
+    unsigned int mImageHeight;
+    double mImageScale;
+    unsigned int mImageWidth;
 
-protected:
+    // OpenCL
+
+    // other data members:
+    shared_ptr<CTaskList> mTaskList;
+    shared_ptr<CModelList> mModelList;
     QString mExeFolder;
 
     // Queue:
-	priority_queue<WorkerOperations, vector<WorkerOperations>, WorkerQueueComparision> mOpQueue;
-	QMutex mOpQueueMutex;
-	QSemaphore mOpQueueSemaphore;
+	priority_queue<WorkerOperations, vector<WorkerOperations>, WorkerQueueComparision> mTaskQueue;
+	QMutex mTaskMutex;			// For adding/removing items from the operation queue
+	QSemaphore mTaskSemaphore;	// For blocking calling thread while operation finishes
 
 	bool mRun;
-	QMutex mMutex;
-	QSemaphore mSemaphore;
+	QMutex mWorkerMutex;			// Lock to have exclusive access to this object (all calls from external threads do this)
+	QSemaphore mWorkerSemaphore;	// Acquire if a read/write operation is enqueued.
 
 	// Temporary storage locations
-	valarray<double> * mTempArray;
+	valarray<double> * mTempArray;	// External memory. Don't allocate/deallocate.
+	string mTempString;
+	double mTempDouble;
 
 public:
     CWorkerThread(CGLWidget * glWidget, QString exe_folder);
     virtual ~CWorkerThread();
 
-    void Enqueue(WorkerOperations op);
+public:
+    void AddModel(CModelPtr model);
 
+protected:
+    void ClearQueue();
+
+    void Enqueue(WorkerOperations op);
+public:
+    void ExportResults(QString save_folder);
+
+//    CModelListPtr GetModelList() { return mModelList; };	// Doing this may cause some cross-threading issues.
     WorkerOperations GetNextOperation(void);
     void GetResiduals(valarray<double> & residuals);
+//    CTaskListPtr GetTaskList() { return mTaskList; };		// Doing this may cause some cross-threading issues.
     void GetUncertainties(valarray<double> & uncertainties);
 
+    unsigned int GetImageDepth() { return mImageDepth; };
+    unsigned int GetImageHeight() { return mImageHeight; };
+    unsigned int GetImageWidth() { return mImageWidth; };
+    double GetImageScale() { return mImageScale; };
+
+    void Render();
     void run();
+
+    void startAnimation(double timestep);
+    void stopAnimation();
+    void stop();
 };
     
 #endif // C_WORKER_THREAD

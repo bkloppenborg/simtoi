@@ -39,6 +39,7 @@
 #include "liboi.hpp"
 #include "CModelList.h"
 #include "CMinimizer.h"
+#include "CWorkerThread.h"
 
 class CModel;
 class CTreeModel;
@@ -49,6 +50,11 @@ class CGLWidget : public QGLWidget
     
 protected:
     shared_ptr<CCL_GLThread> mGLT;
+
+    // Worker thread:
+    shared_ptr<CWorkerThread> mWorker;
+
+    // Minimizer
     CMinimizerPtr mMinimizer;
     std::thread mMinimizerThread;
     QStandardItemModel * mOpenFileModel;

@@ -35,7 +35,7 @@
 #include <GL/glu.h>
 
 COI::COI(CWorkerThread * WorkerThread)
-	: CWorker(WorkerThread)
+	: CTask(WorkerThread)
 {
 	// First initialize local storage:
 //	mImageWidth = mWorkerThread->GetImageWidth();

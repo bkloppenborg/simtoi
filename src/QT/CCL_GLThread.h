@@ -201,7 +201,7 @@ public:
 
 	bool 	IsRunning() { return mIsRunning; };
 
-    vector<string> GetModelTypes() { return mModelList->GetTypes(); };
+//    vector<string> GetModelTypes() { return mModelList->GetTypes(); };
 //    vector< pair<int, string> > GetPositionTypes() { return mGLT.GetPositionTypes(); };
 
 

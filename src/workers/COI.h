@@ -36,12 +36,12 @@
 #ifndef COI_H_
 #define COI_H_
 
-#include "CWorker.h"
+#include "CTask.h"
 #include "liboi.hpp"
 
 using namespace liboi;
 
-class COI: public CWorker
+class COI: public CTask
 {
 protected:
     GLuint mFBO;
