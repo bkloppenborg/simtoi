@@ -1,6 +1,9 @@
 // Model save file from SIMTOI in JSON format.
 
 {
+    "area_height" : 128,
+    "area_scale" : 0.025,
+    "area_width" : 128,
 	"model_0" : 
 	{
 		"base_data" : 

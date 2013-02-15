@@ -71,7 +71,7 @@ QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double mo
     int frame_width = 8;
     int frame_height = 28;
 
-    sw->setFixedSize(model_width + frame_width, model_height + frame_height);
+    //sw->setFixedSize(model_width + frame_width, model_height + frame_height);
     //sw->resize(model_width + frame_width, model_height + frame_height);
     sw->show();
 
@@ -477,6 +477,17 @@ void gui_main::ModelOpen()
 	}
 }
 
+void gui_main::Open(QStringList & filenames)
+{
+	for(auto filename : filenames)
+	{
+		// Create a GL Area with reasonable parameters
+		QMdiSubWindow * sw = AddGLArea(16, 16, 0.025);
+		CGLWidget * widget = dynamic_cast<CGLWidget*>(sw->widget());
+		widget->Open(filename.toStdString());
+	}
+}
+
 void gui_main::ModelOpen(QStringList & fileNames, QMdiSubWindow * sw)
 {
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
@@ -511,6 +522,23 @@ void gui_main::ModelSave()
 
 		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 //		widget->Save(filename);
+	}
+}
+
+void gui_main::on_actionOpen_triggered()
+{
+   // Open a dialog, get a list of file that the user selected:
+	QFileDialog dialog(this);
+	dialog.setDirectory(QString::fromStdString(mOpenDataDir));
+	dialog.setNameFilter(tr("SIMTOI Model Files (*.json)"));
+	dialog.setFileMode(QFileDialog::ExistingFiles);
+
+    QStringList filenames;
+    QString dir = "";
+	if (dialog.exec())
+	{
+		filenames = dialog.selectedFiles();
+		Open(filenames);
 	}
 }
 

@@ -75,6 +75,10 @@ protected:
     void MinimizerRun(string MinimizerID, QMdiSubWindow * sw);
     void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
 
+public:
+    void Open(QStringList & filenames);
+
+protected:
     void Init();
 
 private slots:
@@ -90,6 +94,7 @@ private slots:
     void SetSavePath();
     void SetTime();
 
+    void on_actionOpen_triggered();
     void on_btnAddData_clicked();
     void on_btnAddModel_clicked();
     void on_btnEditModel_clicked();

@@ -24,6 +24,10 @@
  */
 
 #include "CGLWidget.h"
+
+#include "textio.hpp"
+#include "json/json.h"
+
 #include "CTreeModel.h"
 
 #include "CMinimizer.h"
@@ -153,7 +157,22 @@ bool CGLWidget::GetMinimizerRunning()
 
 void CGLWidget::Open(string filename)
 {
-//	mGLT->Open(filename);
+	Json::Reader reader;
+	Json::Value input;
+	string file_contents = ReadFile(filename, "Could not SIMTOI save file: '" + filename + "'.");
+	bool parsingSuccessful = reader.parse(file_contents, input);
+	if(!parsingSuccessful)
+		throw runtime_error("JSON parse error in SIMTOI save file '" + filename + "'. File cannot be opened.");
+
+	int width = input["area_width"].asInt();
+	int height = input["area_height"].asInt();
+	double scale = input["area_scale"].asDouble();
+
+	if(width < 1 || height < 1)
+		throw runtime_error("Window size must be greater than one pixel!");
+
+	resize(width, height);
+
 	RebuildTree();
 }
 

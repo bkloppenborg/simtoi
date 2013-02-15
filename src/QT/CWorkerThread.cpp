@@ -33,6 +33,8 @@
 #include "CTaskList.h"
 #include "CModelList.h"
 
+
+
 CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 	: QThread(), mGLWidget(glWidget)
 {
