@@ -39,7 +39,7 @@
 #include <vector>
 #include <valarray>
 
-class CCL_GLThread;
+#include "CWorkerThread.h"
 
 using namespace std;
 
@@ -47,10 +47,10 @@ class CWorker
 {
 protected:
 	string mExeFolder;
-	CCL_GLThread * mWorkerThread;
+	CWorkerThread * mWorkerThread;
 
 public:
-	CWorker(CCL_GLThread * WorkerThread);
+	CWorker(CWorkerThread * WorkerThread);
 	virtual ~CWorker();
 
 	virtual string GetDataDescription() = 0;

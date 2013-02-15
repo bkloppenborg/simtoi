@@ -39,13 +39,27 @@
 #include "CWorker.h"
 #include "liboi.hpp"
 
+using namespace liboi;
+
 class COI: public CWorker
 {
 protected:
-	;
+    GLuint mFBO;
+	GLuint mFBO_texture;
+	GLuint mFBO_depth;
+    GLuint mFBO_storage;
+	GLuint mFBO_storage_texture;
+
+	unsigned int mImageWidth;
+	unsigned int mImageHeight;
+	double mImageScale;
+
+	CLibOI * mLibOI;
+
+	GLsizei mSamples;
 
 public:
-	COI(CCL_GLThread * WorkerThread);
+	COI(CWorkerThread * WorkerThread);
 	virtual ~COI();
 
 	virtual string GetDataDescription();
@@ -53,6 +67,13 @@ public:
 	virtual unsigned int GetNData();
 	virtual void GetResiduals(valarray<double> & residuals);
 	virtual void GetUncertainties(valarray<double> & uncertainties);
+
+protected:
+    void 	InitFrameBuffers(void);
+    void 	InitMultisampleRenderBuffer(void);
+    void 	InitStorageBuffer(void);
+
+public:
 
 	virtual void LoadData(string filename);
 };

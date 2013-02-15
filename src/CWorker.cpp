@@ -32,7 +32,7 @@
 
 #include "CWorker.h"
 
-CWorker::CWorker(CCL_GLThread * WorkerThread)
+CWorker::CWorker(CWorkerThread * WorkerThread)
 {
 	mWorkerThread = WorkerThread;
 
