@@ -30,25 +30,25 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CWorkerFactory.h"
+#include "CTaskFactory.h"
 #include <stdexcept>
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
 //#include "Workers/CWorkerXY.h"
 
-CWorkerFactory::CWorkerFactory()
+CTaskFactory::CTaskFactory()
 {
 //	Register("xy", &CWorkerXY::Create);
 }
 
-CWorkerFactory::~CWorkerFactory() \
+CTaskFactory::~CTaskFactory() \
 {
 	// TODO Auto-generated destructor stub
 }
 
 /// Create an instance of the specified Worker.
 /// Returns a shared_ptr<CWorker> to the object if found, or throws a runtime exception.
-shared_ptr<CWorker> CWorkerFactory::CreateWorker(string WorkerID, CCL_GLThread * WorkerThread)
+shared_ptr<CTask> CTaskFactory::CreateWorker(string WorkerID, CWorkerThread * WorkerThread)
 {
 	auto it = mFactory.find(WorkerID);
 	if(it != mFactory.end())
@@ -56,11 +56,11 @@ shared_ptr<CWorker> CWorkerFactory::CreateWorker(string WorkerID, CCL_GLThread *
 
 	throw runtime_error("The Worker with ID '" + WorkerID + "' not registered with CWorkerFactory");
 
-	return shared_ptr<CWorker>();
+	return shared_ptr<CTask>();
 }
 
 /// Returns a vector of the Worker names that are loaded.
-vector<string> CWorkerFactory::GetWorkerList()
+vector<string> CTaskFactory::GetWorkerList()
 {
 	vector<string> temp;
 
@@ -71,14 +71,14 @@ vector<string> CWorkerFactory::GetWorkerList()
 }
 
 /// Returns a copy of the WorkerFactory instance
-CWorkerFactory CWorkerFactory::Instance()
+CTaskFactory CTaskFactory::Instance()
 {
-	static CWorkerFactory instance;
+	static CTaskFactory instance;
 	return instance;
 }
 
 /// Registers a Worker with the name "WorkerID" and creation function "CreateFunction" with the factory.
-void CWorkerFactory::Register(string WorkerID, CreateWorkerFn CreateFunction)
+void CTaskFactory::Register(string WorkerID, CreateTaskFn CreateFunction)
 {
 	if(mFactory.find(WorkerID) != mFactory.end())
 		throw runtime_error("A Worker model with ID '" + WorkerID + "' is already registered with CWorkerFactory");

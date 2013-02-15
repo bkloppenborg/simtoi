@@ -1,27 +1,27 @@
 /*
- * CWorkerList.cpp
+ * CTaskList.cpp
  *
  *  Created on: Feb 14, 2013
  *      Author: bkloppenborg
  */
 
-#include "CWorkerList.h"
+#include "CTaskList.h"
 
-CWorkerList::~CWorkerList() {
+CTaskList::~CTaskList() {
 	// TODO Auto-generated destructor stub
 }
 
-CWorkerList::CWorkerList() {
+CTaskList::CTaskList() {
 	// TODO Auto-generated constructor stub
 
 }
 
-void CWorkerList::InitCL()
+void CTaskList::InitCL()
 {
 
 }
 
-void CWorkerList::InitGL()
+void CTaskList::InitGL()
 {
 
 }

@@ -1,5 +1,5 @@
 /*
- * CWorker.h
+ * CTask.h
  *
  *  Created on: Feb 14, 2013
  *      Author: bkloppenborg
@@ -32,8 +32,8 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CWORKER_H_
-#define CWORKER_H_
+#ifndef CTASK_H_
+#define CTASK_H_
 
 #include <string>
 #include <vector>
@@ -43,15 +43,15 @@
 
 using namespace std;
 
-class CWorker
+class CTask
 {
 protected:
 	string mExeFolder;
 	CWorkerThread * mWorkerThread;
 
 public:
-	CWorker(CWorkerThread * WorkerThread);
-	virtual ~CWorker();
+	CTask(CWorkerThread * WorkerThread);
+	virtual ~CTask();
 
 	virtual string GetDataDescription() = 0;
 	virtual vector<string> GetDataTypes() = 0;
@@ -63,4 +63,4 @@ public:
 
 };
 
-#endif /* CWORKER_H_ */
+#endif /* CTASK_H_ */

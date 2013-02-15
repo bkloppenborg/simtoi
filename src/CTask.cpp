@@ -1,5 +1,5 @@
 /*
- * CWorker.cpp
+ * CTask.cpp
  *
  *  Created on: Feb 14, 2013
  *      Author: bkloppenborg
@@ -30,15 +30,15 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CWorker.h"
+#include "CTask.h"
 
-CWorker::CWorker(CWorkerThread * WorkerThread)
+CTask::CTask(CWorkerThread * WorkerThread)
 {
 	mWorkerThread = WorkerThread;
 
 }
 
-CWorker::~CWorker() {
+CTask::~CTask() {
 	// TODO Auto-generated destructor stub
 }
 

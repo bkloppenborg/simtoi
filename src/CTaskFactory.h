@@ -1,5 +1,5 @@
 /*
- * CWorkerFactory.h
+ * CTaskFactory.h
  *
  *  Created on: Feb 10, 2013
  *      Author: bkloppenborg
@@ -30,8 +30,8 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CWORKERFACTORY_H_
-#define CWORKERFACTORY_H_
+#ifndef CTASKFACTORY_H_
+#define CTASKFACTORY_H_
 
 #include <map>
 #include <memory>
@@ -39,29 +39,29 @@
 
 using namespace std;
 
-class CWorker;
-class CCL_GLThread;
+class CTask;
+class CWorkerThread;
 
-typedef shared_ptr<CWorker> (*CreateWorkerFn)(CCL_GLThread * WorkerThread);
+typedef shared_ptr<CTask> (*CreateTaskFn)(CWorkerThread * WorkerThread);
 
 
-class CWorkerFactory {
+class CTaskFactory {
 private:
-	map<string, CreateWorkerFn> mFactory;
+	map<string, CreateTaskFn> mFactory;
 
-	CWorkerFactory();
-
-public:
-	virtual ~CWorkerFactory();
+	CTaskFactory();
 
 public:
-	shared_ptr<CWorker> CreateWorker(string WorkerID, CCL_GLThread * WorkerThread);
+	virtual ~CTaskFactory();
 
-	static CWorkerFactory Instance();
+public:
+	shared_ptr<CTask> CreateWorker(string WorkerID, CWorkerThread * WorkerThread);
 
-	void Register(string WorkerID, CreateWorkerFn CreateFunction);
+	static CTaskFactory Instance();
+
+	void Register(string WorkerID, CreateTaskFn CreateFunction);
 
 	vector<string> GetWorkerList();
 };
 
-#endif /* CWORKERFACTORY_H_ */
+#endif /* CTASKFACTORY_H_ */
