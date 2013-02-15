@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <memory>
+#include <valarray>
 
 using namespace std;
 
@@ -24,6 +25,11 @@ protected:
 public:
 	virtual ~CTaskList();
 	CTaskList();
+
+	void Export(string export_folder);
+
+	void GetResiduals(valarray<double> & residuals);
+	void GetUncertainties(valarray<double> & uncertainties);
 
 	void InitCL();
 	void InitGL();

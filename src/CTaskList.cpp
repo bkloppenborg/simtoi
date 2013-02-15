@@ -16,6 +16,21 @@ CTaskList::CTaskList() {
 
 }
 
+void CTaskList::Export(string export_folder)
+{
+
+}
+
+void CTaskList::GetResiduals(valarray<double> & residuals)
+{
+
+}
+
+void CTaskList::GetUncertainties(valarray<double> & uncertainties)
+{
+
+}
+
 void CTaskList::InitCL()
 {
 

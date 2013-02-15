@@ -96,19 +96,19 @@ void gui_main::Animation_StartStop()
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 
-	if(mAnimating)
-	{
-		widget->EnqueueOperation(GLT_AnimateStop);
-		mAnimating = false;
-		this->btnStartStop->setText("Start");
-	}
-	else
-	{
-		widget->SetTimestep(this->spinTimeStep->value());
-		widget->EnqueueOperation(GLT_Animate);
-		mAnimating = true;
-		this->btnStartStop->setText("Stop");
-	}
+//	if(mAnimating)
+//	{
+//		widget->EnqueueOperation(GLT_AnimateStop);
+//		mAnimating = false;
+//		this->btnStartStop->setText("Start");
+//	}
+//	else
+//	{
+//		widget->SetTimestep(this->spinTimeStep->value());
+//		widget->EnqueueOperation(GLT_Animate);
+//		mAnimating = true;
+//		this->btnStartStop->setText("Stop");
+//	}
 }
 
 void gui_main::Animation_Reset()
@@ -119,8 +119,8 @@ void gui_main::Animation_Reset()
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 
-	widget->SetTime(this->spinTimeStart->value());
-	widget->EnqueueOperation(GLT_RenderModels);
+//	widget->SetTime(this->spinTimeStart->value());
+//	widget->EnqueueOperation(GLT_RenderModels);
 
 }
 /// Checks to see which buttons can be enabled/disabled.
@@ -265,13 +265,13 @@ void gui_main::AddData(QStringList & filenames, QMdiSubWindow * sw)
 		// Tell the widget to load the data file and append a row to its file list:
 		tmp = filenames[i].toStdString();
 		dir_size = tmp.size() - mOpenDataDir.size();
-		widget->LoadData(tmp);
+//		widget->LoadData(tmp);
 
 		// Filename
 		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
 		// Mean JD
 		time_str.str("");
-		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
+//		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
 		items.append( new QStandardItem(QString::fromStdString( time_str.str() )));
 
 		model->appendRow(items);
@@ -304,7 +304,7 @@ void gui_main::ExportFITS()
     	return;
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-	widget->EnqueueOperation(CLT_Init);
+//	widget->EnqueueOperation(CLT_Init);
 
     string filename;
     QStringList fileNames;
@@ -327,7 +327,7 @@ void gui_main::ExportFITS()
 		// Automatically overwrite files if they already exist.  The dialog should prompt for us.
 		filename = "!" + filename;
 
-		widget->SaveImage(filename);
+//		widget->SaveImage(filename);
 	}
 }
 
@@ -339,7 +339,7 @@ void gui_main::ExportPhotometry()
     	return;
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-	widget->EnqueueOperation(CLT_Init);
+//	widget->EnqueueOperation(CLT_Init);
 
     double t = this->spinTimeStart->value();
     double step = this->spinTimeStep->value();
@@ -361,9 +361,9 @@ void gui_main::ExportPhotometry()
 		// Compute the flux
 		while(t < stop)
 		{
-			widget->SetTime(t);
-			widget->EnqueueOperation(GLT_RenderModels);
-			flux = widget->GetFlux();
+//			widget->SetTime(t);
+//			widget->EnqueueOperation(GLT_RenderModels);
+//			flux = widget->GetFlux();
 
 			output.push_back( pair<float, float>(t, flux));
 			t += step;
@@ -510,7 +510,7 @@ void gui_main::ModelSave()
 			filename += ".json";
 
 		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-		widget->Save(filename);
+//		widget->Save(filename);
 	}
 }
 
@@ -560,7 +560,7 @@ void gui_main::on_btnAddModel_clicked(void)
     }
 
     // Now render the models and refresh the tree
-    widget->EnqueueOperation(GLT_RenderModels);
+//    widget->EnqueueOperation(GLT_RenderModels);
 
 }
 
@@ -655,7 +655,7 @@ void gui_main::on_btnRemoveData_clicked()
     for(it = --list.end(); it > list.begin(); it--)
     {
     	id = (*it).row();
-    	widget->RemoveData(id);
+//    	widget->RemoveData(id);
     	model->removeRow(id, QModelIndex());
     }
 }
@@ -669,7 +669,7 @@ void gui_main::render()
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     if(widget)
     {
-    	widget->EnqueueOperation(GLT_RenderModels);
+//    	widget->EnqueueOperation(GLT_RenderModels);
     }
 }
 
@@ -698,8 +698,8 @@ void gui_main::SetTime(void)
 
     QList<QModelIndex>::iterator it = list.begin();
     int id = (*it).row();
-    double t = widget->GetDataAveJD(id);
-    widget->SetTime(t);
-    widget->EnqueueOperation(GLT_RenderModels);
+//    double t = widget->GetDataAveJD(id);
+//    widget->SetTime(t);
+//    widget->EnqueueOperation(GLT_RenderModels);
 }
 

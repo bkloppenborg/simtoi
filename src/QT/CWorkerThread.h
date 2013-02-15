@@ -45,6 +45,7 @@
 #include <QString>
 #include <QMutex>
 #include <QSemaphore>
+#include <QSize>
 #include <valarray>
 #include <memory>
 #include <queue>
@@ -63,10 +64,12 @@ enum WorkerOperations
 {
 	ANIMATE,
 	ANIMATE_STOP,
+	BLIT_TO_SCREEN,
 	EXPORT,
 	GET_RESIDUALS,
 	GET_UNCERTAINTIES,
 	RENDER,
+	RESIZE,
 	STOP
 };
 
@@ -123,7 +126,10 @@ public:
 
 public:
     void AddModel(CModelPtr model);
+protected:
+    void BlitToScreen();
 
+    void CheckOpenGLError(string function_name);
 protected:
     void ClearQueue();
 
@@ -131,10 +137,10 @@ protected:
 public:
     void ExportResults(QString save_folder);
 
-//    CModelListPtr GetModelList() { return mModelList; };	// Doing this may cause some cross-threading issues.
+    CModelListPtr GetModelList() { return mModelList; };
     WorkerOperations GetNextOperation(void);
     void GetResiduals(valarray<double> & residuals);
-//    CTaskListPtr GetTaskList() { return mTaskList; };		// Doing this may cause some cross-threading issues.
+    CTaskListPtr GetTaskList() { return mTaskList; };
     void GetUncertainties(valarray<double> & uncertainties);
 
     unsigned int GetImageDepth() { return mImageDepth; };
@@ -143,6 +149,11 @@ public:
     double GetImageScale() { return mImageScale; };
 
     void Render();
+protected:
+    void Resize(unsigned int width, unsigned int height);
+public:
+    void resizeViewport(const QSize &size);
+    void resizeViewport(int width, int height);
     void run();
 
     void startAnimation(double timestep);

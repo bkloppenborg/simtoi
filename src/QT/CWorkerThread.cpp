@@ -39,6 +39,12 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 	mRun = true;
 	mTaskList = shared_ptr<CTaskList>(new CTaskList());
     mModelList = shared_ptr<CModelList>(new CModelList());
+
+    // Init datamembers to something reasonable.
+    mImageWidth = 128;
+    mImageHeight = 128;
+    mImageDepth = 1;
+    mImageScale = 0.05;
 }
 
 CWorkerThread::~CWorkerThread()
@@ -46,7 +52,6 @@ CWorkerThread::~CWorkerThread()
 	// Stop the thread if it is running. This is a blocking call.
 	if(mRun)
 		stop();
-
 }
 
 /// Appends a model to the list of models.
@@ -57,6 +62,26 @@ void CWorkerThread::AddModel(CModelPtr model)
 
 	// Modify the list of models:
 	mModelList->AddModel(model);
+	Enqueue(RENDER);
+}
+
+/// Blits the off-screen framebuffer to the foreground buffer.
+void CWorkerThread::BlitToScreen()
+{
+    mGLWidget->swapBuffers();
+}
+
+/// Static function for checking OpenGL errors:
+void CWorkerThread::CheckOpenGLError(string function_name)
+{
+    GLenum status = glGetError(); // Check that status of our generated frame buffer
+    // If the frame buffer does not report back as complete
+    if (status != 0)
+    {
+        string errstr =  (const char *) gluErrorString(status);
+        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
+        throw;
+    }
 }
 
 // Clears the worker task queue.
@@ -139,6 +164,39 @@ void CWorkerThread::Render()
 	Enqueue(RENDER);
 }
 
+void CWorkerThread::Resize(unsigned int width, unsigned int height)
+{
+	// Resize the screen, then cascade to a render and a blit.
+    glViewport(0, 0, mImageWidth, mImageHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    double half_width = mImageWidth * mImageScale / 2;
+	glOrtho(-half_width, half_width, -half_width, half_width, -mImageDepth, mImageDepth);
+    glMatrixMode(GL_MODELVIEW);
+
+    CWorkerThread::CheckOpenGLError("CWorkerThread Resize(int, int)");
+	Enqueue(RENDER);
+}
+
+/// Resize the window.  Normally called from QT
+void CWorkerThread::resizeViewport(const QSize &size)
+{
+    resizeViewport(size.width(), size.height());
+}
+
+/// Resize the window.  Called from external applications.
+void CWorkerThread::resizeViewport(int width, int height)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mImageWidth = width;
+	mImageHeight = height;
+	Enqueue(RESIZE);
+}
+
+
+
 // The main function of this thread
 void CWorkerThread::run()
 {
@@ -162,15 +220,9 @@ void CWorkerThread::run()
 	// Enable multisample anti-aliasing.
 	glEnable(GL_MULTISAMPLE);
 
-	// Now setup the projection system to be orthographic
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	Resize(mImageWidth, mImageHeight);
 
-	// Note, the coordinates here are in object-space, not coordinate space.
-	double half_width = mImageWidth * mImageScale;
-	glOrtho(-half_width, half_width, -half_width, half_width, -mImageDepth, mImageDepth);
-
-	CCL_GLThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
+	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
 	// Now have the workers initialize any OpenGL objects they need
 	mTaskList->InitGL();
@@ -195,40 +247,48 @@ void CWorkerThread::run()
 			Enqueue(ANIMATE);
 			break;
 
-		case EXPORT:
-			// uses mTempString
+		case ANIMATE_STOP:
+			ClearQueue();
+			break;
 
+		case BLIT_TO_SCREEN:
+		    BlitToScreen();
+			break;
+
+		case EXPORT:
+			mTaskList->Export(mTempString);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case GET_RESIDUALS:
 			// uses mTempArray
+			mTaskList->GetResiduals(*mTempArray);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case GET_UNCERTAINTIES:
 			// uses mTempArray
+			mTaskList->GetUncertainties(*mTempArray);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case RENDER:
 			mModelList->Render(0, mImageWidth, mImageHeight);
+			Enqueue(BLIT_TO_SCREEN);
 			break;
 
-		case ANIMATE_STOP:
-			ClearQueue();
-			break;
+		case RESIZE:
+        	Resize(mImageWidth, mImageHeight);
+        	break;
 
 		default:
 		case STOP:
+			ClearQueue();
 			mRun = false;
 			break;
 
 		}
 	}
-
-	// Release the semaphore blocking from the STOP call
-	mWorkerSemaphore.release(1);
 
 	emit finished();
 }
@@ -252,5 +312,4 @@ void CWorkerThread::stop()
 	QMutexLocker lock(&mWorkerMutex);
 	// Equeue a stop command
 	Enqueue(STOP);
-	mWorkerSemaphore.acquire(1);
 }

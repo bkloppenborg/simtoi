@@ -33,13 +33,17 @@
 #include "CTreeModel.h"
 #include "CParameterItem.h"
 
+extern string EXE_FOLDER;
+
 CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
     : QGLWidget(widget_parent)
 { 
-	mGLT.reset(new CCL_GLThread(this, shader_source_dir, cl_kernel_dir));
-
-    setAutoBufferSwap(false);
+	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context
+	setAutoBufferSwap(false);
     this->doneCurrent();
+
+    // Immediately initialize the worker thread. This will claim the OPenGL context.
+	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
 
     mOpenFileModel = new QStandardItemModel();
 	QStringList labels = QStringList();
@@ -65,7 +69,7 @@ CGLWidget::~CGLWidget()
 void CGLWidget::AddModel(shared_ptr<CModel> model)
 {
 	// Instruct the thread to add the model to it's list:
-	mGLT->AddModel(model);
+	mWorker->AddModel(model);
 
 	RebuildTree();
 }
@@ -74,11 +78,6 @@ void CGLWidget::closeEvent(QCloseEvent *evt)
 {
     stopRendering();
     QGLWidget::closeEvent(evt);
-}
-
-void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
-{
-	mGLT->EnqueueOperation(op);
 }
 
 void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
@@ -154,13 +153,13 @@ bool CGLWidget::GetMinimizerRunning()
 
 void CGLWidget::Open(string filename)
 {
-	mGLT->Open(filename);
+//	mGLT->Open(filename);
 	RebuildTree();
 }
 
 void CGLWidget::paintEvent(QPaintEvent *)
 {
-    mGLT->EnqueueOperation(GLT_RenderModels);
+    mWorker->Render();
 }
 
 void CGLWidget::RebuildTree()
@@ -170,7 +169,7 @@ void CGLWidget::RebuildTree()
 	mTreeModel->clear();
 	mTreeModel->setColumnCount(5);
 	mTreeModel->setHorizontalHeaderLabels(labels);
-	CModelList * model_list = mGLT->GetModelList();
+	CModelListPtr model_list = mWorker->GetModelList();
 
 	QList<QStandardItem *> items;
 	QStandardItem * item;
@@ -210,36 +209,35 @@ void CGLWidget::RebuildTree()
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
-    mGLT->resizeViewport(evt->size());
+    mWorker->resizeViewport(evt->size());
 }
 
 void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
 {
 	stopMinimizer();
 	mMinimizer = minimizer;
-	mMinimizer->Init(mGLT);
+//	mMinimizer->Init(mGLT);
 }
 
 void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_params)
 {
-	mGLT->SetFreeParameters(params, n_params, scale_params);
+//	mGLT->SetFreeParameters(params, n_params, scale_params);
 }
 
 void CGLWidget::SetScale(double scale)
 {
-	mGLT->SetScale(scale);
+//	mGLT->SetScale(scale);
 }
 
 void CGLWidget::startRendering()
 {
 	// Tell the thread to start.
-    mGLT->start();
+    mWorker->start();
 }
 
 void CGLWidget::stopRendering()
 {
-    mGLT->stop();
-    mGLT->wait();
+    mWorker->stop();
 }
 
 void CGLWidget::startMinimizer()
@@ -248,7 +246,7 @@ void CGLWidget::startMinimizer()
 		return;
 
 	// Initialize OpenCL
-	mGLT->EnqueueOperation(CLT_Init);
+//	mGLT->EnqueueOperation(CLT_Init);
 
 	// Start the minimization thread
 	mMinimizerThread = std::thread(&CMinimizer::start, mMinimizer);
