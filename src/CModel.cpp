@@ -50,8 +50,7 @@ CModel::CModel(int n_params)
 	mBaseParams = 3;	// Number of base params, less one (zero indexed).
 
 	// Shader storage location, boolean if it is loaded:
-	mShader = NULL;
-	mShaderLoaded = false;
+	mShader = CShaderPtr();
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
 	mParamNames.push_back("Inclination");
@@ -73,9 +72,54 @@ CModel::~CModel()
 
 }
 
+/// \brief Returns the type of the model
+string CModel::GetID()
+{
+	return "model_base_invalid";
+}
 
-/// Returns the values for all parameters in this model
-/// including the model, position, shader, and all features.
+/// \brief Returns the number of free parameters in the model
+int CModel::GetNModelFreeParameters()
+{
+	return mNFreeParams;
+}
+
+/// \brief Returns the number of free parameters in the positioning model
+int CModel::GetNPositionFreeParameters()
+{
+	if(mPosition != NULL)
+		return mPosition->GetNFreeParams();
+
+	return 0;
+}
+
+/// \brief Retursn the number of free parameters used in the shader
+int CModel::GetNShaderFreeParameters()
+{
+	if(mShader != NULL)
+		return mShader->GetNFreeParams();
+
+	return 0;
+}
+
+/// \brief Get a copy of the position object. Note, this could be NULL.
+CPositionPtr CModel::GetPosition(void)
+{
+	return mPosition;
+}
+
+/// \brief Get a copy of the shader object. Note, this could be NULL.
+CShaderPtr CModel::GetShader(void)
+{
+	return mShader;
+}
+
+/// \brief Get the values of up to `n_params` parameters in this model
+///
+/// Returns all of the parameters used in the model including the position
+/// and shader objects.
+/// \param params A pre-allocated buffer for storing the parameters
+/// \param n_params The size of `params`
 void CModel::GetAllParameters(double * params, int n_params)
 {
 	// Send parameter set command to the components of this model.
@@ -93,6 +137,10 @@ void CModel::GetAllParameters(double * params, int n_params)
 	}
 }
 
+/// \brief Get a vector containing the minimum/maximum values for all free parameters.
+///
+/// \return A vector of pairs which contain the minimum and maximum values
+/// that the free parameters are permitted to take.
 vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 {
 	vector< pair<double, double> > tmp1;
@@ -110,9 +158,17 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 	return tmp1;
 }
 
-/// Gets the free parameters for this model in a:
-///  scale_params = false => uniform hypercube (x = [0...1])
-///  scale_params = true => native values (x = [param.min... param.max])
+/// \brief Gets the nominal value for the free parameters in this model, including
+/// 		the position and shader.
+///
+/// This function lets you get up to `n_params` nominial values for the free
+/// parameters including the position and shader models.
+///
+/// \param params A pre-allocated buffer
+/// \param n_params The size of `params`
+/// \param scale_params If false, returns the parameters in a uniform
+/// 		hypercube (x = [0...1]). If true, scales the values into
+/// 		their native ranges (x = [param.min... param.max]).
 void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	int n = 0;
@@ -129,7 +185,7 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 }
 
 
-/// Returns a vector of strings containing the names of the free parameters:
+/// \brief Returns a vector of strings containing the names of the free parameters.
 vector<string> CModel::GetFreeParameterNames()
 {
 	vector<string> tmp1;
@@ -147,24 +203,12 @@ vector<string> CModel::GetFreeParameterNames()
 	return tmp1;
 }
 
-/// Returns the product of priors for all free model parameters.
-/// NOTICE: This intentially overrides, but still calls, the GetFreePriorProd derived
-/// by inheritance from CParameters.
-double CModel::GetFreePriorProd()
-{
-	int tmp = CParameters::GetFreePriorProd();
-	tmp *= mPosition->GetFreePriorProd();
-
-	if(mShader != NULL)
-		tmp *= mShader->GetFreePriorProd();
-
-	return tmp;
-}
-
 int CModel::GetTotalFreeParameters()
 {
 	// Sum up the free parameters from the model, position, and features
-	return this->GetNModelFreeParameters() + this->GetNPositionFreeParameters() + this->GetNShaderFreeParameters() + this->GetNFeatureFreeParameters();
+	return this->GetNModelFreeParameters() +
+			this->GetNPositionFreeParameters() +
+			this->GetNShaderFreeParameters();
 }
 
 void CModel::Color()
