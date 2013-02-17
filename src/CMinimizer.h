@@ -1,17 +1,8 @@
 /*
- * CMinimizer.h
+ * \file CMinimizer.h
  *
  *  Created on: Dec 8, 2011
- *      Author: bkloppenborg
- *
- *  A generic base class for minimization routines.  All minimizers should have the following
- *  behavior:
- *  	1) If mRun == false, they should terminate gracefully, deallocating resources as needed
- *  	2) Upon completion, the best-fit parameters should be stored in mParams
- *  	3) Upon completion, results should be exported to a file.
- *
- *  NOTE: This class also maintains a static function for minimizer creation.  If you add a new
- *  minimizer, be sure to modify GetTypes() and GetMinimizer()
+ * \author bkloppenborg
  *
  */
  
@@ -58,28 +49,43 @@ class CCL_GLThread;
 class CMinimizer;
 typedef shared_ptr<CMinimizer> CMinimizerPtr;
 
+/// \brief A generic base class for minimization routines.
+///
+/// All minimization routines used by SIMTOI inherit from this class.
+/// SIMTOI expects the following behavior from all minimizers:
+///  1. They MUST periodically check if mRun == false. If so, they MUST
+///		terminate gracefully and deallocate any self-allocated resources.
+///  2. Upon completion, the best-fit parameters MUST be stored in mParams
+///  3. Upon completion, the results (with applicable uncertainty estimates) SHOULD
+/// 	be exported to a savefile using mSaveFileBasename as the save prefix.
+///
+/// Before a minimizer is started, SIMTOI will call `Init()` to setup several
+/// base-class datamembers. If you overwride this function, be sure to call
+/// the base-class routine.
 class CMinimizer
 {
 protected:
-	bool mIsRunning;
-	std::thread mThread;
+	bool mIsRunning;		///< Indicates if the thread is running
+	std::thread mThread;	///< Thread object.
 
 public:
-	shared_ptr<CCL_GLThread> mCLThread;
-	double * mParams;	// Current parameter values. Set to best-fit parameters upon exit (required)
-	unsigned int mNParams;
-	bool mRun;
-	string mSaveFileBasename;
+	shared_ptr<CCL_GLThread> mCLThread; ///< Pointer to the worker thread.
+	double * mParams;		///< Current parameter values. Set to best-fit parameters upon exit (required)
+	unsigned int mNParams;	///< Number of parameters
+	bool mRun;				/// Boolean to indicate if the minimizer should continue to run.
+							/// The programmer MUST check this and terminate the minimizer if false.
+							///
+	string mSaveFileBasename;	///< Save file location
 
-	string mMinimizerName;
-	string mMinimizerID;
+	string mMinimizerName;	///< Human-friendly name for the minimizer.
+	string mMinimizerID;	///< Unique ID for the minimizer.
 
 	CMinimizer();
 	virtual ~CMinimizer();
 
 	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 
-	string GetID() { return mMinimizerID; };
+	string GetID();
 	virtual void GetResults(double * results, int n_params);
 
 	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);

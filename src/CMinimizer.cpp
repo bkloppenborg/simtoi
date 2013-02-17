@@ -5,7 +5,7 @@
  *      Author: bkloppenborg
  */
  
- /* 
+ /*
  * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
@@ -55,7 +55,7 @@ CMinimizer::~CMinimizer()
 	delete[] mParams;
 }
 
-/// Saves the V2, and T3 data along with best-fit model simulated data
+/// \brief Saves the V2, and T3 data along with best-fit model simulated data
 /// for each epoch.
 void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 {
@@ -89,7 +89,20 @@ void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 	mCLThread->ExportResults(mSaveFileBasename);
 }
 
-/// Returns the best-fit parameters.
+/// \brief Returns the unique ID assigned to this minimizer.
+string CMinimizer::GetID()
+{
+	return mMinimizerID;
+}
+
+/// \brief Returns the best-fit parameters after minimization has completed.
+///
+/// Once the minimization is complete the minimizer is *required* to set the `mParams`
+/// variable to the best-fit minimization parameters. This function can be used
+/// to copy the first `n_params` values into the `results` buffer.
+///
+/// \param results A pre-allocated buffer of size `n_params` to which results are written.
+/// \param n_params The size of the `results` buffer.
 void CMinimizer::GetResults(double * results, int n_params)
 {
 	// Copy the values
@@ -97,14 +110,24 @@ void CMinimizer::GetResults(double * results, int n_params)
 		results[i] = mParams[i];
 }
 
-void CMinimizer::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
+/// \brief Initialization function.
+///
+/// \param worker_thread A shared pointer to the worker thread
+void CMinimizer::Init(shared_ptr<CCL_GLThread> worker_thread)
 {
-	mCLThread = cl_gl_thread;
+	mCLThread = worker_thread;
 	mNParams = mCLThread->GetNFreeParameters();
 	mParams = new double[mNParams];
 	mRun = true;
 }
 
+/// \brief Changes the default filename which the minimizer uses for savefiles.
+///
+/// Some minimization engines may write out intermediate files during the
+/// minimization process. This function permits you to set an absolute path
+/// and filename prefix which is used by the minimizers.
+///
+/// \param filename An absolute path prefix for minimizer files.
 void CMinimizer::SetSaveFileBasename(string filename)
 {
 	// Only permit non-empty save file names:
@@ -112,11 +135,13 @@ void CMinimizer::SetSaveFileBasename(string filename)
 		mSaveFileBasename = filename;
 }
 
+/// \brief Starts the minimizer.
 void CMinimizer::start(CMinimizerPtr minimizer)
 {
 	minimizer->run();
 }
 
+/// \brief Stops the minimizer.
 void CMinimizer::stop()
 {
 	mRun = false;
