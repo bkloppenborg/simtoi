@@ -1,7 +1,7 @@
 /*
- * CMinimizer_Benchmark.h
+ * CMMultiNest.h
  *
- *  Created on: Feb 10, 2012
+ *  Created on: Jan 26, 2012
  *      Author: bkloppenborg
  */
  
@@ -30,23 +30,26 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMINIMIZER_BENCHMARK_H_
-#define CMINIMIZER_BENCHMARK_H_
+#ifndef CMULTINEST_H_
+#define CMULTINEST_H_
 
 #include "CMinimizer.h"
+#include "multinest.h"
 
-class CMinimizer_Benchmark: public CMinimizer
+class CMultiNest: public CMinimizer
 {
+
 public:
-	CMinimizer_Benchmark();
-	virtual ~CMinimizer_Benchmark();
+	CMultiNest();
+	virtual ~CMultiNest();
 
-	static CMinimizerPtr Create();
+	static shared_ptr<CMinimizer> Create();
 
-	static int GetMilliCount();
-	static int GetMilliSpan(int nTimeStart);
+	static void dumper(int & nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double **paramConstr, double &maxLogLike, double &logZ, double &logZerr, void * misc);
 
+	static void log_likelihood(double * Cube, int & ndim, int & npars, double & lnew, void * misc);
 	int run();
+
 };
 
-#endif /* CMINIMIZER_BENCHMARK_H_ */
+#endif /* CMULTINEST_H_ */

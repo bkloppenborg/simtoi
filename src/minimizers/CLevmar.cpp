@@ -1,5 +1,5 @@
 /*
- * CMinimizer_levmar.cpp
+ * Clevmar.cpp
  *
  *  Created on: Feb 13, 2012
  *      Author: bkloppenborg
@@ -30,34 +30,34 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CMinimizer_levmar.h"
+#include "CLevmar.h"
 #include <cmath>
 
 #include "levmar.h"
 #include "CCL_GLThread.h"
 
 
-CMinimizer_levmar::CMinimizer_levmar()
+CLevmar::CLevmar()
 {
 	mMinimizerID = "levmar";
 	mMinimizerName = "Levmar";
 	mResiduals = NULL;
 }
 
-CMinimizer_levmar::~CMinimizer_levmar()
+CLevmar::~CLevmar()
 {
 	if(mResiduals) delete[] mResiduals;
 }
 
-CMinimizerPtr CMinimizer_levmar::Create()
+CMinimizerPtr CLevmar::Create()
 {
-	return shared_ptr<CMinimizer>(new CMinimizer_levmar());
+	return shared_ptr<CMinimizer>(new CLevmar());
 }
 
-void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
+void CLevmar::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
 {
 	// Get the "this" pointer
-	CMinimizer_levmar * minimizer = reinterpret_cast<CMinimizer_levmar*>(misc);
+	CLevmar * minimizer = reinterpret_cast<CLevmar*>(misc);
 	int n_data_sets = minimizer->mCLThread->GetNDataSets();
 	int n_data_alloc = 0;
 	int n_data_offset = 0;
@@ -91,7 +91,7 @@ void CMinimizer_levmar::ErrorFunc(double * params, double * output, int nParams,
 	}
 }
 
-void CMinimizer_levmar::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
+void CLevmar::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 {
 	CMinimizer::Init(cl_gl_thread);
 	int nData = mCLThread->GetNDataAllocated();
@@ -103,7 +103,7 @@ void CMinimizer_levmar::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 	}
 }
 
-string CMinimizer_levmar::GetExitString(int exit_num)
+string CLevmar::GetExitString(int exit_num)
 {
 	string tmp;
 	switch(exit_num)
@@ -142,7 +142,7 @@ string CMinimizer_levmar::GetExitString(int exit_num)
 }
 
 /// Prints out cmpfit results (from testmpfit.c)
-void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar)
+void CLevmar::printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar)
 {
 	if ((x == 0) || (n_pars == 0))
 		return;
@@ -197,13 +197,13 @@ void CMinimizer_levmar::printresult(double * x, int n_pars, int n_data, vector<s
 
 }
 
-int CMinimizer_levmar::run()
+int CLevmar::run()
 {
 	// Run the minimizer using this instance of CMinimizer_levmar
-	run(&CMinimizer_levmar::ErrorFunc);
+	run(&CLevmar::ErrorFunc);
 }
 
-int CMinimizer_levmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *adata))
+int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *adata))
 {
 	// Ensure memory is initialized.
 	if(mResiduals == NULL)

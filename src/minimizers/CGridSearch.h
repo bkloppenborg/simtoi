@@ -1,13 +1,10 @@
 /*
- * CMinimizer_Bootstrap.h
+ * CGridSearch.h
  *
  *  Created on: Oct 4, 2012
  *      Author: bkloppen
  *
- *  A re-implementation of the levmar minimizer that includes bootstrapping.
- *  This minimizer runs levmar like normal, but applies a mask to the chi
- *  which weights (potentially ignores) some chi elements. This, in effect
- *  selects a random subset of the data.
+ *  Implementation of a basic grid-search minimizer.
  */
 
  /*
@@ -35,39 +32,23 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMINIMIZER_BOOTSTRAP_H_
-#define CMINIMIZER_BOOTSTRAP_H_
+#ifndef CGRIDSEARCH_H_
+#define CGRIDSEARCH_H_
 
-#include "CMinimizer_levmar.h"
-#include "oi_file.hpp"
+#include "CMinimizer.h"
 
-using namespace ccoifits;
-
-class CMinimizer_Bootstrap: public CMinimizer_levmar
-{
-protected:
-	unsigned int mBootstrapFailures;
-	unsigned int mMaxBootstrapFailures;
-
+class CGridSearch: public CMinimizer {
 public:
-	vector<OIDataList> mData;	// A copy of the original data
-
-public:
-	CMinimizer_Bootstrap();
-	virtual ~CMinimizer_Bootstrap();
-
-	vector< vector<double> > mResults;
+	CGridSearch();
+	virtual ~CGridSearch();
 
 	static CMinimizerPtr Create();
 
-	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
+	vector< tuple<double,double,double> > mResults;
+
 	virtual void ExportResults(double * params, int n_params, bool no_setparams);
-
-	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
-
-	void Next();
 
 	int run();
 };
 
-#endif /* CMINIMIZER_BOOTSTRAP_H_ */
+#endif /* CMINIMIZER_GRIDSEARCH_H_ */

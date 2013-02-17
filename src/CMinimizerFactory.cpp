@@ -40,25 +40,25 @@ using namespace std;
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
 
-#include "minimizers/CMinimizer_Benchmark.h"
-#include "minimizers/CMinimizer_Bootstrap.h"
-#include "minimizers/CMinimizer_GridSearch.h"
-#include "minimizers/CMinimizer_levmar.h"
+#include "minimizers/CBenchmark.h"
+#include "minimizers/CBootstrap_Levmar.h"
+#include "minimizers/CGridSearch.h"
+#include "minimizers/CLevmar.h"
 // Compiler directive to add support for MultiNest
 #ifdef _ADD_MULTINEST
-#include "minimizers/CMinimizer_MultiNest.h"
+#include "minimizers/CMultiNest.h"
 #endif // _ADD_MULTINEST
 
 /// \brief Private constructor. Use `Instance()` instead.
 CMinimizerFactory::CMinimizerFactory()
 {
 	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
-	Register("benchmark", &CMinimizer_Benchmark::Create);
-	Register("bootstrap_levmar", &CMinimizer_Bootstrap::Create);
-	Register("gridsearch", &CMinimizer_GridSearch::Create);
-	Register("levmar", &CMinimizer_levmar::Create);
+	Register("benchmark", &CBenchmark::Create);
+//	Register("bootstrap_levmar", &CBoostrap_Levmar::Create);
+	Register("gridsearch", &CGridSearch::Create);
+	Register("levmar", &CLevmar::Create);
 #ifdef _ADD_MULTINEST
-	Register("multinest", &CMinimizer_MultiNest::Create);
+	Register("multinest", &CMultiNest::Create);
 #endif // _ADD_MULTINEST
 }
 

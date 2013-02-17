@@ -1,7 +1,7 @@
 /*
- * CMinimizer_MultiNest.h
+ * Clevmar.h
  *
- *  Created on: Jan 26, 2012
+ *  Created on: Feb 13, 2012
  *      Author: bkloppenborg
  */
  
@@ -30,26 +30,36 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMINIMIZER_MULTINEST_H_
-#define CMINIMIZER_MULTINEST_H_
+#ifndef CLEVMAR_H_
+#define CLEVMAR_H_
+
+#include <valarray>
+
+using namespace std;
 
 #include "CMinimizer.h"
-#include "multinest.h"
 
-class CMinimizer_MultiNest: public CMinimizer
+class CLevmar: public CMinimizer
 {
+protected:
+	float * mResiduals;
 
 public:
-	CMinimizer_MultiNest();
-	virtual ~CMinimizer_MultiNest();
+	CLevmar();
+	virtual ~CLevmar();
 
-	static shared_ptr<CMinimizer> Create();
+	static CMinimizerPtr Create();
 
-	static void dumper(int & nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double **paramConstr, double &maxLogLike, double &logZ, double &logZerr, void * misc);
+	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
 
-	static void log_likelihood(double * Cube, int & ndim, int & npars, double & lnew, void * misc);
-	int run();
+	string GetExitString(int exit_num);
 
+	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
+
+	void printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar);
+
+	virtual int run();
+	int run(void (*error_func)(double *p, double *hx, int m, int n, void *adata));
 };
 
-#endif /* CMINIMIZER_MULTINEST_H_ */
+#endif /* CMINIMIZER_LEVMAR_H_ */

@@ -1,5 +1,5 @@
 /*
- * CMinimizer_Benchmark.cpp
+ * CBenchmark.cpp
  *
  *  Created on: Feb 10, 2012
  *      Author: bkloppenborg
@@ -30,28 +30,28 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CMinimizer_Benchmark.h"
+#include "CBenchmark.h"
 #include <sys/timeb.h>
 #include "CCL_GLThread.h"
 #include "misc.h"
 
-CMinimizer_Benchmark::CMinimizer_Benchmark()
+CBenchmark::CBenchmark()
 {
 	mMinimizerID = "benchmark";
 	mMinimizerName = "Benchmark";
 }
 
-CMinimizer_Benchmark::~CMinimizer_Benchmark()
+CBenchmark::~CBenchmark()
 {
 	// TODO Auto-generated destructor stub
 }
 
-CMinimizerPtr CMinimizer_Benchmark::Create()
+CMinimizerPtr CBenchmark::Create()
 {
-	return CMinimizerPtr(new CMinimizer_Benchmark());
+	return CMinimizerPtr(new CBenchmark());
 }
 
-int CMinimizer_Benchmark::GetMilliCount()
+int CBenchmark::GetMilliCount()
 {
 	// Something like GetTickCount but portable
 	// It rolls over every ~ 12.1 days (0x100000/24/60/60)
@@ -62,7 +62,7 @@ int CMinimizer_Benchmark::GetMilliCount()
 	return nCount;
 }
 
-int CMinimizer_Benchmark::GetMilliSpan( int nTimeStart )
+int CBenchmark::GetMilliSpan( int nTimeStart )
 {
 	int nSpan = GetMilliCount() - nTimeStart;
 	if ( nSpan < 0 )
@@ -73,7 +73,7 @@ int CMinimizer_Benchmark::GetMilliSpan( int nTimeStart )
 /// Runs the benchmark minimizer
 /// This simply runs n_iterations iterations as fast as possible, timing the result
 /// and reporting it to the user.
-int CMinimizer_Benchmark::run()
+int CBenchmark::run()
 {
 	mIsRunning = true;
 	// only the first loaded data set is used.

@@ -1,5 +1,5 @@
 /*
- * CMinimizer_Bootstrap.cpp
+ * CBootstrap_Levmar.cpp
  *
  *  Created on: Oct 4, 2012
  *      Author: bkloppen
@@ -30,7 +30,7 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CMinimizer_Bootstrap.h"
+#include "CBootstrap_Levmar.h"
 
 #include <random>
 #include <chrono>
@@ -44,7 +44,7 @@
 using namespace std;
 
 
-CMinimizer_Bootstrap::CMinimizer_Bootstrap()
+CBootstrap_Levmar::CBootstrap_Levmar()
 {
 	mMinimizerID = "bootstrap";
 	mMinimizerName = "Bootstrap";
@@ -55,24 +55,24 @@ CMinimizer_Bootstrap::CMinimizer_Bootstrap()
 	mMaxBootstrapFailures = 20;
 }
 
-CMinimizer_Bootstrap::~CMinimizer_Bootstrap()
+CBootstrap_Levmar::~CBootstrap_Levmar()
 {
 
 }
 
-CMinimizerPtr CMinimizer_Bootstrap::Create()
+CMinimizerPtr CBootstrap_Levmar::Create()
 {
-	return shared_ptr<CMinimizer>(new CMinimizer_Bootstrap());
+	return shared_ptr<CMinimizer>(new CBootstrap_Levmar());
 }
 
 ///
-void CMinimizer_Bootstrap::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
+void CBootstrap_Levmar::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
 {
 	// First run the standard levmar minimizer:
-	CMinimizer_levmar::ErrorFunc(params, output, nParams, nOutput, misc);
+	CLevmar::ErrorFunc(params, output, nParams, nOutput, misc);
 }
 
-void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_setparams)
+void CBootstrap_Levmar::ExportResults(double * params, int n_params, bool no_setparams)
 {
 	stringstream filename;
 	ofstream outfile;
@@ -106,9 +106,9 @@ void CMinimizer_Bootstrap::ExportResults(double * params, int n_params, bool no_
 
 }
 
-void CMinimizer_Bootstrap::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
+void CBootstrap_Levmar::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 {
-	CMinimizer_levmar::Init(cl_gl_thread);
+	CLevmar::Init(cl_gl_thread);
 
 	// Get a copy of the original data, load it into memory.
 	int nData = mCLThread->GetNDataSets();
@@ -116,7 +116,7 @@ void CMinimizer_Bootstrap::Init(shared_ptr<CCL_GLThread> cl_gl_thread)
 		mData.push_back(mCLThread->GetData(data_set));
 }
 
-void CMinimizer_Bootstrap::Next()
+void CBootstrap_Levmar::Next()
 {
 
 // TODO: Calibrator information is hard-coded for eps Aur. This should be read in from elsewhere.
@@ -165,7 +165,7 @@ void CMinimizer_Bootstrap::Next()
 	}
 }
 
-int CMinimizer_Bootstrap::run()
+int CBootstrap_Levmar::run()
 {
 	// init local storage
 	vector<double> tmp_vec;
@@ -201,7 +201,7 @@ int CMinimizer_Bootstrap::run()
 		cout << endl << "Starting iteration " << iteration + 1 << endl;
 
 		// run the minimizer
-		exit_value = CMinimizer_levmar::run(&CMinimizer_Bootstrap::ErrorFunc);
+		exit_value = CLevmar::run(&CBootstrap_Levmar::ErrorFunc);
 
 		// Compute the average reduced chi2 per data set:
 		chi2r_ave = 0;

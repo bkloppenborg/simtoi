@@ -1,5 +1,5 @@
 /*
- * CMinimizer_GridSearch.cpp
+ * CGridSearch.cpp
  *
  *  Created on: Oct 4, 2012
  *      Author: bkloppen
@@ -30,7 +30,7 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CMinimizer_GridSearch.h"
+#include "CGridSearch.h"
 
 #include <tuple>
 #include <fstream>
@@ -40,22 +40,22 @@
 
 using namespace std;
 
-CMinimizer_GridSearch::CMinimizer_GridSearch()
+CGridSearch::CGridSearch()
 {
 	mMinimizerID = "gridsearch";
 	mMinimizerName = "Gridsearch";
 }
 
-CMinimizer_GridSearch::~CMinimizer_GridSearch() {
+CGridSearch::~CGridSearch() {
 	// TODO Auto-generated destructor stub
 }
 
-CMinimizerPtr CMinimizer_GridSearch::Create()
+CMinimizerPtr CGridSearch::Create()
 {
-	return shared_ptr<CMinimizer>(new CMinimizer_GridSearch());
+	return shared_ptr<CMinimizer>(new CGridSearch());
 }
 
-void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no_setparams)
+void CGridSearch::ExportResults(double * params, int n_params, bool no_setparams)
 {
 	stringstream filename;
 	ofstream outfile;
@@ -77,7 +77,7 @@ void CMinimizer_GridSearch::ExportResults(double * params, int n_params, bool no
 }
 
 
-int CMinimizer_GridSearch::run()
+int CGridSearch::run()
 {
 	// TODO: This minimizer only works on two-dimentional data.
 	if(mNParams > 2)

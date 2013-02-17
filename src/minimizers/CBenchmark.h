@@ -1,7 +1,7 @@
 /*
- * CMinimizer_levmar.h
+ * CBenchmark.h
  *
- *  Created on: Feb 13, 2012
+ *  Created on: Feb 10, 2012
  *      Author: bkloppenborg
  */
  
@@ -30,36 +30,23 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMINIMIZER_LEVMAR_H_
-#define CMINIMIZER_LEVMAR_H_
-
-#include <valarray>
-
-using namespace std;
+#ifndef CBENCHMARK_H_
+#define CBENCHMARK_H_
 
 #include "CMinimizer.h"
 
-class CMinimizer_levmar: public CMinimizer
+class CBenchmark: public CMinimizer
 {
-protected:
-	float * mResiduals;
-
 public:
-	CMinimizer_levmar();
-	virtual ~CMinimizer_levmar();
+	CBenchmark();
+	virtual ~CBenchmark();
 
 	static CMinimizerPtr Create();
 
-	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
+	static int GetMilliCount();
+	static int GetMilliSpan(int nTimeStart);
 
-	string GetExitString(int exit_num);
-
-	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
-
-	void printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar);
-
-	virtual int run();
-	int run(void (*error_func)(double *p, double *hx, int m, int n, void *adata));
+	int run();
 };
 
-#endif /* CMINIMIZER_LEVMAR_H_ */
+#endif /* CBENCHMARK_H_ */

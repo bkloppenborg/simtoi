@@ -1,5 +1,5 @@
 /*
- * CMinimizer_MultiNest.cpp
+ * CMultiNest.cpp
  *
  *  Created on: Jan 26, 2012
  *      Author: bkloppenborg
@@ -30,28 +30,28 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CMinimizer_MultiNest.h"
+#include "CMultiNest.h"
 #include "CCL_GLThread.h"
 #include <limits>
 
-CMinimizer_MultiNest::CMinimizer_MultiNest()
+CMultiNest::CMultiNest()
 {
 	mMinimizerID = "multinest";
 	mMinimizerName = "MultiNest";
 }
 
-CMinimizer_MultiNest::~CMinimizer_MultiNest()
+CMultiNest::~CMultiNest()
 {
 	// TODO Auto-generated destructor stub
 }
 
-CMinimizerPtr CMinimizer_MultiNest::Create()
+CMinimizerPtr CMultiNest::Create()
 {
-	return shared_ptr<CMinimizer>(new CMinimizer_MultiNest());
+	return shared_ptr<CMinimizer>(new CMultiNest());
 }
 
 /// Dumper (do nothing)
-void CMinimizer_MultiNest::dumper(int &nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double ** paramConstr, double &maxLogLike, double & logZ, double & logZerr, void * misc)
+void CMultiNest::dumper(int &nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double ** paramConstr, double &maxLogLike, double & logZ, double & logZerr, void * misc)
 {
 /*
 //	 paramConstr(4*nPar):
@@ -71,15 +71,15 @@ void CMinimizer_MultiNest::dumper(int &nSamples, int &nlive, int &nPar, double *
 	// If we haven't been requested to stop, copy the values over to a saveable array:
 	if(maxLogLike < numeric_limits<double>::max())
 	{
-		CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
+		CMultiNest * minimizer = reinterpret_cast<CMultiNest*>(misc);
 		for(int i = 0; i < nPar; i++)
 			minimizer->mParams[i] = paramConstr[0][i];
 	}
 }
 
-void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
+void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
 {
-	CMinimizer_MultiNest * minimizer = reinterpret_cast<CMinimizer_MultiNest*>(misc);
+	CMultiNest * minimizer = reinterpret_cast<CMultiNest*>(misc);
 	int n_data_sets = minimizer->mCLThread->GetNDataSets();
 	double tmp = 0;
 
@@ -112,7 +112,7 @@ void CMinimizer_MultiNest::log_likelihood(double * params, int & ndim, int & npa
 
 
 /// Runs MultiNest.
-int CMinimizer_MultiNest::run()
+int CMultiNest::run()
 {
 	// Init MultiNest:
 	mNParams = mCLThread->GetNFreeParameters();
@@ -157,8 +157,8 @@ int CMinimizer_MultiNest::run()
         maxModes, updInt, Ztol, path,
         seed, pWrap, fb, resume,
         outfile, initMPI, logZero, maxIterations,
-        CMinimizer_MultiNest::log_likelihood,
-        CMinimizer_MultiNest::dumper,
+        CMultiNest::log_likelihood,
+        CMultiNest::dumper,
         misc);
 
     mIsRunning = false;
