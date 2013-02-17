@@ -1,8 +1,8 @@
 /*
- * CMinimizerFactory.cpp
+ * \file CMinimizerFactory.cpp
  *
  *  Created on: Feb 10, 2013
- *      Author: bkloppenborg
+ *  \author bkloppenborg
  */
 
  /*
@@ -49,8 +49,10 @@ using namespace std;
 #include "minimizers/CMinimizer_MultiNest.h"
 #endif // _ADD_MULTINEST
 
+/// \brief Private constructor. Use `Instance()` instead.
 CMinimizerFactory::CMinimizerFactory()
 {
+	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
 	Register("benchmark", &CMinimizer_Benchmark::Create);
 	Register("bootstrap_levmar", &CMinimizer_Bootstrap::Create);
 	Register("gridsearch", &CMinimizer_GridSearch::Create);
@@ -62,10 +64,11 @@ CMinimizerFactory::CMinimizerFactory()
 
 CMinimizerFactory::~CMinimizerFactory() \
 {
-	// TODO Auto-generated destructor stub
+
 }
 
-/// Create an instance of the specified model.
+/// \brief Create an instance of the specified model.
+///
 /// Returns a shared_ptr<CModel> to the object if found, or throws a runtime exception.
 shared_ptr<CMinimizer> CMinimizerFactory::CreateMinimizer(string MinimizerID)
 {
@@ -78,7 +81,7 @@ shared_ptr<CMinimizer> CMinimizerFactory::CreateMinimizer(string MinimizerID)
 	return shared_ptr<CMinimizer>();
 }
 
-/// Returns a vector of the model names that are loaded.
+/// \brief Returns a vector of the minimizer ids that are loaded.
 vector<string> CMinimizerFactory::GetMinimizerList()
 {
 	vector<string> temp;
@@ -89,14 +92,17 @@ vector<string> CMinimizerFactory::GetMinimizerList()
 	return temp;
 }
 
-/// Returns a copy of the ModelFactory instance
+/// \brief Returns a copy of the CMinimizerFactory instance
 CMinimizerFactory CMinimizerFactory::Instance()
 {
 	static CMinimizerFactory instance;
 	return instance;
 }
 
-/// Registers a model with the name "ModelID" and creation function "CreateFunction" with the factory.
+/// \brief Registers a minimizer with the factory
+///
+/// \param MinimizerID A unique string which identifies this minimizer.
+/// \param CreateFunction A pointer to a CMinimizer::Create
 void CMinimizerFactory::Register(string MinimizerID, CreateMinimizerFn CreateFunction)
 {
 	if(mFactory.find(MinimizerID) != mFactory.end())

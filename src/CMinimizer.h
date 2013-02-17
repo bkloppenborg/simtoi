@@ -53,10 +53,15 @@ typedef shared_ptr<CMinimizer> CMinimizerPtr;
 ///
 /// All minimization routines used by SIMTOI inherit from this class.
 /// SIMTOI expects the following behavior from all minimizers:
-///  1. They MUST periodically check if mRun == false. If so, they MUST
-///		terminate gracefully and deallocate any self-allocated resources.
-///  2. Upon completion, the best-fit parameters MUST be stored in mParams
-///  3. Upon completion, the results (with applicable uncertainty estimates) SHOULD
+///  - To be used with SIMTOI, all minimizers MUST:
+///		-# Have a unique ID stored in `mMinimizerID` (see the list of built-in IDs)
+///		-# Implement a static function to create an instance of the
+///		   minimizer wrapped in a CMinimizerPtr. (i.e. see
+///		   `CMinimizer_GridSearch::Create()`).
+///		-# Periodically check mRun and, if false, terminate gracefully
+///		   deallocating any self-allocated resources (i.e. no calls to `exit`)
+///		-# Upon completion, the best-fit parameters MUST be stored in mParams
+///  - Upon completion, the results (with applicable uncertainty estimates) SHOULD
 /// 	be exported to a savefile using mSaveFileBasename as the save prefix.
 ///
 /// Before a minimizer is started, SIMTOI will call `Init()` to setup several

@@ -1,8 +1,8 @@
 /*
- * CMinimizerFactory.h
+ * \file CMinimizerFactory.h
  *
  *  Created on: Feb 10, 2013
- *      Author: bkloppenborg
+ *  \author bkloppenborg
  */
 
  /*
@@ -43,12 +43,20 @@ class CMinimizer;
 typedef shared_ptr<CMinimizer> CMinimizerPtr;
 typedef CMinimizerPtr (*CreateMinimizerFn)(void);
 
+/// \brief A factory class for creating minimizer objects
+///
+/// This factory is used to register and create instances of minimizers in SIMTOI.
+/// As this class is a singleton, the constructor is private. Call the `Instance()`
+/// function to get a copy of this object.
+///
+/// Before any minimizer may be used in SIMTOI, it must be registered with this class.
+/// Simply call `Register()` with a unique ID and `CMinimizerPtr` creation function.
+/// After the minimizer has been registered it will become available for use in SIMTOI.
 class CMinimizerFactory {
 private:
+	map<string, CreateMinimizerFn> mFactory; ///< Associates id -> minimizer create function
 
-	map<string, CreateMinimizerFn> mFactory;
-
-	CMinimizerFactory();
+	CMinimizerFactory();	///< Singleton class => private constructor.
 
 public:
 	virtual ~CMinimizerFactory();
