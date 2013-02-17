@@ -45,7 +45,6 @@ using namespace std;
 #include "CPosition.h"
 
 class CModel;
-
 typedef shared_ptr<CModel> CModelPtr;
 
 /// \brief A container class for a list of models.

@@ -1,8 +1,8 @@
 /*
- * CCModelList.cpp
+ * \file CCModelList.cpp
  *
  *  Created on: Nov 8, 2011
- *      Author: bkloppenborg
+ * \author: bkloppenborg
  */
  
  /* 
@@ -31,18 +31,17 @@
  */
 
 #include "CModelList.h"
-#include "CModelFactory.h"
 
 #include <sstream>
 #include <algorithm>
 
-#include "CCL_GLThread.h"
-
-// Models
 #include "CModel.h"
+#include "CModelFactory.h"
+#include "CCL_GLThread.h"
 
 using namespace std;
 
+/// \brief Default constructor
 CModelList::CModelList()
 {
 	mTime = 0;
@@ -53,14 +52,14 @@ CModelList::~CModelList()
 
 }
 
-/// Adds a new model to the list
+/// \brief Adds a new model to the list
 void CModelList::AddModel(CModelPtr model)
 {
 	mModels.push_back(model);
 }
 
 
-/// Returns the total number of free parameters in the models
+/// \brief Returns the total number of free parameters in all models
 int CModelList::GetNFreeParameters()
 {
     int n = 0;
@@ -74,6 +73,11 @@ int CModelList::GetNFreeParameters()
     return n;
 }
 
+/// \brief Yields the values of all of the parameters in the models
+///
+/// \param params A pre-allocated array of size `n_params` into which the
+/// 	parameter values will be placed.
+/// \param n_params The size of params.
 void CModelList::GetAllParameters(double * params, int n_params)
 {
     int n = 0;
@@ -86,6 +90,7 @@ void CModelList::GetAllParameters(double * params, int n_params)
     }
 }
 
+/// \brief Get the free parameter min/maxes
 vector< pair<double, double> > CModelList::GetFreeParamMinMaxes()
 {
     vector< pair<double, double> > tmp1;
@@ -101,7 +106,7 @@ vector< pair<double, double> > CModelList::GetFreeParamMinMaxes()
     return tmp1;
 }
 
-/// Gets the values for all of the free parameters.
+/// \brief Gets the values for all of the free parameters.
 void CModelList::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
     int n = 0;
