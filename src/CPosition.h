@@ -49,17 +49,29 @@ typedef shared_ptr<CPosition> CPositionPtr;
 
 class CPosition : public CParameters
 {
+public:
+	enum PositionTypes
+	{
+		STATIC,
+		DYNAMIC
+	};
+
 protected:
 	string mPositionID;
+	PositionTypes mPositionType;
+	double mTime;
 
 public:
 	CPosition(int n_parameters);
 	virtual ~CPosition();
 
 	virtual string GetID() { return mPositionID; };
+	PositionTypes GetPositionType() { return mPositionType; };
 
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
 	virtual void GetXYZ(double & x, double & y, double & z);
+
+	virtual void SetTime(double time);
 };
 
 #endif /* CPOSITION_H_ */

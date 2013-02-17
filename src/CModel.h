@@ -74,6 +74,9 @@ typedef shared_ptr<CShader> CShaderPtr;
 /// models from SIMTOI save files and for basic OpenGL operations such as rotation
 /// and translation.
 ///
+/// At a minimum, all models should override the `Render()` and `GetID()` functions.
+/// See `CModelSphere` for a simple example.
+///
 /// This class is derived from `CParameters` which is used to store the
 /// values of model parameters.
 class CModel : public CParameters

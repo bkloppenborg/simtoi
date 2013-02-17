@@ -50,3 +50,8 @@ void CPosition::GetXYZ(double & x, double & y, double & z)
 	y = 0;
 	z = 0;
 }
+
+void CPosition::SetTime(double time)
+{
+	mTime = time;
+}

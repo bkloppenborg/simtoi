@@ -34,21 +34,21 @@
 #include <stdexcept>
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
-#include "models/CModelSphere.h"
-#include "models/CModelDisk.h"
-#include "models/CModelDisk_A.h"
-#include "models/CModelDisk_B.h"
-#include "models/CModelDisk_C.h"
-#include "models/CModelDisk_ConcentricRings.h"
+#include "models/CSphere.h"
+#include "models/CCylinder.h"
+#include "models/CDisk_A.h"
+#include "models/CDisk_B.h"
+#include "models/CDisk_C.h"
+#include "models/CDisk_ConcentricRings.h"
 
 CModelFactory::CModelFactory()
 {
-	Register("sphere", &CModelSphere::Create);
-	Register("cylinder", &CModelDisk::Create);
-	Register("disk_a", &CModelDisk_A::Create);
-	Register("disk_b", &CModelDisk_B::Create);
-	Register("disk_c", &CModelDisk_C::Create);
-	Register("disk_concentric_rings", &CModelDisk_ConcentricRings::Create);
+	Register("sphere", &CSphere::Create);
+	Register("cylinder", &CCylinder::Create);
+	Register("disk_a", &CDisk_A::Create);
+	Register("disk_b", &CDisk_B::Create);
+	Register("disk_c", &CDisk_C::Create);
+	Register("disk_concentric_rings", &CDisk_ConcentricRings::Create);
 }
 
 CModelFactory::~CModelFactory() \

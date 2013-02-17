@@ -72,6 +72,37 @@ CModel::~CModel()
 
 }
 
+/// \brief Sets the color for the vertex based upon the model color.
+void CModel::Color()
+{
+	glColor4d(mParams[3], 0.0, 0.0, 1.0);
+}
+
+/// \brief Static functionw which creates a lookup table of sine and cosine values
+/// 	used in drawing things in polar coordinates.
+///
+/// Code taken from
+/// <a href="http://openglut.cvs.sourceforge.net/viewvc/openglut/openglut/lib/src/og_geometry.c">OpenGLUT</a>
+void CModel::CircleTable( double * sint, double * cost, const int n )
+{
+    int i;
+    const int size = abs( n );
+    double angle;
+
+    assert( n );
+    angle = 2 * PI / ( double )n;
+
+    for( i = 0; i < size; i++ )
+    {
+        sint[ i ] = sin( angle * i );
+        cost[ i ] = cos( angle * i );
+    }
+
+    /* Last sample is duplicate of the first */
+    sint[ size ] = sint[ 0 ];
+    cost[ size ] = cost[ 0 ];
+}
+
 /// \brief Returns the type of the model
 string CModel::GetID()
 {
@@ -203,6 +234,7 @@ vector<string> CModel::GetFreeParameterNames()
 	return tmp1;
 }
 
+/// \brief Gets the total number of free parameters in the model.
 int CModel::GetTotalFreeParameters()
 {
 	// Sum up the free parameters from the model, position, and features
@@ -211,33 +243,8 @@ int CModel::GetTotalFreeParameters()
 			this->GetNShaderFreeParameters();
 }
 
-void CModel::Color()
-{
-	glColor4d(mParams[3], 0.0, 0.0, 1.0);
-}
-
-/// Creates a lookup table of sine and cosine values for use in drawing
-/// Taken from http://openglut.cvs.sourceforge.net/viewvc/openglut/openglut/lib/src/og_geometry.c
-void CModel::CircleTable( double * sint, double * cost, const int n )
-{
-    int i;
-    const int size = abs( n );
-    double angle;
-
-    assert( n );
-    angle = 2 * PI / ( double )n;
-
-    for( i = 0; i < size; i++ )
-    {
-        sint[ i ] = sin( angle * i );
-        cost[ i ] = cos( angle * i );
-    }
-
-    /* Last sample is duplicate of the first */
-    sint[ size ] = sint[ 0 ];
-    cost[ size ] = cost[ 0 ];
-}
-
+/// \brief Runs OpenGL calls to rotate the model according to the inclination
+/// 	position angle, and rotation angle (rotational phase).
 void CModel::Rotate()
 {
 	// Rotations are implemented in the standard way, namely
@@ -250,6 +257,19 @@ void CModel::Rotate()
 	CCL_GLThread::CheckOpenGLError("CModel::Rotate()");
 }
 
+/// \brief Restores a model from SIMTOI's JSON save file.
+///
+/// This function inspects a top-level model block from a JSON save file
+/// and restores the model parameters, position object, and shader method
+/// by inspecting the `base_data`, `position_id` and `shader_id` fields.
+/// Further restoration is passed on to the respective objects by sending
+/// their respective JSON data blocks to the position and shader objects.
+///
+/// If no position is found, the default `CPositionXY` and default shader
+/// are restored.
+///
+/// \param input JSON input corresponding to a top-level model block
+/// 		(i.e. model_N) from a JSON save file.
 void CModel::Restore(Json::Value input)
 {
 	// Restore the base parameters
@@ -277,7 +297,7 @@ void CModel::Restore(Json::Value input)
 	SetShader(shader);
 }
 
-/// Sets up the matrix mode for rendering models.
+/// \brief Sets up the matrix mode for rendering models.
 void CModel::SetupMatrix()
 {
     // Rotate from (x,y,z) to (North, East, Away).  Note, we are following the (x,y,z)
@@ -289,7 +309,15 @@ void CModel::SetupMatrix()
 
 }
 
-/// Serializes a model object into a JSON object.
+/// \brief Serializes a model object into a JSON object.
+///
+/// This function creates a Json::Value object containing six primary elements:
+/// `[base|position|shader]_id` : the unique IDs of the model, position, and shader models.
+///	`[base|position|shader]_data' : a serialized copy of the model, position, and shader data.
+///
+/// If this method is overridden, the programmer is responsible for re-creating this functionality.
+///
+/// \return A serialized copy of this object in JSON format.
 Json::Value CModel::Serialize()
 {
 	Json::Value output;
@@ -305,26 +333,38 @@ Json::Value CModel::Serialize()
 	return output;
 }
 
-/// Copies inc and Omega from the position object iff it's type is CPosition::ORBIT
-/// and the angular parameter is not free.
+/// \brief Sets the inclination and position angle relative to dynamic
+///		position model parameters.
+///
+/// If the position models are dynamic, they are often determined from
+/// orbits. This function simplifies the setting of the position angle
+/// and inclination to be relative to their orbital counterparts.
 void CModel::SetAnglesFromPosition()
 {
-	// TODO: Fix this section:
-//	if(mPosition->GetID() == CPosition::ORBIT)
-//	{
-//		// Inclination
-//		if(!this->IsFree(0))
-//			mParams[0] = mPosition->GetParam(0);
-//
-//		// Omega / Position angle
-//		// TODO: Is this right?
-//		if(!this->IsFree(1))
-//			mParams[1] = mPosition->GetParam(1);
-//	}
+	if(mPosition == NULL)
+		return;
+
+	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
+	{
+		// the inclination
+		if(!this->IsFree(0))
+			mParams[0] += mPosition->GetParam(0);
+
+		// position angle
+		if(!this->IsFree(1))
+			mParams[1] += mPosition->GetParam(1);
+	}
 }
 
-/// Sets the parameters for this model, the position, shader, and all features.
-void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_params)
+/// \brief Sets the free parameters for the model, position, and shader objects.
+///
+/// Iteratively sets the free parameters for the model, position, and shader
+/// objects by calling `SetFreeParams()` with in_params and pointer arithmetic.
+///
+/// \param in_params The array of input parameters
+/// \param n_params The size of `in_params`
+/// \param scale_params True if `in_params` is on a unit hypercube, false otherwise.
+void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_params = false)
 {
 	// Here we use pointer math to advance the position of the array passed to the functions
 	// that set the parameters.  First assign values to this model (use pull_params):
@@ -347,42 +387,48 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	SetAnglesFromPosition();
 }
 
-/// Assigns and initializes a position type.
+/// \brief Assigns the position object from a position id
+///
+/// \param position_id A registered position ID in `CPositionFactory`
 void CModel::SetPositionModel(string position_id)
 {
 	auto factory = CPositionFactory::Instance();
 	SetPositionModel( factory.CreatePosition(position_id));
 }
 
+/// \brief Sets the position model for this objects.
+///
+/// \param position A valid `shared_ptr<CPosition>` object.
 void CModel::SetPositionModel(CPositionPtr position)
 {
 	mPosition = position;
 }
 
+/// \brief Sets the time at which the model should be rendered.
 void CModel::SetTime(double time)
 {
+	if(mPosition == NULL)
+		return;
 
-	// TODO: Fix this
-//	if(mPosition->GetID() == CPosition::ORBIT)
-//	{
-//		tmp = reinterpret_cast<CPositionOrbit*>(mPosition);
-//		tmp->SetTime(time);
-//	}
+	mPosition->SetTime(time);
 }
 
-/// Replaces the loaded shader with the one specified by shader_id
+/// \brief Replaces the loaded shader with the one specified by shader_id
 void CModel::SetShader(string shader_id)
 {
 	auto shaders = CShaderFactory::Instance();
 	SetShader(shaders.CreateShader(shader_id));
 }
 
-/// Replaces the loaded shader with the specified shader
+/// \brief Replaces the loaded shader with the specified shader
+///
+/// \param shader A valid `shared_ptr<CShader>` object.
 void CModel::SetShader(CShaderPtr shader)
 {
 	mShader = shader;
 }
 
+/// \brief Translates the model to the (x,y,z) position specified by the position object.
 void CModel::Translate()
 {
 	double x, y, z;
@@ -393,6 +439,13 @@ void CModel::Translate()
 	CCL_GLThread::CheckOpenGLError("CModel::Translate()");
 }
 
+/// \brief Use the shader on the model
+///
+/// Calls the shader, passing the minimum/maximum XYZ positions
+/// of the verticies in the model.
+///
+/// \param min_xyz The minimum (x,y,z) values in the model.
+/// \param max_xyz The maximum (x,y,z) values in the model.
 void CModel::UseShader(double min_xyz[3], double max_xyz[3])
 {
 	if(mShader != NULL)
