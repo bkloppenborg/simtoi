@@ -1,5 +1,5 @@
 /*
- * CModelDisk_A.cpp
+ * CDisk_B.cpp
  *
  *  Created on: Feb 24, 2012
  *      Author: bkloppenborg
@@ -30,12 +30,12 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CModelDisk_A.h"
+#include "CDisk_B.h"
 
-CModelDisk_A::CModelDisk_A()
-	:CModelDisk(1)
+CDisk_B::CDisk_B()
+	:CCylinder(1)
 {
-	mName = "Disk A";
+	mName = "Disk B";
 
 	mParamNames.push_back("Decay Factor");
 	SetParam(mBaseParams + mDiskParams + 1, 0.05);
@@ -44,18 +44,18 @@ CModelDisk_A::CModelDisk_A()
 	SetMin(mBaseParams + mDiskParams + 1, 0.01);
 }
 
-CModelDisk_A::~CModelDisk_A()
+CDisk_B::~CDisk_B()
 {
 	// TODO Auto-generated destructor stub
 }
 
-shared_ptr<CModel> CModelDisk_A::Create()
+shared_ptr<CModel> CDisk_B::Create()
 {
-	return shared_ptr<CModel>(new CModelDisk_A());
+	return shared_ptr<CModel>(new CDisk_B());
 }
 
 /// Returns the radius for the specified height following exponential decay
-double CModelDisk_A::GetRadius(double half_height, double h, double dh, double rim_radius)
+double CDisk_B::GetRadius(double half_height, double h, double dh, double rim_radius)
 {
 	const double h_r = mParams[mBaseParams + mDiskParams + 1];
 	h = fabs(h);
@@ -63,5 +63,5 @@ double CModelDisk_A::GetRadius(double half_height, double h, double dh, double r
 	if(h < dh)
 		h = dh;
 
-	return rim_radius - h_r * log(h/half_height);
+	return rim_radius + sqrt(-2*h_r*h_r * log(h/half_height));
 }

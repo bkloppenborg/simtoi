@@ -1,5 +1,5 @@
 /*
- * CModelDisk_A.cpp
+ * CDisk_A.h
  *
  *  Created on: Feb 24, 2012
  *      Author: bkloppenborg
@@ -29,39 +29,34 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+ /*
+ *  Disk Model A:
+ *  This model modifies the edges of the simple CModelDisk to extend radially outward
+ *  with an exponentially decaying height:
+ *
+ *  	h(r) = h0 * exp( -(r-r0)/h_r )
+ *
+ *  where h0 is the initial height, r0 is the inner radius of the decaying region and
+ *  h_r is a decay factor (akin to scale height)
+ *
+ */
 
-#include "CModelDisk_B.h"
+#ifndef CDISK_A_H_
+#define CDISK_A_H_
 
-CModelDisk_B::CModelDisk_B()
-	:CModelDisk(1)
+#include "CCylinder.h"
+
+class CDisk_A: public CCylinder
 {
-	mName = "Disk B";
+public:
+	CDisk_A();
+	virtual ~CDisk_A();
 
-	mParamNames.push_back("Decay Factor");
-	SetParam(mBaseParams + mDiskParams + 1, 0.05);
-	SetFree(mBaseParams + mDiskParams + 1, true);
-	SetMax(mBaseParams + mDiskParams + 1, 2.0);
-	SetMin(mBaseParams + mDiskParams + 1, 0.01);
-}
+	static shared_ptr<CModel> Create();
 
-CModelDisk_B::~CModelDisk_B()
-{
-	// TODO Auto-generated destructor stub
-}
+	virtual string GetID() { return "disk_a"; };
+	double GetRadius(double half_height, double h, double dh, double rim_radius);
+};
 
-shared_ptr<CModel> CModelDisk_B::Create()
-{
-	return shared_ptr<CModel>(new CModelDisk_B());
-}
-
-/// Returns the radius for the specified height following exponential decay
-double CModelDisk_B::GetRadius(double half_height, double h, double dh, double rim_radius)
-{
-	const double h_r = mParams[mBaseParams + mDiskParams + 1];
-	h = fabs(h);
-
-	if(h < dh)
-		h = dh;
-
-	return rim_radius + sqrt(-2*h_r*h_r * log(h/half_height));
-}
+#endif /* CDISK_A_H_ */

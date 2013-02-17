@@ -1,5 +1,5 @@
 /*
- * CModelDisk_ConcentricRings.h
+ * CDisk_ConcentricRings.h
  *
  *  Created on: Dec 28, 2012
  *      Author: bkloppen
@@ -17,17 +17,17 @@
  *  WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
  */
 
-#ifndef CMODELDISK_CONCENTRICRINGS_H_
-#define CMODELDISK_CONCENTRICRINGS_H_
+#ifndef CDISK_CONCENTRICRINGS_H_
+#define CDISK_CONCENTRICRINGS_H_
 
-#include "CModelDisk.h"
+#include "CCylinder.h"
 
-class CModelDisk_ConcentricRings: public CModelDisk
+class CDisk_ConcentricRings: public CCylinder
 {
 
 public:
-	CModelDisk_ConcentricRings();
-	virtual ~CModelDisk_ConcentricRings();
+	CDisk_ConcentricRings();
+	virtual ~CDisk_ConcentricRings();
 
 	static shared_ptr<CModel> Create();
 

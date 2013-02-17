@@ -1,5 +1,5 @@
 /*
- * CModelDisk.h
+ * CCylinder.h
  *
  *  Created on: Feb 23, 2012
  *      Author: bkloppenborg
@@ -36,12 +36,12 @@
  *  the CModelDisk(int) function and start numbering additional parameters at 3.
  */
 
-#ifndef CMODELDISK_H_
-#define CMODELDISK_H_
+#ifndef CCYLINDER_H_
+#define CCYLINDER_H_
 
 #include "CModel.h"
 
-class CModelDisk : public CModel
+class CCylinder : public CModel
 {
 protected:
 	static int mDiskParams;
@@ -52,9 +52,9 @@ protected:
 	double mZeroThreshold;
 
 public:
-	CModelDisk();
-	CModelDisk(int additional_params);
-	virtual ~CModelDisk();
+	CCylinder();
+	CCylinder(int additional_params);
+	virtual ~CCylinder();
 
 	static shared_ptr<CModel> Create();
 

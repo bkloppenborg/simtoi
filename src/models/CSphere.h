@@ -1,5 +1,5 @@
 /*
- * CModelSphere.h
+ * CSphere.h
  *
  *  Created on: Nov 8, 2011
  *      Author: bkloppenborg
@@ -30,19 +30,19 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMODELSPHERE_H_
-#define CMODELSPHERE_H_
+#ifndef CSPHERE_H_
+#define CSPHERE_H_
 
 #include "CModel.h"
 
-class CModelSphere: public CModel
+class CSphere: public CModel
 {
 protected:
 	int mSlices;
 
 public:
-	CModelSphere();
-	virtual ~CModelSphere();
+	CSphere();
+	virtual ~CSphere();
 
 	static shared_ptr<CModel> Create();
 
@@ -52,4 +52,4 @@ public:
 	void Render(GLuint framebuffer_object, int width, int height);
 };
 
-#endif /* CMODELSPHERE_H_ */
+#endif /* CSPHERE_H_ */

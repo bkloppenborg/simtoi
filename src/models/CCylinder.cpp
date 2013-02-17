@@ -1,5 +1,5 @@
 /*
- * CModelDisk.cpp
+ * CCylinder.cpp
  *
  *  Created on: Feb 23, 2012
  *      Author: bkloppenborg
@@ -30,35 +30,35 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CModelDisk.h"
+#include "CCylinder.h"
 
-int CModelDisk::mDiskParams = 2;
+int CCylinder::mDiskParams = 2;
 
-CModelDisk::CModelDisk()
+CCylinder::CCylinder()
 	: CModel(mDiskParams)
 {
 	InitMembers();
 }
 
-CModelDisk::CModelDisk(int additional_params)
+CCylinder::CCylinder(int additional_params)
 	: CModel(mDiskParams + additional_params)
 {
 	InitMembers();
 }
 
-CModelDisk::~CModelDisk()
+CCylinder::~CCylinder()
 {
 	delete[] mSinT;
 	delete[] mCosT;
 }
 
-shared_ptr<CModel> CModelDisk::Create()
+shared_ptr<CModel> CCylinder::Create()
 {
-	return shared_ptr<CModel>(new CModelDisk());
+	return shared_ptr<CModel>(new CCylinder());
 }
 
 /// Baseclass routine, draws a cylinder with a top and bottom.
-void CModelDisk::Draw()
+void CCylinder::Draw()
 {
 	// Rename a few variables for convenience:
 	const double radius = mParams[mBaseParams + 1] / 2;	// diameter / 2
@@ -71,13 +71,13 @@ void CModelDisk::Draw()
 	DrawDisk(0, radius, -half_height);
 }
 
-void CModelDisk::DrawDisk(double radius, double at_z)
+void CCylinder::DrawDisk(double radius, double at_z)
 {
 	DrawDisk(0, radius, at_z);
 }
 
 /// Draws a flat (planar) disk
-void CModelDisk::DrawDisk(double r_in, double r_out, double at_z)
+void CCylinder::DrawDisk(double r_in, double r_out, double at_z)
 {
     double color = mParams[3];
     glBegin(GL_QUAD_STRIP);
@@ -98,7 +98,7 @@ void CModelDisk::DrawDisk(double r_in, double r_out, double at_z)
 }
 
 /// Draws the sides of the disk (cylinder)
-void CModelDisk::DrawSides(double radius, double total_height)
+void CCylinder::DrawSides(double radius, double total_height)
 {
 	double transparency = 0;
     double z0 = 0;
@@ -140,12 +140,12 @@ void CModelDisk::DrawSides(double radius, double total_height)
 
 /// Returns the radius as a function of height for the outer edge of the disk
 /// Specify r0 to indicate the radius of the outer rim.
-double CModelDisk::GetRadius(double half_height, double h, double dh, double rim_radius)
+double CCylinder::GetRadius(double half_height, double h, double dh, double rim_radius)
 {
 	return rim_radius;
 }
 
-void CModelDisk::InitMembers()
+void CCylinder::InitMembers()
 {
 	// CModel(3) because we have three additional parameters for this model
 	// Remember, mParams[0] = yaw, mParams[1] = pitch, mParams[2] = roll.
@@ -175,7 +175,7 @@ void CModelDisk::InitMembers()
 	SetMin(mBaseParams + 2, 0.1);
 }
 
-void CModelDisk::Render(GLuint framebuffer_object, int width, int height)
+void CCylinder::Render(GLuint framebuffer_object, int width, int height)
 {
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
 

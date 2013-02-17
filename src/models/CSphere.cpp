@@ -31,7 +31,7 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CModelSphere.h"
+#include "CSphere.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
@@ -40,7 +40,7 @@
 
 using namespace std;
 
-CModelSphere::CModelSphere()
+CSphere::CSphere()
 	: CModel(1)
 {
 	// CModel(1) because we have one additional parameter for this model
@@ -59,17 +59,17 @@ CModelSphere::CModelSphere()
 	SetMin(mBaseParams + 1, 0.1);
 }
 
-CModelSphere::~CModelSphere()
+CSphere::~CSphere()
 {
 	// TODO Auto-generated destructor stub
 }
 
-shared_ptr<CModel> CModelSphere::Create()
+shared_ptr<CModel> CSphere::Create()
 {
-	return shared_ptr<CModel>(new CModelSphere());
+	return shared_ptr<CModel>(new CSphere());
 }
 
-void CModelSphere::Render(GLuint framebuffer_object, int width, int height)
+void CSphere::Render(GLuint framebuffer_object, int width, int height)
 {
 	// NOTE: When rendering assume that the framebuffer has already been cleared.
 

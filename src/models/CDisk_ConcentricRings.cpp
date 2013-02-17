@@ -1,15 +1,15 @@
 /*
- * CModelDisk_ConcentricRings.cpp
+ * CDisk_ConcentricRings.cpp
  *
  *  Created on: Dec 28, 2012
  *      Author: bkloppen
  */
 
-#include "CModelDisk_ConcentricRings.h"
+#include "CDisk_ConcentricRings.h"
 #include "CShaderFactory.h"
 
-CModelDisk_ConcentricRings::CModelDisk_ConcentricRings()
-: 	CModelDisk(6 - mDiskParams)
+CDisk_ConcentricRings::CDisk_ConcentricRings()
+: 	CCylinder(6 - mDiskParams)
 {
 	mName = "Concentric Rings";
 
@@ -59,23 +59,23 @@ CModelDisk_ConcentricRings::CModelDisk_ConcentricRings()
 	mShader = shaders.CreateShader("default");
 }
 
-CModelDisk_ConcentricRings::~CModelDisk_ConcentricRings()
+CDisk_ConcentricRings::~CDisk_ConcentricRings()
 {
 	// TODO Auto-generated destructor stub
 }
 
-shared_ptr<CModel> CModelDisk_ConcentricRings::Create()
+shared_ptr<CModel> CDisk_ConcentricRings::Create()
 {
-	return shared_ptr<CModel>(new CModelDisk_ConcentricRings());
+	return shared_ptr<CModel>(new CDisk_ConcentricRings());
 }
 
 /// Overrides the default CModel::SetShader function.
-void CModelDisk_ConcentricRings::SetShader(CShaderPtr shader)
+void CDisk_ConcentricRings::SetShader(CShaderPtr shader)
 {
 	// This mode does not accept different shaders, do nothing here.
 }
 
-double CModelDisk_ConcentricRings::MidplaneTransparency(double radius)
+double CDisk_ConcentricRings::MidplaneTransparency(double radius)
 {
 	const double r_in  = mParams[mBaseParams + 1];
 	const double r_out = mParams[mBaseParams + 2];
@@ -84,7 +84,7 @@ double CModelDisk_ConcentricRings::MidplaneTransparency(double radius)
 	return (1 - pow((radius - r_in) / (r_out - r_in), alpha));
 }
 
-void CModelDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, int height)
+void CDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, int height)
 {
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -135,7 +135,7 @@ void CModelDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, in
 	CCL_GLThread::CheckOpenGLError("CModelDisk.Render()");
 }
 
-double CModelDisk_ConcentricRings::Transparency(double half_height, double at_z)
+double CDisk_ConcentricRings::Transparency(double half_height, double at_z)
 {
 	const double beta  = mParams[mBaseParams + 5];
 	return 1 - pow(abs(at_z) / half_height, beta);
