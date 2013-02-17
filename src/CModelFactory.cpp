@@ -41,6 +41,7 @@
 #include "models/CDisk_C.h"
 #include "models/CDisk_ConcentricRings.h"
 
+/// \brief Private constructor. Call `Instance()` instead.
 CModelFactory::CModelFactory()
 {
 	Register("sphere", &CSphere::Create);
@@ -56,9 +57,12 @@ CModelFactory::~CModelFactory() \
 	// TODO Auto-generated destructor stub
 }
 
-/// Create an instance of the specified model.
-/// Returns a shared_ptr<CModel> to the object if found, or throws a runtime exception.
-shared_ptr<CModel> CModelFactory::CreateModel(string ModelID)
+/// \brief Creates an instance of the the specified model
+///
+/// Attempts to create an instance of the model specified by `ModelID`. If found
+/// a new `CModelPtr` is created and returned. If the model is not found
+/// this function will through a `runtime_error`
+CModelPtr CModelFactory::CreateModel(string ModelID)
 {
 	auto it = mFactory.find(ModelID);
 	if(it != mFactory.end())
@@ -66,10 +70,10 @@ shared_ptr<CModel> CModelFactory::CreateModel(string ModelID)
 
 	throw runtime_error("The model with ID '" + ModelID + "' not registered with CModelFactory");
 
-	return shared_ptr<CModel>();
+	return CModelPtr();
 }
 
-/// Returns a vector of the model names that are loaded.
+/// \brief Get a list of the model IDs that are registered with this factory.
 vector<string> CModelFactory::GetModelList()
 {
 	vector<string> temp;
@@ -80,14 +84,17 @@ vector<string> CModelFactory::GetModelList()
 	return temp;
 }
 
-/// Returns a copy of the ModelFactory instance
+/// \brief Returns a copy of the ModelFactory instance
 CModelFactory CModelFactory::Instance()
 {
 	static CModelFactory instance;
 	return instance;
 }
 
-/// Registers a model with the name "ModelID" and creation function "CreateFunction" with the factory.
+/// \brief Registers a model with the factory
+///
+/// \param ModelID A unique string which identifies this minimizer.
+/// \param CreateFunction A pointer to a function with returns a CModelPtr
 void CModelFactory::Register(string ModelID, CreateModelFn CreateFunction)
 {
 	if(mFactory.find(ModelID) != mFactory.end())

@@ -40,7 +40,6 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "enumerations.h"
 #include "CGLWidget.h"
 #include "CPosition.h"
 #include "CMinimizer.h"

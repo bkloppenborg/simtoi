@@ -1,8 +1,8 @@
 /*
- * CModelFactory.h
+ * \file CModelFactory.h
  *
  *  Created on: Feb 10, 2013
- *      Author: bkloppenborg
+ *  \author bkloppenborg
  */
 
  /*
@@ -40,14 +40,21 @@
 using namespace std;
 
 class CModel;
+typedef shared_ptr<CModel> CModelPtr;
 
 typedef shared_ptr<CModel> (*CreateModelFn)(void);
 
-
+/// \brief A factory class for creating/registering SIMTOI models
+///
+/// This factory is used to register and create instances of models in SIMTOI.
+/// As this class is a singleton, the constructor is private. Call the `Instance()`
+/// function to get a copy of this object.
+///
+/// Before any model may be used in SIMTOI, it must be registered with this class.
+/// Simply call `Register()` with a unique ID and `CModelPtr` creation function.
+/// After the model has been registered it will become available for use in SIMTOI.
 class CModelFactory {
 private:
-//	static CModelFactory * mInstance;
-
 	map<string, CreateModelFn> mFactory;
 
 	CModelFactory();

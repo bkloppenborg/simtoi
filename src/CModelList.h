@@ -42,22 +42,20 @@
 #include <vector>
 using namespace std;
 
-#include "enumerations.h"
 #include "CPosition.h"
 
 class CModel;
 
 typedef shared_ptr<CModel> CModelPtr;
 
-// A container for a list of models.
+/// \brief A container class for a list of models.
 class CModelList
 {
 protected:
 	vector<CModelPtr> mModels;
 
 protected:
-	double mTime;
-	double mTimestep;
+	double mTime;	///< The current time for the models in this list.
 
 public:
 	CModelList();
@@ -76,8 +74,6 @@ public:
 	double GetTime() { return mTime; };
 
 	static vector<string> GetTypes(void);
-
-	void IncrementTime();
 
 	void Render(GLuint fbo, int width, int height);
 	void Restore(Json::Value input);

@@ -46,7 +46,6 @@ using namespace std;
 CModelList::CModelList()
 {
 	mTime = 0;
-	mTimestep = 0;
 }
 
 CModelList::~CModelList()
@@ -149,12 +148,6 @@ double CModelList::GetFreeParameterPriorProduct()
     return tmp;
 }
 
-/// Increments the time by the set timestep value.
-void CModelList::IncrementTime()
-{
-	SetTime(mTime + mTimestep);
-}
-
 // Render the image to the specified OpenGL framebuffer object.
 void CModelList::Render(GLuint fbo, int width, int height)
 {
@@ -249,12 +242,6 @@ void CModelList::SetTime(double t)
     {
     	(*it)->SetTime(mTime);
     }
-}
-
-/// Sets the time increment (for use with animation).
-void CModelList::SetTimestep(double dt)
-{
-	mTimestep = dt;
 }
 
 bool CModelList::SortByZ(const CModelPtr & A, const CModelPtr & B)

@@ -534,7 +534,7 @@ void CCL_GLThread::run()
         switch(op)
         {
         case GLT_Animate:
-         	mModelList->IncrementTime();
+//         	mModelList->IncrementTime();
          	QThread::msleep(40);
          	EnqueueOperation(GLT_RenderModels);
          	EnqueueOperation(GLT_Animate);
@@ -716,7 +716,7 @@ void CCL_GLThread::SetTime(double t)
 
 void CCL_GLThread::SetTimestep(double dt)
 {
-	mModelList->SetTimestep(dt);
+//	mModelList->SetTimestep(dt);
 }
 
 /// Stop the thread.

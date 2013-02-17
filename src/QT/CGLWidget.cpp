@@ -25,8 +25,11 @@
 
 #include "CGLWidget.h"
 
+#include <stdexcept>
 #include "textio.hpp"
 #include "json/json.h"
+using namespace std;
+
 
 #include "CTreeModel.h"
 
