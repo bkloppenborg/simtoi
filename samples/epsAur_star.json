@@ -18,9 +18,10 @@
 		"position_data" : 
 		{
             "X" : [ 0.0, 0.0, 0.0, false ],
-            "Y" : [ 0.0, 0.0, 0.0, false ]
+            "Y" : [ 0.0, 0.0, 0.0, false ],
+            "Z" : [ 0.0, 0.0, 0.0, false ]
 		},
-		"position_id" : "xy",
+		"position_id" : "xyz",
 		"shader_data" : 
 		{
 			"alpha" : [ 0.50, 0.1, 1.0, false ]
