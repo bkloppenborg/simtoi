@@ -39,9 +39,9 @@
 #include "CModelList.h"
 #include "CMinimizer.h"
 #include "CWorkerThread.h"
+#include "CTreeModel.h"
 
 class CModel;
-class CTreeModel;
 
 class CGLWidget : public QGLWidget
 {
@@ -55,7 +55,7 @@ protected:
     CMinimizerPtr mMinimizer;
     std::thread mMinimizerThread;
     QStandardItemModel * mOpenFileModel;
-    CTreeModel * mTreeModel;
+    CTreeModel mTreeModel;
     static QGLFormat mFormat;
 
 public:
@@ -92,7 +92,7 @@ public:
 //    CModelList * GetModelList() { return mGLT->GetModelList(); };
     QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
 //    double GetScale() { return mGLT->GetScale(); };
-    CTreeModel * GetTreeModel() { return mTreeModel; };
+    CTreeModel * GetTreeModel() { return &mTreeModel; };
 
 
 //    void LoadData(string filename) { mGLT->LoadData(filename); };
@@ -110,7 +110,7 @@ public:
 //    void RemoveData(int data_num) { mGLT->RemoveData(data_num); };
 
 public:
-//    void Save(string location) { mGLT->Save(location); };
+    void Save(string filename);
 //    void SaveImage(string filename) { mGLT->SaveImage(filename); };
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetMinimizer(CMinimizerPtr minimizer);
@@ -124,8 +124,9 @@ public:
     void stopMinimizer();
     void stopRendering();
 
+private slots:
 
-
+	void on_mTreeModel_parameterUpdated();
 };
 
 #endif

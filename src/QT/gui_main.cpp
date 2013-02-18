@@ -234,9 +234,16 @@ void gui_main::closeEvent(QCloseEvent *evt)
 /// SIMTOI will automatically exit when all minimization engines have completed execution.
 void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, int size, double scale, bool close_simtoi)
 {
-	QMdiSubWindow * sw = AddGLArea(size, size, scale);
+	// First open the model area and configure the UI.
+	Open(model_files);
+
+	// Get a pointer to the active model area.
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    // Now open data, run the minimizer and close (if needed)
 	AddData(data_files, sw);
-	ModelOpen(model_files, sw);
 	MinimizerRun(minimizer, sw);
 	AutoClose(close_simtoi, sw);
 }
@@ -445,37 +452,6 @@ void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
 	ButtonCheck();
 }
 
-void gui_main::ModelOpen()
-{
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setDirectory(QString::fromStdString(mOpenModelDir));
-    dialog.setNameFilter(tr("SIMTOI Save Files (*.json)"));
-    dialog.setViewMode(QFileDialog::Detail);
-    QStringList fileNames;
-	if (dialog.exec())
-	{
-		fileNames = dialog.selectedFiles();
-
-		// Try to open the savefile, catch any generated exceptions and display an
-		// error message to the user.
-		try
-		{
-			ModelOpen(fileNames, sw);
-		}
-		catch(runtime_error & e)
-		{
-			QMessageBox msgBox;
-			msgBox.setText(QString("Could not open savefile.\n") + QString(e.what()));
-			msgBox.exec();
-		}
-	}
-}
-
 void gui_main::Open(QStringList & filenames)
 {
 	for(auto filename : filenames)
@@ -487,17 +463,24 @@ void gui_main::Open(QStringList & filenames)
 	}
 }
 
-void gui_main::ModelOpen(QStringList & fileNames, QMdiSubWindow * sw)
+void gui_main::on_actionOpen_triggered()
 {
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-	widget->Open(fileNames.first().toStdString());
-	this->treeModels->reset();
+   // Open a dialog, get a list of file that the user selected:
+	QFileDialog dialog(this);
+	dialog.setDirectory(QString::fromStdString(mOpenDataDir));
+	dialog.setNameFilter(tr("SIMTOI Model Files (*.json)"));
+	dialog.setFileMode(QFileDialog::ExistingFiles);
 
-	// Store the directory name for the next file open dialog.
-	mOpenModelDir = QFileInfo(fileNames[0]).absolutePath().toStdString();
+    QStringList filenames;
+    QString dir = "";
+	if (dialog.exec())
+	{
+		filenames = dialog.selectedFiles();
+		Open(filenames);
+	}
 }
 
-void gui_main::ModelSave()
+void gui_main::on_actionSave_triggered()
 {
     QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
     if(!sw)
@@ -520,25 +503,9 @@ void gui_main::ModelSave()
 			filename += ".json";
 
 		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-//		widget->Save(filename);
+		widget->Save(filename);
 	}
-}
 
-void gui_main::on_actionOpen_triggered()
-{
-   // Open a dialog, get a list of file that the user selected:
-	QFileDialog dialog(this);
-	dialog.setDirectory(QString::fromStdString(mOpenDataDir));
-	dialog.setNameFilter(tr("SIMTOI Model Files (*.json)"));
-	dialog.setFileMode(QFileDialog::ExistingFiles);
-
-    QStringList filenames;
-    QString dir = "";
-	if (dialog.exec())
-	{
-		filenames = dialog.selectedFiles();
-		Open(filenames);
-	}
 }
 
 void gui_main::on_btnAddData_clicked(void)

@@ -173,23 +173,37 @@ void CModelList::Restore(Json::Value input)
 	auto factory = CModelFactory::Instance();
 	CModelPtr model;
 
-	// Clear the list:
+	// Clear the model list:
 	mModels.clear();
 
 	string model_id = "";
-	Json::Value tmp;
+	string id = "";
+	stringstream temp;
 
 	// Iterate through the members in the file, get their model_id, and restore the objects.
-	Json::Value::Members members = input.getMemberNames();
-	for(unsigned int i = 0; i < members.size(); i++)
+	for(unsigned int i = 0; ; i++)
 	{
-		// Look up the type of model and create an object of that type:
-		model_id = input[members[i]]["base_id"].asString();
-		model = factory.CreateModel(model_id);
+		// Create a temporary string containing "model_N"
+		temp << "model_" << i;
+		id = temp.str();
 
-		// Now have the model restore the rest of itself, then push it onto the list.
-		model->Restore(input[members[i]]);
-		AddModel(model);
+		// If this model exists, restore it.
+		if(input.isMember(id))
+		{
+			// Look up the type of model and create an object of that type:
+			model_id = input[id]["base_id"].asString();
+			model = factory.CreateModel(model_id);
+
+			// Now have the model restore the rest of itself, then push it onto the list.
+			model->Restore(input[id]);
+			AddModel(model);
+		}
+		else // Otherwise break out of the loop.
+			break;
+
+		// Reset the stringstream.
+		temp.str("");
+		temp.clear();
 	}
 }
 
@@ -197,7 +211,6 @@ void CModelList::Restore(Json::Value input)
 Json::Value CModelList::Serialize()
 {
 	Json::Value output;
-	output.setComment("// Model save file from SIMTOI in JSON format.", Json::commentBefore);
 	stringstream name;
 
     // Now call render on all of the models:

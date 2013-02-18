@@ -89,12 +89,11 @@ private slots:
     void ExportPhotometry();
     void ExportFITS();
     void render();
-    void ModelOpen();
-    void ModelSave();
     void SetSavePath();
     void SetTime();
 
     void on_actionOpen_triggered();
+    void on_actionSave_triggered();
     void on_btnAddData_clicked();
     void on_btnAddModel_clicked();
     void on_btnEditModel_clicked();

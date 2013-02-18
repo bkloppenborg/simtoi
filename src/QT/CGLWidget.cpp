@@ -60,7 +60,8 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 	mOpenFileModel->setColumnCount(2);
 	mOpenFileModel->setHorizontalHeaderLabels(labels);
 
-    mTreeModel = new CTreeModel();
+	// This signal-slot would not connect automatically, so we do it explicitly here.
+	connect(&mTreeModel, SIGNAL(parameterUpdated()), this, SLOT(on_mTreeModel_parameterUpdated()));
 }
 
 CGLWidget::~CGLWidget()
@@ -71,7 +72,6 @@ CGLWidget::~CGLWidget()
 
 	// Delete any operating objects.
 	delete mOpenFileModel;
-	delete mTreeModel;
 }
 
 void CGLWidget::AddModel(shared_ptr<CModel> model)
@@ -159,6 +159,11 @@ bool CGLWidget::GetMinimizerRunning()
 	return mMinimizerThread.joinable();
 }
 
+void CGLWidget::on_mTreeModel_parameterUpdated()
+{
+	mWorker->Render();
+}
+
 void CGLWidget::Open(string filename)
 {
 	Json::Reader reader;
@@ -172,15 +177,24 @@ void CGLWidget::Open(string filename)
 	int height = input["area_height"].asInt();
 	double scale = input["area_scale"].asDouble();
 
+	// If the width and height are nonsense, override them.
 	if(width < 1 || height < 1)
-		throw runtime_error("Window size must be greater than one pixel!");
+	{
+		width = 128;
+		height = 128;
+	}
 
+	// Resize this widget
 	resize(width, height);
 
+	// Resize the parent widget.
     // TODO: This is approximately right for my machine, probably not ok on other OSes.
     int frame_width = 8;
     int frame_height = 28;
 	parentWidget()->setFixedSize(width + frame_width, height + frame_height);
+
+	// Now have the Worker thread open the remainder of the file.
+	mWorker->Restore(input);
 
 	RebuildTree();
 }
@@ -194,9 +208,9 @@ void CGLWidget::RebuildTree()
 {
 	QStringList labels = QStringList();
 	labels << "Name" << "Free" << "Value" << "Min" << "Max";
-	mTreeModel->clear();
-	mTreeModel->setColumnCount(5);
-	mTreeModel->setHorizontalHeaderLabels(labels);
+	mTreeModel.clear();
+	mTreeModel.setColumnCount(5);
+	mTreeModel.setHorizontalHeaderLabels(labels);
 	CModelListPtr model_list = mWorker->GetModelList();
 
 	QList<QStandardItem *> items;
@@ -216,7 +230,7 @@ void CGLWidget::RebuildTree()
 
 		items = LoadParametersHeader(QString("Model"), model.get());
 		item_parent = items[0];
-		mTreeModel->appendRow(items);
+		mTreeModel.appendRow(items);
 		LoadParameters(item_parent, model.get());
 
 		// Now for the Position Parameters
@@ -238,6 +252,24 @@ void CGLWidget::RebuildTree()
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
     mWorker->resizeViewport(evt->size());
+}
+
+void CGLWidget::Save(string filename)
+{
+	Json::StyledStreamWriter writer;
+	Json::Value output;
+
+	// Serialize the mWorker object first
+	output = mWorker->Serialize();
+	output.setComment("// Model save file from SIMTOI in JSON format.", Json::commentBefore);
+
+	// Now save the OpenGL area information.
+	output["area_width"] = mWorker->GetImageWidth();
+	output["area_height"] = mWorker->GetImageHeight();
+	output["area_scale"] = mWorker->GetImageScale();
+
+	std::ofstream outfile(filename.c_str());
+	writer.write(outfile, output);
 }
 
 void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)

@@ -197,6 +197,14 @@ void CWorkerThread::resizeViewport(int width, int height)
 	Enqueue(RESIZE);
 }
 
+void CWorkerThread::Restore(Json::Value input)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mModelList->Restore(input);
+}
+
 // The main function of this thread
 void CWorkerThread::run()
 {
@@ -291,6 +299,16 @@ void CWorkerThread::run()
 	}
 
 	emit finished();
+}
+
+Json::Value CWorkerThread::Serialize()
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	Json::Value temp = mModelList->Serialize();
+
+	return temp;
 }
 
 void CWorkerThread::startAnimation(double timestep)

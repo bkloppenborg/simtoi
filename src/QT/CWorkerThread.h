@@ -49,6 +49,7 @@
 #include <valarray>
 #include <memory>
 #include <queue>
+#include "json/json.h"
 
 using namespace std;
 
@@ -148,14 +149,17 @@ public:
     unsigned int GetImageWidth() { return mImageWidth; };
     double GetImageScale() { return mImageScale; };
 
+
     void Render();
 protected:
     void Resize(unsigned int width, unsigned int height);
 public:
     void resizeViewport(const QSize &size);
     void resizeViewport(int width, int height);
+    void Restore(Json::Value input);
     void run();
 
+    Json::Value Serialize();
     void startAnimation(double timestep);
     void stopAnimation();
     void stop();
