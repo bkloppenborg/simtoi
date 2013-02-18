@@ -29,7 +29,7 @@ if(MULTINEST_FOUND)
     add_definitions(-D_ADD_MULTINEST)
 else(MULTINEST_FOUND)
     message(STATUS "MultiNest NOT found, SIMTOI compiled without support for this minimizer.")
-    file(GLOB REMOVE_MULTINEST "minimizers/CMinimizer_MultiNest.cpp")
+    file(GLOB REMOVE_MULTINEST "minimizers/CMultiNest.cpp")
     list(REMOVE_ITEM SOURCE ${REMOVE_MULTINEST})
 endif(MULTINEST_FOUND)
 

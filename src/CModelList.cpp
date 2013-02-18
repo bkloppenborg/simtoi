@@ -142,17 +142,6 @@ vector<string> CModelList::GetTypes(void)
 	return factory.GetModelList();
 }
 
-/// Returns the product of priors from all models
-double CModelList::GetFreeParameterPriorProduct()
-{
-	double tmp = 1;
-
-    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
-    	tmp *= (*it)->GetFreePriorProd();
-
-    return tmp;
-}
-
 // Render the image to the specified OpenGL framebuffer object.
 void CModelList::Render(GLuint fbo, int width, int height)
 {

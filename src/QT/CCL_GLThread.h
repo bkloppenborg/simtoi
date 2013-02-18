@@ -186,7 +186,6 @@ public:
     CL_GLT_Operations GetNextOperation(void);
 	int 	GetNFreeParameters() { return mModelList->GetNFreeParameters(); };
 	vector< pair<double, double> > GetFreeParamMinMaxes() { return mModelList->GetFreeParamMinMaxes(); };
-	double GetFreeParameterPriorProduct() { return mModelList->GetFreeParameterPriorProduct(); };
 	vector<string> GetFreeParamNames() { return mModelList->GetFreeParamNames(); };
     string  GetMinimizerID();
     bool  	GetMinimizerRunning();
