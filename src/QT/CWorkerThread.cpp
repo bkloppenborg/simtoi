@@ -40,8 +40,8 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 	: QThread(), mGLWidget(glWidget)
 {
 	mRun = true;
-	mTaskList = shared_ptr<CTaskList>(new CTaskList());
-    mModelList = shared_ptr<CModelList>(new CModelList());
+	mTaskList = CTaskListPtr(new CTaskList());
+    mModelList = CModelListPtr(new CModelList());
 
     // Init datamembers to something reasonable.
     mImageWidth = 128;

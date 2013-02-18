@@ -160,6 +160,7 @@ public:
     unsigned int GetImageHeight() { return mImageHeight; };
     unsigned int GetImageWidth() { return mImageWidth; };
     double GetImageScale() { return mImageScale; };
+    COpenCLPtr GetOpenCL() { return mOpenCL; };
 
     void OpenData(string filename);
 

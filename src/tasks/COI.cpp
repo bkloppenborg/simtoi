@@ -34,12 +34,14 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "CModelList.h"
+
 extern string EXE_FOLDER;
 
 COI::COI(CWorkerPtr WorkerThread)
 	: CTask(WorkerThread)
 {
-
+	mLibOIInitialized = false;
 }
 
 COI::~COI()
@@ -78,7 +80,42 @@ unsigned int COI::GetNData()
 
 void COI::GetResiduals(valarray<double> & residuals)
 {
+	// During the first call there may be some remaining initialization to be done.
+	// Lets make sure they are ready to go:
+	if(!mLibOIInitialized)
+	{
+		// Make sure the residuals buffer is large enough
+		mTempFloat = valarray<float>(mLibOI->GetNDataAllocated());
+		// Get LibOI up and running
+		mLibOI->Init();
+	}
 
+	unsigned int n_data_offset = 0;
+	unsigned int n_data_alloc = 0;
+
+	CModelListPtr model_list = mWorkerThread->GetModelList();
+
+	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
+	unsigned int n_data_sets = mLibOI->GetNDataSets();
+	for(int data_set = 0; data_set < n_data_sets; data_set++)
+	{
+		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
+		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+		mLibOI->CopyImageToBuffer(0);
+		// Notice, the ImageToChi expects a floating point array, not a valarray<float>.
+		// C++11 guarantees that storage is contiguous so we can do pointer math here.
+		mLibOI->ImageToChi(data_set, &mTempFloat[0] + n_data_offset, n_data_alloc);
+
+		// Advance the pointer
+		n_data_offset += n_data_alloc;
+	}
+
+	// Copy the floats from liboi into doubles for SIMTOI.
+	for(unsigned int i = 0; i < residuals.size(); i++)
+	{
+		residuals[i] = double(mTempFloat[i]);
+	}
 }
 
 void COI::GetUncertainties(valarray<double> & uncertainties)
@@ -100,17 +137,14 @@ void COI::InitCL()
 	double scale = mWorkerThread->GetImageScale();
 
 	// Initialize liboi using the worker thread's OpenCL+OpenGL context
-//	mLibOI = new CLibOI()
-//	mLibOI->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
-//	mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
-}
-
-void COI::LoadData(string filename)
-{
-	mLibOI->LoadData(filename);
+	mLibOI = new CLibOI(mWorkerThread->GetOpenCL());
+	mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
+	mLibOI->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
+	mLibOI->SetImageInfo(mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight(),
+			mWorkerThread->GetImageDepth(), mWorkerThread->GetImageScale());
 }
 
 void COI::OpenData(string filename)
 {
-
+	mLibOI->LoadData(filename);
 }

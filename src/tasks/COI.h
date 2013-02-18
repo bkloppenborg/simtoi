@@ -51,8 +51,10 @@ protected:
 	GLuint mFBO_storage_texture;
 
 	CLibOI * mLibOI;
+	bool mLibOIInitialized;
 
 	GLsizei mSamples;
+	valarray<float> mTempFloat;
 
 public:
 	COI(CWorkerPtr WorkerThread);
@@ -68,8 +70,6 @@ public:
 
 	virtual void InitGL();
 	virtual void InitCL();
-
-	virtual void LoadData(string filename);
 
 	void OpenData(string filename);
 };
