@@ -102,7 +102,7 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 	}
 
 	// Add in the priors.
-	tmp += minimizer->mCLThread->GetFreeParameterPriorProduct();
+//	tmp += minimizer->mCLThread->GetFreeParameterPriorProduct();
 
 	// Get the scaled parameter values
 	minimizer->mCLThread->GetFreeParameters(params, npars, true);
