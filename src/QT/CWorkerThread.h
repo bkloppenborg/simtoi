@@ -50,6 +50,8 @@
 #include <memory>
 #include <queue>
 #include "json/json.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 using namespace std;
 

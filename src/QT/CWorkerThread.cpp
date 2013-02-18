@@ -26,8 +26,6 @@
 
 #include "CWorkerThread.h"
 #include <QMutexLocker>
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 #include "CGLWidget.h"
 #include "CTaskList.h"
@@ -71,8 +69,8 @@ void CWorkerThread::AddModel(CModelPtr model)
 
 void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture)
 {
-	InitMultisampleRenderBuffer(mImageWidth, mImageHeight, mSamples, FBO, FBO_texture, FBO_depth, );
-	InitStorageBuffer(mWidth, mHeight, FBO_storage, FBO_storage_texture);
+	CreateGLMultisampleRenderBuffer(mImageWidth, mImageHeight, mImageSamples, FBO, FBO_texture, FBO_depth);
+	CreateGLStorageBuffer(mImageWidth, mImageHeight, FBO_storage, FBO_storage_texture);
 }
 
 void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned int height, unsigned int samples,
@@ -109,8 +107,8 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 
 void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int height, GLuint & FBO_storage, GLuint & FBO_storage_texture)
 {
-    glGenTextures(1, &mFBO_storage_texture); // Generate one texture
-    glBindTexture(GL_TEXTURE_2D, mFBO_storage_texture); // Bind the texture mFBOtexture
+    glGenTextures(1, &FBO_storage_texture); // Generate one texture
+    glBindTexture(GL_TEXTURE_2D, FBO_storage_texture); // Bind the texture mFBOtexture
 
     // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
