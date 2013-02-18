@@ -59,6 +59,45 @@ gui_main::~gui_main()
 	close();
 }
 
+void gui_main::AddData(QStringList & filenames, QMdiSubWindow * sw)
+{
+	string tmp;
+	int dir_size = 0;
+	stringstream time_str;
+	time_str.precision(4);
+	time_str.setf(ios::fixed,ios::floatfield);
+
+    // Get access to the current widget and QStandardItemModel:
+    CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+    QStandardItemModel * model = widget->GetOpenFileModel();
+	QList<QStandardItem *> items;
+
+	// Now pull out the data directory (to make file display cleaner)
+	if(filenames.size() > 0)
+		mOpenDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
+
+	for(int i = 0; i < filenames.size(); i++)
+	{
+		items.clear();
+		// Tell the widget to load the data file and append a row to its file list:
+		tmp = filenames[i].toStdString();
+		dir_size = tmp.size() - mOpenDataDir.size();
+		widget->OpenData(tmp);
+
+		// Filename
+		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
+		// Mean JD
+		time_str.str("");
+		// TODO: Re-enable this (or something like it).
+//		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
+		items.append( new QStandardItem(QString::fromStdString( time_str.str() )));
+
+		model->appendRow(items);
+	}
+
+	ButtonCheck();
+}
+
 QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double model_scale)
 {
 	// Create a new subwindow with a title and close button:
@@ -248,153 +287,99 @@ void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, 
 	AutoClose(close_simtoi, sw);
 }
 
-void gui_main::AddData(QStringList & filenames, QMdiSubWindow * sw)
-{
-	string tmp;
-	int dir_size = 0;
-	stringstream time_str;
-	time_str.precision(4);
-	time_str.setf(ios::fixed,ios::floatfield);
-
-    // Get access to the current widget and QStandardItemModel:
-    CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    QStandardItemModel * model = widget->GetOpenFileModel();
-	QList<QStandardItem *> items;
-
-	// Now pull out the data directory (to make file display cleaner)
-	if(filenames.size() > 0)
-		mOpenDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
-
-	for(int i = 0; i < filenames.size(); i++)
-	{
-		items.clear();
-		// Tell the widget to load the data file and append a row to its file list:
-		tmp = filenames[i].toStdString();
-		dir_size = tmp.size() - mOpenDataDir.size();
-//		widget->LoadData(tmp);
-
-		// Filename
-		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
-		// Mean JD
-		time_str.str("");
-//		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
-		items.append( new QStandardItem(QString::fromStdString( time_str.str() )));
-
-		model->appendRow(items);
-	}
-
-	ButtonCheck();
-}
-
-void gui_main::DeleteGLArea()
-{
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    if (widget)
-    {
-        widget->stopRendering();
-        delete widget;
-    }
-
-    ButtonCheck();
-}
-
 /// Exports the current rendered model to a floating point FITS file
 void gui_main::ExportFITS()
 {
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-//	widget->EnqueueOperation(CLT_Init);
-
-    string filename;
-    QStringList fileNames;
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setNameFilter(tr("FITS Files (*.fits)"));
-    dialog.setViewMode(QFileDialog::Detail);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-
-	if (dialog.exec())
-	{
-
-		fileNames = dialog.selectedFiles();
-		filename = fileNames.first().toStdString();
-
-		// Add an extension if it doesn't already exist
-		if(filename.substr(filename.size() - 5, 5) != ".fits")
-			filename += ".fits";
-
-		// Automatically overwrite files if they already exist.  The dialog should prompt for us.
-		filename = "!" + filename;
-
+//    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+//    if(!sw)
+//    	return;
+//
+//	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+////	widget->EnqueueOperation(CLT_Init);
+//
+//    string filename;
+//    QStringList fileNames;
+//    QFileDialog dialog(this);
+//    dialog.setFileMode(QFileDialog::AnyFile);
+//    dialog.setNameFilter(tr("FITS Files (*.fits)"));
+//    dialog.setViewMode(QFileDialog::Detail);
+//    dialog.setAcceptMode(QFileDialog::AcceptSave);
+//
+//	if (dialog.exec())
+//	{
+//
+//		fileNames = dialog.selectedFiles();
+//		filename = fileNames.first().toStdString();
+//
+//		// Add an extension if it doesn't already exist
+//		if(filename.substr(filename.size() - 5, 5) != ".fits")
+//			filename += ".fits";
+//
+//		// Automatically overwrite files if they already exist.  The dialog should prompt for us.
+//		filename = "!" + filename;
+//
 //		widget->SaveImage(filename);
-	}
+//	}
 }
 
 /// Animates the display, exporting the photometry at specified intervals
 void gui_main::ExportPhotometry()
 {
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-//	widget->EnqueueOperation(CLT_Init);
-
-    double t = this->spinTimeStart->value();
-    double step = this->spinTimeStep->value();
-    double duration = this->spinTimeDuration->value();
-    double stop = t + duration;
-    vector< pair<float, float> > output;
-    float flux;
-
-    string filename;
-    QStringList fileNames;
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setNameFilter(tr("Text Files (*.txt)"));
-    dialog.setViewMode(QFileDialog::Detail);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-
-	if (dialog.exec())
-	{
-		// Compute the flux
-		while(t < stop)
-		{
-//			widget->SetTime(t);
-//			widget->EnqueueOperation(GLT_RenderModels);
-//			flux = widget->GetFlux();
-
-			output.push_back( pair<float, float>(t, flux));
-			t += step;
-		}
-
-		fileNames = dialog.selectedFiles();
-		filename = fileNames.first().toStdString();
-
-		if(filename.substr(filename.size() - 4, 4) != ".txt")
-			filename += ".txt";
-	}
-
-	ofstream outfile;
-	outfile.open(filename.c_str());
-	outfile.precision(4);
-	outfile.setf(ios::fixed,ios::floatfield);
-	outfile << "# Time Flux" << endl;
-	//outfile << "# Created using the following parameters: " << endl;
-
-	for(int i = 0; i < output.size(); i++)
-	{
-		outfile << output[i].first << " " << -2.5*log10(output[i].second) << endl;
-	}
-
-	outfile.close();
+//    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+//    if(!sw)
+//    	return;
+//
+//	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+////	widget->EnqueueOperation(CLT_Init);
+//
+//    double t = this->spinTimeStart->value();
+//    double step = this->spinTimeStep->value();
+//    double duration = this->spinTimeDuration->value();
+//    double stop = t + duration;
+//    vector< pair<float, float> > output;
+//    float flux;
+//
+//    string filename;
+//    QStringList fileNames;
+//    QFileDialog dialog(this);
+//    dialog.setFileMode(QFileDialog::AnyFile);
+//    dialog.setNameFilter(tr("Text Files (*.txt)"));
+//    dialog.setViewMode(QFileDialog::Detail);
+//    dialog.setAcceptMode(QFileDialog::AcceptSave);
+//
+//	if (dialog.exec())
+//	{
+//		// Compute the flux
+//		while(t < stop)
+//		{
+////			widget->SetTime(t);
+////			widget->EnqueueOperation(GLT_RenderModels);
+////			flux = widget->GetFlux();
+//
+//			output.push_back( pair<float, float>(t, flux));
+//			t += step;
+//		}
+//
+//		fileNames = dialog.selectedFiles();
+//		filename = fileNames.first().toStdString();
+//
+//		if(filename.substr(filename.size() - 4, 4) != ".txt")
+//			filename += ".txt";
+//	}
+//
+//	ofstream outfile;
+//	outfile.open(filename.c_str());
+//	outfile.precision(4);
+//	outfile.setf(ios::fixed,ios::floatfield);
+//	outfile << "# Time Flux" << endl;
+//	//outfile << "# Created using the following parameters: " << endl;
+//
+//	for(int i = 0; i < output.size(); i++)
+//	{
+//		outfile << output[i].first << " " << -2.5*log10(output[i].second) << endl;
+//	}
+//
+//	outfile.close();
 
 }
 

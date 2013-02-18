@@ -31,6 +31,11 @@ void CTaskList::GetUncertainties(valarray<double> & uncertainties)
 
 }
 
+void CTaskList::OpenData(string filename)
+{
+
+}
+
 void CTaskList::InitCL()
 {
 

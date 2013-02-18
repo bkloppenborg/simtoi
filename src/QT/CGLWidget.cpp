@@ -53,12 +53,11 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
     // Immediately initialize the worker thread. This will claim the OPenGL context.
 	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
 
-    mOpenFileModel = new QStandardItemModel();
 	QStringList labels = QStringList();
 	labels << "File" << "Mean JD";
-	mOpenFileModel->clear();
-	mOpenFileModel->setColumnCount(2);
-	mOpenFileModel->setHorizontalHeaderLabels(labels);
+	mOpenFileModel.clear();
+	mOpenFileModel.setColumnCount(2);
+	mOpenFileModel.setHorizontalHeaderLabels(labels);
 
 	// This signal-slot would not connect automatically, so we do it explicitly here.
 	connect(&mTreeModel, SIGNAL(parameterUpdated()), this, SLOT(on_mTreeModel_parameterUpdated()));
@@ -69,9 +68,6 @@ CGLWidget::~CGLWidget()
 	// Stop any running threads
 	stopMinimizer();
 	stopRendering();
-
-	// Delete any operating objects.
-	delete mOpenFileModel;
 }
 
 void CGLWidget::AddModel(shared_ptr<CModel> model)
@@ -197,6 +193,11 @@ void CGLWidget::Open(string filename)
 	mWorker->Restore(input);
 
 	RebuildTree();
+}
+
+void CGLWidget::OpenData(string filename)
+{
+	mWorker->OpenData(filename);
 }
 
 void CGLWidget::paintEvent(QPaintEvent *)

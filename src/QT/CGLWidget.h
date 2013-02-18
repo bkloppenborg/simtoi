@@ -54,7 +54,7 @@ protected:
     // Minimizer
     CMinimizerPtr mMinimizer;
     std::thread mMinimizerThread;
-    QStandardItemModel * mOpenFileModel;
+    QStandardItemModel mOpenFileModel;
     CTreeModel mTreeModel;
     static QGLFormat mFormat;
 
@@ -65,11 +65,7 @@ public:
     void AddModel(shared_ptr<CModel> model);
 protected:
     void closeEvent(QCloseEvent *evt);
-public:
 
-//    void EnqueueOperation(CL_GLT_Operations op);
-
-protected:
 	void paintEvent(QPaintEvent * );
 
     void resizeEvent(QResizeEvent *evt);
@@ -90,7 +86,7 @@ public:
 
 //    int GetNModels() { return mGLT->GetModelList()->size(); };
 //    CModelList * GetModelList() { return mGLT->GetModelList(); };
-    QStandardItemModel * GetOpenFileModel() { return mOpenFileModel; };
+    QStandardItemModel * GetOpenFileModel() { return &mOpenFileModel; };
 //    double GetScale() { return mGLT->GetScale(); };
     CTreeModel * GetTreeModel() { return &mTreeModel; };
 
@@ -102,6 +98,7 @@ protected:
 
 public:
     void Open(string filename);
+    void OpenData(string filename);
 //    bool OpenCLInitialized() { return mGLT->OpenCLInitialized(); };
 
 protected:

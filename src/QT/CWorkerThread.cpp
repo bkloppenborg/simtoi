@@ -47,6 +47,7 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageHeight = 128;
     mImageDepth = 1;
     mImageScale = 0.05;
+    mImageSamples = 4;
 }
 
 CWorkerThread::~CWorkerThread()
@@ -66,6 +67,92 @@ void CWorkerThread::AddModel(CModelPtr model)
 	mModelList->AddModel(model);
 	Enqueue(RENDER);
 }
+
+
+void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture)
+{
+	InitMultisampleRenderBuffer(mImageWidth, mImageHeight, mSamples, FBO, FBO_texture, FBO_depth, );
+	InitStorageBuffer(mWidth, mHeight, FBO_storage, FBO_storage_texture);
+}
+
+void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned int height, unsigned int samples,
+		GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth)
+{
+	glGenFramebuffers(1, &FBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+	glGenRenderbuffers(1, &FBO_texture);
+	glBindRenderbuffer(GL_RENDERBUFFER, FBO_texture);
+	// Create a 2D multisample texture
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA32F, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, FBO_texture);
+
+	glGenRenderbuffers(1, &FBO_depth);
+	glBindRenderbuffer(GL_RENDERBUFFER, FBO_depth);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FBO_depth);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    // Check that status of our generated frame buffer
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+    	const GLubyte * errStr = gluErrorString(status);
+        printf("Couldn't create multisample frame buffer: %x %s\n", status, (char*)errStr);
+        delete errStr;
+        exit(0); // Exit the application
+    }
+
+    // All done, bind back to the default framebuffer.
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int height, GLuint & FBO_storage, GLuint & FBO_storage_texture)
+{
+    glGenTextures(1, &mFBO_storage_texture); // Generate one texture
+    glBindTexture(GL_TEXTURE_2D, mFBO_storage_texture); // Bind the texture mFBOtexture
+
+    // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
+    // Enable this one for alpha blending:
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
+    // These other formats might work, check that GL_BYTE is still correct for the higher precision.
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, mWidth, mHeight, 0, GL_RED, CL_HALF_FLOAT, NULL);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mWidth, mHeight, 0, GL_RED, GL_FLOAT, NULL);
+
+    // Setup the basic texture parameters
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // Unbind the texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glGenFramebuffers(1, &FBO_storage); // Generate one frame buffer and store the ID in mFBO
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO_storage); // Bind our frame buffer
+
+    // Attach the depth and texture buffer to the frame buffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO_storage_texture, 0);
+//    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    // Check that status of our generated frame buffer
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+    	const GLubyte * errStr = gluErrorString(status);
+        printf("Couldn't create storage frame buffer: %x %s\n", status, (char*)errStr);
+        delete errStr;
+        exit(0); // Exit the application
+    }
+
+    // All done, bind back to the default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 
 /// Blits the off-screen framebuffer to the foreground buffer.
 void CWorkerThread::BlitToScreen()
@@ -156,6 +243,14 @@ void CWorkerThread::GetUncertainties(valarray<double> & uncertainties)
 	mTempArray = &uncertainties;
 	Enqueue(GET_UNCERTAINTIES);
 	mWorkerSemaphore.acquire(1);
+}
+
+void CWorkerThread::OpenData(string filename)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mTaskList->OpenData(filename);
 }
 
 /// Instructs the thread to render to the default framebuffer.

@@ -31,6 +31,8 @@ public:
 	void GetResiduals(valarray<double> & residuals);
 	void GetUncertainties(valarray<double> & uncertainties);
 
+	void OpenData(string filename);
+
 	void InitCL();
 	void InitGL();
 };

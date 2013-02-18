@@ -207,7 +207,7 @@ void CCylinder::Render(GLuint framebuffer_object, int width, int height)
 
 	glPopMatrix();
 
-//	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 
 
 	// Return to the default framebuffer before leaving.

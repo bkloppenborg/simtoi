@@ -99,6 +99,7 @@ protected:
     unsigned int mImageHeight;
     double mImageScale;
     unsigned int mImageWidth;
+    unsigned int mImageSamples;
 
     // OpenCL
 
@@ -127,12 +128,18 @@ public:
 
 public:
     void AddModel(CModelPtr model);
+    void AllocateBuffer();
 protected:
     void BlitToScreen();
 
     void CheckOpenGLError(string function_name);
 protected:
     void ClearQueue();
+public:
+    void CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture);
+    void CreateGLMultisampleRenderBuffer(unsigned int width, unsigned int height, unsigned int samples,
+    		GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth);
+    void CreateGLStorageBuffer(unsigned int width, unsigned int height, GLuint & FBO_storage, GLuint & FBO_storage_texture);
 
     void Enqueue(WorkerOperations op);
 public:
@@ -149,6 +156,7 @@ public:
     unsigned int GetImageWidth() { return mImageWidth; };
     double GetImageScale() { return mImageScale; };
 
+    void OpenData(string filename);
 
     void Render();
 protected:

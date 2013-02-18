@@ -59,7 +59,7 @@ public:
 	virtual void GetResiduals(valarray<double> & residuals) = 0;
 	virtual void GetUncertainties(valarray<double> & uncertainties) = 0;
 
-	virtual void LoadData(string filename) = 0;
+	virtual void OpenData(string filename) = 0;
 
 };
 

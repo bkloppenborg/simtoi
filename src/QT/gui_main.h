@@ -85,7 +85,6 @@ private slots:
     void Animation_StartStop();
     void Animation_Reset();
     void AutoClose(QWidget * widget);
-    void DeleteGLArea();
     void ExportPhotometry();
     void ExportFITS();
     void render();
