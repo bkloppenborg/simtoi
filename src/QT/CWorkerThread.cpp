@@ -197,8 +197,6 @@ void CWorkerThread::resizeViewport(int width, int height)
 	Enqueue(RESIZE);
 }
 
-
-
 // The main function of this thread
 void CWorkerThread::run()
 {

@@ -123,6 +123,9 @@ public:
     void startRendering();
     void stopMinimizer();
     void stopRendering();
+
+
+
 };
 
 #endif

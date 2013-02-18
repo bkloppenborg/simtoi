@@ -70,7 +70,7 @@ QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double mo
     int frame_width = 8;
     int frame_height = 28;
 
-    //sw->setFixedSize(model_width + frame_width, model_height + frame_height);
+    sw->setFixedSize(model_width + frame_width, model_height + frame_height);
     //sw->resize(model_width + frame_width, model_height + frame_height);
     sw->show();
 

@@ -25,6 +25,7 @@
 
 #include "CGLWidget.h"
 
+#include <QMdiSubWindow>
 #include <stdexcept>
 #include "textio.hpp"
 #include "json/json.h"
@@ -175,6 +176,11 @@ void CGLWidget::Open(string filename)
 		throw runtime_error("Window size must be greater than one pixel!");
 
 	resize(width, height);
+
+    // TODO: This is approximately right for my machine, probably not ok on other OSes.
+    int frame_width = 8;
+    int frame_height = 28;
+	parentWidget()->setFixedSize(width + frame_width, height + frame_height);
 
 	RebuildTree();
 }
