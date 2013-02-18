@@ -50,17 +50,15 @@ protected:
     GLuint mFBO_storage;
 	GLuint mFBO_storage_texture;
 
-	unsigned int mImageWidth;
-	unsigned int mImageHeight;
-	double mImageScale;
-
 	CLibOI * mLibOI;
 
 	GLsizei mSamples;
 
 public:
-	COI(CWorkerThread * WorkerThread);
+	COI(CWorkerPtr WorkerThread);
 	virtual ~COI();
+
+	static CTaskPtr Create(CWorkerPtr worker);
 
 	virtual string GetDataDescription();
 	virtual vector<string> GetDataTypes();
@@ -68,14 +66,12 @@ public:
 	virtual void GetResiduals(valarray<double> & residuals);
 	virtual void GetUncertainties(valarray<double> & uncertainties);
 
-protected:
-    void 	InitFrameBuffers(void);
-    void 	InitMultisampleRenderBuffer(void);
-    void 	InitStorageBuffer(void);
-
-public:
+	virtual void InitGL();
+	virtual void InitCL();
 
 	virtual void LoadData(string filename);
+
+	void OpenData(string filename);
 };
 
 #endif /* COI_H_ */

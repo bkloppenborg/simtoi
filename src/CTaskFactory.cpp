@@ -34,11 +34,11 @@
 #include <stdexcept>
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
-//#include "Workers/CWorkerXY.h"
+#include "tasks/COI.h"
 
 CTaskFactory::CTaskFactory()
 {
-//	Register("xy", &CWorkerXY::Create);
+	Register("oi", COI::Create);
 }
 
 CTaskFactory::~CTaskFactory() \
@@ -48,7 +48,7 @@ CTaskFactory::~CTaskFactory() \
 
 /// Create an instance of the specified Worker.
 /// Returns a shared_ptr<CWorker> to the object if found, or throws a runtime exception.
-shared_ptr<CTask> CTaskFactory::CreateWorker(string WorkerID, CWorkerThread * WorkerThread)
+shared_ptr<CTask> CTaskFactory::CreateWorker(string WorkerID, CWorkerPtr WorkerThread)
 {
 	auto it = mFactory.find(WorkerID);
 	if(it != mFactory.end())

@@ -41,16 +41,21 @@
 
 #include "CWorkerThread.h"
 
+class CTask;
+typedef shared_ptr<CTask> CTaskPtr;
+class CWorkerThread;
+typedef shared_ptr<CWorkerThread> CWorkerPtr;
+
 using namespace std;
 
 class CTask
 {
 protected:
 	string mExeFolder;
-	CWorkerThread * mWorkerThread;
+	CWorkerPtr mWorkerThread;
 
 public:
-	CTask(CWorkerThread * WorkerThread);
+	CTask(CWorkerPtr WorkerThread);
 	virtual ~CTask();
 
 	virtual string GetDataDescription() = 0;
@@ -58,6 +63,9 @@ public:
 	virtual unsigned int GetNData() = 0;
 	virtual void GetResiduals(valarray<double> & residuals) = 0;
 	virtual void GetUncertainties(valarray<double> & uncertainties) = 0;
+
+	virtual void InitGL() {};
+	virtual void InitCL() {};
 
 	virtual void OpenData(string filename) = 0;
 

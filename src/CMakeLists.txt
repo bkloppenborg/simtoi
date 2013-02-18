@@ -14,7 +14,7 @@ add_subdirectory(QT)
 add_subdirectory(scripts)
 
 # Assemble all of the source to build simtoi.
-file(GLOB SOURCE *.cpp models/*.cpp positions/*.cpp minimizers/*.cpp workers/*.cpp)
+file(GLOB SOURCE *.cpp models/*.cpp positions/*.cpp minimizers/*.cpp tasks/*.cpp)
 
 # Levmar requires a linear algebra package, but it doesn't export a
 # LEVMAR_LIBRARIES. SIMTOI instructions say install Lapack, so we'll always

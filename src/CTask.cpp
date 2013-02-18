@@ -32,7 +32,7 @@
 
 #include "CTask.h"
 
-CTask::CTask(CWorkerThread * WorkerThread)
+CTask::CTask(CWorkerPtr WorkerThread)
 {
 	mWorkerThread = WorkerThread;
 
