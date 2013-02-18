@@ -62,6 +62,8 @@ class CModel;
 typedef shared_ptr<CModel> CModelPtr;
 class CModelList;
 typedef shared_ptr<CModelList> CModelListPtr;
+class COpenCL;
+typedef shared_ptr<COpenCL> COpenCLPtr;
 
 enum WorkerOperations
 {
@@ -104,6 +106,7 @@ protected:
     unsigned int mImageSamples;
 
     // OpenCL
+    COpenCLPtr mOpenCL;
 
     // other data members:
     shared_ptr<CTaskList> mTaskList;

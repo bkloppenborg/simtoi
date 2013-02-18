@@ -31,7 +31,10 @@
 #include "CTaskList.h"
 #include "CModelList.h"
 
+// X11 "Status" definition causes namespace issues. Include after any QT headers (https://bugreports.qt-project.org/browse/QTBUG-54)
+#include "COpenCL.hpp"
 
+extern string EXE_FOLDER;
 
 CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 	: QThread(), mGLWidget(glWidget)
@@ -46,6 +49,9 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageDepth = 1;
     mImageScale = 0.05;
     mImageSamples = 4;
+
+    // Initalize OpenCL
+	mOpenCL = COpenCLPtr(new COpenCL(CL_DEVICE_TYPE_GPU));
 }
 
 CWorkerThread::~CWorkerThread()
