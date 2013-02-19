@@ -70,7 +70,6 @@ enum WorkerOperations
 {
 	ANIMATE,
 	ANIMATE_STOP,
-	BLIT_TO_SCREEN,
 	EXPORT,
 	GET_RESIDUALS,
 	GET_UNCERTAINTIES,
@@ -107,6 +106,14 @@ protected:
     unsigned int mImageWidth;
     unsigned int mImageSamples;
 
+    // Off-screen framebuffer (this matches the buffer created by CreateGLBuffer)
+    // All rendering from the UI happens in these buffers. Results are blitted to screen.
+    GLuint mFBO;
+	GLuint mFBO_texture;
+	GLuint mFBO_depth;
+    GLuint mFBO_storage;
+	GLuint mFBO_storage_texture;
+
     // OpenCL
     COpenCLPtr mOpenCL;
 
@@ -137,8 +144,8 @@ public:
 public:
     void AddModel(CModelPtr model);
     void AllocateBuffer();
-protected:
-    void BlitToScreen();
+public:
+    void BlitToScreen(GLuint FBO);
 
     void CheckOpenGLError(string function_name);
 protected:
@@ -181,6 +188,8 @@ public:
     void startAnimation(double timestep);
     void stopAnimation();
     void stop();
+protected:
+    void SwapBuffers();
 };
     
 #endif // C_WORKER_THREAD

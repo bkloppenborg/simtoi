@@ -47,7 +47,6 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageDepth = 1;
     mImageScale = 0.05;
     mImageSamples = 4;
-
 }
 
 CWorkerThread::~CWorkerThread()
@@ -55,6 +54,13 @@ CWorkerThread::~CWorkerThread()
 	// Stop the thread if it is running. This is a blocking call.
 	if(mRun)
 		stop();
+
+	// Free local OpenGL objects.
+	glDeleteFramebuffers(1, &mFBO);
+	glDeleteFramebuffers(1, &mFBO_texture);
+	glDeleteFramebuffers(1, &mFBO_depth);
+	glDeleteFramebuffers(1, &mFBO_storage);
+	glDeleteFramebuffers(1, &mFBO_storage_texture);
 }
 
 /// Appends a model to the list of models.
@@ -153,11 +159,20 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-
 /// Blits the off-screen framebuffer to the foreground buffer.
-void CWorkerThread::BlitToScreen()
+void CWorkerThread::BlitToScreen(GLuint FBO)
 {
-    mGLWidget->swapBuffers();
+    // Bind back to the default buffer (just in case something didn't do it),
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Blit the application-defined render buffer to the on-screen render buffer.
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+
+    /// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
+    //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
+    glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+    SwapBuffers();
 }
 
 /// Static function for checking OpenGL errors:
@@ -360,6 +375,10 @@ void CWorkerThread::run()
 
 	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
+	// Now create this thread's off-screen buffers to match other off-screen buffers
+	// All rendering of objects from the UI happens here.
+	CreateGLBuffer(mFBO, mFBO_texture, mFBO_depth, mFBO_storage, mFBO_storage_texture);
+
 	// Now have the workers initialize any OpenGL objects they need
 	mTaskList->InitGL();
 
@@ -388,10 +407,6 @@ void CWorkerThread::run()
 			ClearQueue();
 			break;
 
-		case BLIT_TO_SCREEN:
-		    BlitToScreen();
-			break;
-
 		case EXPORT:
 			// Instruct the worker to export data
 			mTaskList->Export(mTempString);
@@ -416,8 +431,8 @@ void CWorkerThread::run()
 			mWorkerSemaphore.release(1);
 
 		case RENDER:
-			mModelList->Render(0, mImageWidth, mImageHeight);
-			Enqueue(BLIT_TO_SCREEN);
+			mModelList->Render(mFBO, mImageWidth, mImageHeight);
+			BlitToScreen(mFBO);
 			break;
 
 		case RESIZE:
@@ -465,4 +480,11 @@ void CWorkerThread::stop()
 	QMutexLocker lock(&mWorkerMutex);
 	// Equeue a stop command
 	Enqueue(STOP);
+}
+
+void CWorkerThread::SwapBuffers()
+{
+	glFinish();
+    mGLWidget->swapBuffers();
+    CWorkerThread::CheckOpenGLError("CWorkerThread::SwapBuffers()");
 }
