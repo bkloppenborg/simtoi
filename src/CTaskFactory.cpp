@@ -48,7 +48,7 @@ CTaskFactory::~CTaskFactory() \
 
 /// Create an instance of the specified Worker.
 /// Returns a shared_ptr<CWorker> to the object if found, or throws a runtime exception.
-shared_ptr<CTask> CTaskFactory::CreateWorker(string WorkerID, CWorkerPtr WorkerThread)
+shared_ptr<CTask> CTaskFactory::CreateWorker(string WorkerID, CWorkerThread * WorkerThread)
 {
 	auto it = mFactory.find(WorkerID);
 	if(it != mFactory.end())

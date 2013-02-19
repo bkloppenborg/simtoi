@@ -52,17 +52,19 @@ class CTask
 {
 protected:
 	string mExeFolder;
-	CWorkerPtr mWorkerThread;
+	CWorkerThread * mWorkerThread;
 
 public:
-	CTask(CWorkerPtr WorkerThread);
+	CTask(CWorkerThread * WorkerThread);
 	virtual ~CTask();
 
+	virtual void Export(string folder_name) = 0;
+
 	virtual string GetDataDescription() = 0;
-	virtual vector<string> GetDataTypes() = 0;
+	virtual vector<string> GetExtensions() = 0;
 	virtual unsigned int GetNData() = 0;
-	virtual void GetResiduals(valarray<double> & residuals) = 0;
-	virtual void GetUncertainties(valarray<double> & uncertainties) = 0;
+	virtual void GetResiduals(double * residuals, unsigned int size) = 0;
+	virtual void GetUncertainties(double * residuals, unsigned int size) = 0;
 
 	virtual void InitGL() {};
 	virtual void InitCL() {};

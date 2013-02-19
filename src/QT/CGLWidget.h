@@ -72,6 +72,7 @@ protected:
 
 public:
 
+    QStringList GetFileFilters();
 //    double GetFlux() { return mGLT->GetFlux(); };
 //    void GetImage(float * image, unsigned int width, unsigned int height, unsigned int depth) { mGLT->GetImage(image, width, height, depth); };
 //    unsigned int GetImageDepth() { return mGLT->GetImageDepth(); };

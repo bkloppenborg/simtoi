@@ -40,8 +40,6 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 	: QThread(), mGLWidget(glWidget)
 {
 	mRun = true;
-	mTaskList = CTaskListPtr(new CTaskList());
-    mModelList = CModelListPtr(new CModelList());
 
     // Init datamembers to something reasonable.
     mImageWidth = 128;
@@ -50,8 +48,6 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageScale = 0.05;
     mImageSamples = 4;
 
-    // Initalize OpenCL
-	mOpenCL = COpenCLPtr(new COpenCL(CL_DEVICE_TYPE_GPU));
 }
 
 CWorkerThread::~CWorkerThread()
@@ -207,9 +203,27 @@ void CWorkerThread::ExportResults(QString save_folder)
 	// get exclusive access to the operation queue
 	QMutexLocker lock(&mTaskMutex);
 
+
 	mTempString = save_folder.toStdString();
 	Enqueue(EXPORT);
-	mTaskSemaphore.release(1);
+	mWorkerSemaphore.release(1);
+}
+
+/// Gets a list of file filters for use in a QFileDialog
+///
+/// NOTE: This read-only operation is a cross-thread call
+QStringList CWorkerThread::GetFileFilters()
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	vector<string> filters = mTaskList->GetFileFilters();
+	QStringList output;
+
+	for(auto filter: filters)
+		output.append(QString::fromStdString(filter));
+
+	return output;
 }
 
 /// Get the next operation from the queue.  This is a blocking function.
@@ -227,25 +241,31 @@ WorkerOperations CWorkerThread::GetNextOperation(void)
 	return tmp;
 }
 
-void CWorkerThread::GetResiduals(valarray<double> & residuals)
+void CWorkerThread::GetResiduals(double * residuals, unsigned int size)
 {
 	// Get exclusive access to the worker
 	QMutexLocker lock(&mWorkerMutex);
 
 	// Assign temporary storage, enqueue the command, and wait for completion
-	mTempArray = &residuals;
+	mTempArray = residuals;
+	mTempArraySize = size;
 	Enqueue(GET_RESIDUALS);
+
+	// Wait for the operation to complete
 	mWorkerSemaphore.acquire(1);
 }
 
-void CWorkerThread::GetUncertainties(valarray<double> & uncertainties)
+void CWorkerThread::GetUncertainties(double * uncertainties, unsigned int size)
 {
 	// Get exclusive access to the worker
 	QMutexLocker lock(&mWorkerMutex);
 
 	// Assign temporary storage, enqueue the command, and wait for completion
-	mTempArray = &uncertainties;
+	mTempArray = uncertainties;\
+	mTempArraySize = size;
 	Enqueue(GET_UNCERTAINTIES);
+
+	// Wait for the operation to complete
 	mWorkerSemaphore.acquire(1);
 }
 
@@ -254,7 +274,11 @@ void CWorkerThread::OpenData(string filename)
 	// Get exclusive access to the worker
 	QMutexLocker lock(&mWorkerMutex);
 
-	mTaskList->OpenData(filename);
+	mTempString = filename;
+	Enqueue(OPEN_DATA);
+
+	// Wait for the operation to complete.
+	mWorkerSemaphore.acquire(1);
 }
 
 /// Instructs the thread to render to the default framebuffer.
@@ -301,12 +325,17 @@ void CWorkerThread::Restore(Json::Value input)
 	// Get exclusive access to the worker
 	QMutexLocker lock(&mWorkerMutex);
 
+	// Note, this is a cross-thread call.
 	mModelList->Restore(input);
 }
 
 // The main function of this thread
 void CWorkerThread::run()
 {
+	// Initialize the model and task lists:
+    mModelList = CModelListPtr(new CModelList());
+	mTaskList = CTaskListPtr(new CTaskList(this));
+
 	// ########
 	// OpenGL initialization
 	// ########
@@ -335,8 +364,9 @@ void CWorkerThread::run()
 	mTaskList->InitGL();
 
 	// ########
-	// OpenCL initialization
+	// OpenCL initialization (must occur after OpenGL init)
 	// ########
+	mOpenCL = COpenCLPtr(new COpenCL(CL_DEVICE_TYPE_GPU));
 
 	// Lastly, have the workers initialize any OpenCL objects they need
 	mTaskList->InitCL();
@@ -363,21 +393,27 @@ void CWorkerThread::run()
 			break;
 
 		case EXPORT:
+			// Instruct the worker to export data
 			mTaskList->Export(mTempString);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case GET_RESIDUALS:
 			// uses mTempArray
-			mTaskList->GetResiduals(*mTempArray);
+			mTaskList->GetResiduals(mTempArray, mTempArraySize);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case GET_UNCERTAINTIES:
 			// uses mTempArray
-			mTaskList->GetUncertainties(*mTempArray);
+			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
 			mWorkerSemaphore.release(1);
 			break;
+
+		case OPEN_DATA:
+			// Instruct the task list to open the file.
+			mTaskList->OpenData(mTempString);
+			mWorkerSemaphore.release(1);
 
 		case RENDER:
 			mModelList->Render(0, mImageWidth, mImageHeight);

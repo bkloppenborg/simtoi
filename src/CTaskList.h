@@ -11,25 +11,30 @@
 #include <vector>
 #include <memory>
 #include <valarray>
+#include <map>
 
 using namespace std;
 
 class CTask;
-typedef shared_ptr<CTask> CWorkerPtr;
+typedef shared_ptr<CTask> CTaskPtr;
+
+class CWorkerThread;
+typedef shared_ptr<CWorkerThread> CWorkerPtr;
 
 class CTaskList
 {
 protected:
-	vector<CWorkerPtr> mWorkers;
+	vector<CTaskPtr> mTasks;
 
 public:
+	CTaskList(CWorkerThread * WorkerThread);
 	virtual ~CTaskList();
-	CTaskList();
 
 	void Export(string export_folder);
 
-	void GetResiduals(valarray<double> & residuals);
-	void GetUncertainties(valarray<double> & uncertainties);
+	vector<string> GetFileFilters();
+	void GetResiduals(double * residuals, unsigned int size);
+	void GetUncertainties(double * uncertainties, unsigned int size);
 
 	void OpenData(string filename);
 

@@ -43,7 +43,7 @@ class CTask;
 class CWorkerThread;
 typedef shared_ptr<CWorkerThread> CWorkerPtr;
 
-typedef shared_ptr<CTask> (*CreateTaskFn)(CWorkerPtr WorkerThread);
+typedef shared_ptr<CTask> (*CreateTaskFn)(CWorkerThread * WorkerThread);
 
 
 class CTaskFactory {
@@ -56,7 +56,7 @@ public:
 	virtual ~CTaskFactory();
 
 public:
-	shared_ptr<CTask> CreateWorker(string WorkerID, CWorkerPtr WorkerThread);
+	shared_ptr<CTask> CreateWorker(string WorkerID, CWorkerThread * WorkerThread);
 
 	static CTaskFactory Instance();
 

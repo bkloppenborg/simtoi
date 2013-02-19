@@ -43,6 +43,7 @@
 #include <QObject>
 #include <QThread>
 #include <QString>
+#include <QStringList>
 #include <QMutex>
 #include <QSemaphore>
 #include <QSize>
@@ -73,6 +74,7 @@ enum WorkerOperations
 	EXPORT,
 	GET_RESIDUALS,
 	GET_UNCERTAINTIES,
+	OPEN_DATA,
 	RENDER,
 	RESIZE,
 	STOP
@@ -123,7 +125,8 @@ protected:
 	QSemaphore mWorkerSemaphore;	// Acquire if a read/write operation is enqueued.
 
 	// Temporary storage locations
-	valarray<double> * mTempArray;	// External memory. Don't allocate/deallocate.
+	double * mTempArray;	// External memory. Don't allocate/deallocate.
+	unsigned int mTempArraySize;
 	string mTempString;
 	double mTempDouble;
 
@@ -150,11 +153,12 @@ public:
 public:
     void ExportResults(QString save_folder);
 
+    QStringList GetFileFilters();
     CModelListPtr GetModelList() { return mModelList; };
     WorkerOperations GetNextOperation(void);
-    void GetResiduals(valarray<double> & residuals);
+    void GetResiduals(double * residuals, unsigned int size);
     CTaskListPtr GetTaskList() { return mTaskList; };
-    void GetUncertainties(valarray<double> & uncertainties);
+    void GetUncertainties(double * uncertainties, unsigned int size);
 
     unsigned int GetImageDepth() { return mImageDepth; };
     unsigned int GetImageHeight() { return mImageHeight; };

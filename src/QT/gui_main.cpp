@@ -30,6 +30,7 @@
 #include <QMdiSubWindow>
 #include <QVariant>
 #include <QString>
+#include <QStringList>
 #include <QMessageBox>
 #include <QTreeView>
 #include <QStringList>
@@ -508,8 +509,15 @@ void gui_main::on_btnAddData_clicked(void)
     // Open a dialog, get a list of file that the user selected:
     QFileDialog dialog(this);
     dialog.setDirectory(QString::fromStdString(mOpenDataDir));
-    dialog.setNameFilter(tr("Data Files (*.fit *.fits *.oifits)"));
     dialog.setFileMode(QFileDialog::ExistingFiles);
+
+    // Now add in valid file types:
+    CGLWidget * widget = dynamic_cast<CGLWidget*>(sw->widget());
+    QStringList filters = widget->GetFileFilters();
+    for(QString filter: filters)
+    {
+    	dialog.setNameFilter(filter);
+    }
 
     QStringList filenames;
     QString dir = "";

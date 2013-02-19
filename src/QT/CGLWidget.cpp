@@ -141,6 +141,12 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	return items;
 }
 
+/// Returns a list of file filters for use in QFileDialog
+QStringList CGLWidget::GetFileFilters()
+{
+	return mWorker->GetFileFilters();
+}
+
 /// Returns the Minimizer's ID if one is loaded, otherwise an empty string.
 string CGLWidget::GetMinimizerID()
 {

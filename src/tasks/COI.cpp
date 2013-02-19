@@ -38,15 +38,26 @@
 
 extern string EXE_FOLDER;
 
-COI::COI(CWorkerPtr WorkerThread)
+COI::COI(CWorkerThread * WorkerThread)
 	: CTask(WorkerThread)
 {
+    mFBO = 0;
+	mFBO_texture = 0;
+	mFBO_depth = 0;
+    mFBO_storage = 0;
+	mFBO_storage_texture = 0;
+
+	mLibOI = NULL;
 	mLibOIInitialized = false;
+
+	mSamples = 4;
+	mTempFloat = NULL;
 }
 
 COI::~COI()
 {
 	delete mLibOI;
+	if(mTempFloat) delete mTempFloat;
 
 	glDeleteFramebuffers(1, &mFBO);
 	glDeleteFramebuffers(1, &mFBO_texture);
@@ -55,9 +66,14 @@ COI::~COI()
 	glDeleteFramebuffers(1, &mFBO_storage_texture);
 }
 
-CTaskPtr COI::Create(CWorkerPtr WorkerThread)
+CTaskPtr COI::Create(CWorkerThread * WorkerThread)
 {
 	return CTaskPtr(new COI(WorkerThread));
+}
+
+void COI::Export(string folder_name)
+{
+
 }
 
 string COI::GetDataDescription()
@@ -65,11 +81,11 @@ string COI::GetDataDescription()
 	return "OIFITS data";
 }
 
-vector<string> COI::GetDataTypes()
+vector<string> COI::GetExtensions()
 {
 	vector<string> temp;
-	temp.push_back("*.oifits");
-	temp.push_back("*.fits");
+	temp.push_back("oifits");
+	temp.push_back("fits");
 	return temp;
 }
 
@@ -78,17 +94,9 @@ unsigned int COI::GetNData()
 	mLibOI->GetNData();
 }
 
-void COI::GetResiduals(valarray<double> & residuals)
+void COI::GetResiduals(double * residuals, unsigned int size)
 {
-	// During the first call there may be some remaining initialization to be done.
-	// Lets make sure they are ready to go:
-	if(!mLibOIInitialized)
-	{
-		// Make sure the residuals buffer is large enough
-		mTempFloat = valarray<float>(mLibOI->GetNDataAllocated());
-		// Get LibOI up and running
-		mLibOI->Init();
-	}
+	InitBuffers();
 
 	unsigned int n_data_offset = 0;
 	unsigned int n_data_alloc = 0;
@@ -103,24 +111,65 @@ void COI::GetResiduals(valarray<double> & residuals)
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
 		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
 		mLibOI->CopyImageToBuffer(0);
+
 		// Notice, the ImageToChi expects a floating point array, not a valarray<float>.
-		// C++11 guarantees that storage is contiguous so we can do pointer math here.
-		mLibOI->ImageToChi(data_set, &mTempFloat[0] + n_data_offset, n_data_alloc);
+		// C++11 guarantees that storage is contiguous so we can do pointer math
+		// within the valarray storage without issues.
+		mLibOI->ImageToChi(data_set, mTempFloat + n_data_offset, n_data_alloc);
 
 		// Advance the pointer
 		n_data_offset += n_data_alloc;
 	}
 
 	// Copy the floats from liboi into doubles for SIMTOI.
-	for(unsigned int i = 0; i < residuals.size(); i++)
+	for(unsigned int i = 0; i < size; i++)
 	{
 		residuals[i] = double(mTempFloat[i]);
 	}
 }
 
-void COI::GetUncertainties(valarray<double> & uncertainties)
+void COI::GetUncertainties(double * uncertainties, unsigned int size)
 {
+	InitBuffers();
 
+	unsigned int n_data_offset = 0;
+	unsigned int n_data_alloc = 0;
+
+	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
+	unsigned int n_data_sets = mLibOI->GetNDataSets();
+	for(int data_set = 0; data_set < n_data_sets; data_set++)
+	{
+		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
+
+		// Notice, the ImageToChi expects a floating point array, not a valarray<float>.
+		// C++11 guarantees that storage is contiguous so we can do pointer math
+		// within the valarray storage without issues.
+		mLibOI->GetDataUncertainties(data_set, mTempFloat + n_data_offset, n_data_alloc);
+
+		// Advance the pointer
+		n_data_offset += n_data_alloc;
+	}
+
+	// Copy the floats from liboi into doubles for SIMTOI.
+	for(unsigned int i = 0; i < size; i++)
+	{
+		uncertainties[i] = double(mTempFloat[i]);
+	}
+}
+
+void COI::InitBuffers()
+{
+	// During the first call there may be some remaining initialization to be done.
+	// Lets make sure they are ready to go:
+	if(!mLibOIInitialized)
+	{
+		// Make sure the residuals buffer is large enough
+		mTempFloat = new float[mLibOI->GetNDataAllocated()];
+		// Get LibOI up and running
+		mLibOI->Init();
+
+		mLibOIInitialized = true;
+	}
 }
 
 void COI::InitGL()

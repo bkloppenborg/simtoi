@@ -54,20 +54,23 @@ protected:
 	bool mLibOIInitialized;
 
 	GLsizei mSamples;
-	valarray<float> mTempFloat;
+	float * mTempFloat;
 
 public:
-	COI(CWorkerPtr WorkerThread);
+	COI(CWorkerThread * WorkerThread);
 	virtual ~COI();
 
-	static CTaskPtr Create(CWorkerPtr worker);
+	static CTaskPtr Create(CWorkerThread * worker);
 
-	virtual string GetDataDescription();
-	virtual vector<string> GetDataTypes();
+	void Export(string folder_name);
+
+	string GetDataDescription();
+	vector<string> GetExtensions();
 	virtual unsigned int GetNData();
-	virtual void GetResiduals(valarray<double> & residuals);
-	virtual void GetUncertainties(valarray<double> & uncertainties);
+	virtual void GetResiduals(double * residuals, unsigned int size);
+	virtual void GetUncertainties(double * residuals, unsigned int size);
 
+	void InitBuffers();
 	virtual void InitGL();
 	virtual void InitCL();
 
