@@ -283,7 +283,7 @@ void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
 {
 	stopMinimizer();
 	mMinimizer = minimizer;
-//	mMinimizer->Init(mGLT);
+	mMinimizer->Init(mWorker);
 }
 
 void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_params)

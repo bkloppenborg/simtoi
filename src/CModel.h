@@ -41,7 +41,7 @@
 #include "CParameters.h"
 #include "CPosition.h"
 #include "CShader.h"
-#include "CCL_GLThread.h"
+#include "CWorkerThread.h"
 #include "CModelList.h"
 
 #include <cstdlib>

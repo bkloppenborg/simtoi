@@ -145,9 +145,10 @@ public:
     void AddModel(CModelPtr model);
     void AllocateBuffer();
 public:
+    void BlitToBuffer(GLuint in_buffer, GLuint out_buffer);
     void BlitToScreen(GLuint FBO);
 
-    void CheckOpenGLError(string function_name);
+    static void CheckOpenGLError(string function_name);
 protected:
     void ClearQueue();
 public:
@@ -160,6 +161,7 @@ public:
 public:
     void ExportResults(QString save_folder);
 
+    unsigned int GetDataSize();
     QStringList GetFileFilters();
     CModelListPtr GetModelList() { return mModelList; };
     WorkerOperations GetNextOperation(void);

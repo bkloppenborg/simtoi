@@ -63,7 +63,7 @@ public:
 	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);
 	virtual void ExportResults(double * params, int n_params, bool no_setparams);
 
-	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
+	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
 
 	void Next();
 

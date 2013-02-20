@@ -32,7 +32,7 @@
 
 #include "CBenchmark.h"
 #include <sys/timeb.h>
-#include "CCL_GLThread.h"
+#include "CWorkerThread.h"
 #include "misc.h"
 
 CBenchmark::CBenchmark()
@@ -75,22 +75,26 @@ int CBenchmark::GetMilliSpan( int nTimeStart )
 /// and reporting it to the user.
 int CBenchmark::run()
 {
+	// setup locals
 	mIsRunning = true;
-	// only the first loaded data set is used.
-	float chi2r = 0;
-	double chi_cpu = 0;
 	int n_iterations = 1000;
+	double chi2r = 0;
 	double time = 0;
-	int nData = mCLThread->GetNDataAllocated(0);
-	float output[nData];
+
+	// Allocate storage for the residuals and uncertainties
+	unsigned int n_data = mWorkerThread->GetDataSize();
+	valarray<double> residuals(n_data);
+	valarray<double> uncertainties(n_data);
+
+	// Look up the uncertainties, cache them here.
+    mWorkerThread->GetUncertainties(&uncertainties[0], uncertainties.size());
 
 	int start = GetMilliCount();
 
 	for(int i = 0; i < n_iterations && mRun; i++)
 	{
-		mCLThread->SetTime(mCLThread->GetDataAveJD(0));
-		mCLThread->EnqueueOperation(GLT_RenderModels);
-		chi2r = mCLThread->GetChi2(0) / (nData - mNParams - 1);
+		mWorkerThread->GetResiduals(&residuals[0], residuals.size());
+		chi2r = ComputeChi2r(residuals, uncertainties, mNParams);
 
 		if(i % 100 == 0)
 			printf("Iteration %i Chi2r: %f\n", i, chi2r);
@@ -98,7 +102,9 @@ int CBenchmark::run()
 
 	// Calculate the time, print out a nice message.
 	time = double(GetMilliSpan(start)) / 1000;
-	printf("Benchmark Test completed!\n %i iterations in %f seconds, throughput %f iterations/sec.\n", n_iterations, time, n_iterations/time);
+	cout << "Benchmark Test completed!" << endl;
+	cout << "Completed " << n_iterations << " iterations in " << time << " seconds." << endl;
+	cout << "Throughput: " << n_iterations/time << " iterations/second." << endl;
 
 	mIsRunning = false;
 	return 0;

@@ -120,6 +120,7 @@ void COI::GetResiduals(double * residuals, unsigned int size)
 		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
 		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
 		mWorkerThread->BlitToScreen(mFBO);
 
 		mLibOI->CopyImageToBuffer(0);

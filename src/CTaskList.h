@@ -32,6 +32,7 @@ public:
 
 	void Export(string export_folder);
 
+	unsigned int GetDataSize();
 	vector<string> GetFileFilters();
 	void GetResiduals(double * residuals, unsigned int size);
 	void GetUncertainties(double * uncertainties, unsigned int size);

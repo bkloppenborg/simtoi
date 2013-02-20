@@ -34,6 +34,18 @@ void CTaskList::Export(string export_folder)
 		task->Export(export_folder);
 }
 
+unsigned int CTaskList::GetDataSize()
+{
+	// Iterate over the tasks, find out how much data they hold
+	unsigned int n_data = 0;
+	for(auto task: mTasks)
+	{
+		n_data += task->GetNData();
+	}
+
+	return n_data;
+}
+
 /// \brief Builds a list of file filters for use in open file dialogs.
 ///
 /// Builds a vector of strings containing the valid file description and
@@ -92,7 +104,7 @@ void CTaskList::GetUncertainties(double * uncertainties, unsigned int size)
 		n_data = task->GetNData();
 
 		// Get the residuals. Don't forget to re-calculate the size of the array:
-		task->GetResiduals(uncertainties + offset, size - offset);
+		task->GetUncertainties(uncertainties + offset, size - offset);
 
 		offset += n_data;
 	}

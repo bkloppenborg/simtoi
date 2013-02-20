@@ -31,7 +31,7 @@
  */
 
 #include "CMinimizer.h"
-#include "CCL_GLThread.h"
+#include "CWorkerThread.h"
 
 using namespace std;
 
@@ -55,38 +55,54 @@ CMinimizer::~CMinimizer()
 	delete[] mParams;
 }
 
+void CMinimizer::ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results)
+{
+	// Valarray operations happen
+	results = residuals / uncertainties;
+}
+
+double CMinimizer::ComputeChi2r(valarray<double> & residuals, const valarray<double> & uncertainties, unsigned int n_params)
+{
+	// Square the numerator, divide by the uncertainties
+	residuals *= residuals;
+	residuals /= uncertainties;
+
+	// Now compute the sum dividied by (n_data - n_params - 1)
+	return residuals.sum() / (residuals.size() - n_params - 1);
+}
+
 /// \brief Saves the V2, and T3 data along with best-fit model simulated data
 /// for each epoch.
 void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 {
-	stringstream filename;
-	ofstream outfile;
-
-	vector<string> names = mCLThread->GetFreeParamNames();
-
-	// Open the statistics file for writing:
-	filename.str("");
-	filename << mSaveFileBasename << "_param_names.txt";
-	outfile.open(filename.str().c_str());
-	outfile.width(15);
-	outfile.precision(8);
-	outfile << "# Parameter names in a column." << endl;
-	outfile << "# Param0, ..., ParamN" << endl;
-	WriteRow(names, outfile);
-	outfile.close();
-
-	if(!no_setparams)
-	{
-		n_params = min(n_params, int(mNParams));
-
-	    //printf("Generating Plots using best-fit parameters:\n");
-		for(int i = 0; i < n_params; i++)
-			printf("%i: %e \n", i, params[i]);
-
-		mCLThread->SetFreeParameters(params, n_params, true);
-	}
-
-	mCLThread->ExportResults(mSaveFileBasename);
+//	stringstream filename;
+//	ofstream outfile;
+//
+//	vector<string> names = mWorkerThread->GetFreeParamNames();
+//
+//	// Open the statistics file for writing:
+//	filename.str("");
+//	filename << mSaveFileBasename << "_param_names.txt";
+//	outfile.open(filename.str().c_str());
+//	outfile.width(15);
+//	outfile.precision(8);
+//	outfile << "# Parameter names in a column." << endl;
+//	outfile << "# Param0, ..., ParamN" << endl;
+//	WriteRow(names, outfile);
+//	outfile.close();
+//
+//	if(!no_setparams)
+//	{
+//		n_params = min(n_params, int(mNParams));
+//
+//	    //printf("Generating Plots using best-fit parameters:\n");
+//		for(int i = 0; i < n_params; i++)
+//			printf("%i: %e \n", i, params[i]);
+//
+//		mWorkerThread->SetFreeParameters(params, n_params, true);
+//	}
+//
+//	mWorkerThread->ExportResults(mSaveFileBasename);
 }
 
 /// \brief Returns the unique ID assigned to this minimizer.
@@ -113,10 +129,11 @@ void CMinimizer::GetResults(double * results, int n_params)
 /// \brief Initialization function.
 ///
 /// \param worker_thread A shared pointer to the worker thread
-void CMinimizer::Init(shared_ptr<CCL_GLThread> worker_thread)
+void CMinimizer::Init(shared_ptr<CWorkerThread> worker_thread)
 {
-	mCLThread = worker_thread;
-	mNParams = mCLThread->GetNFreeParameters();
+	mWorkerThread = worker_thread;
+//	mNParams = mWorkerThread->GetNFreeParameters();
+	mNParams = 1;
 	mParams = new double[mNParams];
 	mRun = true;
 }

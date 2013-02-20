@@ -42,10 +42,11 @@
 #include <vector>
 #include <memory>
 #include <thread>
+#include <valarray>
 
 using namespace std;
 
-class CCL_GLThread;
+class CWorkerThread;
 class CMinimizer;
 typedef shared_ptr<CMinimizer> CMinimizerPtr;
 
@@ -74,7 +75,7 @@ protected:
 	std::thread mThread;	///< Thread object.
 
 public:
-	shared_ptr<CCL_GLThread> mCLThread; ///< Pointer to the worker thread.
+	shared_ptr<CWorkerThread> mWorkerThread; ///< Pointer to the worker thread.
 	double * mParams;		///< Current parameter values. Set to best-fit parameters upon exit (required)
 	unsigned int mNParams;	///< Number of parameters
 	bool mRun;				/// Boolean to indicate if the minimizer should continue to run.
@@ -88,12 +89,15 @@ public:
 	CMinimizer();
 	virtual ~CMinimizer();
 
+	virtual void ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results);
+	virtual double ComputeChi2r(valarray<double> & residuals, const valarray<double> & uncertainties, unsigned int n_params);
+
 	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 
 	string GetID();
 	virtual void GetResults(double * results, int n_params);
 
-	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
+	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
 	bool IsRunning();
 
 	// Pure virtual function, each minimizer must implement this.

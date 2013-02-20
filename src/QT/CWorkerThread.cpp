@@ -159,6 +159,18 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void CWorkerThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer)
+{
+	// TODO: Need to figure out how to use the layer
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, in_buffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, out_buffer);
+	//glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, out_buffer, 0, out_layer);
+	glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glFinish();
+
+  	CWorkerThread::CheckOpenGLError("CGLThread BlitToBuffer");
+}
+
 /// Blits the off-screen framebuffer to the foreground buffer.
 void CWorkerThread::BlitToScreen(GLuint FBO)
 {
@@ -218,10 +230,18 @@ void CWorkerThread::ExportResults(QString save_folder)
 	// get exclusive access to the operation queue
 	QMutexLocker lock(&mTaskMutex);
 
-
 	mTempString = save_folder.toStdString();
 	Enqueue(EXPORT);
 	mWorkerSemaphore.release(1);
+}
+
+unsigned int CWorkerThread::GetDataSize()
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	// NOTE: this is a cross-thread call.
+	return mTaskList->GetDataSize();
 }
 
 /// Gets a list of file filters for use in a QFileDialog
@@ -276,7 +296,7 @@ void CWorkerThread::GetUncertainties(double * uncertainties, unsigned int size)
 	QMutexLocker lock(&mWorkerMutex);
 
 	// Assign temporary storage, enqueue the command, and wait for completion
-	mTempArray = uncertainties;\
+	mTempArray = uncertainties;
 	mTempArraySize = size;
 	Enqueue(GET_UNCERTAINTIES);
 

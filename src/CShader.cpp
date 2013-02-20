@@ -33,10 +33,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
+#include <sstream>
 #include "CShader.h"
 #include "textio.hpp"
-#include "CCL_GLThread.h"
+#include "CWorkerThread.h"
 #include "json/json.h"
+
+using namespace std;
 
 CShader::CShader(const CShader & other)
 	: CParameters(other)

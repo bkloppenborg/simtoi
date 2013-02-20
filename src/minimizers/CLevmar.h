@@ -54,7 +54,7 @@ public:
 
 	string GetExitString(int exit_num);
 
-	virtual void Init(shared_ptr<CCL_GLThread> cl_gl_thread);
+	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
 
 	void printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar);
 
