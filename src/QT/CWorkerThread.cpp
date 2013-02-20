@@ -74,6 +74,46 @@ void CWorkerThread::AddModel(CModelPtr model)
 	Enqueue(RENDER);
 }
 
+void CWorkerThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer)
+{
+	// TODO: Need to figure out how to use the layer
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, in_buffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, out_buffer);
+	//glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, out_buffer, 0, out_layer);
+	glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glFinish();
+
+  	CWorkerThread::CheckOpenGLError("CGLThread BlitToBuffer");
+}
+
+/// Blits the off-screen framebuffer to the foreground buffer.
+void CWorkerThread::BlitToScreen(GLuint FBO)
+{
+    // Bind back to the default buffer (just in case something didn't do it),
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Blit the application-defined render buffer to the on-screen render buffer.
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+
+    /// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
+    //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
+    glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+    SwapBuffers();
+}
+
+/// Static function for checking OpenGL errors:
+void CWorkerThread::CheckOpenGLError(string function_name)
+{
+    GLenum status = glGetError(); // Check that status of our generated frame buffer
+    // If the frame buffer does not report back as complete
+    if (status != 0)
+    {
+        string errstr =  (const char *) gluErrorString(status);
+        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
+        throw;
+    }
+}
 
 void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture)
 {
@@ -157,47 +197,6 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 
     // All done, bind back to the default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void CWorkerThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer)
-{
-	// TODO: Need to figure out how to use the layer
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, in_buffer);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, out_buffer);
-	//glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, out_buffer, 0, out_layer);
-	glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	glFinish();
-
-  	CWorkerThread::CheckOpenGLError("CGLThread BlitToBuffer");
-}
-
-/// Blits the off-screen framebuffer to the foreground buffer.
-void CWorkerThread::BlitToScreen(GLuint FBO)
-{
-    // Bind back to the default buffer (just in case something didn't do it),
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // Blit the application-defined render buffer to the on-screen render buffer.
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
-
-    /// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
-    //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
-    glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-    SwapBuffers();
-}
-
-/// Static function for checking OpenGL errors:
-void CWorkerThread::CheckOpenGLError(string function_name)
-{
-    GLenum status = glGetError(); // Check that status of our generated frame buffer
-    // If the frame buffer does not report back as complete
-    if (status != 0)
-    {
-        string errstr =  (const char *) gluErrorString(status);
-        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
-        throw;
-    }
 }
 
 // Clears the worker task queue.

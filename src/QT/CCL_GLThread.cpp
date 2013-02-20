@@ -144,7 +144,7 @@ void CCL_GLThread::ClearQueue()
 }
 
 /// Static function for checking OpenGL errors:
-void CWorkerThread::CheckOpenGLError(string function_name)
+void CCL_GLThread::CheckOpenGLError(string function_name)
 {
     GLenum status = glGetError(); // Check that status of our generated frame buffer
     // If the frame buffer does not report back as complete
