@@ -37,6 +37,7 @@
 #include <sstream>
 
 #include "CWorkerThread.h"
+#include "CModelList.h"
 
 using namespace std;
 
@@ -57,78 +58,80 @@ CMinimizerPtr CGridSearch::Create()
 
 void CGridSearch::ExportResults(double * params, int n_params, bool no_setparams)
 {
-//	stringstream filename;
-//	ofstream outfile;
-//	double tmp[3];
-//
-//	// Open the statistics file for writing:
-//	filename.str("");
-//	filename << mSaveFileBasename << "_gridsearch.txt";
-//	outfile.open(filename.str().c_str());
-//	outfile.width(15);
-//	outfile.precision(8);
-//	outfile << "# Param1 Param2 Chi2" << endl;
-//
-//	// write the data to the file
-//	for(int i = 0; i < mResults.size(); i++)
-//		outfile << get<0>(mResults[i]) << " " << get<1>(mResults[i]) << " " << get<2>(mResults[i]) << endl;
-//
-//	outfile.close();
+	stringstream filename;
+	ofstream outfile;
+	double tmp[3];
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mSaveFileBasename << "_gridsearch.txt";
+	outfile.open(filename.str().c_str());
+	outfile.width(15);
+	outfile.precision(8);
+	outfile << "# Param1 Param2 Chi2" << endl;
+
+	// write the data to the file
+	for(int i = 0; i < mResults.size(); i++)
+		outfile << get<0>(mResults[i]) << " " << get<1>(mResults[i]) << " " << get<2>(mResults[i]) << endl;
+
+	outfile.close();
 }
 
 
 int CGridSearch::run()
 {
-//	// TODO: This minimizer only works on two-dimentional data.
-//	if(mNParams > 2)
-//		return 0;
-//
-//	int nData = 0;
-//	int nDataSets = mWorkerThread->GetNDataSets();
-//	int n_data_offset = 0;
-//	double chi2r_sum = 0;
-//
-//	// Get the min/max ranges for the parameters:
-//	mWorkerThread->GetFreeParameters(mParams, mNParams, true);
-//	vector< pair<double, double> > min_max = mWorkerThread->GetFreeParamMinMaxes();
-//
-//	// Hard coded for the moment, results in 2500 iterations equally spaced in both dimensions.
-//	int nSteps = 50;
-//
-//	// Determine the size of each step.
-//	double steps[mNParams];
-//	for(int i = 0; i < mNParams; i++)
-//		steps[i] = (min_max[i].second - min_max[i].first) / nSteps;
-//
-//	// Run the grid search.
-//	for(mParams[0] = min_max[0].first; mParams[0] < min_max[0].second; mParams[0] += steps[0])
-//	{
-//		for(mParams[1] = min_max[1].first; mParams[1] < min_max[1].second; mParams[1] += steps[1])
-//		{
-//			chi2r_sum = 0;
-//			// Permit termination in the middle of a run.
-//			if(!mRun)
-//				break;
-//
-//			// Set the parameters (note, they are not scaled to unit magnitude).
-//			mWorkerThread->SetFreeParameters(mParams, mNParams, false);
-//
-//			// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
-//			for(int data_set = 0; data_set < nDataSets; data_set++)
-//			{
-//				nData = mWorkerThread->GetNDataAllocated(data_set);
-//				mWorkerThread->SetTime(mWorkerThread->GetDataAveJD(data_set));
-//				mWorkerThread->EnqueueOperation(GLT_RenderModels);
-//				chi2r_sum += mWorkerThread->GetChi2(data_set) / (nData - mNParams - 1);
-//				n_data_offset += nData;
-//			}
-//
-//			mResults.push_back( tuple<double, double, double>(mParams[0], mParams[1], chi2r_sum/nDataSets) );
-//
-//		}
-//	}
-//
-//	// Export the results.  Note, mParams is set to the maximum value, not the minimum.
-//	ExportResults(mParams, mNParams, true);
-//	return 0;
+	// TODO: This minimizer only works on two-dimentional data.
+	if(mNParams > 2)
+		return 0;
+
+	// Init local storage
+	double chi2r = 0;
+
+	// Allocate storage for the residuals and uncertainties
+	unsigned int n_data = mWorkerThread->GetDataSize();
+	valarray<double> residuals(n_data);
+	valarray<double> uncertainties(n_data);
+
+	// Look up the uncertainties, cache them here.
+    mWorkerThread->GetUncertainties(&uncertainties[0], uncertainties.size());
+
+    // Get ahold of the model list
+    CModelListPtr model_list = mWorkerThread->GetModelList();
+
+	// Get the min/max ranges for the parameters:
+    model_list->GetFreeParameters(mParams, mNParams, true);
+	vector< pair<double, double> > min_max = model_list->GetFreeParamMinMaxes();
+
+	// Hard coded for the moment, results in 2500 iterations equally spaced in both dimensions.
+	int nSteps = 50;
+
+	// Determine the size of each step.
+	double steps[mNParams];
+	for(int i = 0; i < mNParams; i++)
+		steps[i] = (min_max[i].second - min_max[i].first) / nSteps;
+
+	// Run the grid search.
+	for(mParams[0] = min_max[0].first; mParams[0] < min_max[0].second; mParams[0] += steps[0])
+	{
+		for(mParams[1] = min_max[1].first; mParams[1] < min_max[1].second; mParams[1] += steps[1])
+		{
+			// Permit termination in the middle of a run.
+			if(!mRun)
+				break;
+
+			// Set the parameters (note, they are not scaled to unit magnitude), get the residuals, compute the chi2r
+			model_list->SetFreeParameters(mParams, mNParams, false);
+			mWorkerThread->GetResiduals(&residuals[0], residuals.size());
+			chi2r = ComputeChi2r(residuals, uncertainties, mNParams);
+
+			// Enable to see output on the console.
+			//cout << mParams[0] << " " << mParams[1]<< " " << chi2r << endl;
+
+			mResults.push_back( tuple<double, double, double>(mParams[0], mParams[1], chi2r) );
+		}
+	}
+
+	// Export the results.  Note, mParams is set to the maximum value, not the minimum.
+	ExportResults(mParams, mNParams, true);
+	return 0;
 }

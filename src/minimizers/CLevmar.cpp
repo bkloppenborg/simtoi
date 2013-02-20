@@ -34,7 +34,7 @@
 #include <cmath>
 
 #include "levmar.h"
-#include "CCL_GLThread.h"
+#include "CWorkerThread.h"
 
 
 CLevmar::CLevmar()

@@ -59,11 +59,11 @@ COI::~COI()
 	delete mLibOI;
 	if(mTempFloat) delete mTempFloat;
 
-	glDeleteFramebuffers(1, &mFBO);
-	glDeleteFramebuffers(1, &mFBO_texture);
-	glDeleteFramebuffers(1, &mFBO_depth);
-	glDeleteFramebuffers(1, &mFBO_storage);
-	glDeleteFramebuffers(1, &mFBO_storage_texture);
+	if(mFBO) glDeleteFramebuffers(1, &mFBO);
+	if(mFBO_texture) glDeleteFramebuffers(1, &mFBO_texture);
+	if(mFBO_depth) glDeleteFramebuffers(1, &mFBO_depth);
+	if(mFBO_storage) glDeleteFramebuffers(1, &mFBO_storage);
+	if(mFBO_storage_texture) glDeleteFramebuffers(1, &mFBO_storage_texture);
 }
 
 CTaskPtr COI::Create(CWorkerThread * WorkerThread)
@@ -178,6 +178,18 @@ void COI::InitBuffers()
 	{
 		// Make sure the residuals buffer is large enough
 		mTempFloat = new float[mLibOI->GetNDataAllocated()];
+
+		// Get image properties
+		unsigned int width = mWorkerThread->GetImageWidth();
+		unsigned int height = mWorkerThread->GetImageHeight();
+		unsigned int depth = mWorkerThread->GetImageDepth();
+		double scale = mWorkerThread->GetImageScale();
+
+		// Initalize remaining OpenCL items.
+		mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
+		mLibOI->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
+		mLibOI->SetImageInfo(width, height, depth, scale);
+
 		// Get LibOI up and running
 		mLibOI->Init();
 
@@ -193,17 +205,8 @@ void COI::InitGL()
 
 void COI::InitCL()
 {
-	// First initialize local storage:
-	unsigned int width = mWorkerThread->GetImageWidth();
-	unsigned int height = mWorkerThread->GetImageHeight();
-	double scale = mWorkerThread->GetImageScale();
-
 	// Initialize liboi using the worker thread's OpenCL+OpenGL context
 	mLibOI = new CLibOI(mWorkerThread->GetOpenCL());
-	mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
-	mLibOI->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
-	mLibOI->SetImageInfo(mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight(),
-			mWorkerThread->GetImageDepth(), mWorkerThread->GetImageScale());
 }
 
 void COI::OpenData(string filename)

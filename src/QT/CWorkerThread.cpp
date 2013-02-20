@@ -330,7 +330,8 @@ void CWorkerThread::Resize(unsigned int width, unsigned int height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     double half_width = mImageWidth * mImageScale / 2;
-	glOrtho(-half_width, half_width, -half_width, half_width, -mImageDepth, mImageDepth);
+    double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
+	glOrtho(-half_width, half_width, -half_width, half_width, -depth, depth);
     glMatrixMode(GL_MODELVIEW);
 
     CWorkerThread::CheckOpenGLError("CWorkerThread Resize(int, int)");

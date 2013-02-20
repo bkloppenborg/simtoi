@@ -32,6 +32,7 @@
 
 #include "CMinimizer.h"
 #include "CWorkerThread.h"
+#include "CModelList.h"
 
 using namespace std;
 
@@ -67,8 +68,10 @@ double CMinimizer::ComputeChi2r(valarray<double> & residuals, const valarray<dou
 	residuals *= residuals;
 	residuals /= uncertainties;
 
+	double chi2_sum = residuals.sum();
+
 	// Now compute the sum dividied by (n_data - n_params - 1)
-	return residuals.sum() / (residuals.size() - n_params - 1);
+	return chi2_sum / (residuals.size() - n_params - 1);
 }
 
 /// \brief Saves the V2, and T3 data along with best-fit model simulated data
@@ -132,8 +135,9 @@ void CMinimizer::GetResults(double * results, int n_params)
 void CMinimizer::Init(shared_ptr<CWorkerThread> worker_thread)
 {
 	mWorkerThread = worker_thread;
-//	mNParams = mWorkerThread->GetNFreeParameters();
-	mNParams = 1;
+
+	CModelListPtr model_list = mWorkerThread->GetModelList();
+	mNParams = model_list->GetNFreeParameters();
 	mParams = new double[mNParams];
 	mRun = true;
 }
