@@ -112,5 +112,5 @@ void CSphere::Render(GLuint framebuffer_object, int width, int height)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CCL_GLThread::CheckOpenGLError("CModelSphere.Render()");
+	CWorkerThread::CheckOpenGLError("CModelSphere.Render()");
 }

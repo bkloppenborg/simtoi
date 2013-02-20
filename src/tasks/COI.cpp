@@ -73,7 +73,17 @@ CTaskPtr COI::Create(CWorkerThread * WorkerThread)
 
 void COI::Export(string folder_name)
 {
+	CModelListPtr model_list = mWorkerThread->GetModelList();
 
+	unsigned int n_data_sets = mLibOI->GetNDataSets();
+	for(int data_set = 0; data_set < n_data_sets; data_set++)
+	{
+		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+		mWorkerThread->BlitToScreen(mFBO);
+//		mLibOI->SaveImage(...)
+		mLibOI->SaveSimulatedData(data_set, folder_name);
+	}
 }
 
 string COI::GetDataDescription()
@@ -110,6 +120,8 @@ void COI::GetResiduals(double * residuals, unsigned int size)
 		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
 		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+		mWorkerThread->BlitToScreen(mFBO);
+
 		mLibOI->CopyImageToBuffer(0);
 
 		// Notice, the ImageToChi expects a floating point array, not a valarray<float>.

@@ -205,14 +205,14 @@ void CShader::Init()
 
     // Now create the mProgram with vertex and fragement shaders
 	mProgram = glCreateProgram();
-    CCL_GLThread::CheckOpenGLError("Could not create shader mProgram.");
+    CWorkerThread::CheckOpenGLError("Could not create shader mProgram.");
     mShader_vertex = glCreateShader(GL_VERTEX_SHADER);
     if(!bool(glIsShader(mShader_vertex)))
-    	CCL_GLThread::CheckOpenGLError("Could not create vertex shader.");
+    	CWorkerThread::CheckOpenGLError("Could not create vertex shader.");
 
     mShader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
     if(!bool(glIsShader(mShader_vertex)))
-    	CCL_GLThread::CheckOpenGLError("Could not create fragement shader shader.");
+    	CWorkerThread::CheckOpenGLError("Could not create fragement shader shader.");
 
     glAttachShader(mProgram, mShader_vertex);
     glAttachShader(mProgram, mShader_fragment);
@@ -226,19 +226,19 @@ void CShader::Init()
 
     LinkProgram(mProgram);
 
-    CCL_GLThread::CheckOpenGLError("Could not link shader mProgram.");
+    CWorkerThread::CheckOpenGLError("Could not link shader mProgram.");
 
     // Now look up the locations of the parameters, start with the min/max value locations:
     mMinXYZ_location = glGetUniformLocation(mProgram, "min_xyz");
-	CCL_GLThread::CheckOpenGLError("Could find variable 'min_xyz' in shader source.");
+	CWorkerThread::CheckOpenGLError("Could find variable 'min_xyz' in shader source.");
     mMaxXYZ_location = glGetUniformLocation(mProgram, "max_xyz");
-	CCL_GLThread::CheckOpenGLError("Could find variable 'max_xyz' in shader source.");
+	CWorkerThread::CheckOpenGLError("Could find variable 'max_xyz' in shader source.");
 
     // Now the shader-specific parameters:
     for(int i = 0; i < mNParams; i++)
     {
     	mParam_locations[i] = glGetUniformLocation(mProgram, mParamNames[i].c_str());
-    	CCL_GLThread::CheckOpenGLError("Could find variable in shader source.");
+    	CWorkerThread::CheckOpenGLError("Could find variable in shader source.");
     }
 
     // The shader has been loaded, compiled, and linked.
@@ -276,7 +276,7 @@ void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, u
 
 	// Tell OpenGL to use the mProgram
 	glUseProgram(mProgram);
-	CCL_GLThread::CheckOpenGLError("CShader::UseShader, glUseProgram");
+	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUseProgram");
 
 	// Init temporary storage and copy the XYZ min/max values into the corresponding array.
 	GLfloat min_tmp[3];
@@ -292,7 +292,7 @@ void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, u
 	// Send the values off to the shader:
 	glUniform3fv(mMinXYZ_location, 1, min_tmp);
 	glUniform3fv(mMaxXYZ_location, 1, max_tmp);
-	CCL_GLThread::CheckOpenGLError("CShader::UseShader, glUniform3fv");
+	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUniform3fv");
 
 	// Set the shader-specific parameters.  Notice again the intentional downcast.
 	GLfloat tmp;
@@ -301,5 +301,5 @@ void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, u
 		tmp = GLfloat(params[i]);
 		glUniform1fv(mParam_locations[i], 1, &tmp);
 	}
-	CCL_GLThread::CheckOpenGLError("CShader::UseShader, glUniform1fv");
+	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUniform1fv");
 }

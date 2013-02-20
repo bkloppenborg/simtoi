@@ -132,7 +132,7 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, int hei
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CCL_GLThread::CheckOpenGLError("CModelDisk.Render()");
+	CWorkerThread::CheckOpenGLError("CModelDisk.Render()");
 }
 
 double CDisk_ConcentricRings::Transparency(double half_height, double at_z)

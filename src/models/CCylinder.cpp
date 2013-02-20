@@ -212,5 +212,5 @@ void CCylinder::Render(GLuint framebuffer_object, int width, int height)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CCL_GLThread::CheckOpenGLError("CModelDisk.Render()");
+	CWorkerThread::CheckOpenGLError("CModelDisk.Render()");
 }

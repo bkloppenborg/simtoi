@@ -254,7 +254,7 @@ void CModel::Rotate()
 	glRotatef(mParams[0], 1, 0, 0);	// inclination
 	glRotatef(mParams[1], 0, 1, 0); // position angle
 	glRotatef(mParams[2], 0, 0, 1); // roll
-	CCL_GLThread::CheckOpenGLError("CModel::Rotate()");
+	CWorkerThread::CheckOpenGLError("CModel::Rotate()");
 }
 
 /// \brief Restores a model from SIMTOI's JSON save file.
@@ -436,7 +436,7 @@ void CModel::Translate()
 
 	// Call the translation routines.  Use the double-precision call.
 	glTranslatef(x, y, z);
-	CCL_GLThread::CheckOpenGLError("CModel::Translate()");
+	CWorkerThread::CheckOpenGLError("CModel::Translate()");
 }
 
 /// \brief Use the shader on the model
@@ -451,5 +451,5 @@ void CModel::UseShader(double min_xyz[3], double max_xyz[3])
 	if(mShader != NULL)
 		mShader->UseShader(min_xyz, max_xyz);
 
-	CCL_GLThread::CheckOpenGLError("CModel::UseShader()");
+	CWorkerThread::CheckOpenGLError("CModel::UseShader()");
 }

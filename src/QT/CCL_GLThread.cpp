@@ -112,7 +112,7 @@ void CCL_GLThread::BlitToScreen()
 
     glFinish();
     mGLWidget->swapBuffers();
-	CCL_GLThread::CheckOpenGLError("CGLThread::BlitToScreen()");
+	CWorkerThread::CheckOpenGLError("CGLThread::BlitToScreen()");
 }
 
 /// Blits the input buffer to the out_layer of the output buffer
@@ -125,7 +125,7 @@ void CCL_GLThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer, unsigned in
 	glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	glFinish();
 
-  	CCL_GLThread::CheckOpenGLError("CGLThread BlitToBuffer");
+  	CWorkerThread::CheckOpenGLError("CGLThread BlitToBuffer");
 }
 
 void CCL_GLThread::ClearQueue()
@@ -144,7 +144,7 @@ void CCL_GLThread::ClearQueue()
 }
 
 /// Static function for checking OpenGL errors:
-void CCL_GLThread::CheckOpenGLError(string function_name)
+void CWorkerThread::CheckOpenGLError(string function_name)
 {
     GLenum status = glGetError(); // Check that status of our generated frame buffer
     // If the frame buffer does not report back as complete
@@ -509,7 +509,7 @@ void CCL_GLThread::run()
     //EnqueueOperation(GLT_BlitToScreen);
     CL_GLT_Operations op;
 
-	CCL_GLThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
+	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
 	// ########
 	// OpenCL initialization
@@ -548,7 +548,7 @@ void CCL_GLThread::run()
             half_width = mImageWidth * mScale / 2;
 			glOrtho(-half_width, half_width, -half_width, half_width, -mAreaDepth, mAreaDepth);
             glMatrixMode(GL_MODELVIEW);
-        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_Resize");
+        	CWorkerThread::CheckOpenGLError("CGLThread GLT_Resize");
         	// Now tell OpenCL about the image (depth = 1 because we have only one layer)
         	mCL->SetImageInfo(mImageWidth, mImageHeight, 1, double(mScale));
         	mPermitResize = false;
@@ -556,13 +556,13 @@ void CCL_GLThread::run()
         default:
         case GLT_RenderModels:
             // Render the models, then cascade to a blit to screen.
-        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_RenderModels Entry");
+        	CWorkerThread::CheckOpenGLError("CGLThread GLT_RenderModels Entry");
             mModelList->Render(mFBO, mImageWidth, mImageHeight);
             BlitToBuffer(mFBO, mFBO_storage, 0);
 
      	case GLT_BlitToScreen:
 			BlitToScreen();
-        	CCL_GLThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
+        	CWorkerThread::CheckOpenGLError("CGLThread GLT_BlitToScreen");
 			break;
 
         case GLT_Stop:
