@@ -53,7 +53,6 @@ protected:
 	CLibOI * mLibOI;
 	bool mLibOIInitialized;
 
-	GLsizei mSamples;
 	float * mTempFloat;
 
 public:

@@ -50,7 +50,6 @@ COI::COI(CWorkerThread * WorkerThread)
 	mLibOI = NULL;
 	mLibOIInitialized = false;
 
-	mSamples = 4;
 	mTempFloat = NULL;
 }
 
