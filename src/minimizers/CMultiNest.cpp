@@ -31,8 +31,15 @@
  */
 
 #include "CMultiNest.h"
-#include "CCL_GLThread.h"
 #include <limits>
+#include <cmath>
+
+#include "CWorkerThread.h"
+#include "CModelList.h"
+
+#ifndef PI
+#define PI M_PI
+#endif
 
 CMultiNest::CMultiNest()
 {
@@ -45,7 +52,7 @@ CMultiNest::~CMultiNest()
 	// TODO Auto-generated destructor stub
 }
 
-double ComputeLogZ(valarray<double> & residuals, const valarray<double> & uncertainties)
+double CMultiNest::ComputeLogZ(valarray<double> & residuals, const valarray<double> & uncertainties)
 {
 	// We compute the log likelihood from the following formulation:
 	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp(chi^2_i / 2)]
@@ -53,7 +60,7 @@ double ComputeLogZ(valarray<double> & residuals, const valarray<double> & uncert
 
 	// Form the chi^2, store it in the residual buffer
 	residuals = residuals*residuals / uncertainties;
-	residuals /= 2
+	residuals /= 2;
 
 	return -residuals.size() / 2 * log(2*PI) - 2*log(uncertainties).sum() + 0.5 * residuals.sum();
 }
@@ -120,7 +127,7 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 int CMultiNest::run()
 {
 	// Init MultiNest:
-	string tmp_output = mWorkerThread->GetTempOutputDir();
+	string tmp_output = "/tmp"; //mWorkerThread->GetTempOutputDir();
 
 	void * misc = reinterpret_cast<void*>(this);
 
@@ -149,7 +156,7 @@ int CMultiNest::run()
 	int initMPI = 0;				// initialize MPI routines?, relevant only if compiling with MPI
 							        // set it to F if you want your main program to handle MPI initialization
 
-	double logZero = -DBL_MAX;		// points with loglike < logZero will be ignored by MultiNest
+	double logZero = -numeric_limits<double>::max();		// points with loglike < logZero will be ignored by MultiNest
 //	int context = 0;				// not required by MultiNest, any additional information user wants to pass
 	int maxIterations = 1E9;
 

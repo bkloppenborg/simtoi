@@ -26,6 +26,9 @@
 
 #include "CWorkerThread.h"
 #include <QMutexLocker>
+#include <stdexcept>
+
+using namespace std;
 
 #include "CGLWidget.h"
 #include "CTaskList.h"
