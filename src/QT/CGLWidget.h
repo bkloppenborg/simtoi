@@ -78,6 +78,8 @@ public:
 
     QStandardItemModel * GetOpenFileModel() { return &mOpenFileModel; };
     CTreeModel * GetTreeModel() { return &mTreeModel; };
+    unsigned int GetImageWidth() { return mWorker->GetImageWidth(); };
+    unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
 
 protected:
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
@@ -92,10 +94,11 @@ protected:
 
 public:
     void Save(string filename);
+    void SetScale(double scale);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetMinimizer(CMinimizerPtr minimizer);
-    void SetScale(double scale);
     void SetSaveFileBasename(string filename);
+    void SetSize(unsigned int width, unsigned int height);
     void startMinimizer();
     void startRendering();
     void stopMinimizer();

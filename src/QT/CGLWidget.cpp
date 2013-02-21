@@ -186,14 +186,9 @@ void CGLWidget::Open(string filename)
 		height = 128;
 	}
 
-	// Resize this widget
-	resize(width, height);
-
-	// Resize the parent widget.
-    // TODO: This is approximately right for my machine, probably not ok on other OSes.
-    int frame_width = 8;
-    int frame_height = 28;
-	parentWidget()->setFixedSize(width + frame_width, height + frame_height);
+	// Set the area scale and height
+	mWorker->SetSize(width, height);
+	mWorker->SetScale(scale);
 
 	// Now have the Worker thread open the remainder of the file.
 	mWorker->Restore(input);
@@ -258,7 +253,7 @@ void CGLWidget::RebuildTree()
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
-    mWorker->resizeViewport(evt->size());
+	// do nothing, the area cannot be resized once created
 }
 
 void CGLWidget::Save(string filename)
@@ -279,6 +274,11 @@ void CGLWidget::Save(string filename)
 	writer.write(outfile, output);
 }
 
+void CGLWidget::SetScale(double scale)
+{
+	mWorker->SetScale(scale);
+}
+
 void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
 {
 	stopMinimizer();
@@ -286,14 +286,9 @@ void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
 	mMinimizer->Init(mWorker);
 }
 
-void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_params)
+void CGLWidget::SetSize(unsigned int width, unsigned int height)
 {
-//	mGLT->SetFreeParameters(params, n_params, scale_params);
-}
-
-void CGLWidget::SetScale(double scale)
-{
-//	mGLT->SetScale(scale);
+	mWorker->SetSize(width, height);
 }
 
 void CGLWidget::startRendering()

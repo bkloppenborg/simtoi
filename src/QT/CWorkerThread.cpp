@@ -47,6 +47,10 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageDepth = 1;
     mImageScale = 0.05;
     mImageSamples = 4;
+
+	// Initialize the model and task lists:
+    mModelList = CModelListPtr(new CModelList());
+	mTaskList = CTaskListPtr(new CTaskList(this));
 }
 
 CWorkerThread::~CWorkerThread()
@@ -323,38 +327,6 @@ void CWorkerThread::Render()
 	Enqueue(RENDER);
 }
 
-void CWorkerThread::Resize(unsigned int width, unsigned int height)
-{
-	// Resize the screen, then cascade to a render and a blit.
-    glViewport(0, 0, mImageWidth, mImageHeight);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    double half_width = mImageWidth * mImageScale / 2;
-    double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
-	glOrtho(-half_width, half_width, -half_width, half_width, -depth, depth);
-    glMatrixMode(GL_MODELVIEW);
-
-    CWorkerThread::CheckOpenGLError("CWorkerThread Resize(int, int)");
-	Enqueue(RENDER);
-}
-
-/// Resize the window.  Normally called from QT
-void CWorkerThread::resizeViewport(const QSize &size)
-{
-    resizeViewport(size.width(), size.height());
-}
-
-/// Resize the window.  Called from external applications.
-void CWorkerThread::resizeViewport(int width, int height)
-{
-	// Get exclusive access to the worker
-	QMutexLocker lock(&mWorkerMutex);
-
-	mImageWidth = width;
-	mImageHeight = height;
-	Enqueue(RESIZE);
-}
-
 void CWorkerThread::Restore(Json::Value input)
 {
 	// Get exclusive access to the worker
@@ -367,10 +339,6 @@ void CWorkerThread::Restore(Json::Value input)
 // The main function of this thread
 void CWorkerThread::run()
 {
-	// Initialize the model and task lists:
-    mModelList = CModelListPtr(new CModelList());
-	mTaskList = CTaskListPtr(new CTaskList(this));
-
 	// ########
 	// OpenGL initialization
 	// ########
@@ -391,7 +359,14 @@ void CWorkerThread::run()
 	// Enable multisample anti-aliasing.
 	glEnable(GL_MULTISAMPLE);
 
-	Resize(mImageWidth, mImageHeight);
+	// Resize the screen, then cascade to a render and a blit.
+    glViewport(0, 0, mImageWidth, mImageHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    double half_width = mImageWidth * mImageScale / 2;
+    double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
+	glOrtho(-half_width, half_width, -half_width, half_width, -depth, depth);
+    glMatrixMode(GL_MODELVIEW);
 
 	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
@@ -455,10 +430,6 @@ void CWorkerThread::run()
 			BlitToScreen(mFBO);
 			break;
 
-		case RESIZE:
-        	Resize(mImageWidth, mImageHeight);
-        	break;
-
 		default:
 		case STOP:
 			ClearQueue();
@@ -469,6 +440,29 @@ void CWorkerThread::run()
 	}
 
 	emit finished();
+}
+
+void CWorkerThread::SetScale(double scale)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	if(scale < 0)
+		throw runtime_error("Image scale cannot be negative.");
+
+	mImageScale = scale;
+}
+
+void CWorkerThread::SetSize(unsigned int width, unsigned int height)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	if(width < 1 || height < 1)
+		throw runtime_error("Image size must be at least 1x1 pixel");
+
+	mImageWidth = width;
+	mImageHeight = height;
 }
 
 Json::Value CWorkerThread::Serialize()

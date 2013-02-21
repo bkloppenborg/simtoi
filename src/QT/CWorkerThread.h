@@ -75,7 +75,6 @@ enum WorkerOperations
 	GET_UNCERTAINTIES,
 	OPEN_DATA,
 	RENDER,
-	RESIZE,
 	STOP
 };
 
@@ -178,14 +177,12 @@ public:
     void OpenData(string filename);
 
     void Render();
-protected:
-    void Resize(unsigned int width, unsigned int height);
 public:
-    void resizeViewport(const QSize &size);
-    void resizeViewport(int width, int height);
     void Restore(Json::Value input);
     void run();
 
+    void SetScale(double scale);
+    void SetSize(unsigned int width, unsigned int height);
     Json::Value Serialize();
     void startAnimation(double timestep);
     void stopAnimation();

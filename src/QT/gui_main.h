@@ -38,6 +38,7 @@ using namespace std;
 
 class CParameters;
 class CParameterItem;
+class CGLWidget;
 
 class gui_main : public QMainWindow, private Ui::cmainguiClass
 {
@@ -58,7 +59,7 @@ public:
     virtual ~gui_main();
 
 protected:
-    QMdiSubWindow * AddGLArea(int model_width, int model_height, double model_scale);
+    QMdiSubWindow * AddGLArea(CGLWidget * widget);
     void AddData(QStringList & filenames, QMdiSubWindow * sw);
 public:
     void AutoClose(bool auto_close, QMdiSubWindow * sw);

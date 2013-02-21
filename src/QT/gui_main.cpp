@@ -99,24 +99,27 @@ void gui_main::AddData(QStringList & filenames, QMdiSubWindow * sw)
 	ButtonCheck();
 }
 
-QMdiSubWindow * gui_main::AddGLArea(int model_width, int model_height, double model_scale)
+QMdiSubWindow * gui_main::AddGLArea(CGLWidget * widget)
 {
-	// Create a new subwindow with a title and close button:
-    CGLWidget * widget = new CGLWidget(this->mdiArea, mShaderSourceDir, mKernelSourceDir);
+	// Set the widget's parent to be the MDI area:
+	widget->setParent(this->mdiArea);
+
+	// Create a subwindow in which the widget can live:
     QMdiSubWindow * sw = this->mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
     sw->setWindowTitle("Model Area");
 
+    // Set the subwindow's size
     // TODO: This is approximately right for my machine, probably not ok on other OSes.
     int frame_width = 8;
     int frame_height = 28;
 
-    sw->setFixedSize(model_width + frame_width, model_height + frame_height);
+    sw->setFixedSize(widget->GetImageWidth() + frame_width, widget->GetImageHeight() + frame_height);
     sw->show();
 
-    widget->resize(model_width, model_height);
-    widget->SetScale(model_scale);
-    widget->startRendering();
+    // Start the widget rendering:
+	widget->startRendering();
 
+    // Connect signals/slots
 	// Now connect signals and slots
 	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
 
@@ -441,12 +444,13 @@ void gui_main::Open(QStringList & filenames)
 {
 	for(auto filename : filenames)
 	{
-		// Create a GL Area with reasonable parameters
-		QMdiSubWindow * sw = AddGLArea(16, 16, 0.025);
-		CGLWidget * widget = dynamic_cast<CGLWidget*>(sw->widget());
+		CGLWidget * widget = new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir);
 		widget->Open(filename.toStdString());
+		AddGLArea(widget);
 	}
 }
+
+
 
 void gui_main::on_actionOpen_triggered()
 {
@@ -618,7 +622,10 @@ void gui_main::on_btnNewModelArea_clicked()
     int height = this->spinModelSize->value();
     double scale = this->spinModelScale->value();
 
-    AddGLArea(width, height, scale);
+	CGLWidget * widget = new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir);
+	widget->SetSize(width, height);
+	widget->SetScale(scale);
+	AddGLArea(widget);
 }
 
 /// Removes the current selected data set.
