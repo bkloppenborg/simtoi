@@ -364,8 +364,9 @@ void CWorkerThread::run()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     double half_width = mImageWidth * mImageScale / 2;
+    double half_height = mImageHeight * mImageScale / 2;
     double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
-	glOrtho(-half_width, half_width, -half_width, half_width, -depth, depth);
+	glOrtho(-half_width, half_width, -half_height, half_height, -depth, depth);
     glMatrixMode(GL_MODELVIEW);
 
 	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
