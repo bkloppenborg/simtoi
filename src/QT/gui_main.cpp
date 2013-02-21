@@ -517,10 +517,7 @@ void gui_main::on_btnAddData_clicked(void)
     // Now add in valid file types:
     CGLWidget * widget = dynamic_cast<CGLWidget*>(sw->widget());
     QStringList filters = widget->GetFileFilters();
-    for(QString filter: filters)
-    {
-    	dialog.setNameFilter(filter);
-    }
+    dialog.setNameFilters(filters);
 
     QStringList filenames;
     QString dir = "";

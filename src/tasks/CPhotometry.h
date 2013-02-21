@@ -43,7 +43,7 @@ class CPhotometricDataPoint
 public:
 	double jd;
 	double mag;
-	double sig_mag;
+	double mag_err;
 };
 typedef shared_ptr<CPhotometricDataPoint> CPhotometricDataPointPtr;
 
@@ -75,6 +75,7 @@ public:
 	CPhotometry(CWorkerThread * WorkerThread);
 	virtual ~CPhotometry();
 
+	static CTaskPtr Create(CWorkerThread * worker);
 
 	virtual void Export(string folder_name);
 

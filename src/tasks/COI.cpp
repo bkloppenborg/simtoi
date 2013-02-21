@@ -119,7 +119,10 @@ void COI::GetResiduals(double * residuals, unsigned int size)
 		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
 		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+
+		// Blit to the storage buffer (for liboi to use the image)
 		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+		// Blit to the screen (to show the user, not required, but nice.
 		mWorkerThread->BlitToScreen(mFBO);
 
 		mLibOI->CopyImageToBuffer(0);

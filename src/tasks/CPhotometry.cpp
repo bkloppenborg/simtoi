@@ -32,6 +32,7 @@
 
 #include "CPhotometry.h"
 #include "textio.hpp"
+#include "CModelList.h"
 
 extern string EXE_FOLDER;
 
@@ -64,6 +65,10 @@ void CPhotometry::Export(string folder_name)
 
 }
 
+CTaskPtr CPhotometry::Create(CWorkerThread * WorkerThread)
+{
+	return CTaskPtr(new CPhotometry(WorkerThread));
+}
 
 string CPhotometry::GetDataDescription()
 {
@@ -91,43 +96,72 @@ unsigned int CPhotometry::GetNData()
 void CPhotometry::GetResiduals(double * residuals, unsigned int size)
 {
 	InitBuffers();
-//
-//	unsigned int n_data_offset = 0;
-//	unsigned int n_data_alloc = 0;
-//
-//	CModelListPtr model_list = mWorkerThread->GetModelList();
-//
-//	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
-//	unsigned int n_data_sets = mLibOI->GetNDataSets();
-//	for(int data_set = 0; data_set < n_data_sets; data_set++)
-//	{
-//		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
-//		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
-//		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
-//		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
-//		mWorkerThread->BlitToScreen(mFBO);
-//
-//		mLibOI->CopyImageToBuffer(0);
-//
-//		// Notice, the ImageToChi expects a floating point array, not a valarray<float>.
-//		// C++11 guarantees that storage is contiguous so we can do pointer math
-//		// within the valarray storage without issues.
-//		mLibOI->ImageToChi(data_set, mTempFloat + n_data_offset, n_data_alloc);
-//
-//		// Advance the pointer
-//		n_data_offset += n_data_alloc;
-//	}
-//
-//	// Copy the floats from liboi into doubles for SIMTOI.
-//	for(unsigned int i = 0; i < size; i++)
-//	{
-//		residuals[i] = double(mTempFloat[i]);
-//	}
+
+	double sim_flux, sim_mag;
+	double sim_mag_t0, data_mag_t0;
+	unsigned int index = 0;
+	CModelListPtr model_list = mWorkerThread->GetModelList();
+
+	// Iterate through the data, copying the mag_err into the uncertainties buffer
+	for(auto data_file: mData)
+	{
+		for(auto data_point: data_file->data)
+		{
+			// Set the time, render the model
+			model_list->SetTime(data_point->jd);
+			model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+
+			// Blit to the storage buffer (for liboi to use the image)
+			mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+			// Blit to the screen (to show the user, not required, but nice.
+			mWorkerThread->BlitToScreen(mFBO);
+
+			// Compute the flux:
+			mLibOI->CopyImageToBuffer(0);
+
+			// Get the simulated flux, convert it to a simulated magnitude using
+			// -2.5 * log(counts)
+			sim_flux = mLibOI->TotalFlux(true);
+			sim_mag = -2.5 * log(sim_flux);
+
+			// Cache the t = 0 magnitude.
+			if(index == 0)
+			{
+				sim_mag_t0 = sim_mag;
+				data_mag_t0 = data_point->mag;
+			}
+
+			// store the residual calculation
+			residuals[index] = (sim_mag - data_point->mag) - (sim_mag_t0 - data_mag_t0);
+
+			// increment the index
+			index += 1;
+		}
+	}
+
 }
 
-void CPhotometry::GetUncertainties(double * residuals, unsigned int size)
+void CPhotometry::GetUncertainties(double * uncertainties, unsigned int size)
 {
+	InitBuffers();
 
+	unsigned int index = 0;
+
+	// Iterate through the data, copying the mag_err into the uncertainties buffer
+	for(auto data_file: mData)
+	{
+		for(auto data_point: data_file->data)
+		{
+			// be sure not to go out of bounds
+			if(index < size)
+				uncertainties[index] = data_point->mag_err;
+			else
+				break;
+
+			// increment the index
+			index += 1;
+		}
+	}
 }
 
 
@@ -176,7 +210,6 @@ void CPhotometry::OpenData(string filename)
 	//	# comment lines prefixed by #, /, ;, or !
 	//	JD mag sig_mag
 
-	double jd, mag, sig_mag;
 	string line;
 
 	// Create a new data file for storing input data.
@@ -188,7 +221,13 @@ void CPhotometry::OpenData(string filename)
 	{
 		line = lines[i];
 		line = StripWhitespace(line);
-		vector<string> t_line = Tokenize(line);
+		vector<string> t_line = SplitString(line, ',');
+
+		if(t_line.size() < 3)
+		{
+			cout << "WARNING: Could not parse '" + line + "' from photometric data file " + filename << endl;
+			continue;
+		}
 
 		// Attempt to cast variables
 		try
@@ -196,7 +235,7 @@ void CPhotometry::OpenData(string filename)
 			CPhotometricDataPointPtr t_data = CPhotometricDataPointPtr(new CPhotometricDataPoint());
 			t_data->jd = atof(t_line[0].c_str());
 			t_data->mag = atof(t_line[1].c_str());
-			t_data->sig_mag = atof(t_line[2].c_str());
+			t_data->mag_err = atof(t_line[2].c_str());
 
 			data_file->data.push_back(t_data);
 		}
