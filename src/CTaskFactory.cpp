@@ -35,10 +35,12 @@
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
 #include "tasks/COI.h"
+#include "tasks/CPhotometry.h"
 
 CTaskFactory::CTaskFactory()
 {
 	Register("oi", COI::Create);
+	Register("photometry", CPhotometry::Create);
 }
 
 CTaskFactory::~CTaskFactory() \
