@@ -49,8 +49,6 @@ CBootstrap_Levmar::CBootstrap_Levmar()
 	mMinimizerID = "bootstrap";
 	mMinimizerName = "Bootstrap";
 
-	mResiduals = NULL;
-
 	mBootstrapFailures = 0;
 	mMaxBootstrapFailures = 20;
 }

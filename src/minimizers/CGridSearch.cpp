@@ -80,20 +80,15 @@ void CGridSearch::ExportResults(double * params, int n_params, bool no_setparams
 
 int CGridSearch::run()
 {
-	// TODO: This minimizer only works on two-dimentional data.
+	// TODO: This minimizer only works on two-dimensional data.
 	if(mNParams > 2)
 		return 0;
 
 	// Init local storage
 	double chi2r = 0;
 
-	// Allocate storage for the residuals and uncertainties
-	unsigned int n_data = mWorkerThread->GetDataSize();
-	valarray<double> residuals(n_data);
-	valarray<double> uncertainties(n_data);
-
 	// Look up the uncertainties, cache them here.
-    mWorkerThread->GetUncertainties(&uncertainties[0], uncertainties.size());
+    mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
 
     // Get ahold of the model list
     CModelListPtr model_list = mWorkerThread->GetModelList();
@@ -121,8 +116,8 @@ int CGridSearch::run()
 
 			// Set the parameters (note, they are not scaled to unit magnitude), get the residuals, compute the chi2r
 			model_list->SetFreeParameters(mParams, mNParams, false);
-			mWorkerThread->GetResiduals(&residuals[0], residuals.size());
-			chi2r = ComputeChi2r(residuals, uncertainties, mNParams);
+			mWorkerThread->GetResiduals(&mResiduals[0], mResiduals.size());
+			chi2r = ComputeChi2r(mResiduals, mUncertainties, mNParams);
 
 			// Enable to see output on the console.
 			//cout << mParams[0] << " " << mParams[1]<< " " << chi2r << endl;

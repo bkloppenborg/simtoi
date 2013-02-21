@@ -86,11 +86,15 @@ public:
 	string mMinimizerName;	///< Human-friendly name for the minimizer.
 	string mMinimizerID;	///< Unique ID for the minimizer.
 
+	valarray<double> mResiduals;			///< Buffer for storing residuals
+	valarray<double> mUncertainties;		///< Buffer for storing uncertainties.
+
 	CMinimizer();
 	virtual ~CMinimizer();
 
-	virtual void ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results);
-	virtual double ComputeChi2r(valarray<double> & residuals, const valarray<double> & uncertainties, unsigned int n_params);
+	static void ComputeChi(double * residuals, double * uncertainties, double * results, unsigned int size);
+	static void ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results);
+	static double ComputeChi2r(valarray<double> & residuals, const valarray<double> & uncertainties, unsigned int n_params);
 
 	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
 

@@ -81,20 +81,15 @@ int CBenchmark::run()
 	double chi2r = 0;
 	double time = 0;
 
-	// Allocate storage for the residuals and uncertainties
-	unsigned int n_data = mWorkerThread->GetDataSize();
-	valarray<double> residuals(n_data);
-	valarray<double> uncertainties(n_data);
-
 	// Look up the uncertainties, cache them here.
-    mWorkerThread->GetUncertainties(&uncertainties[0], uncertainties.size());
+    mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
 
 	int start = GetMilliCount();
 
 	for(int i = 0; i < n_iterations && mRun; i++)
 	{
-		mWorkerThread->GetResiduals(&residuals[0], residuals.size());
-		chi2r = ComputeChi2r(residuals, uncertainties, mNParams);
+		mWorkerThread->GetResiduals(&mResiduals[0], mResiduals.size());
+		chi2r = ComputeChi2r(mResiduals, mUncertainties, mNParams);
 
 		if(i % 100 == 0)
 			printf("Iteration %i Chi2r: %f\n", i, chi2r);

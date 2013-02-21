@@ -35,18 +35,18 @@
 
 #include "levmar.h"
 #include "CWorkerThread.h"
+#include "CModelList.h"
 
 
 CLevmar::CLevmar()
 {
 	mMinimizerID = "levmar";
 	mMinimizerName = "Levmar";
-	mResiduals = NULL;
 }
 
 CLevmar::~CLevmar()
 {
-	if(mResiduals) delete[] mResiduals;
+
 }
 
 CMinimizerPtr CLevmar::Create()
@@ -56,51 +56,23 @@ CMinimizerPtr CLevmar::Create()
 
 void CLevmar::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
 {
-//	// Get the "this" pointer
-//	CLevmar * minimizer = reinterpret_cast<CLevmar*>(misc);
-//	int n_data_sets = minimizer->mWorkerThread->GetNDataSets();
-//	int n_data_alloc = 0;
-//	int n_data_offset = 0;
-//
-//	// See if we have been requested to exit.  If so, give levmar an invalid result
-//	if(!minimizer->mRun)
-//	{
-//		output[0] = 1.0/0;	// Intentional, generate NAN to cause levmar to terminate.
-//		return;
-//	}
-//
-//	// Set the parameters (note, they are already scaled)
-//	minimizer->mWorkerThread->SetFreeParameters(params, nParams, false);
-//
-//	// Now iterate through the data and pull out the residuals, notice we do pointer math on mResiduals
-//	for(int data_set = 0; data_set < n_data_sets; data_set++)
-//	{
-//		n_data_alloc = minimizer->mWorkerThread->GetNDataAllocated(data_set);
-//		minimizer->mWorkerThread->SetTime(minimizer->mWorkerThread->GetDataAveJD(data_set));
-//		minimizer->mWorkerThread->EnqueueOperation(GLT_RenderModels);
-//		minimizer->mWorkerThread->GetChi(data_set, minimizer->mResiduals + n_data_offset, n_data_alloc);
-//		n_data_offset += n_data_alloc;
-//	}
-//
-//	// Copy the errors back into the double array:
-////	printf("Residuals:\n");
-//	for(int i = 0; i < nOutput; i++)
-//	{
-//		output[i] = double(minimizer->mResiduals[i]);
-////		cout << i << " " << output[i] << endl;
-//	}
-}
+	// Get the "this" pointer
+	CLevmar * minimizer = reinterpret_cast<CLevmar*>(misc);
 
-void CLevmar::Init(shared_ptr<CWorkerThread> worker_thread)
-{
-	CMinimizer::Init(worker_thread);
-//	int nData = mWorkerThread->GetNDataAllocated();
-//
-//	mResiduals = new float[nData];
-//	for(int i = 0; i < nData; i++)
-//	{
-//		mResiduals[i] = 0;
-//	}
+	// See if we have been requested to exit.  If so, give levmar an invalid result
+	if(!minimizer->mRun)
+	{
+		output[0] = 1.0/0;	// Intentional, generate NAN to cause levmar to terminate.
+		return;
+	}
+
+	// Set the parameters (note, they are not scaled to unit magnitude)
+	CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
+	model_list->SetFreeParameters(params, nParams, false);
+
+	// Now get the residuals and compute the chi values. Store these in the output double.
+	minimizer->mWorkerThread->GetResiduals(&minimizer->mResiduals[0], minimizer->mResiduals.size());
+	ComputeChi(&minimizer->mResiduals[0], &minimizer->mUncertainties[0], output, nOutput);
 }
 
 string CLevmar::GetExitString(int exit_num)
@@ -144,10 +116,10 @@ string CLevmar::GetExitString(int exit_num)
 /// Prints out cmpfit results (from testmpfit.c)
 void CLevmar::printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar)
 {
-//	if ((x == 0) || (n_pars == 0))
-//		return;
-//
-//	// Print out some statistics:
+	if ((x == NULL) || (n_pars == 0))
+		return;
+
+	// Print out some statistics:
 //	printf("Chi2r for each data set:\n");
 //	int nData = 0;
 //	double chi2r_total = 0;
@@ -164,36 +136,36 @@ void CLevmar::printresult(double * x, int n_pars, int n_data, vector<string> nam
 //		printf("  Data Set %i chi2r: %f\n", data_set, chi2r);
 //	}
 //	printf("All data, average chi2r: %f\n", chi2r_total/nDataSets);
-//
-//	double value = 0;
-//	double err = 0;
-//	double scale;
-//	string name = "";
-//
-//	printf("Reason for exiting:\n %s\n", GetExitString(int(info[6])).c_str());
-//
-//	printf("Best-fit parameters:\n");
-//	for(int i=0; i < n_pars; i++)
+
+	double value = 0;
+	double err = 0;
+	double scale;
+	string name = "";
+
+	printf("Reason for exiting:\n %s\n", GetExitString(int(info[6])).c_str());
+
+	printf("Best-fit parameters:\n");
+	for(int i=0; i < n_pars; i++)
+	{
+		err = sqrt(covar[n_pars * i + i]);
+		printf("  P[%d] = %f +/- %f (%s)\n", i, x[i], err, names[i].c_str());
+	}
+
+	printf("Covariance Matrix:\n");
+	for(int i = 0; i < n_pars; i++)
+	{
+		for(int j = 0; j < n_pars; j++)
+			printf("%1.5e ", covar[n_pars * i + j]);
+
+		printf("\n");
+	}
+
+//	if(int(info[6]) == 7 && mRun)
 //	{
-//		err = sqrt(covar[n_pars * i + i]);
-//		printf("  P[%d] = %f +/- %f (%s)\n", i, x[i], err, names[i].c_str());
+//		printf("Dumping Residuals Buffer:\n");
+//		for(int i = 0; i < n_data; i++)
+//			printf(" %i %f\n", i, mResiduals[i]);
 //	}
-//
-//	printf("Covariance Matrix:\n");
-//	for(int i = 0; i < n_pars; i++)
-//	{
-//		for(int j = 0; j < n_pars; j++)
-//			printf("%1.5e ", covar[n_pars * i + j]);
-//
-//		printf("\n");
-//	}
-//
-////	if(int(info[6]) == 7 && mRun)
-////	{
-////		printf("Dumping Residuals Buffer:\n");
-////		for(int i = 0; i < n_data; i++)
-////			printf(" %i %f\n", i, mResiduals[i]);
-////	}
 
 }
 
@@ -205,63 +177,63 @@ int CLevmar::run()
 
 int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *adata))
 {
-//	// Ensure memory is initialized.
-//	if(mResiduals == NULL)
-//		return -1;
-//
-//	// Create a member function pointer
-//	int iterations = 0;
-//	int max_iterations = 50;
-//	int nData = mWorkerThread->GetNDataAllocated();
-//	valarray<double> x(nData);
-//	valarray<double> lb(mNParams);
-//	valarray<double> ub(mNParams);
-//	valarray<double> info(LM_INFO_SZ);
-//	valarray<double> opts(LM_INFO_SZ);
-//	valarray<double> covar(mNParams * mNParams);
-//
-//	// Setup the options (LM_* from levmar.h):
-//	// info[1-4]=[ ||e||_2, ||J^T e||_inf,  ||Dp||_2, mu/max[J^T J]_ii ], all computed at estimated p.
-//	// \tau: scale factor for initial \mu
-//	//  opts[0] = |e||_2 				= LM_INIT_MU = 1E-03
-//	// \epsilon1: stopping thresholds for ||J^T e||_inf
-//	//  opts[1] = ||J^T e||_inf 		= LM_STOP_THRESH = 1E-15;
-//	// \epsilon2: stopping thresholds for ||Dp||_2
-//	//  opts[2] = ||Dp||_2 				= LM_STOP_THRESH = 1E-15;
-//	// \epsilon3: stopping thresholds for ||e||_2
-//	//  opts[3] = mu/max[J^T J]_ii ] 	= LM_STOP_THRESH * LM_STOP_THRESH = 1E-17 * 1E-17;
-//	// \delta, step used in difference approximation to the Jacobian.  \delta < 0 => central difference instead of forward difference used
-//	//  opts[4]= LM_DIFF_DELTA;
-//	opts[0]= 1;
-//	opts[1]= 1E-4;
-//	opts[2]= 1E-4;
-//	opts[3]= 1E-12;
-//	opts[4]= LM_DIFF_DELTA;
-//
-//	// Copy out the initial values for the parameters:
-//	mWorkerThread->GetFreeParameters(mParams, mNParams, true);
-//	vector<string> names = mWorkerThread->GetFreeParamNames();
-//	vector< pair<double, double> > min_max = mWorkerThread->GetFreeParamMinMaxes();
-//
-//	// Init parameter500 values
-//	for(int i = 0; i < mNParams; i++)
-//	{
-//		lb[i] = min_max[i].first;
-//		ub[i] = min_max[i].second;
-//	}
-//
-//	printf("Starting levmar...\n");
-//
-//	mIsRunning = true;
-//
-//	// Call levmar.  Note, the results are saved in mParams upon completion.
-//	iterations = dlevmar_bc_dif(error_func, mParams, &x[0], mNParams, nData, &lb[0], &ub[0], NULL, max_iterations, &opts[0], &info[0], NULL, &covar[0], (void*)this);
-//
-//	mIsRunning = false;
-//
-//	printf("Levmar executed %i iterations.\n", iterations);
-//	printresult(mParams, mNParams, nData, names, info, covar);
-//	ExportResults(mParams, mNParams);
-//
-//	return iterations;
+	// Copy the uncertainties
+    mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
+
+	// Create a member function pointer
+	int iterations = 0;
+	int max_iterations = 50;
+	unsigned int n_data = mWorkerThread->GetDataSize();
+	valarray<double> x(n_data);
+	valarray<double> lb(mNParams);
+	valarray<double> ub(mNParams);
+	valarray<double> info(LM_INFO_SZ);
+	valarray<double> opts(LM_INFO_SZ);
+	valarray<double> covar(mNParams * mNParams);
+
+	// Setup the options (LM_* from levmar.h):
+	// info[1-4]=[ ||e||_2, ||J^T e||_inf,  ||Dp||_2, mu/max[J^T J]_ii ], all computed at estimated p.
+	// \tau: scale factor for initial \mu
+	//  opts[0] = |e||_2 				= LM_INIT_MU = 1E-03
+	// \epsilon1: stopping thresholds for ||J^T e||_inf
+	//  opts[1] = ||J^T e||_inf 		= LM_STOP_THRESH = 1E-15;
+	// \epsilon2: stopping thresholds for ||Dp||_2
+	//  opts[2] = ||Dp||_2 				= LM_STOP_THRESH = 1E-15;
+	// \epsilon3: stopping thresholds for ||e||_2
+	//  opts[3] = mu/max[J^T J]_ii ] 	= LM_STOP_THRESH * LM_STOP_THRESH = 1E-17 * 1E-17;
+	// \delta, step used in difference approximation to the Jacobian.  \delta < 0 => central difference instead of forward difference used
+	//  opts[4]= LM_DIFF_DELTA;
+	opts[0]= 1;
+	opts[1]= 1E-4;
+	opts[2]= 1E-4;
+	opts[3]= 1E-12;
+	opts[4]= LM_DIFF_DELTA;
+
+	// Copy out the initial values for the parameters:
+	CModelListPtr model_list = mWorkerThread->GetModelList();
+	model_list->GetFreeParameters(mParams, mNParams, true);
+	vector<string> names = model_list->GetFreeParamNames();
+	vector< pair<double, double> > min_max = model_list->GetFreeParamMinMaxes();
+
+	// Init parameter values
+	for(int i = 0; i < mNParams; i++)
+	{
+		lb[i] = min_max[i].first;
+		ub[i] = min_max[i].second;
+	}
+
+	printf("Starting levmar...\n");
+
+	mIsRunning = true;
+
+	// Call levmar.  Note, the results are saved in mParams upon completion.
+	iterations = dlevmar_bc_dif(error_func, mParams, &x[0], mNParams, n_data, &lb[0], &ub[0], NULL, max_iterations, &opts[0], &info[0], NULL, &covar[0], (void*)this);
+
+	mIsRunning = false;
+
+	printf("Levmar executed %i iterations.\n", iterations);
+	printresult(mParams, mNParams, n_data, names, info, covar);
+	ExportResults(mParams, mNParams);
+
+	return iterations;
 }

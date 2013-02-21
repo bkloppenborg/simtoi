@@ -56,6 +56,14 @@ CMinimizer::~CMinimizer()
 	delete[] mParams;
 }
 
+void CMinimizer::ComputeChi(double * residuals, double * uncertainties, double * results, unsigned int size)
+{
+	for(unsigned int i = 0; i < size; i++)
+	{
+		results[i] = residuals[i] / uncertainties[i];
+	}
+}
+
 void CMinimizer::ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results)
 {
 	// Valarray operations happen
@@ -140,6 +148,11 @@ void CMinimizer::Init(shared_ptr<CWorkerThread> worker_thread)
 	mNParams = model_list->GetNFreeParameters();
 	mParams = new double[mNParams];
 	mRun = true;
+
+	// Allocate storage for the residuals and uncertainties
+	unsigned int n_data = mWorkerThread->GetDataSize();
+	mResiduals = valarray<double>(n_data);
+	mUncertainties = valarray<double>(n_data);
 }
 
 /// \brief Changes the default filename which the minimizer uses for savefiles.
