@@ -21,6 +21,7 @@ CTaskList::CTaskList(CWorkerThread * WorkerThread)
 	CTaskFactory factory = CTaskFactory::Instance();
 
 	mTasks.push_back(factory.CreateWorker("oi", WorkerThread));
+	mTasks.push_back(factory.CreateWorker("photometry", WorkerThread));
 }
 
 CTaskList::~CTaskList()
@@ -84,12 +85,14 @@ void CTaskList::GetResiduals(double * residuals, unsigned int size)
 {
 	unsigned int n_data;
 	unsigned int offset = 0;
+	unsigned int buffer_size = 0;
 	for(auto task: mTasks)
 	{
 		n_data = task->GetNData();
 
-		// Get the residuals. Don't forget to re-calculate the size of the array:
-		task->GetResiduals(residuals + offset, size - offset);
+		// Calculate how many slots the task can fill in the buffer.
+		buffer_size = min(n_data, size - offset);
+		task->GetResiduals(residuals + offset, buffer_size);
 
 		offset += n_data;
 	}
@@ -99,12 +102,14 @@ void CTaskList::GetUncertainties(double * uncertainties, unsigned int size)
 {
 	unsigned int n_data;
 	unsigned int offset = 0;
+	unsigned int buffer_size = 0;
 	for(auto task: mTasks)
 	{
 		n_data = task->GetNData();
 
-		// Get the residuals. Don't forget to re-calculate the size of the array:
-		task->GetUncertainties(uncertainties + offset, size - offset);
+		// Calculate how many slots the task can fill in the buffer.
+		buffer_size = min(n_data, size - offset);
+		task->GetUncertainties(uncertainties + offset, buffer_size);
 
 		offset += n_data;
 	}
