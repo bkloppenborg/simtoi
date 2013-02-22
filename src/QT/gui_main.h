@@ -85,7 +85,7 @@ protected:
 private slots:
     void Animation_StartStop();
     void Animation_Reset();
-    void AutoClose(QWidget * widget);
+    void AutoClose();
     void ExportPhotometry();
     void ExportFITS();
     void render();

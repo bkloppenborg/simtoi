@@ -158,12 +158,20 @@ string CGLWidget::GetMinimizerID()
 
 bool CGLWidget::GetMinimizerRunning()
 {
-	return mMinimizerThread.joinable();
+	if(!mMinimizer)
+		return false;
+
+	return mMinimizer->isRunning();
 }
 
 void CGLWidget::on_mTreeModel_parameterUpdated()
 {
 	mWorker->Render();
+}
+
+void CGLWidget::on_minimizer_finished(void)
+{
+	emit minimizerFinished();
 }
 
 void CGLWidget::Open(string filename)
@@ -307,11 +315,8 @@ void CGLWidget::startMinimizer()
 	if(!mMinimizer)
 		return;
 
-	// Initialize OpenCL
-//	mGLT->EnqueueOperation(CLT_Init);
-
-	// Start the minimization thread
-	mMinimizerThread = std::thread(&CMinimizerThread::start, mMinimizer);
+	mMinimizer->start();
+	connect(mMinimizer.get(), SIGNAL(finished()), this, SLOT(on_minimizer_finished(void)));
 }
 
 void CGLWidget::stopMinimizer()
@@ -321,7 +326,5 @@ void CGLWidget::stopMinimizer()
 
 	// Stop the thread. If it was running, join it.
 	mMinimizer->stop();
-	if(mMinimizerThread.joinable())
-		mMinimizerThread.join();
 }
 

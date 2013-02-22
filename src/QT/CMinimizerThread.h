@@ -43,7 +43,6 @@
 #include <utility>
 #include <vector>
 #include <memory>
-#include <thread>
 #include <valarray>
 
 using namespace std;
@@ -72,11 +71,10 @@ typedef shared_ptr<CMinimizerThread> CMinimizerPtr;
 /// the base-class routine.
 class CMinimizerThread : public QThread
 {
-	Q_OBJECT;
+	Q_OBJECT
 
 protected:
 	bool mIsRunning;		///< Indicates if the thread is running
-	std::thread mThread;	///< Thread object.
 
 public:
 	shared_ptr<CWorkerThread> mWorkerThread; ///< Pointer to the worker thread.
@@ -112,7 +110,6 @@ public:
 	virtual void run() = 0;
 
 	void SetSaveFileBasename(string filename);
-	static void start(CMinimizerPtr minimizer);
 	virtual void stop();
 
 	template <class T>

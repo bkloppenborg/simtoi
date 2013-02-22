@@ -169,12 +169,6 @@ void CMinimizerThread::SetSaveFileBasename(string filename)
 		mSaveFileBasename = filename;
 }
 
-/// \brief Starts the minimizer.
-void CMinimizerThread::start(CMinimizerPtr minimizer)
-{
-	minimizer->run();
-}
-
 /// \brief Stops the minimizer.
 void CMinimizerThread::stop()
 {

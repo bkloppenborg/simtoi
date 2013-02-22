@@ -53,7 +53,6 @@ protected:
 
     // Minimizer
     CMinimizerPtr mMinimizer;
-    std::thread mMinimizerThread;
     QStandardItemModel mOpenFileModel;
     CTreeModel mTreeModel;
     static QGLFormat mFormat;
@@ -107,6 +106,12 @@ public:
 private slots:
 
 	void on_mTreeModel_parameterUpdated();
+
+	void on_minimizer_finished();
+
+signals:
+	void minimizerFinished();
+
 };
 
 #endif

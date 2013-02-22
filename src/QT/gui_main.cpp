@@ -99,13 +99,13 @@ void gui_main::AddData(QStringList & filenames, QMdiSubWindow * sw)
 	ButtonCheck();
 }
 
-QMdiSubWindow * gui_main::AddGLArea(CGLWidget * widget)
+QMdiSubWindow * gui_main::AddGLArea(CGLWidget * gl_widget)
 {
 	// Set the widget's parent to be the MDI area:
-	widget->setParent(this->mdiArea);
+	gl_widget->setParent(this->mdiArea);
 
 	// Create a subwindow in which the widget can live:
-    QMdiSubWindow * sw = this->mdiArea->addSubWindow(widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
+    QMdiSubWindow * sw = this->mdiArea->addSubWindow(gl_widget, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint);
     sw->setWindowTitle("Model Area");
 
     // Set the subwindow's size
@@ -113,15 +113,16 @@ QMdiSubWindow * gui_main::AddGLArea(CGLWidget * widget)
     int frame_width = 8;
     int frame_height = 28;
 
-    sw->setFixedSize(widget->GetImageWidth() + frame_width, widget->GetImageHeight() + frame_height);
+    sw->setFixedSize(gl_widget->GetImageWidth() + frame_width, gl_widget->GetImageHeight() + frame_height);
     sw->show();
 
     // Start the widget rendering:
-	widget->startRendering();
+    gl_widget->startRendering();
 
     // Connect signals/slots
 	// Now connect signals and slots
-	connect(widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
+	connect(gl_widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
+	connect(gl_widget, SIGNAL(minimizerFinished(void)), this, SLOT(AutoClose()));
 
 	// If the load data button isn't enabled, turn it on
 	ButtonCheck();
@@ -164,6 +165,22 @@ void gui_main::Animation_Reset()
 //	widget->EnqueueOperation(GLT_RenderModels);
 
 }
+
+void gui_main::AutoClose()
+{
+	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow*>(sender());
+
+	if(mAutoClose)
+	{
+		// Close the calling subwindow
+		sw->close();
+
+		// If there are more open subwindows and auto-close is set, close SIMTOI
+		if(this->mdiArea->subWindowList().size() == 0)
+			close();
+	}
+}
+
 /// Checks to see which buttons can be enabled/disabled.
 void gui_main::ButtonCheck()
 {
@@ -225,29 +242,6 @@ void gui_main::ButtonCheck()
 
 }
 
-void gui_main::AutoClose(QWidget * widget)
-{
-	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow *>(widget);
-	sw->close();
-
-	// If there are more open subwindows and auto-close is set, close the program.
-	if(mAutoClose && this->mdiArea->subWindowList().size() == 0)
-		close();
-}
-
-void gui_main::AutoClose(bool auto_close, QMdiSubWindow * sw)
-{
-	// logically OR the two values:
-	mAutoClose = auto_close || mAutoClose;
-
-	if(!mAutoClose)
-		return;
-
-	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
-
-	connect(widget, SIGNAL(MinimizationFinished(QWidget *)), this, SLOT(AutoClose(QWidget *)));
-}
-
 void gui_main::close()
 {
 	CGLWidget * widget = NULL;
@@ -287,7 +281,7 @@ void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, 
     // Now open data, run the minimizer and close (if needed)
 	AddData(data_files, sw);
 	MinimizerRun(minimizer, sw);
-	AutoClose(close_simtoi, sw);
+	mAutoClose = close_simtoi;
 }
 
 /// Exports the current rendered model to a floating point FITS file
