@@ -126,6 +126,9 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 /// Runs MultiNest.
 void CMultiNest::run()
 {
+	// Get a copy of the uncertainties from the data
+	mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
+
 	// Init MultiNest:
 	string tmp_output = "/tmp"; //mWorkerThread->GetTempOutputDir();
 
