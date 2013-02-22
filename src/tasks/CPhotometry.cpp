@@ -33,6 +33,7 @@
 #include "CPhotometry.h"
 #include "textio.hpp"
 #include "CModelList.h"
+#include "minimizers/CBenchmark.h"
 
 extern string EXE_FOLDER;
 
@@ -62,7 +63,56 @@ CPhotometry::~CPhotometry()
 
 void CPhotometry::Export(string folder_name)
 {
+	ofstream outfile;
 
+	bool first_point = true;
+	double sim_flux = 1;
+	double sim_mag = 0;
+	double t0_delta_mag = 0;
+	CModelListPtr model_list = mWorkerThread->GetModelList();
+
+	// Iterate through the data, copying the mag_err into the uncertainties buffer
+	for(auto data_file: mData)
+	{
+		first_point = true;
+		outfile.open(folder_name + "test.phot");
+
+		outfile << "# Simulated photometry from SIMTOI" << endl;
+
+		for(auto data_point: data_file->data)
+		{
+			// Set the time, render the model
+			model_list->SetTime(data_point->jd);
+			model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+
+			// Blit to the storage buffer (for liboi to use the image)
+			mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+			// Blit to the screen (to show the user, not required, but nice.
+			mWorkerThread->BlitToScreen(mFBO);
+
+			// Compute the flux:
+			mLibOI->CopyImageToBuffer(0);
+
+			// Get the simulated flux, convert it to a simulated magnitude using
+			// -2.5 * log(counts)
+			sim_flux = mLibOI->TotalFlux(true);
+			sim_mag = -2.5 * log(sim_flux);
+
+			// Cache the t = 0 magnitude.
+			if(first_point)
+			{
+				t0_delta_mag = sim_mag - data_point->mag;
+				first_point = false;
+			}
+
+			// store the residual calculation
+			sim_mag -= (t0_delta_mag);
+
+			outfile << data_point->jd << "," << sim_mag << endl;
+		}
+
+		outfile.close();
+	}
 }
 
 CTaskPtr CPhotometry::Create(CWorkerThread * WorkerThread)
@@ -97,8 +147,12 @@ void CPhotometry::GetResiduals(double * residuals, unsigned int size)
 {
 	InitBuffers();
 
-	double sim_flux, sim_mag;
-	double sim_mag_t0, data_mag_t0;
+	// Enable if you want to see frames per second
+	//int total_start = CBenchmark::GetMilliCount();
+
+	double sim_flux = 1;
+	double sim_mag = 0;
+	double t0_delta_mag = 0;
 	unsigned int index = 0;
 	CModelListPtr model_list = mWorkerThread->GetModelList();
 
@@ -122,23 +176,25 @@ void CPhotometry::GetResiduals(double * residuals, unsigned int size)
 			// Get the simulated flux, convert it to a simulated magnitude using
 			// -2.5 * log(counts)
 			sim_flux = mLibOI->TotalFlux(true);
+
 			sim_mag = -2.5 * log(sim_flux);
 
 			// Cache the t = 0 magnitude.
 			if(index == 0)
-			{
-				sim_mag_t0 = sim_mag;
-				data_mag_t0 = data_point->mag;
-			}
+				t0_delta_mag = sim_mag - data_point->mag;
 
 			// store the residual calculation
-			residuals[index] = (sim_mag - data_point->mag) - (sim_mag_t0 - data_mag_t0);
+			residuals[index] = (sim_mag - data_point->mag) - (t0_delta_mag);
 
 			// increment the index
 			index += 1;
 		}
 	}
 
+	// Enable if you want to see frames per second
+//	int total_time = CBenchmark::GetMilliSpan(total_start);
+//	cout << "Photometric loop completed! It took: " << total_time << " ms." << endl;
+//	cout << " Framerate (fps): " << double(size * 1000) / double(total_time) << endl;
 }
 
 void CPhotometry::GetUncertainties(double * uncertainties, unsigned int size)
@@ -208,7 +264,7 @@ void CPhotometry::OpenData(string filename)
 	// CPhotometry::GetExtensions()
 	// The file must conform to the following format:
 	//	# comment lines prefixed by #, /, ;, or !
-	//	JD mag sig_mag
+	//	JD,mag,sig_mag,ANYTHING_ELSE
 
 	string line;
 
