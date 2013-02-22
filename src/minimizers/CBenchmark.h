@@ -33,7 +33,7 @@
 #ifndef CBENCHMARK_H_
 #define CBENCHMARK_H_
 
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 
 class CBenchmark: public CMinimizerThread
 {

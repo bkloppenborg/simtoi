@@ -1,5 +1,5 @@
 /*
- * \file CMinimizer.h
+ * \file mWorkerThread
  *
  *  Created on: Dec 8, 2011
  * \author bkloppenborg

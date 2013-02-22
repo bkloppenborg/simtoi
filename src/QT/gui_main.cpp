@@ -43,7 +43,7 @@
 
 #include "CGLWidget.h"
 #include "CPosition.h"
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 #include "CTreeModel.h"
 #include "gui_common.h"
 #include "gui_model.h"

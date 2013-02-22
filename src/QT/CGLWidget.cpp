@@ -34,7 +34,7 @@ using namespace std;
 
 #include "CTreeModel.h"
 
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 
 #include "CModel.h"
 #include "CModelList.h"

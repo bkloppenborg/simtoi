@@ -37,7 +37,7 @@
 
 using namespace std;
 
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 
 class CLevmar: public CMinimizerThread
 {

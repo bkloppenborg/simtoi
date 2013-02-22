@@ -37,7 +37,7 @@
 
 #include "liboi.hpp"
 #include "CModelList.h"
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 #include "CWorkerThread.h"
 #include "CTreeModel.h"
 

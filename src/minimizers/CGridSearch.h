@@ -35,7 +35,7 @@
 #ifndef CGRIDSEARCH_H_
 #define CGRIDSEARCH_H_
 
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 
 class CGridSearch: public CMinimizerThread {
 public:

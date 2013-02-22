@@ -30,7 +30,7 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 #include "CWorkerThread.h"
 #include "CModelList.h"
 
