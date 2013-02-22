@@ -85,13 +85,13 @@ protected:
 private slots:
     void Animation_StartStop();
     void Animation_Reset();
-    void AutoClose();
     void ExportPhotometry();
     void ExportFITS();
     void render();
     void SetSavePath();
     void SetTime();
 
+    void minimizerFinished();
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
     void on_btnAddData_clicked();
@@ -99,10 +99,10 @@ private slots:
     void on_btnEditModel_clicked();
     void on_btnRemoveData_clicked();
     void on_btnDeleteModel_clicked();
-    void on_btnMinimizerStart_clicked();
-    void on_btnMinimizerStop_clicked();
+    void on_btnMinimizerStartStop_clicked();
     void on_btnNewModelArea_clicked();
     void on_mdiArea_subWindowActivated();
+
 };
 
 #endif // CMAINGUI_H

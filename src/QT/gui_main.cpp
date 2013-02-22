@@ -122,7 +122,7 @@ QMdiSubWindow * gui_main::AddGLArea(CGLWidget * gl_widget)
     // Connect signals/slots
 	// Now connect signals and slots
 	connect(gl_widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
-	connect(gl_widget, SIGNAL(minimizerFinished(void)), this, SLOT(AutoClose()));
+	connect(gl_widget, SIGNAL(minimizerFinished(void)), this, SLOT(minimizerFinished(void)));
 
 	// If the load data button isn't enabled, turn it on
 	ButtonCheck();
@@ -137,7 +137,7 @@ void gui_main::Animation_StartStop()
     	return;
 
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-
+//
 //	if(mAnimating)
 //	{
 //		widget->EnqueueOperation(GLT_AnimateStop);
@@ -166,21 +166,6 @@ void gui_main::Animation_Reset()
 
 }
 
-void gui_main::AutoClose()
-{
-	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow*>(sender());
-
-	if(mAutoClose)
-	{
-		// Close the calling subwindow
-		sw->close();
-
-		// If there are more open subwindows and auto-close is set, close SIMTOI
-		if(this->mdiArea->subWindowList().size() == 0)
-			close();
-	}
-}
-
 /// Checks to see which buttons can be enabled/disabled.
 void gui_main::ButtonCheck()
 {
@@ -190,10 +175,9 @@ void gui_main::ButtonCheck()
 	this->btnEditModel->setEnabled(false);
 	this->btnDeleteModel->setEnabled(false);
 	this->btnRemoveData->setEnabled(false);
-	this->btnStartStop->setEnabled(false);
+	this->btnStartStop->setEnabled(true);
 	this->btnReset->setEnabled(false);
-	this->btnMinimizerStart->setEnabled(false);
-	this->btnMinimizerStop->setEnabled(false);
+	this->btnMinimizerStartStop->setEnabled(true);
 	this->btnSavePhotometry->setEnabled(false);
 	this->btnSaveFITS->setEnabled(false);
 	this->btnSetTime->setEnabled(false);
@@ -228,17 +212,12 @@ void gui_main::ButtonCheck()
 	int id = this->cboMinimizers->findText(QString::fromStdString(widget->GetMinimizerID()));
 	if(id > -1)
 		this->cboMinimizers->setCurrentIndex(id);
-	// Toggle minimizer start/stop buttons
+
+	// Toggle minimizer start/stop button
 	if(widget->GetMinimizerRunning())
-	{
-		this->btnMinimizerStop->setEnabled(true);
-		this->btnMinimizerStart->setEnabled(false);
-	}
+		this->btnMinimizerStartStop->setText("Stop");
 	else
-	{
-		this->btnMinimizerStop->setEnabled(false);
-		this->btnMinimizerStart->setEnabled(true);
-	}
+		this->btnMinimizerStartStop->setText("Start");
 
 }
 
@@ -444,7 +423,25 @@ void gui_main::Open(QStringList & filenames)
 	}
 }
 
+void gui_main::minimizerFinished()
+{
+	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow*>(sender());
 
+	// Update the buttons
+	ButtonCheck();
+
+	// Close the subwindow if automatic closing is enabled.
+	if(mAutoClose)
+	{
+		// Close the calling subwindow
+		sw->close();
+
+		// If there are more open subwindows and auto-close is set, close SIMTOI
+		if(this->mdiArea->subWindowList().size() == 0)
+			close();
+	}
+
+}
 
 void gui_main::on_actionOpen_triggered()
 {
@@ -539,10 +536,6 @@ void gui_main::on_btnAddModel_clicked(void)
     {
     	widget->AddModel(tmp.GetModel());
     }
-
-    // Now render the models and refresh the tree
-//    widget->EnqueueOperation(GLT_RenderModels);
-
 }
 
 /// Deletes the selected model from the model list
@@ -558,7 +551,7 @@ void gui_main::on_btnEditModel_clicked()
 }
 
 /// Starts the minimizer
-void gui_main::on_btnMinimizerStart_clicked()
+void gui_main::on_btnMinimizerStartStop_clicked()
 {
 	/// TODO: Handle thread-execution exceptions that might be thrown.
 
@@ -569,20 +562,15 @@ void gui_main::on_btnMinimizerStart_clicked()
 	// We have a valid subwindow, so cast it into a CGLWidget
 	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
 
-	// Look up the minimizer
-	string id = this->cboMinimizers->currentText().toStdString();
-	MinimizerRun(id, sw);
-}
+	// If the minimizer is running, stop it.
+	if(widget->GetMinimizerRunning())
+		widget->stopMinimizer();
+	else // start a new minimizer.
+	{
+		string id = this->cboMinimizers->currentText().toStdString();
+		MinimizerRun(id, sw);
+	}
 
-/// Stops the minimizer running on the currently selected subwindow
-void gui_main::on_btnMinimizerStop_clicked()
-{
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-	widget->stopMinimizer();
 	ButtonCheck();
 }
 
@@ -644,6 +632,7 @@ void gui_main::on_btnRemoveData_clicked()
     }
 }
 
+
 void gui_main::render()
 {
     QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
@@ -659,6 +648,8 @@ void gui_main::render()
 
 void gui_main::SetSavePath(void)
 {
+	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow*>(sender());
+
 
 }
 

@@ -54,9 +54,12 @@ protected:
 
 public:
     gui_model(QWidget *parent = 0);
+    gui_model(QWidget *parent, shared_ptr<CModel> model);
     virtual ~gui_model();
 
     shared_ptr<CModel> GetModel();
+
+    void SetupUI();
 };
 
 #endif // GUI_ADDMODEL_H

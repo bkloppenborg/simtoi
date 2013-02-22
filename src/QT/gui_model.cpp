@@ -33,19 +33,23 @@
 gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
 {
-	// setup the UI
-	ui.setupUi(this);
+	SetupUI();
 
-	auto models = CModelFactory::Instance();
-	auto positions = CPositionFactory::Instance();
-	auto shaders = CShaderFactory::Instance();
+}
 
-	gui_common::SetupComboOptions(ui.cboModels, models.GetModelList());
-	gui_common::SetupComboOptions(ui.cboPositions, positions.GetPositionList());
-	gui_common::SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
+gui_model::gui_model(QWidget *parent, shared_ptr<CModel> model)
+{
+	SetupUI();
 
-	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+	// Find the model, position, and shader IDs from the combo boxes:
+	int model_id = ui.cboModels->findText(QString::fromStdString(model->GetID()));
+	int position_id = ui.cboPositions->findText(QString::fromStdString(model->GetPosition()->GetID()));
+	int shader_id = ui.cboShaders->findText(QString::fromStdString(model->GetShader()->GetID()));
+
+	// Set the current selected text based upon the model IDs
+	ui.cboModels->setCurrentIndex(model_id);
+	ui.cboPositions->setCurrentIndex(position_id);
+	ui.cboShaders->setCurrentIndex(shader_id);
 }
 
 gui_model::~gui_model()
@@ -68,4 +72,21 @@ shared_ptr<CModel> gui_model::GetModel(void)
 	model->SetShader(shader_id);
 
 	return model;
+}
+
+void gui_model::SetupUI()
+{
+	// setup the UI
+	ui.setupUi(this);
+
+	auto models = CModelFactory::Instance();
+	auto positions = CPositionFactory::Instance();
+	auto shaders = CShaderFactory::Instance();
+
+	gui_common::SetupComboOptions(ui.cboModels, models.GetModelList());
+	gui_common::SetupComboOptions(ui.cboPositions, positions.GetPositionList());
+	gui_common::SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
+
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
