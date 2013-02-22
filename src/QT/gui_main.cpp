@@ -274,7 +274,7 @@ void gui_main::closeEvent(QCloseEvent *evt)
 
 /// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
 /// SIMTOI will automatically exit when all minimization engines have completed execution.
-void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, int size, double scale, bool close_simtoi)
+void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, bool close_simtoi)
 {
 	// First open the model area and configure the UI.
 	Open(model_files);

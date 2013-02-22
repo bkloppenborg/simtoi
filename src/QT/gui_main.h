@@ -70,7 +70,7 @@ protected:
     void close();
     void closeEvent(QCloseEvent *evt);
 public:
-    void CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, int size, double scale, bool close_simtoi);
+    void CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, bool close_simtoi);
 
 protected:
     void MinimizerRun(string MinimizerID, QMdiSubWindow * sw);
