@@ -33,7 +33,7 @@
 #ifndef CMULTINEST_H_
 #define CMULTINEST_H_
 
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 #include "multinest.h"
 
 class CMultiNest: public CMinimizerThread

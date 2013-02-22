@@ -67,7 +67,7 @@ double CMultiNest::ComputeLogZ(valarray<double> & residuals, const valarray<doub
 
 CMinimizerPtr CMultiNest::Create()
 {
-	return shared_ptr<CMinimizer>(new CMultiNest());
+	return shared_ptr<CMinimizerThread>(new CMultiNest());
 }
 
 /// Dumper (do nothing)
