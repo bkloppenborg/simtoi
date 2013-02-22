@@ -73,7 +73,7 @@ int CBenchmark::GetMilliSpan( int nTimeStart )
 /// Runs the benchmark minimizer
 /// This simply runs n_iterations iterations as fast as possible, timing the result
 /// and reporting it to the user.
-int CBenchmark::run()
+void CBenchmark::run()
 {
 	// setup locals
 	mIsRunning = true;
@@ -102,6 +102,5 @@ int CBenchmark::run()
 	cout << "Throughput: " << n_iterations/time << " iterations/second." << endl;
 
 	mIsRunning = false;
-	return 0;
 }
 

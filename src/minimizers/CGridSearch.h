@@ -37,7 +37,7 @@
 
 #include "CMinimizer.h"
 
-class CGridSearch: public CMinimizer {
+class CGridSearch: public CMinimizerThread {
 public:
 	CGridSearch();
 	virtual ~CGridSearch();
@@ -48,7 +48,7 @@ public:
 
 	virtual void ExportResults(double * params, int n_params, bool no_setparams);
 
-	int run();
+	void run();
 };
 
 #endif /* CMINIMIZER_GRIDSEARCH_H_ */

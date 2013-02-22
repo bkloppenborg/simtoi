@@ -39,8 +39,8 @@
 
 using namespace std;
 
-class CMinimizer;
-typedef shared_ptr<CMinimizer> CMinimizerPtr;
+class CMinimizerThread;
+typedef shared_ptr<CMinimizerThread> CMinimizerPtr;
 typedef CMinimizerPtr (*CreateMinimizerFn)(void);
 
 /// \brief A factory class for creating minimizer objects
@@ -62,7 +62,7 @@ public:
 	virtual ~CMinimizerFactory();
 
 public:
-	shared_ptr<CMinimizer> CreateMinimizer(string MinimizerID);
+	shared_ptr<CMinimizerThread> CreateMinimizer(string MinimizerID);
 
 	static CMinimizerFactory Instance();
 

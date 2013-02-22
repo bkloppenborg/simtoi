@@ -34,6 +34,8 @@
 #ifndef CMINIMIZER_H_
 #define CMINIMIZER_H_
 
+#include <QThread>
+
 #include <string>
 #include <cstdio>
 #include <fstream>
@@ -47,8 +49,8 @@
 using namespace std;
 
 class CWorkerThread;
-class CMinimizer;
-typedef shared_ptr<CMinimizer> CMinimizerPtr;
+class CMinimizerThread;
+typedef shared_ptr<CMinimizerThread> CMinimizerPtr;
 
 /// \brief A generic base class for minimization routines.
 ///
@@ -68,8 +70,10 @@ typedef shared_ptr<CMinimizer> CMinimizerPtr;
 /// Before a minimizer is started, SIMTOI will call `Init()` to setup several
 /// base-class datamembers. If you overwride this function, be sure to call
 /// the base-class routine.
-class CMinimizer
+class CMinimizerThread : public QThread
 {
+	Q_OBJECT;
+
 protected:
 	bool mIsRunning;		///< Indicates if the thread is running
 	std::thread mThread;	///< Thread object.
@@ -89,8 +93,8 @@ public:
 	valarray<double> mResiduals;			///< Buffer for storing residuals
 	valarray<double> mUncertainties;		///< Buffer for storing uncertainties.
 
-	CMinimizer();
-	virtual ~CMinimizer();
+	CMinimizerThread();
+	virtual ~CMinimizerThread();
 
 	static void ComputeChi(double * residuals, double * uncertainties, double * results, unsigned int size);
 	static void ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results);
@@ -105,7 +109,7 @@ public:
 	bool IsRunning();
 
 	// Pure virtual function, each minimizer must implement this.
-	virtual int run() = 0;
+	virtual void run() = 0;
 
 	void SetSaveFileBasename(string filename);
 	static void start(CMinimizerPtr minimizer);

@@ -36,7 +36,7 @@
 
 using namespace std;
 
-CMinimizer::CMinimizer()
+CMinimizerThread::CMinimizerThread()
 {
 	mParams = NULL;
 	mNParams = 0;
@@ -47,7 +47,7 @@ CMinimizer::CMinimizer()
 	mMinimizerID = "";
 }
 
-CMinimizer::~CMinimizer()
+CMinimizerThread::~CMinimizerThread()
 {
 	// Cleanly stop the thread
 	stop();
@@ -56,7 +56,7 @@ CMinimizer::~CMinimizer()
 	delete[] mParams;
 }
 
-void CMinimizer::ComputeChi(double * residuals, double * uncertainties, double * results, unsigned int size)
+void CMinimizerThread::ComputeChi(double * residuals, double * uncertainties, double * results, unsigned int size)
 {
 	for(unsigned int i = 0; i < size; i++)
 	{
@@ -64,13 +64,13 @@ void CMinimizer::ComputeChi(double * residuals, double * uncertainties, double *
 	}
 }
 
-void CMinimizer::ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results)
+void CMinimizerThread::ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results)
 {
 	// Valarray operations happen
 	results = residuals / uncertainties;
 }
 
-double CMinimizer::ComputeChi2r(valarray<double> & residuals, const valarray<double> & uncertainties, unsigned int n_params)
+double CMinimizerThread::ComputeChi2r(valarray<double> & residuals, const valarray<double> & uncertainties, unsigned int n_params)
 {
 	// Square the numerator, divide by the uncertainties
 	residuals *= residuals;
@@ -84,7 +84,7 @@ double CMinimizer::ComputeChi2r(valarray<double> & residuals, const valarray<dou
 
 /// \brief Saves the V2, and T3 data along with best-fit model simulated data
 /// for each epoch.
-void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
+void CMinimizerThread::ExportResults(double * params, int n_params, bool no_setparams)
 {
 //	stringstream filename;
 //	ofstream outfile;
@@ -117,7 +117,7 @@ void CMinimizer::ExportResults(double * params, int n_params, bool no_setparams)
 }
 
 /// \brief Returns the unique ID assigned to this minimizer.
-string CMinimizer::GetID()
+string CMinimizerThread::GetID()
 {
 	return mMinimizerID;
 }
@@ -130,7 +130,7 @@ string CMinimizer::GetID()
 ///
 /// \param results A pre-allocated buffer of size `n_params` to which results are written.
 /// \param n_params The size of the `results` buffer.
-void CMinimizer::GetResults(double * results, int n_params)
+void CMinimizerThread::GetResults(double * results, int n_params)
 {
 	// Copy the values
 	for(int i = 0; i < mNParams && i < n_params; i++)
@@ -140,7 +140,7 @@ void CMinimizer::GetResults(double * results, int n_params)
 /// \brief Initialization function.
 ///
 /// \param worker_thread A shared pointer to the worker thread
-void CMinimizer::Init(shared_ptr<CWorkerThread> worker_thread)
+void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 {
 	mWorkerThread = worker_thread;
 
@@ -162,7 +162,7 @@ void CMinimizer::Init(shared_ptr<CWorkerThread> worker_thread)
 /// and filename prefix which is used by the minimizers.
 ///
 /// \param filename An absolute path prefix for minimizer files.
-void CMinimizer::SetSaveFileBasename(string filename)
+void CMinimizerThread::SetSaveFileBasename(string filename)
 {
 	// Only permit non-empty save file names:
 	if(filename.size() > 0)
@@ -170,13 +170,13 @@ void CMinimizer::SetSaveFileBasename(string filename)
 }
 
 /// \brief Starts the minimizer.
-void CMinimizer::start(CMinimizerPtr minimizer)
+void CMinimizerThread::start(CMinimizerPtr minimizer)
 {
 	minimizer->run();
 }
 
 /// \brief Stops the minimizer.
-void CMinimizer::stop()
+void CMinimizerThread::stop()
 {
 	mRun = false;
 }

@@ -39,7 +39,7 @@ using namespace std;
 
 #include "CMinimizer.h"
 
-class CLevmar: public CMinimizer
+class CLevmar: public CMinimizerThread
 {
 
 public:
@@ -54,7 +54,7 @@ public:
 
 	void printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar);
 
-	virtual int run();
+	virtual void run();
 	int run(void (*error_func)(double *p, double *hx, int m, int n, void *adata));
 };
 

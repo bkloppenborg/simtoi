@@ -35,7 +35,7 @@
 
 #include "CMinimizer.h"
 
-class CBenchmark: public CMinimizer
+class CBenchmark: public CMinimizerThread
 {
 public:
 	CBenchmark();
@@ -46,7 +46,7 @@ public:
 	static int GetMilliCount();
 	static int GetMilliSpan(int nTimeStart);
 
-	int run();
+	void run();
 };
 
 #endif /* CBENCHMARK_H_ */

@@ -124,7 +124,7 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 
 
 /// Runs MultiNest.
-int CMultiNest::run()
+void CMultiNest::run()
 {
 	// Init MultiNest:
 	string tmp_output = "/tmp"; //mWorkerThread->GetTempOutputDir();
@@ -177,6 +177,4 @@ int CMultiNest::run()
     // TODO: For some reason the parameters are getting mangled when they come from MultiNest
     // resulting in a mangled image for data exporting.
     ExportResults(mParams, mNParams, true);
-
-    return 0;
 }

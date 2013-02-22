@@ -51,7 +51,7 @@ CLevmar::~CLevmar()
 
 CMinimizerPtr CLevmar::Create()
 {
-	return shared_ptr<CMinimizer>(new CLevmar());
+	return CMinimizerPtr(new CLevmar());
 }
 
 void CLevmar::ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc)
@@ -169,7 +169,7 @@ void CLevmar::printresult(double * x, int n_pars, int n_data, vector<string> nam
 
 }
 
-int CLevmar::run()
+void CLevmar::run()
 {
 	// Run the minimizer using this instance of CMinimizer_levmar
 	run(&CLevmar::ErrorFunc);

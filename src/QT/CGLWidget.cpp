@@ -311,7 +311,7 @@ void CGLWidget::startMinimizer()
 //	mGLT->EnqueueOperation(CLT_Init);
 
 	// Start the minimization thread
-	mMinimizerThread = std::thread(&CMinimizer::start, mMinimizer);
+	mMinimizerThread = std::thread(&CMinimizerThread::start, mMinimizer);
 }
 
 void CGLWidget::stopMinimizer()

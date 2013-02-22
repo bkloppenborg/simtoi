@@ -41,7 +41,6 @@ using namespace std;
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
 
 #include "minimizers/CBenchmark.h"
-#include "minimizers/CBootstrap_Levmar.h"
 #include "minimizers/CGridSearch.h"
 #include "minimizers/CLevmar.h"
 // Compiler directive to add support for MultiNest
@@ -70,7 +69,7 @@ CMinimizerFactory::~CMinimizerFactory() \
 /// \brief Create an instance of the specified model.
 ///
 /// Returns a shared_ptr<CModel> to the object if found, or throws a runtime exception.
-shared_ptr<CMinimizer> CMinimizerFactory::CreateMinimizer(string MinimizerID)
+shared_ptr<CMinimizerThread> CMinimizerFactory::CreateMinimizer(string MinimizerID)
 {
 	auto it = mFactory.find(MinimizerID);
 	if(it != mFactory.end())
@@ -78,7 +77,7 @@ shared_ptr<CMinimizer> CMinimizerFactory::CreateMinimizer(string MinimizerID)
 
 	throw runtime_error("The minimizer with ID '" + MinimizerID + "' not registered with CMinimizerFactory");
 
-	return shared_ptr<CMinimizer>();
+	return shared_ptr<CMinimizerThread>();
 }
 
 /// \brief Returns a vector of the minimizer ids that are loaded.

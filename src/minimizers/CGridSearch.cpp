@@ -53,7 +53,7 @@ CGridSearch::~CGridSearch() {
 
 CMinimizerPtr CGridSearch::Create()
 {
-	return shared_ptr<CMinimizer>(new CGridSearch());
+	return CMinimizerPtr(new CGridSearch());
 }
 
 void CGridSearch::ExportResults(double * params, int n_params, bool no_setparams)
@@ -78,11 +78,11 @@ void CGridSearch::ExportResults(double * params, int n_params, bool no_setparams
 }
 
 
-int CGridSearch::run()
+void CGridSearch::run()
 {
 	// TODO: This minimizer only works on two-dimensional data.
 	if(mNParams > 2)
-		return 0;
+		return;
 
 	// Init local storage
 	double chi2r = 0;
@@ -128,5 +128,4 @@ int CGridSearch::run()
 
 	// Export the results.  Note, mParams is set to the maximum value, not the minimum.
 	ExportResults(mParams, mNParams, true);
-	return 0;
 }

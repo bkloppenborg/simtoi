@@ -36,21 +36,21 @@
 #include "CMinimizer.h"
 #include "multinest.h"
 
-class CMultiNest: public CMinimizer
+class CMultiNest: public CMinimizerThread
 {
 
 public:
 	CMultiNest();
 	virtual ~CMultiNest();
 
-	static shared_ptr<CMinimizer> Create();
+	static shared_ptr<CMinimizerThread> Create();
 
 	static double ComputeLogZ(valarray<double> & residuals, const valarray<double> & uncertainties);
 
 	static void dumper(int & nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double **paramConstr, double &maxLogLike, double &logZ, double &logZerr, void * misc);
 
 	static void log_likelihood(double * Cube, int & ndim, int & npars, double & lnew, void * misc);
-	int run();
+	void run();
 
 };
 
