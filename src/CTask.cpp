@@ -35,10 +35,41 @@
 CTask::CTask(CWorkerThread * WorkerThread)
 {
 	mWorkerThread = WorkerThread;
-
 }
 
 CTask::~CTask() {
 	// TODO Auto-generated destructor stub
 }
 
+string CTask::GetDataDescription()
+{
+	return mDataDescription;
+}
+
+vector<string> CTask::GetExtensions()
+{
+	return mExtensions;
+}
+
+/// \brief Strips the absolute path from the filename
+string CTask::StripPath(string filename)
+{
+	// strip off all characters before and including the last instance of a slash.
+	return filename.substr(filename.find_last_of("\\/") + 1, filename.size());
+}
+
+/// \brief Strips the extension from a file.
+string CTask::StripExtension(string filename, vector<string> & valid_extensions)
+{
+	size_t lastindex = std::string::npos;
+
+	for(auto extension : valid_extensions)
+	{
+		lastindex = filename.rfind("." + extension);
+
+		if (lastindex != std::string::npos)
+			return filename.substr(0, lastindex);
+	}
+
+	return filename;
+}

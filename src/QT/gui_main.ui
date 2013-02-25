@@ -309,12 +309,12 @@
         <item row="1" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Save Path</string>
+           <string>Save Folder</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="textSavePath"/>
+         <widget class="QLineEdit" name="textSaveFolder"/>
         </item>
         <item row="2" column="1">
          <widget class="QPushButton" name="btnMinimizerStartStop">
@@ -356,6 +356,7 @@
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionOpen"/>
+    <addaction name="actionExport"/>
    </widget>
    <addaction name="menuFIle"/>
   </widget>
@@ -372,6 +373,11 @@
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
    </property>
   </action>
  </widget>

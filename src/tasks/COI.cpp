@@ -51,6 +51,12 @@ COI::COI(CWorkerThread * WorkerThread)
 	mLibOIInitialized = false;
 
 	mTempFloat = NULL;
+
+	// Describe the data and provide extensions
+	mDataDescription = "OIFITS data";
+	mExtensions.push_back("fit");
+	mExtensions.push_back("fits");
+	mExtensions.push_back("oifits");
 }
 
 COI::~COI()
@@ -72,17 +78,16 @@ CTaskPtr COI::Create(CWorkerThread * WorkerThread)
 
 void COI::Export(string folder_name)
 {
-	CModelListPtr model_list = mWorkerThread->GetModelList();
-
-	unsigned int n_data_sets = mLibOI->GetNDataSets();
-	for(int data_set = 0; data_set < n_data_sets; data_set++)
-	{
-		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
-		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
-		mWorkerThread->BlitToScreen(mFBO);
-//		mLibOI->SaveImage(...)
-		mLibOI->SaveSimulatedData(data_set, folder_name);
-	}
+//	CModelListPtr model_list = mWorkerThread->GetModelList();
+//
+//	unsigned int n_data_sets = mLibOI->GetNDataSets();
+//	for(int data_set = 0; data_set < n_data_sets; data_set++)
+//	{
+//		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+//		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+//		mWorkerThread->BlitToScreen(mFBO);
+//		mLibOI->SaveSimulatedData(data_set, folder_name);
+//	}
 }
 
 void COI::GetChi(double * chis, unsigned int size)
@@ -123,19 +128,6 @@ void COI::GetChi(double * chis, unsigned int size)
 	{
 		chis[i] = double(mTempFloat[i]);
 	}
-}
-
-string COI::GetDataDescription()
-{
-	return "OIFITS data";
-}
-
-vector<string> COI::GetExtensions()
-{
-	vector<string> temp;
-	temp.push_back("oifits");
-	temp.push_back("fits");
-	return temp;
 }
 
 unsigned int COI::GetNData()

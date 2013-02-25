@@ -33,6 +33,7 @@
 #include "CMinimizerThread.h"
 #include "CWorkerThread.h"
 #include "CModelList.h"
+#include <QDir>
 
 using namespace std;
 
@@ -42,7 +43,7 @@ CMinimizerThread::CMinimizerThread()
 	mNParams = 0;
 	mRun = false;
 	mIsRunning = false;
-	mSaveFileBasename = "/tmp/model";
+	mSaveFolder = "/tmp/model";
 	mMinimizerName = "";
 	mMinimizerID = "";
 }
@@ -67,38 +68,43 @@ double CMinimizerThread::ComputeChi2r(valarray<double> & chis, unsigned int n_pa
 	return chi2_sum / (chis.size() - n_params - 1);
 }
 
-/// \brief Saves the V2, and T3 data along with best-fit model simulated data
-/// for each epoch.
-void CMinimizerThread::ExportResults(double * params, int n_params, bool no_setparams)
+/// \brief Exports the parameter names, best-fit values, and model data.
+///
+/// Exports minimization results using the best-fit parameters stored in
+/// the mParams buffer.
+void CMinimizerThread::ExportResults()
 {
-//	stringstream filename;
-//	ofstream outfile;
-//
-//	vector<string> names = mWorkerThread->GetFreeParamNames();
-//
-//	// Open the statistics file for writing:
-//	filename.str("");
-//	filename << mSaveFileBasename << "_param_names.txt";
-//	outfile.open(filename.str().c_str());
-//	outfile.width(15);
-//	outfile.precision(8);
-//	outfile << "# Parameter names in a column." << endl;
-//	outfile << "# Param0, ..., ParamN" << endl;
-//	WriteRow(names, outfile);
-//	outfile.close();
-//
-//	if(!no_setparams)
-//	{
-//		n_params = min(n_params, int(mNParams));
-//
-//	    //printf("Generating Plots using best-fit parameters:\n");
-//		for(int i = 0; i < n_params; i++)
-//			printf("%i: %e \n", i, params[i]);
-//
-//		mWorkerThread->SetFreeParameters(params, n_params, true);
-//	}
-//
-//	mWorkerThread->ExportResults(mSaveFileBasename);
+	stringstream filename;
+	ofstream outfile;
+
+	// Get a pointer to the model list;
+    CModelListPtr model_list = mWorkerThread->GetModelList();
+	vector<string> names = model_list->GetFreeParamNames();
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mSaveFolder << "/best_fit.txt";
+	outfile.open(filename.str().c_str());
+	outfile.width(15);
+	outfile.precision(8);
+	outfile << "# Parameter names in a column." << endl;
+	outfile << "# Param0, ..., ParamN" << endl;
+	WriteRow(names, outfile);
+
+	// Now insert the best-fit parameters
+	vector<double> best_fit;
+	for(int i = 0; i < mNParams; i++)
+		best_fit.push_back(mParams[i]);
+
+	WriteRow(best_fit, outfile);
+	outfile.close();
+
+	// Set the best-fit parameter values
+	model_list->SetFreeParameters(mParams, mNParams, false);
+
+	// Tell the worker thread to save files.
+	QString save_folder = QString::fromStdString(mSaveFolder);
+	mWorkerThread->ExportResults(save_folder + "/");
 }
 
 /// \brief Returns the unique ID assigned to this minimizer.
@@ -147,11 +153,10 @@ void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 /// and filename prefix which is used by the minimizers.
 ///
 /// \param filename An absolute path prefix for minimizer files.
-void CMinimizerThread::SetSaveFileBasename(string filename)
+void CMinimizerThread::SetSaveFolder(string folder_name)
 {
-	// Only permit non-empty save file names:
-	if(filename.size() > 0)
-		mSaveFileBasename = filename;
+	if(folder_name.size() > 0)
+		mSaveFolder = folder_name;
 }
 
 /// \brief Stops the minimizer.

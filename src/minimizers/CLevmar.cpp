@@ -112,29 +112,11 @@ string CLevmar::GetExitString(int exit_num)
 	return tmp;
 }
 
-/// Prints out cmpfit results (from testmpfit.c)
+/// Prints out levmar results (from testmpfit.c)
 void CLevmar::printresult(double * x, int n_pars, int n_data, vector<string> names, valarray<double> & info, valarray<double> & covar)
 {
 	if ((x == NULL) || (n_pars == 0))
 		return;
-
-	// Print out some statistics:
-//	printf("Chi2r for each data set:\n");
-//	int nData = 0;
-//	double chi2r_total = 0;
-//	double chi2r = 0;
-//	int nDataSets = mWorkerThread->GetNDataSets();
-//	mWorkerThread->SetFreeParameters(mParams, mNParams, false);
-//	for(int data_set = 0; data_set < nDataSets; data_set++)
-//	{
-//		nData = mWorkerThread->GetNDataAllocated(data_set);
-//		mWorkerThread->SetTime(mWorkerThread->GetDataAveJD(data_set));
-//		mWorkerThread->EnqueueOperation(GLT_RenderModels);
-//		chi2r = mWorkerThread->GetChi2(data_set) / (nData - mNParams - 1);
-//		chi2r_total += chi2r;
-//		printf("  Data Set %i chi2r: %f\n", data_set, chi2r);
-//	}
-//	printf("All data, average chi2r: %f\n", chi2r_total/nDataSets);
 
 	double value = 0;
 	double err = 0;
@@ -158,14 +140,6 @@ void CLevmar::printresult(double * x, int n_pars, int n_data, vector<string> nam
 
 		printf("\n");
 	}
-
-//	if(int(info[6]) == 7 && mRun)
-//	{
-//		printf("Dumping Residuals Buffer:\n");
-//		for(int i = 0; i < n_data; i++)
-//			printf(" %i %f\n", i, mResiduals[i]);
-//	}
-
 }
 
 void CLevmar::run()
@@ -229,7 +203,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 
 	printf("Levmar executed %i iterations.\n", iterations);
 	printresult(mParams, mNParams, n_data, names, info, covar);
-	ExportResults(mParams, mNParams);
+	ExportResults();
 
 	return iterations;
 }

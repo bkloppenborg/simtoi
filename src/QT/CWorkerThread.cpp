@@ -233,8 +233,12 @@ void CWorkerThread::Enqueue(WorkerOperations op)
 
 void CWorkerThread::ExportResults(QString save_folder)
 {
-	// get exclusive access to the operation queue
-	QMutexLocker lock(&mTaskMutex);
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	// Make sure the save_folder ends in a slash
+	if(save_folder[save_folder.size()] != QChar('/'))
+		save_folder += "/";
 
 	mTempString = save_folder.toStdString();
 	Enqueue(EXPORT);

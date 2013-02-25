@@ -83,7 +83,7 @@ public:
 	bool mRun;				/// Boolean to indicate if the minimizer should continue to run.
 							/// The programmer MUST check this and terminate the minimizer if false.
 							///
-	string mSaveFileBasename;	///< Save file location
+	string mSaveFolder;		///< Folder to which minimizer save files and exported data are saved.
 
 	string mMinimizerName;	///< Human-friendly name for the minimizer.
 	string mMinimizerID;	///< Unique ID for the minimizer.
@@ -96,7 +96,7 @@ public:
 
 	static double ComputeChi2r(valarray<double> & chi, unsigned int n_params);
 
-	virtual void ExportResults(double * params, int n_params, bool no_setparams=false);
+	virtual void ExportResults();
 
 	string GetID();
 	virtual void GetResults(double * results, int n_params);
@@ -107,7 +107,7 @@ public:
 	// Pure virtual function, each minimizer must implement this.
 	virtual void run() = 0;
 
-	void SetSaveFileBasename(string filename);
+	void SetSaveFolder(string filename);
 	virtual void stop();
 
 	template <class T>

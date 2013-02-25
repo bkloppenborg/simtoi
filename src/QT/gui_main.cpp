@@ -386,7 +386,7 @@ void gui_main::Init(void)
 	gui_common::SetupComboOptions(this->cboMinimizers, minimizers.GetMinimizerList());
 
 	// Setup the text boxes
-	this->textSavePath->setText(mDefaultSaveDir.c_str());
+	this->textSaveFolder->setText(mDefaultSaveDir.c_str());
 }
 
 void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
@@ -399,6 +399,12 @@ void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
 
 	try
 	{
+		// ensure that the save directory exists before running.
+		QString save_dir = textSaveFolder->text();
+		// Make the directory if it does not exist
+		if(!QDir(save_dir).exists())
+			QDir().mkdir(save_dir);
+
 		CMinimizerPtr minimizer = minimizers.CreateMinimizer(MinimizerID);
 		widget->SetMinimizer(minimizer);
 		widget->startMinimizer();
@@ -441,6 +447,30 @@ void gui_main::minimizerFinished()
 			close();
 	}
 
+}
+
+void gui_main::on_actionExport_triggered()
+{
+    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+    if(!sw)
+    	return;
+
+    // Open a dialog, get a list of file that the user selected:
+ 	QFileDialog dialog(this);
+ 	dialog.setFileMode(QFileDialog::Directory);
+ 	dialog.setOption(QFileDialog::ShowDirsOnly);
+
+    QStringList filenames;
+	if (dialog.exec())
+	{
+		filenames = dialog.selectedFiles();
+		// Make the directory if it does not exist
+		if(!QDir(filenames[0]).exists())
+			QDir().mkdir(filenames[0]);
+
+		CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+		widget->Export(filenames[0]);
+	}
 }
 
 void gui_main::on_actionOpen_triggered()

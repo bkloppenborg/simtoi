@@ -87,13 +87,13 @@ void CMultiNest::dumper(int &nSamples, int &nlive, int &nPar, double **physLive,
 ////	for(int i = 0; i < nPar; i++)
 ////		printf("%i: %e \n", i, paramConstr[0][i]); //*(paramConstr[2* (nPar) + i]), *(paramConstr[3* (nPar) + i]));
 //
-//	// If we haven't been requested to stop, copy the values over to a saveable array:
-//	if(maxLogLike < numeric_limits<double>::max())
-//	{
-//		CMultiNest * minimizer = reinterpret_cast<CMultiNest*>(misc);
-//		for(int i = 0; i < nPar; i++)
-//			minimizer->mParams[i] = paramConstr[0][i];
-//	}
+	// If we haven't been requested to stop, copy the values over to a saveable array:
+	if(maxLogLike < numeric_limits<double>::max())
+	{
+		CMultiNest * minimizer = reinterpret_cast<CMultiNest*>(misc);
+		for(int i = 0; i < nPar; i++)
+			minimizer->mParams[i] = paramConstr[0][i];
+	}
 }
 
 void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
@@ -128,9 +128,7 @@ void CMultiNest::run()
 	// Get a copy of the uncertainties from the data
 	mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
 
-	// Init MultiNest:
-	string tmp_output = "/tmp"; //mWorkerThread->GetTempOutputDir();
-
+	// Init MultiNest
 	void * misc = reinterpret_cast<void*>(this);
 
 	// set the MultiNest sampling parameters
@@ -150,7 +148,7 @@ void CMultiNest::run()
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	const std::string path = mSaveFileBasename + "_multinest";		// root for output files
+	const std::string path = mSaveFolder + "/multinest";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
 	int resume = 0;					// resume from a previous job?
@@ -178,5 +176,5 @@ void CMultiNest::run()
 
     // TODO: For some reason the parameters are getting mangled when they come from MultiNest
     // resulting in a mangled image for data exporting.
-    ExportResults(mParams, mNParams, true);
+    ExportResults();
 }

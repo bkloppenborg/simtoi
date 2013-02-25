@@ -51,6 +51,15 @@ CMinimizerPtr CBenchmark::Create()
 	return CMinimizerPtr(new CBenchmark());
 }
 
+/// \brief Exports results from this minimzer
+///
+/// The benchmark minimizer should not export anything so we simply override
+/// the base class function with one that does nothing.
+void CBenchmark::ExportResults()
+{
+	// do nothing.
+}
+
 int CBenchmark::GetMilliCount()
 {
 	// Something like GetTickCount but portable

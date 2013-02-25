@@ -46,7 +46,7 @@ public:
 
 	vector< tuple<double,double,double> > mResults;
 
-	virtual void ExportResults(double * params, int n_params, bool no_setparams);
+	virtual void ExportResults();
 
 	void run();
 };

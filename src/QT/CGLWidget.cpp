@@ -84,6 +84,11 @@ void CGLWidget::closeEvent(QCloseEvent *evt)
     QGLWidget::closeEvent(evt);
 }
 
+void CGLWidget::Export(QString save_folder)
+{
+	mWorker->ExportResults(save_folder);
+}
+
 void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
 {
 	for(int j = 0; j < parameters->GetNParams(); j++)

@@ -36,6 +36,9 @@
 #include "CTask.h"
 #include "liboi.hpp"
 
+#include <string>
+
+using namespace std;
 using namespace liboi;
 
 class CPhotometricDataPoint
@@ -50,6 +53,7 @@ typedef shared_ptr<CPhotometricDataPoint> CPhotometricDataPointPtr;
 class CPhotometricDataFile
 {
 public:
+	string base_filename; ///< The filename less the path and extension.
 	double wavelength;
 	vector<CPhotometricDataPointPtr> data;
 
@@ -80,8 +84,6 @@ public:
 	virtual void Export(string folder_name);
 
 	virtual void GetChi(double * residuals, unsigned int size);
-	virtual string GetDataDescription();
-	virtual vector<string> GetExtensions();
 	virtual unsigned int GetNData();
 	virtual void GetUncertainties(double * residuals, unsigned int size);
 
@@ -90,6 +92,8 @@ public:
 	virtual void InitCL();
 
 	virtual void OpenData(string filename);
+
+	double SimulatePhotometry(CModelListPtr, double jd);
 };
 
 #endif /* CPHOTOMETRY_H_ */

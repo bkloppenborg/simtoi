@@ -56,15 +56,18 @@ CMinimizerPtr CGridSearch::Create()
 	return CMinimizerPtr(new CGridSearch());
 }
 
-void CGridSearch::ExportResults(double * params, int n_params, bool no_setparams)
+void CGridSearch::ExportResults()
 {
+	// Call the base-class export function:
+	CMinimizerThread::ExportResults();
+
 	stringstream filename;
 	ofstream outfile;
 	double tmp[3];
 
 	// Open the statistics file for writing:
 	filename.str("");
-	filename << mSaveFileBasename << "_gridsearch.txt";
+	filename << mSaveFolder << "/gridsearch.txt";
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);
@@ -124,5 +127,5 @@ void CGridSearch::run()
 	}
 
 	// Export the results.  Note, mParams is set to the maximum value, not the minimum.
-	ExportResults(mParams, mNParams, true);
+	ExportResults();
 }

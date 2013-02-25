@@ -70,6 +70,9 @@ protected:
     void resizeEvent(QResizeEvent *evt);
 
 public:
+    void Export(QString save_folder);
+
+public:
 
     QStringList GetFileFilters();
     string GetMinimizerID();

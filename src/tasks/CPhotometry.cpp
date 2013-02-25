@@ -48,6 +48,10 @@ CPhotometry::CPhotometry(CWorkerThread * WorkerThread)
 
 	mLibOI = NULL;
 	mLibOIInitialized = false;
+
+	// Describe the data and provide extensions
+	mDataDescription = "Photometric data";
+	mExtensions.push_back("phot");
 }
 
 CPhotometry::~CPhotometry()
@@ -63,6 +67,8 @@ CPhotometry::~CPhotometry()
 
 void CPhotometry::Export(string folder_name)
 {
+	InitBuffers();
+
 	ofstream outfile;
 
 	bool first_point = true;
@@ -75,28 +81,16 @@ void CPhotometry::Export(string folder_name)
 	for(auto data_file: mData)
 	{
 		first_point = true;
-		outfile.open(folder_name + "test.phot");
+		// The save file should follow the following format:
+		outfile.open(folder_name + data_file->base_filename + "_model.phot");
+		outfile.width(15);
+		outfile.precision(8);
 
 		outfile << "# Simulated photometry from SIMTOI" << endl;
 
 		for(auto data_point: data_file->data)
 		{
-			// Set the time, render the model
-			model_list->SetTime(data_point->jd);
-			model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
-
-			// Blit to the storage buffer (for liboi to use the image)
-			mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
-			// Blit to the screen (to show the user, not required, but nice.
-			mWorkerThread->BlitToScreen(mFBO);
-
-			// Compute the flux:
-			mLibOI->CopyImageToBuffer(0);
-
-			// Get the simulated flux, convert it to a simulated magnitude using
-			// -2.5 * log(counts)
-			sim_flux = mLibOI->TotalFlux(true);
-			sim_mag = -2.5 * log(sim_flux);
+			sim_mag = SimulatePhotometry(model_list, data_point->jd);
 
 			// Cache the t = 0 magnitude.
 			if(first_point)
@@ -105,7 +99,7 @@ void CPhotometry::Export(string folder_name)
 				first_point = false;
 			}
 
-			// store the residual calculation
+			// Add the zero-point offset:
 			sim_mag -= (t0_delta_mag);
 
 			outfile << data_point->jd << "," << sim_mag << endl;
@@ -138,30 +132,17 @@ void CPhotometry::GetChi(double * chi, unsigned int size)
 	{
 		for(auto data_point: data_file->data)
 		{
-			// Set the time, render the model
-			model_list->SetTime(data_point->jd);
-			model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
-
-			// Blit to the storage buffer (for liboi to use the image)
-			mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
-			// Blit to the screen (to show the user, not required, but nice.
-			mWorkerThread->BlitToScreen(mFBO);
-
-			// Compute the flux:
-			mLibOI->CopyImageToBuffer(0);
-
-			// Get the simulated flux, convert it to a simulated magnitude using
-			// -2.5 * log(counts)
-			sim_flux = mLibOI->TotalFlux(true);
-
-			sim_mag = -2.5 * log(sim_flux);
+			sim_mag = SimulatePhotometry(model_list, data_point->jd);
 
 			// Cache the t = 0 magnitude.
 			if(index == 0)
 				t0_delta_mag = sim_mag - data_point->mag;
 
+			// Add the zero-point offset:
+			sim_mag -= (t0_delta_mag);
+
 			// store the residual calculation
-			chi[index] = ((sim_mag - data_point->mag) - (t0_delta_mag)) / data_point->mag_err;
+			chi[index] = (sim_mag - data_point->mag) / data_point->mag_err;
 
 			// increment the index
 			index += 1;
@@ -172,18 +153,6 @@ void CPhotometry::GetChi(double * chi, unsigned int size)
 //	int total_time = CBenchmark::GetMilliSpan(total_start);
 //	cout << "Photometric loop completed! It took: " << total_time << " ms." << endl;
 //	cout << " Framerate (fps): " << double(size * 1000) / double(total_time) << endl;
-}
-
-string CPhotometry::GetDataDescription()
-{
-	return "Photometric data";
-}
-
-vector<string> CPhotometry::GetExtensions()
-{
-	vector<string> temp;
-	temp.push_back("phot");
-	return temp;
 }
 
 unsigned int CPhotometry::GetNData()
@@ -270,6 +239,9 @@ void CPhotometry::OpenData(string filename)
 
 	// Create a new data file for storing input data.
 	CPhotometricDataFilePtr data_file = CPhotometricDataFilePtr(new CPhotometricDataFile());
+	string base_filename = StripPath(filename);
+	base_filename = StripExtension(base_filename, mExtensions);
+	data_file->base_filename = base_filename;
 
 	// Get a vector of the non-comment lines in the text file:
 	vector<string> lines = ReadFile(filename, "#/;!", "Could not read photometric data file " + filename + ".");
@@ -303,4 +275,26 @@ void CPhotometry::OpenData(string filename)
 
 	// The data was imported correctly, push it onto our data list
 	mData.push_back(data_file);
+}
+
+double CPhotometry::SimulatePhotometry(CModelListPtr model_list, double jd)
+{
+	double sim_flux = 0;
+
+	// Set the time, render the model
+	model_list->SetTime(jd);
+	model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+
+	// Blit to the storage buffer (for liboi to use the image)
+	mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+	// Blit to the screen (to show the user, not required, but nice.
+	mWorkerThread->BlitToScreen(mFBO);
+
+	// Compute the flux:
+	mLibOI->CopyImageToBuffer(0);
+
+	// Get the simulated flux, convert it to a simulated magnitude using
+	// -2.5 * log(counts)
+	sim_flux = mLibOI->TotalFlux(true);
+	return -2.5 * log10(sim_flux);
 }

@@ -43,6 +43,8 @@ public:
 
 	static CMinimizerPtr Create();
 
+	virtual void ExportResults();
+
 	static int GetMilliCount();
 	static int GetMilliSpan(int nTimeStart);
 

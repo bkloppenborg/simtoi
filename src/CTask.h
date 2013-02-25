@@ -54,6 +54,9 @@ protected:
 	string mExeFolder;
 	CWorkerThread * mWorkerThread;
 
+	string mDataDescription; ///< A short few-word phrase to describe the data.
+	vector<string> mExtensions; ///< A list of valid extensions for this task.
+
 public:
 	CTask(CWorkerThread * WorkerThread);
 	virtual ~CTask();
@@ -61,8 +64,8 @@ public:
 	virtual void Export(string folder_name) = 0;
 
 	virtual void GetChi(double * chis, unsigned int size) = 0;
-	virtual string GetDataDescription() = 0;
-	virtual vector<string> GetExtensions() = 0;
+	virtual string GetDataDescription();
+	virtual vector<string> GetExtensions();
 	virtual unsigned int GetNData() = 0;
 	virtual void GetUncertainties(double * residuals, unsigned int size) = 0;
 
@@ -70,6 +73,9 @@ public:
 	virtual void InitCL() {};
 
 	virtual void OpenData(string filename) = 0;
+
+	static string StripPath(string filename);
+	static string StripExtension(string filename, vector<string> & valid_extensions);
 
 };
 
