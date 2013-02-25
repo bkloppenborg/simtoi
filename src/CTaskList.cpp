@@ -35,7 +35,7 @@ void CTaskList::Export(string export_folder)
 		task->Export(export_folder);
 }
 
-void CTaskList::GetChi(double * residuals, unsigned int size)
+void CTaskList::GetChi(double * chis, unsigned int size)
 {
 	unsigned int n_data;
 	unsigned int offset = 0;
@@ -46,7 +46,7 @@ void CTaskList::GetChi(double * residuals, unsigned int size)
 
 		// Calculate how many slots the task can fill in the buffer.
 		buffer_size = min(n_data, size - offset);
-		task->GetChi(residuals + offset, buffer_size);
+		task->GetChi(chis + offset, buffer_size);
 
 		offset += n_data;
 	}

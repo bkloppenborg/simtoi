@@ -78,16 +78,34 @@ CTaskPtr COI::Create(CWorkerThread * WorkerThread)
 
 void COI::Export(string folder_name)
 {
-//	CModelListPtr model_list = mWorkerThread->GetModelList();
-//
-//	unsigned int n_data_sets = mLibOI->GetNDataSets();
-//	for(int data_set = 0; data_set < n_data_sets; data_set++)
-//	{
-//		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
-//		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
-//		mWorkerThread->BlitToScreen(mFBO);
-//		mLibOI->SaveSimulatedData(data_set, folder_name);
-//	}
+	InitBuffers();
+
+	CModelListPtr model_list = mWorkerThread->GetModelList();
+	string filename = "";
+
+	unsigned int n_data_sets = mLibOI->GetNDataSets();
+	for(int data_set = 0; data_set < n_data_sets; data_set++)
+	{
+		// Get the base name for the file:
+		filename = mLibOI->GetDataFileName(data_set);
+		filename = StripPath(filename);
+		filename = StripExtension(filename, mExtensions);
+
+		// Set the current JD, render the model.
+		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+		// Blit to the storage buffer (for liboi to use the image)
+		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+		mWorkerThread->BlitToScreen(mFBO);
+		mLibOI->CopyImageToBuffer(0);
+
+		// Now export the image, overwriting any image that already exists:
+		mLibOI->ExportImage("!" + folder_name + filename + "_model.fits");
+
+		// Now generate and save the simulated data:
+		mLibOI->ImageToData(data_set);
+		mLibOI->ExportData(data_set, folder_name + filename);
+	}
 }
 
 void COI::GetChi(double * chis, unsigned int size)

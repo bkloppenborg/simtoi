@@ -397,14 +397,14 @@ void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
 	// Look up the minimizer
 	auto minimizers = CMinimizerFactory::Instance();
 
+	// ensure that the save directory exists before running.
+	QString save_dir = textSaveFolder->text();
+	// Make the directory if it does not exist
+	if(!QDir(save_dir).exists())
+		QDir().mkdir(save_dir);
+
 	try
 	{
-		// ensure that the save directory exists before running.
-		QString save_dir = textSaveFolder->text();
-		// Make the directory if it does not exist
-		if(!QDir(save_dir).exists())
-			QDir().mkdir(save_dir);
-
 		CMinimizerPtr minimizer = minimizers.CreateMinimizer(MinimizerID);
 		widget->SetMinimizer(minimizer);
 		widget->startMinimizer();
