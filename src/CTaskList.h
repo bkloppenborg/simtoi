@@ -32,9 +32,9 @@ public:
 
 	void Export(string export_folder);
 
+	void GetChi(double * chis, unsigned int size);
 	unsigned int GetDataSize();
 	vector<string> GetFileFilters();
-	void GetResiduals(double * residuals, unsigned int size);
 	void GetUncertainties(double * uncertainties, unsigned int size);
 
 	void OpenData(string filename);

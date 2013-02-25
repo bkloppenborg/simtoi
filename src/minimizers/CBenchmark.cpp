@@ -81,15 +81,12 @@ void CBenchmark::run()
 	double chi2r = 0;
 	double time = 0;
 
-	// Look up the uncertainties, cache them here.
-    mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
-
 	int start = GetMilliCount();
 
 	for(int i = 0; i < n_iterations && mRun; i++)
 	{
-		mWorkerThread->GetResiduals(&mResiduals[0], mResiduals.size());
-		chi2r = ComputeChi2r(mResiduals, mUncertainties, mNParams);
+		mWorkerThread->GetChi(&mChis[0], mChis.size());
+		chi2r = ComputeChi2r(mChis, mNParams);
 
 		if(i % 100 == 0)
 			printf("Iteration %i Chi2r: %f\n", i, chi2r);

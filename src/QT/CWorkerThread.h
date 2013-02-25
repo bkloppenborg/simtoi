@@ -71,7 +71,7 @@ enum WorkerOperations
 	ANIMATE,
 	ANIMATE_STOP,
 	EXPORT,
-	GET_RESIDUALS,
+	GET_CHI,
 	GET_UNCERTAINTIES,
 	OPEN_DATA,
 	RENDER,
@@ -160,11 +160,11 @@ public:
 public:
     void ExportResults(QString save_folder);
 
+    void GetChi(double * chi, unsigned int size);
     unsigned int GetDataSize();
     QStringList GetFileFilters();
     CModelListPtr GetModelList() { return mModelList; };
     WorkerOperations GetNextOperation(void);
-    void GetResiduals(double * residuals, unsigned int size);
     CTaskListPtr GetTaskList() { return mTaskList; };
     void GetUncertainties(double * uncertainties, unsigned int size);
 

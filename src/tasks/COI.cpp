@@ -85,25 +85,7 @@ void COI::Export(string folder_name)
 	}
 }
 
-string COI::GetDataDescription()
-{
-	return "OIFITS data";
-}
-
-vector<string> COI::GetExtensions()
-{
-	vector<string> temp;
-	temp.push_back("oifits");
-	temp.push_back("fits");
-	return temp;
-}
-
-unsigned int COI::GetNData()
-{
-	mLibOI->GetNData();
-}
-
-void COI::GetResiduals(double * residuals, unsigned int size)
+void COI::GetChi(double * chis, unsigned int size)
 {
 	InitBuffers();
 
@@ -139,8 +121,26 @@ void COI::GetResiduals(double * residuals, unsigned int size)
 	// Copy the floats from liboi into doubles for SIMTOI.
 	for(unsigned int i = 0; i < size; i++)
 	{
-		residuals[i] = double(mTempFloat[i]);
+		chis[i] = double(mTempFloat[i]);
 	}
+}
+
+string COI::GetDataDescription()
+{
+	return "OIFITS data";
+}
+
+vector<string> COI::GetExtensions()
+{
+	vector<string> temp;
+	temp.push_back("oifits");
+	temp.push_back("fits");
+	return temp;
+}
+
+unsigned int COI::GetNData()
+{
+	mLibOI->GetNData();
 }
 
 void COI::GetUncertainties(double * uncertainties, unsigned int size)

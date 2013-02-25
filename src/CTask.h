@@ -60,10 +60,10 @@ public:
 
 	virtual void Export(string folder_name) = 0;
 
+	virtual void GetChi(double * chis, unsigned int size) = 0;
 	virtual string GetDataDescription() = 0;
 	virtual vector<string> GetExtensions() = 0;
 	virtual unsigned int GetNData() = 0;
-	virtual void GetResiduals(double * residuals, unsigned int size) = 0;
 	virtual void GetUncertainties(double * residuals, unsigned int size) = 0;
 
 	virtual void InitGL() {};

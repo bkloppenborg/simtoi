@@ -120,30 +120,7 @@ CTaskPtr CPhotometry::Create(CWorkerThread * WorkerThread)
 	return CTaskPtr(new CPhotometry(WorkerThread));
 }
 
-string CPhotometry::GetDataDescription()
-{
-	return "Photometric data";
-}
-
-vector<string> CPhotometry::GetExtensions()
-{
-	vector<string> temp;
-	temp.push_back("phot");
-	return temp;
-}
-
-unsigned int CPhotometry::GetNData()
-{
-	unsigned int n_data = 0;
-	for(auto datafile: mData)
-	{
-		n_data += datafile->GetNData();
-	}
-
-	return n_data;
-}
-
-void CPhotometry::GetResiduals(double * residuals, unsigned int size)
+void CPhotometry::GetChi(double * chi, unsigned int size)
 {
 	InitBuffers();
 
@@ -184,7 +161,7 @@ void CPhotometry::GetResiduals(double * residuals, unsigned int size)
 				t0_delta_mag = sim_mag - data_point->mag;
 
 			// store the residual calculation
-			residuals[index] = (sim_mag - data_point->mag) - (t0_delta_mag);
+			chi[index] = ((sim_mag - data_point->mag) - (t0_delta_mag)) / data_point->mag_err;
 
 			// increment the index
 			index += 1;
@@ -195,6 +172,29 @@ void CPhotometry::GetResiduals(double * residuals, unsigned int size)
 //	int total_time = CBenchmark::GetMilliSpan(total_start);
 //	cout << "Photometric loop completed! It took: " << total_time << " ms." << endl;
 //	cout << " Framerate (fps): " << double(size * 1000) / double(total_time) << endl;
+}
+
+string CPhotometry::GetDataDescription()
+{
+	return "Photometric data";
+}
+
+vector<string> CPhotometry::GetExtensions()
+{
+	vector<string> temp;
+	temp.push_back("phot");
+	return temp;
+}
+
+unsigned int CPhotometry::GetNData()
+{
+	unsigned int n_data = 0;
+	for(auto datafile: mData)
+	{
+		n_data += datafile->GetNData();
+	}
+
+	return n_data;
 }
 
 void CPhotometry::GetUncertainties(double * uncertainties, unsigned int size)

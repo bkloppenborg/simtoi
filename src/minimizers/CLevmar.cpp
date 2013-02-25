@@ -71,8 +71,7 @@ void CLevmar::ErrorFunc(double * params, double * output, int nParams, int nOutp
 	model_list->SetFreeParameters(params, nParams, false);
 
 	// Now get the residuals and compute the chi values. Store these in the output double.
-	minimizer->mWorkerThread->GetResiduals(&minimizer->mResiduals[0], minimizer->mResiduals.size());
-	ComputeChi(&minimizer->mResiduals[0], &minimizer->mUncertainties[0], output, nOutput);
+	minimizer->mWorkerThread->GetChi(output, nOutput);
 }
 
 string CLevmar::GetExitString(int exit_num)
@@ -177,9 +176,6 @@ void CLevmar::run()
 
 int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *adata))
 {
-	// Copy the uncertainties
-    mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
-
 	// Create a member function pointer
 	int iterations = 0;
 	int max_iterations = 50;

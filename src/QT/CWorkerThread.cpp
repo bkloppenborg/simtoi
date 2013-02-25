@@ -241,6 +241,20 @@ void CWorkerThread::ExportResults(QString save_folder)
 	mWorkerSemaphore.release(1);
 }
 
+void CWorkerThread::GetChi(double * chi, unsigned int size)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	// Assign temporary storage, enqueue the command, and wait for completion
+	mTempArray = chi;
+	mTempArraySize = size;
+	Enqueue(GET_CHI);
+
+	// Wait for the operation to complete
+	mWorkerSemaphore.acquire(1);
+}
+
 unsigned int CWorkerThread::GetDataSize()
 {
 	// Get exclusive access to the worker
@@ -280,20 +294,6 @@ WorkerOperations CWorkerThread::GetNextOperation(void)
 	mTaskQueue.pop();
 
 	return tmp;
-}
-
-void CWorkerThread::GetResiduals(double * residuals, unsigned int size)
-{
-	// Get exclusive access to the worker
-	QMutexLocker lock(&mWorkerMutex);
-
-	// Assign temporary storage, enqueue the command, and wait for completion
-	mTempArray = residuals;
-	mTempArraySize = size;
-	Enqueue(GET_RESIDUALS);
-
-	// Wait for the operation to complete
-	mWorkerSemaphore.acquire(1);
 }
 
 void CWorkerThread::GetUncertainties(double * uncertainties, unsigned int size)
@@ -412,9 +412,9 @@ void CWorkerThread::run()
 			mWorkerSemaphore.release(1);
 			break;
 
-		case GET_RESIDUALS:
+		case GET_CHI:
 			// uses mTempArray
-			mTaskList->GetResiduals(mTempArray, mTempArraySize);
+			mTaskList->GetChi(mTempArray, mTempArraySize);
 			mWorkerSemaphore.release(1);
 			break;
 

@@ -52,17 +52,16 @@ CMultiNest::~CMultiNest()
 	// TODO Auto-generated destructor stub
 }
 
-double CMultiNest::ComputeLogZ(valarray<double> & residuals, const valarray<double> & uncertainties)
+double CMultiNest::ComputeLogZ(valarray<double> & chis, const valarray<double> & uncertainties)
 {
 	// We compute the log likelihood from the following formulation:
 	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp(chi^2_i / 2)]
 	//			= -N/2 log(2 pi) - 2 sum_i( log(sigma_i) ) + 1/2 sum_i(chi^2_i)
 
-	// Form the chi^2, store it in the residual buffer
-	residuals = residuals*residuals / uncertainties;
-	residuals /= 2;
+	// Form the chi squared
+	chis *= chis;
 
-	return -residuals.size() / 2 * log(2*PI) - 2*log(uncertainties).sum() + 0.5 * residuals.sum();
+	return -1*chis.size() / 2 * log(2*PI) - 2*log(uncertainties).sum() + 0.5 * chis.sum();
 }
 
 CMinimizerPtr CMultiNest::Create()
@@ -115,8 +114,8 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 	model_list->GetFreeParameters(params, npars, true);
 
 	// Now get the residuals and compute the chi values. Store these in the output double.
-	minimizer->mWorkerThread->GetResiduals(&minimizer->mResiduals[0], minimizer->mResiduals.size());
-	lnew = ComputeLogZ(minimizer->mResiduals, minimizer->mUncertainties);
+	minimizer->mWorkerThread->GetChi(&minimizer->mChis[0], minimizer->mChis.size());
+	lnew = ComputeLogZ(minimizer->mChis, minimizer->mUncertainties);
 
 	// TODO: Add in priors
 //	lnew += ComputePriors();

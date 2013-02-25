@@ -79,10 +79,10 @@ public:
 
 	virtual void Export(string folder_name);
 
+	virtual void GetChi(double * residuals, unsigned int size);
 	virtual string GetDataDescription();
 	virtual vector<string> GetExtensions();
 	virtual unsigned int GetNData();
-	virtual void GetResiduals(double * residuals, unsigned int size);
 	virtual void GetUncertainties(double * residuals, unsigned int size);
 
 	void InitBuffers();

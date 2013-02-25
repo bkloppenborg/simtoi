@@ -87,9 +87,6 @@ void CGridSearch::run()
 	// Init local storage
 	double chi2r = 0;
 
-	// Look up the uncertainties, cache them here.
-    mWorkerThread->GetUncertainties(&mUncertainties[0], mUncertainties.size());
-
     // Get ahold of the model list
     CModelListPtr model_list = mWorkerThread->GetModelList();
 
@@ -116,8 +113,8 @@ void CGridSearch::run()
 
 			// Set the parameters (note, they are not scaled to unit magnitude), get the residuals, compute the chi2r
 			model_list->SetFreeParameters(mParams, mNParams, false);
-			mWorkerThread->GetResiduals(&mResiduals[0], mResiduals.size());
-			chi2r = ComputeChi2r(mResiduals, mUncertainties, mNParams);
+			mWorkerThread->GetChi(&mChis[0], mChis.size());
+			chi2r = ComputeChi2r(mChis, mNParams);
 
 			// Enable to see output on the console.
 			//cout << mParams[0] << " " << mParams[1]<< " " << chi2r << endl;

@@ -56,30 +56,15 @@ CMinimizerThread::~CMinimizerThread()
 	delete[] mParams;
 }
 
-void CMinimizerThread::ComputeChi(double * residuals, double * uncertainties, double * results, unsigned int size)
-{
-	for(unsigned int i = 0; i < size; i++)
-	{
-		results[i] = residuals[i] / uncertainties[i];
-	}
-}
-
-void CMinimizerThread::ComputeChi(valarray<double> & residuals, const valarray<double> & uncertainties, valarray<double> & results)
-{
-	// Valarray operations happen
-	results = residuals / uncertainties;
-}
-
-double CMinimizerThread::ComputeChi2r(valarray<double> & residuals, const valarray<double> & uncertainties, unsigned int n_params)
+double CMinimizerThread::ComputeChi2r(valarray<double> & chis, unsigned int n_params)
 {
 	// Square the numerator, divide by the uncertainties
-	residuals *= residuals;
-	residuals /= uncertainties;
+	chis *= chis;
 
-	double chi2_sum = residuals.sum();
+	double chi2_sum = chis.sum();
 
 	// Now compute the sum dividied by (n_data - n_params - 1)
-	return chi2_sum / (residuals.size() - n_params - 1);
+	return chi2_sum / (chis.size() - n_params - 1);
 }
 
 /// \brief Saves the V2, and T3 data along with best-fit model simulated data
@@ -151,7 +136,7 @@ void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 
 	// Allocate storage for the residuals and uncertainties
 	unsigned int n_data = mWorkerThread->GetDataSize();
-	mResiduals = valarray<double>(n_data);
+	mChis = valarray<double>(n_data);
 	mUncertainties = valarray<double>(n_data);
 }
 
