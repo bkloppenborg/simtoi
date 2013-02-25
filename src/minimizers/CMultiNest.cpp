@@ -56,12 +56,12 @@ double CMultiNest::ComputeLogZ(valarray<double> & chis, const valarray<double> &
 {
 	// We compute the log likelihood from the following formulation:
 	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp(chi^2_i / 2)]
-	//			= -N/2 log(2 pi) - 2 sum_i( log(sigma_i) ) + 1/2 sum_i(chi^2_i)
+	//			= -N/2 log(2 pi) - 2 sum_i( log(sigma_i) ) - 1/2 sum_i(chi^2_i)
 
 	// Form the chi squared
 	chis *= chis;
 
-	return -1*chis.size() / 2 * log(2*PI) - 2*log(uncertainties).sum() + 0.5 * chis.sum();
+	return -1*chis.size() / 2 * log(2*PI) - 2*log(uncertainties).sum() - 0.5 * chis.sum();
 }
 
 CMinimizerPtr CMultiNest::Create()
