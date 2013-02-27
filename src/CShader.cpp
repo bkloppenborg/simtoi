@@ -59,6 +59,7 @@ CShader::CShader(const CShader & other)
 		mParams[i] = other.mParams[i];
 		mMinMax[i].first = other.mMinMax[i].first;
 		mMinMax[i].second = other.mMinMax[i].second;
+		mSteps[i] = other.mSteps[i];
 	}
 }
 
@@ -160,6 +161,7 @@ CShader::CShader(string shader_id, string shader_dir, string base_filename, stri
 		mParams[i] = starting_values[i];
 		mMinMax[i].first = minmax[i].first;
 		mMinMax[i].second = minmax[i].second;
+		mSteps[i] = 0;
 	}
 }
 
