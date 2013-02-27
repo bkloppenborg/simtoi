@@ -72,27 +72,24 @@ CMinimizerPtr CMultiNest::Create()
 /// Dumper (do nothing)
 void CMultiNest::dumper(int &nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double ** paramConstr, double &maxLogLike, double & logZ, double & logZerr, void * misc)
 {
-///*
-////	 paramConstr(4*nPar):
-////   paramConstr(1) to paramConstr(nPar)	     	= mean values of the parameters
-////   paramConstr(nPar+1) to paramConstr(2*nPar)    	= standard deviation of the parameters
-////   paramConstr(nPar*2+1) to paramConstr(3*nPar)  	= best-fit (maxlike) parameters
-////   paramConstr(nPar*4+1) to paramConstr(4*nPar)  	= MAP (maximum-a-posteriori) parameters
-//*/
-////	printf("npar %i\n", *nPar);
-////	printf("Pointer %p\n", paramConstr);
-////
-////	printf("maxLogLike %f, logZ %f, logZerr %f\n", 	*maxLogLike, *logZ, *logZerr);
-////
-////	for(int i = 0; i < nPar; i++)
-////		printf("%i: %e \n", i, paramConstr[0][i]); //*(paramConstr[2* (nPar) + i]), *(paramConstr[3* (nPar) + i]));
-//
-	// If we haven't been requested to stop, copy the values over to a saveable array:
+/*
+//	 paramConstr(4*nPar):
+//   paramConstr(1) to paramConstr(nPar)	     	= mean values of the parameters
+//   paramConstr(nPar+1) to paramConstr(2*nPar)    	= standard deviation of the parameters
+//   paramConstr(nPar*2+1) to paramConstr(3*nPar)  	= best-fit (maxlike) parameters
+//   paramConstr(nPar*4+1) to paramConstr(4*nPar)  	= MAP (maximum-a-posteriori) parameters
+*/
+	// If we haven't been requested to stop, copy the values over to a save-able array:
 	if(maxLogLike < numeric_limits<double>::max())
 	{
 		CMultiNest * minimizer = reinterpret_cast<CMultiNest*>(misc);
+		CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
+
 		for(int i = 0; i < nPar; i++)
 			minimizer->mParams[i] = paramConstr[0][i];
+
+		model_list->SetFreeParameters(minimizer->mParams, nPar, true);
+		model_list->GetFreeParameters(minimizer->mParams, nPar, true);
 	}
 }
 
@@ -140,7 +137,7 @@ void CMultiNest::run()
 	int ndims = mNParams;			// dimensionality (no. of free parameters)
 	int nPar = mNParams;				// total no. of parameters including free & derived parameters
 	int nClsPar = 1;			// no. of parameters to do mode separation on
-	int updInt = 10;				// after how many iterations feedback is required & the output files should be updated
+	int updInt = 1;				// after how many iterations feedback is required & the output files should be updated
 									// note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	double Ztol = -1E90;			// all the modes with logZ < Ztol are ignored
 	int maxModes = 10;				// expected max no. of modes (used only for memory allocation)
