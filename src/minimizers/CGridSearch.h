@@ -37,18 +37,26 @@
 
 #include "CMinimizerThread.h"
 
-class CGridSearch: public CMinimizerThread {
+class CGridSearch: public CMinimizerThread
+{
+protected:
+	vector< pair<double, double> > mMinMax;
+	vector<double> mSteps;
+	ofstream mOutputFile;
+
 public:
 	CGridSearch();
 	virtual ~CGridSearch();
 
 	static CMinimizerPtr Create();
 
-	vector< tuple<double,double,double> > mResults;
-
 	virtual void ExportResults();
 
+	void GridSearch(unsigned int level);
+
 	void run();
+
+	void WriteRow(double * data, unsigned int size, double chi2r, ofstream & output);
 };
 
 #endif /* CMINIMIZER_GRIDSEARCH_H_ */

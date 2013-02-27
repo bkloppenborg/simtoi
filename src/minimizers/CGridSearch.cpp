@@ -80,52 +80,65 @@ void CGridSearch::ExportResults()
 	outfile.close();
 }
 
-
-void CGridSearch::run()
+void CGridSearch::GridSearch(unsigned int level)
 {
-	// TODO: This minimizer only works on two-dimensional data.
-	if(mNParams > 2)
-		return;
-
-	// Init local storage
-	double chi2r = 0;
-
-    // Get ahold of the model list
-    CModelListPtr model_list = mWorkerThread->GetModelList();
-
-	// Get the min/max ranges for the parameters:
-    model_list->GetFreeParameters(mParams, mNParams, true);
-	vector< pair<double, double> > min_max = model_list->GetFreeParamMinMaxes();
-
-	// Hard coded for the moment, results in 2500 iterations equally spaced in both dimensions.
-	int nSteps = 50;
-
-	// Determine the size of each step.
-	double steps[mNParams];
-	for(int i = 0; i < mNParams; i++)
-		steps[i] = (min_max[i].second - min_max[i].first) / nSteps;
-
-	// Run the grid search.
-	for(mParams[0] = min_max[0].first; mParams[0] < min_max[0].second; mParams[0] += steps[0])
+	if(level = mNParams)
 	{
-		for(mParams[1] = min_max[1].first; mParams[1] < min_max[1].second; mParams[1] += steps[1])
+	    CModelListPtr model_list = mWorkerThread->GetModelList();
+		model_list->SetFreeParameters(mParams, mNParams, false);
+		mWorkerThread->GetChi(&mChis[0], mChis.size());
+		double chi2r = ComputeChi2r(mChis, mNParams);
+
+		WriteRow(mParams, mNParams, mOutputFile);
+
+
+	}
+	else
+	{
+		double step = mSteps[level];
+		double min = mMinMax[level].first;
+		double max = mMinMax[level].second + step;
+		for(double value = min; value < max; value += step)
 		{
-			// Permit termination in the middle of a run.
 			if(!mRun)
 				break;
 
-			// Set the parameters (note, they are not scaled to unit magnitude), get the residuals, compute the chi2r
-			model_list->SetFreeParameters(mParams, mNParams, false);
-			mWorkerThread->GetChi(&mChis[0], mChis.size());
-			chi2r = ComputeChi2r(mChis, mNParams);
-
-			// Enable to see output on the console.
-			//cout << mParams[0] << " " << mParams[1]<< " " << chi2r << endl;
-
-			mResults.push_back( tuple<double, double, double>(mParams[0], mParams[1], chi2r) );
+			mParams[level] = value;
+			GridSearch(level + 1);
 		}
 	}
+}
+
+void CGridSearch::run()
+{
+	// Get the min/max ranges for the parameters:
+    model_list->GetFreeParameters(mParams, mNParams, true);
+	mMinMax = model_list->GetFreeParamMinMaxes();
+	mSteps = model_list->GetFreeParamSteps();
+
+	stringstream filename;
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mSaveFolder << "/gridsearch.txt";
+	mOutputFile.open(filename.str().c_str());
+	mOutputFile.width(15);
+	mOutputFile.precision(8);
+
+	mIsRunning = true;
+	GridSearch(0);
+	mIsRunnning = false;
+
+	mOutputFile.close();
 
 	// Export the results.  Note, mParams is set to the maximum value, not the minimum.
 	ExportResults();
+}
+
+void CGridSearch::WriteRow(double * data, unsigned int size, double chi2r, ofstream & output)
+{
+	for(int i = 0; i < size; i++)
+		output << data[i] << ", ";
+
+	output << chi2r << endl;
 }
