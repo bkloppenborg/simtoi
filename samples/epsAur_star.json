@@ -1,30 +1,30 @@
 // Model save file from SIMTOI in JSON format.
 
 {
-    "area_height" : 128,
-    "area_scale" : 0.025,
-    "area_width" : 128,
+	"area_height" : 128,
+	"area_scale" : 0.0250,
+	"area_width" : 128,
 	"model_0" : 
 	{
 		"base_data" : 
 		{
-			"Color" : [ 1.0, 0.0, 0.0, false ],
-			"Diameter" : [ 3.0, 1.0, 3.0, true ],
-			"Inclination" : [ 0.0, 0.0, 0.0, false ],
-			"Pos. Angle" : [ 0.0, 0.0, 0.0, false ],
-			"Rotation" : [ 0.0, 0.0, 0.0, false ]
+			"Color" : [ 1.0, 0.0, 0.0, false, 0.0 ],
+			"Diameter" : [ 3.0, 1.0, 3.0, true, 0.1 ],
+			"Inclination" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"Pos. Angle" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"Rotation" : [ 0.0, 0.0, 0.0, false, 0.0 ]
 		},
 		"base_id" : "sphere",
 		"position_data" : 
 		{
-            "X" : [ 0.0, 0.0, 0.0, false ],
-            "Y" : [ 0.0, 0.0, 0.0, false ],
-            "Z" : [ 0.0, 0.0, 0.0, false ]
+			"E" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"N" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"Z" : [ 0.0, 0.0, 0.0, false, 0.0 ]
 		},
 		"position_id" : "xyz",
 		"shader_data" : 
 		{
-			"alpha" : [ 0.50, 0.1, 1.0, false ]
+			"alpha" : [ 0.50, 0.10, 1.0, true, 0.1 ]
 		},
 		"shader_id" : "ldl_power_law"
 	}
