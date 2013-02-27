@@ -35,6 +35,7 @@
 #include <tuple>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 #include "CWorkerThread.h"
 #include "CModelList.h"
@@ -56,42 +57,25 @@ CMinimizerPtr CGridSearch::Create()
 	return CMinimizerPtr(new CGridSearch());
 }
 
-void CGridSearch::ExportResults()
-{
-	// Call the base-class export function:
-	CMinimizerThread::ExportResults();
-
-	stringstream filename;
-	ofstream outfile;
-	double tmp[3];
-
-	// Open the statistics file for writing:
-	filename.str("");
-	filename << mSaveFolder << "/gridsearch.txt";
-	outfile.open(filename.str().c_str());
-	outfile.width(15);
-	outfile.precision(8);
-	outfile << "# Param1 Param2 Chi2" << endl;
-
-	// write the data to the file
-	for(int i = 0; i < mResults.size(); i++)
-		outfile << get<0>(mResults[i]) << " " << get<1>(mResults[i]) << " " << get<2>(mResults[i]) << endl;
-
-	outfile.close();
-}
-
 void CGridSearch::GridSearch(unsigned int level)
 {
-	if(level = mNParams)
+	if(level == mNParams)
 	{
 	    CModelListPtr model_list = mWorkerThread->GetModelList();
 		model_list->SetFreeParameters(mParams, mNParams, false);
 		mWorkerThread->GetChi(&mChis[0], mChis.size());
 		double chi2r = ComputeChi2r(mChis, mNParams);
 
-		WriteRow(mParams, mNParams, mOutputFile);
+		WriteRow(mParams, mNParams, chi2r, mOutputFile);
 
+		// If this set of parameters fits better, replace the best-fit params.
+		if(chi2r < mBestFit[mNParams])
+		{
+			for(int i = 0; i < mNParams; i++)
+				mBestFit[i] = mParams[i];
 
+			mBestFit[mNParams] = chi2r;
+		}
 	}
 	else
 	{
@@ -109,12 +93,32 @@ void CGridSearch::GridSearch(unsigned int level)
 	}
 }
 
+void CGridSearch::Init(shared_ptr<CWorkerThread> worker_thread)
+{
+	CMinimizerThread::Init(worker_thread);
+
+	mSteps.resize(mNParams);
+}
+
 void CGridSearch::run()
 {
 	// Get the min/max ranges for the parameters:
+    CModelListPtr model_list = mWorkerThread->GetModelList();
     model_list->GetFreeParameters(mParams, mNParams, true);
 	mMinMax = model_list->GetFreeParamMinMaxes();
-	mSteps = model_list->GetFreeParamSteps();
+	model_list->GetFreeParameterSteps(&mSteps[0], mSteps.size());
+
+	// Verify that all of the steps are > 0
+	for(double step: mSteps)
+	{
+		if(step <= 0)
+			throw runtime_error("Step size for one parameter is zero. Please fix and try again!");
+	}
+
+	// Resize the best-fit parameter array to hold the best-fit parameters
+	// and their chi2r (as the last element)
+	mBestFit.resize(mNParams + 1);
+	mBestFit[mNParams] = 1E6;	// Init the best-fit chi2r to some bogus value.
 
 	stringstream filename;
 
@@ -127,7 +131,7 @@ void CGridSearch::run()
 
 	mIsRunning = true;
 	GridSearch(0);
-	mIsRunnning = false;
+	mIsRunning = false;
 
 	mOutputFile.close();
 

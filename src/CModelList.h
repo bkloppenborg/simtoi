@@ -67,6 +67,7 @@ public:
 	vector< pair<double, double> > GetFreeParamMinMaxes();
 	void GetFreeParameters(double * params, int n_params, bool scale_params);
 	void GetFreeParametersScaled(double * params, int n_params);
+	void GetFreeParameterSteps(double * steps, unsigned int size);
 	vector<string> GetFreeParamNames();
 	CModelPtr GetModel(int i) { return mModels.at(i); };
 	double GetTime() { return mTime; };

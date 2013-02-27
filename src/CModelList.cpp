@@ -119,6 +119,16 @@ void CModelList::GetFreeParameters(double * params, int n_params, bool scale_par
     }
 }
 
+void CModelList::GetFreeParameterSteps(double * steps, unsigned int size)
+{
+	unsigned int n = 0;
+	for(auto model: mModels)
+	{
+		model->GetFreeParameterSteps(steps + n, size - n);
+		n += model->GetTotalFreeParameters();
+	}
+}
+
 /// Returns a vector of string containing the parameter names.
 vector<string> CModelList::GetFreeParamNames()
 {

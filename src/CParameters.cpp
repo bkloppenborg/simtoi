@@ -50,6 +50,7 @@ CParameters::CParameters(const CParameters & other)
 	mScales = new double[mNParams];
 	mMinMax = new pair<double,double>[mNParams];
 	mName = other.mName;
+	mSteps = new double[mNParams];
 
 	// Init parameter values.
 	for(int i = 0; i < mNParams; i++)
@@ -61,6 +62,7 @@ CParameters::CParameters(const CParameters & other)
 		mMinMax[i].first = other.mMinMax[i].first;
 		mMinMax[i].second = other.mMinMax[i].second;
 		mParamNames.push_back(other.mParamNames[i]);
+		mSteps[i] = other.mSteps[i];
 	}
 }
 
@@ -78,6 +80,7 @@ CParameters::CParameters(unsigned int n_params)
 	mScales = new double[mNParams];
 	mMinMax = new pair<double,double>[mNParams];
 	mName = "";
+	mSteps = new double[mNParams];
 
 	// Init parameter values.
 	for(int i = 0; i < mNParams; i++)
@@ -86,6 +89,7 @@ CParameters::CParameters(unsigned int n_params)
 		mFreeParams[i] = false;
 		mScales[i] = 1;
 		mMinMax[i] = pair<double,double>(0.0, 0.0);
+		mSteps[i] = 0;
 	}
 }
 
@@ -95,6 +99,7 @@ CParameters::~CParameters()
 	delete[] mFreeParams;
 	delete[] mScales;
 	delete[] mMinMax;
+	delete[] mSteps;
 }
 
 /// \brief Counts the number of free parameters in this object
@@ -231,6 +236,19 @@ vector<string> CParameters::GetParamNames()
 	return mParamNames;
 }
 
+void CParameters::GetFreeParamSteps(double * steps, unsigned int size)
+{
+	int j = 0;
+	for(int i = 0; i < mNParams && j < size; i++)
+	{
+		if(mFreeParams[i])
+		{
+			steps[j] = mSteps[i];
+			j++;
+		}
+	}
+}
+
 /// \brief Returns all of the parameters as a vector of pairs in (id, name) format
 vector< pair<int, string> > CParameters::GetParamIDsNames()
 {
@@ -284,11 +302,14 @@ void CParameters::Restore(Json::Value input)
 		name = mParamNames[i];
 		if(input.isMember(name))
 		{
-			//
+			// Note, we do not need to check the sizes of input[name] here
+			// because JSONcpp will automatically fill in zeros for undefined
+			// values.
 			mParams[i] =        double( input[name][0u].asDouble() );
 			mMinMax[i].first =  double( input[name][1u].asDouble() );
 			mMinMax[i].second = double( input[name][2u].asDouble() );
-			mFreeParams[i] =    bool ( input[name][3u].asBool()   );
+			mFreeParams[i] =    bool  ( input[name][3u].asBool()   );
+			mSteps[i] = 		double( input[name][4u].asDouble() );
 		}
 	}
 
@@ -393,6 +414,7 @@ Json::Value CParameters::Serialize()
 		tmp.append(Json::Value(mMinMax[i].first));
 		tmp.append(Json::Value(mMinMax[i].second));
 		tmp.append(Json::Value(mFreeParams[i]));
+		tmp.append(Json::Value(mSteps[i]));
 		output[mParamNames[i]] = tmp;
 	}
 

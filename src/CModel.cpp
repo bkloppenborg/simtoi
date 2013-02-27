@@ -234,6 +234,22 @@ vector<string> CModel::GetFreeParameterNames()
 	return tmp1;
 }
 
+// \brief Gets the step sizes for the free parameters.
+void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
+{
+	int n = 0;
+	GetFreeParamSteps(steps, size);
+	n += this->mNFreeParams;
+	mPosition->GetFreeParamSteps(steps + n, size - n);
+	n += mPosition->GetNFreeParams();
+
+	if(mShader != NULL)
+	{
+		mShader->GetFreeParamSteps(steps + n, size - n);
+		n += mShader->GetNFreeParams();
+	}
+}
+
 /// \brief Gets the total number of free parameters in the model.
 int CModel::GetTotalFreeParameters()
 {

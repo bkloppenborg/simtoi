@@ -69,6 +69,7 @@ protected:
 	int mNFreeParams; 		///< The number of free parameters stored in this object
 	bool * mFreeParams; 	///< A bitmask for which parameters are free
 	double * mScales; 		///< Scaling factors for the parameters
+	double * mSteps;
 	pair<double, double> * mMinMax; ///< Minimum/maximum values
 	vector<string> mParamNames; ///< Parameter names
 
@@ -86,6 +87,7 @@ protected:
 public:
 	void GetFreeParams(double * params, unsigned int n_params, bool scale_params);
 	vector<string> GetFreeParamNames();
+	virtual void GetFreeParamSteps(double * steps, unsigned int size);
 	string GetName(void) { return mName; };
 	int GetNFreeParams(void) { return mNFreeParams; };
 	int GetNParams(void) { return mNParams; };

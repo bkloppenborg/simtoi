@@ -44,15 +44,17 @@ protected:
 	vector<double> mSteps;
 	ofstream mOutputFile;
 
+	valarray<double> mBestFit;
+
 public:
 	CGridSearch();
 	virtual ~CGridSearch();
 
 	static CMinimizerPtr Create();
 
-	virtual void ExportResults();
-
 	void GridSearch(unsigned int level);
+
+	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
 
 	void run();
 

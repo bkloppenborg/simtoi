@@ -110,6 +110,7 @@ CShader::CShader(string json_config_file)
 	mScales = new double[mNParams];
 	mMinMax = new pair<double,double>[mNParams];
 	mName = input["human_name"].asString();
+	mSteps = new double[mNParams];
 
 	// Init parameter values.
 	for(int i = 0; i < mNParams; i++)
@@ -121,6 +122,7 @@ CShader::CShader(string json_config_file)
 		mMinMax[i].first = t_min_max[i].first;
 		mMinMax[i].second = t_min_max[i].second;
 		mParamNames.push_back(t_names[i]);
+		mSteps[i] = 0;
 	}
 
 	//

@@ -102,6 +102,7 @@ public:
 	void GetFreeParameters(double * params, int n_params, bool scale_params);
 	vector<string> GetFreeParameterNames();
 	vector< pair<double, double> > GetFreeParamMinMaxes();
+	void GetFreeParameterSteps(double * steps, unsigned int size);
 
 	void SetFreeParameters(double * params, int n_params, bool scale_params);
 
