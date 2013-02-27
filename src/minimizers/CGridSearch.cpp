@@ -57,8 +57,19 @@ CMinimizerPtr CGridSearch::Create()
 	return CMinimizerPtr(new CGridSearch());
 }
 
+void CGridSearch::ExportResults()
+{
+	// Copy the best-fit parameters into the mParams buffer
+	for(unsigned int i = 0; i < mNParams; i++)
+		mParams[i] = mBestFit[i];
+
+	// Call the base-class function:
+	CMinimizerThread::ExportResults();
+}
+
 void CGridSearch::GridSearch(unsigned int level)
 {
+	// If we just set the last parameter, get the chi2r
 	if(level == mNParams)
 	{
 	    CModelListPtr model_list = mWorkerThread->GetModelList();
@@ -90,6 +101,10 @@ void CGridSearch::GridSearch(unsigned int level)
 			mParams[level] = value;
 			GridSearch(level + 1);
 		}
+
+		// If we are on an even level, flush the results to a file.
+		if(level % 2 == 0)
+			mOutputFile.flush();
 	}
 }
 

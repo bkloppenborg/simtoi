@@ -52,6 +52,8 @@ public:
 
 	static CMinimizerPtr Create();
 
+	void ExportResults();
+
 	void GridSearch(unsigned int level);
 
 	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
