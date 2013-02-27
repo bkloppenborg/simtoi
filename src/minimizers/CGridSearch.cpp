@@ -52,11 +52,16 @@ CGridSearch::~CGridSearch() {
 	// TODO Auto-generated destructor stub
 }
 
+/// \brief Create a new CGridSearch object
 CMinimizerPtr CGridSearch::Create()
 {
 	return CMinimizerPtr(new CGridSearch());
 }
 
+/// \brief Export results from this minimizer.
+///
+/// Overrides the base class method to copy the best-fit parameters into the
+/// mParams buffer.
 void CGridSearch::ExportResults()
 {
 	// Copy the best-fit parameters into the mParams buffer
@@ -67,16 +72,23 @@ void CGridSearch::ExportResults()
 	CMinimizerThread::ExportResults();
 }
 
+/// \brief A recurisve gridsearch function
+///
+/// Recursivly calls gridsearch until the final level is found. At this level
+/// the data are simulated and written to mOutputFile. Data are flushed to disk
+/// after a level %2 == 0 iteration completes.
 void CGridSearch::GridSearch(unsigned int level)
 {
 	// If we just set the last parameter, get the chi2r
 	if(level == mNParams)
 	{
+		// Get the chi2r for the data set
 	    CModelListPtr model_list = mWorkerThread->GetModelList();
 		model_list->SetFreeParameters(mParams, mNParams, false);
 		mWorkerThread->GetChi(&mChis[0], mChis.size());
 		double chi2r = ComputeChi2r(mChis, mNParams);
 
+		// Save to the file
 		WriteRow(mParams, mNParams, chi2r, mOutputFile);
 
 		// If this set of parameters fits better, replace the best-fit params.
@@ -88,7 +100,7 @@ void CGridSearch::GridSearch(unsigned int level)
 			mBestFit[mNParams] = chi2r;
 		}
 	}
-	else
+	else	// Otherwise set the current parameter value and then recursivly call the next level.
 	{
 		double step = mSteps[level];
 		double min = mMinMax[level].first;
@@ -108,6 +120,7 @@ void CGridSearch::GridSearch(unsigned int level)
 	}
 }
 
+/// \brief Initialize the gridsearch minimizer.
 void CGridSearch::Init(shared_ptr<CWorkerThread> worker_thread)
 {
 	CMinimizerThread::Init(worker_thread);
@@ -115,6 +128,7 @@ void CGridSearch::Init(shared_ptr<CWorkerThread> worker_thread)
 	mSteps.resize(mNParams);
 }
 
+/// \brief Run the gridsearch minimzer
 void CGridSearch::run()
 {
 	// Get the min/max ranges for the parameters:
@@ -135,25 +149,28 @@ void CGridSearch::run()
 	mBestFit.resize(mNParams + 1);
 	mBestFit[mNParams] = 1E6;	// Init the best-fit chi2r to some bogus value.
 
-	stringstream filename;
-
 	// Open the statistics file for writing:
+	stringstream filename;
 	filename.str("");
 	filename << mSaveFolder << "/gridsearch.txt";
 	mOutputFile.open(filename.str().c_str());
 	mOutputFile.width(15);
 	mOutputFile.precision(8);
+	// write a somewhat descriptive header
+	mOutputFile << "Param0, Param1, ..., ParamN, chi2r" << endl;
 
+	// run the minimizer
 	mIsRunning = true;
 	GridSearch(0);
 	mIsRunning = false;
 
 	mOutputFile.close();
 
-	// Export the results.  Note, mParams is set to the maximum value, not the minimum.
+	// Export the results.
 	ExportResults();
 }
 
+/// \brief Writes a row of data to the output file.
 void CGridSearch::WriteRow(double * data, unsigned int size, double chi2r, ofstream & output)
 {
 	for(int i = 0; i < size; i++)
