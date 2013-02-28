@@ -99,6 +99,7 @@ public:
 	vector<string> GetParamNames();
 	vector< pair<int, string> > GetParamIDsNames();
 	string GetParamName(unsigned int param_num);
+	double GetStepSize(unsigned int param_num);
 
 	bool IsFree(unsigned int param_num);
 
@@ -111,6 +112,7 @@ public:
 	void SetMax(unsigned int param_num, double value);
 	void SetName(string name) { mName = name; };
 	void SetParam(unsigned int param_num, double value);
+	void SetStepSize(unsigned int param_num, double value);
 	virtual Json::Value Serialize();
 };
 

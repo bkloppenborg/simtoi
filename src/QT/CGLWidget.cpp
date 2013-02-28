@@ -128,6 +128,12 @@ void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * para
 		item->setData(QVariant((double)parameters->GetMax(j)), Qt::DisplayRole);
 		items << item;
 
+		// Maximum step size
+		item = new CParameterItem(parameters, j);
+		item->setEditable(true);
+		item->setData(QVariant((double)parameters->GetStepSize(j)), Qt::DisplayRole);
+		items << item;
+
 		parent_widget->appendRow(items);
 	}
 }
@@ -222,7 +228,7 @@ void CGLWidget::paintEvent(QPaintEvent *)
 void CGLWidget::RebuildTree()
 {
 	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value" << "Min" << "Max";
+	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
 	mTreeModel.clear();
 	mTreeModel.setColumnCount(5);
 	mTreeModel.setHorizontalHeaderLabels(labels);

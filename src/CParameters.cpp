@@ -273,6 +273,20 @@ string CParameters::GetParamName(unsigned int param_n)
 	return 0;
 }
 
+/// \brief Returns the value of the specified parameter.
+///
+/// If the parameter is out of bounds, this function throws a out_of_range
+/// exception.
+double CParameters::GetStepSize(unsigned int param_n)
+{
+	if(param_n < mNParams)
+		return mSteps[param_n];
+
+	throw std::out_of_range("Attempt to access an out-of-bound parameter. CParameters::GetStepSize().");
+
+	return 0;
+}
+
 /// \brief Returns true of the specified parameter is free.
 ///
 /// If `param_num` is out of bounds, an `out_of_range` exception will be thrown.
@@ -392,6 +406,16 @@ void CParameters::SetParam(unsigned int param_num, double value)
 {
 	if(param_num < mNParams)
 		mParams[param_num] = value;
+}
+
+/// \brief Sets the specified step size to the indicated value.
+///
+/// NOTE: It is expected value is in native units. Scaling from a unit hypercube
+/// is not performed
+void CParameters::SetStepSize(unsigned int param_num, double value)
+{
+	if(param_num < mNParams)
+		mSteps[param_num] = value;
 }
 
 /// \brief Serializes the parameters to a Json::Value object
