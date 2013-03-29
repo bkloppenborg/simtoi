@@ -109,6 +109,18 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
     SwapBuffers();
 }
 
+/// \brief Instructs the task lists to prepare a bootstrapped data set
+void CWorkerThread::BootstrapNext()
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	Enqueue(BOOTSTRAP_NEXT);
+
+	// Wait for the operation to complete.
+	mWorkerSemaphore.acquire(1);
+}
+
 /// Static function for checking OpenGL errors:
 void CWorkerThread::CheckOpenGLError(string function_name)
 {
@@ -408,6 +420,10 @@ void CWorkerThread::run()
 
 		case ANIMATE_STOP:
 			ClearQueue();
+			break;
+
+		case BOOTSTRAP_NEXT:
+			mTaskList->BootstrapNext();
 			break;
 
 		case EXPORT:

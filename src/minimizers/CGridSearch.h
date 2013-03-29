@@ -59,8 +59,6 @@ public:
 	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
 
 	void run();
-
-	void WriteRow(double * data, unsigned int size, double chi2r, ofstream & output);
 };
 
 #endif /* CMINIMIZER_GRIDSEARCH_H_ */

@@ -164,3 +164,12 @@ void CMinimizerThread::stop()
 {
 	mRun = false;
 }
+
+/// \brief Writes a row of data to the output file.
+void CMinimizerThread::WriteRow(double * data, unsigned int size, double chi2r, ofstream & output)
+{
+	for(int i = 0; i < size; i++)
+		output << data[i] << ", ";
+
+	output << chi2r << endl;
+}

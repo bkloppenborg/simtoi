@@ -59,6 +59,8 @@ public:
 	COI(CWorkerThread * WorkerThread);
 	virtual ~COI();
 
+	virtual void BootstrapNext();
+
 	static CTaskPtr Create(CWorkerThread * worker);
 
 	void Export(string folder_name);

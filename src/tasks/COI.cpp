@@ -71,6 +71,12 @@ COI::~COI()
 	if(mFBO_storage_texture) glDeleteFramebuffers(1, &mFBO_storage_texture);
 }
 
+/// \brief Creates a new data set via. bootstrapping and replacing currently loaded data.
+void COI::BootstrapNext()
+{
+
+}
+
 CTaskPtr COI::Create(CWorkerThread * WorkerThread)
 {
 	return CTaskPtr(new COI(WorkerThread));

@@ -70,6 +70,7 @@ enum WorkerOperations
 {
 	ANIMATE,
 	ANIMATE_STOP,
+	BOOTSTRAP_NEXT,
 	EXPORT,
 	GET_CHI,
 	GET_UNCERTAINTIES,
@@ -146,6 +147,7 @@ public:
 public:
     void BlitToBuffer(GLuint in_buffer, GLuint out_buffer);
     void BlitToScreen(GLuint FBO);
+    void BootstrapNext();
 
     static void CheckOpenGLError(string function_name);
 protected:

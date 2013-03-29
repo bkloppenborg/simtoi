@@ -65,6 +65,17 @@ CPhotometry::~CPhotometry()
 	if(mFBO_storage_texture) glDeleteFramebuffers(1, &mFBO_storage_texture);
 }
 
+/// \brief Creates a new data set by selecting a subset of the loaded data
+void CPhotometry::BootstrapNext()
+{
+
+}
+
+CTaskPtr CPhotometry::Create(CWorkerThread * WorkerThread)
+{
+	return CTaskPtr(new CPhotometry(WorkerThread));
+}
+
 void CPhotometry::Export(string folder_name)
 {
 	InitBuffers();
@@ -107,11 +118,6 @@ void CPhotometry::Export(string folder_name)
 
 		outfile.close();
 	}
-}
-
-CTaskPtr CPhotometry::Create(CWorkerThread * WorkerThread)
-{
-	return CTaskPtr(new CPhotometry(WorkerThread));
 }
 
 void CPhotometry::GetChi(double * chi, unsigned int size)

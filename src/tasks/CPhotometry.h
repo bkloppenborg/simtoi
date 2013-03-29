@@ -79,6 +79,8 @@ public:
 	CPhotometry(CWorkerThread * WorkerThread);
 	virtual ~CPhotometry();
 
+	virtual void BootstrapNext();
+
 	static CTaskPtr Create(CWorkerThread * worker);
 
 	virtual void Export(string folder_name);

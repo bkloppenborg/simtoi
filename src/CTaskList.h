@@ -30,6 +30,8 @@ public:
 	CTaskList(CWorkerThread * WorkerThread);
 	virtual ~CTaskList();
 
+	void BootstrapNext();
+
 	void Export(string export_folder);
 
 	void GetChi(double * chis, unsigned int size);

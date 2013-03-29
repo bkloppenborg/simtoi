@@ -134,6 +134,8 @@ public:
 
 		output << data[data.size() - 1] << endl;
 	}
+
+	static void WriteRow(double * data, unsigned int size, double chi2r, ofstream & output);
 };
 
 #endif /* CMINIMIZER_H_ */

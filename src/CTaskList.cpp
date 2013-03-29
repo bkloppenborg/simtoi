@@ -29,6 +29,14 @@ CTaskList::~CTaskList()
 
 }
 
+void CTaskList::BootstrapNext()
+{
+	for(auto task: mTasks)
+	{
+		task->BootstrapNext();
+	}
+}
+
 void CTaskList::Export(string export_folder)
 {
 	for(auto task: mTasks)
