@@ -109,7 +109,7 @@ void CBootstrap_Levmar::run()
 		mLevmar->run();
 
 		// Set the best-fit parameters, then compute the average reduced chi2 per data set
-		model_list->SetFreeParameters(mLevmar->mParams, mNParams, true);
+		model_list->SetFreeParameters(mLevmar->mParams, mNParams, false);
 		mWorkerThread->GetChi(&mChis[0], mChis.size());
 		chi2r_ave = ComputeChi2r(mChis, mNParams);
 

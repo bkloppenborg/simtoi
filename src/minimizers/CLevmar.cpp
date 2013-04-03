@@ -203,7 +203,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 
 	printf("Levmar executed %i iterations.\n", iterations);
 	printresult(mParams, mNParams, n_data, names, info, covar);
-	ExportResults();
+	//ExportResults();
 
 	return iterations;
 }
