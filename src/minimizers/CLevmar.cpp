@@ -146,6 +146,7 @@ void CLevmar::run()
 {
 	// Run the minimizer using this instance of CMinimizer_levmar
 	run(&CLevmar::ErrorFunc);
+	ExportResults();
 }
 
 int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *adata))
@@ -203,7 +204,6 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 
 	printf("Levmar executed %i iterations.\n", iterations);
 	printresult(mParams, mNParams, n_data, names, info, covar);
-	//ExportResults();
 
 	return iterations;
 }

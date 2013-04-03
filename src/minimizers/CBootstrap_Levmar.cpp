@@ -52,8 +52,8 @@ void CBootstrap_Levmar::Init(shared_ptr<CWorkerThread> worker_thread)
 	// call the base class initialization routine
 	CMinimizerThread::Init(worker_thread);
 
-	// Create an instance of CLevmar and initialize it
-	mLevmar = CLevmar::Create();
+	// Create an instance of CLevmar and initialize it. Notice we still wrap in a shared_ptr
+	mLevmar = shared_ptr<CLevmar>(new CLevmar());
 	mLevmar->Init(this->mWorkerThread);
 }
 
@@ -106,7 +106,7 @@ void CBootstrap_Levmar::run()
 		cout << endl << "Starting iteration " << iteration + 1 << endl;
 
 		// run the minimizer. The best-fit parameters are stored in mParams upon completion
-		mLevmar->run();
+		mLevmar->run(&CLevmar::ErrorFunc);
 
 		// Set the best-fit parameters, then compute the average reduced chi2 per data set
 		model_list->SetFreeParameters(mLevmar->mParams, mNParams, false);

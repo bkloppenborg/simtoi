@@ -10,6 +10,8 @@
 
 #include "CMinimizerThread.h"
 
+class CLevmar;
+
 class CBootstrap_Levmar: public CMinimizerThread
 {
 public:
@@ -25,7 +27,7 @@ protected:
 
 	ofstream mOutputFile;
 
-	CMinimizerPtr mLevmar;
+	shared_ptr<CLevmar> mLevmar;
 
 public:
 	virtual void ExportResults();
