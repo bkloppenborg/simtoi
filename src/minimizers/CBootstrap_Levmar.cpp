@@ -11,6 +11,7 @@
 #include <chrono>
 #include <stdexcept>
 
+#include "CLevmar.h"
 #include "CWorkerThread.h"
 #include "CModelList.h"
 
@@ -24,12 +25,16 @@ CBootstrap_Levmar::CBootstrap_Levmar()
 	mBootstrapFailures = 0;
 	mMaxBootstrapFailures = 20;
 	mIterations = 10000;
-
 }
 
 CBootstrap_Levmar::~CBootstrap_Levmar()
 {
 
+}
+
+CMinimizerPtr CBootstrap_Levmar::Create()
+{
+	return CMinimizerPtr(new CBootstrap_Levmar());
 }
 
 /// \brief Overwride the CMinimizerThread::ExportResult function to do nothing.
@@ -40,6 +45,16 @@ CBootstrap_Levmar::~CBootstrap_Levmar()
 void CBootstrap_Levmar::ExportResults()
 {
 	// do nothing
+}
+
+void CBootstrap_Levmar::Init(shared_ptr<CWorkerThread> worker_thread)
+{
+	// call the base class initialization routine
+	CMinimizerThread::Init(worker_thread);
+
+	// Create an instance of CLevmar and initialize it
+	mLevmar = CLevmar::Create();
+	mLevmar->Init(this->mWorkerThread);
 }
 
 /// \brief Runs the levmar-based bootstrapping minimizer.
@@ -81,19 +96,20 @@ void CBootstrap_Levmar::run()
 			break;
 
 		// Randomize the starting position of the minimizer
-		for(int i = 0; i < mNParams; i++)
-			mParams[i] = distribution(generator);
+		for(int i = 0; i < mLevmar->mNParams; i++)
+			mLevmar->mParams[i] = distribution(generator);
 
 		// Set the starting position.  Note these values are [0...1] and need to be scaled.
-		model_list->SetFreeParameters(mParams, mNParams, true);
+		model_list->SetFreeParameters(mLevmar->mParams, mLevmar->mNParams, true);
 
 		// Print a status message:
 		cout << endl << "Starting iteration " << iteration + 1 << endl;
 
-		// run the minimizer
-		exit_value = CLevmar::run(&CLevmar::ErrorFunc);
+		// run the minimizer. The best-fit parameters are stored in mParams upon completion
+		mLevmar->run();
 
-		// Compute the average reduced chi2 per data set
+		// Set the best-fit parameters, then compute the average reduced chi2 per data set
+		model_list->SetFreeParameters(mLevmar->mParams, mNParams, true);
 		mWorkerThread->GetChi(&mChis[0], mChis.size());
 		chi2r_ave = ComputeChi2r(mChis, mNParams);
 
@@ -114,10 +130,18 @@ void CBootstrap_Levmar::run()
 
 		// Write the results to a file:
 		// Save to the file
-		WriteRow(mParams, mNParams, chi2r_ave, mOutputFile);
+		WriteRow(mLevmar->mParams, mLevmar->mNParams, chi2r_ave, mOutputFile);
 
 		// Get the next bootstrapped data set and repeat.
-		mWorkerThread->BootstrapNext();
+		mWorkerThread->BootstrapNext(mMaxBootstrapFailures);
 	}
 
+}
+
+/// \brief Stops the minimizer.
+void CBootstrap_Levmar::stop()
+{
+	mRun = false;
+	if(mLevmar)
+		mLevmar->mRun = false;
 }

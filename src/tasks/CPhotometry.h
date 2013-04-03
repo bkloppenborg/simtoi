@@ -79,7 +79,7 @@ public:
 	CPhotometry(CWorkerThread * WorkerThread);
 	virtual ~CPhotometry();
 
-	virtual void BootstrapNext();
+	virtual void BootstrapNext(unsigned int maxBootstrapFailures);
 
 	static CTaskPtr Create(CWorkerThread * worker);
 

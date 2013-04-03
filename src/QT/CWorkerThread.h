@@ -136,6 +136,7 @@ protected:
 	unsigned int mTempArraySize;
 	string mTempString;
 	double mTempDouble;
+	unsigned int mTempUint;
 
 public:
     CWorkerThread(CGLWidget * glWidget, QString exe_folder);
@@ -147,7 +148,7 @@ public:
 public:
     void BlitToBuffer(GLuint in_buffer, GLuint out_buffer);
     void BlitToScreen(GLuint FBO);
-    void BootstrapNext();
+    void BootstrapNext(unsigned int maxBootstrapFailures);
 
     static void CheckOpenGLError(string function_name);
 protected:

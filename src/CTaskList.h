@@ -30,7 +30,7 @@ public:
 	CTaskList(CWorkerThread * WorkerThread);
 	virtual ~CTaskList();
 
-	void BootstrapNext();
+	void BootstrapNext(unsigned int maxBootstrapFailures);
 
 	void Export(string export_folder);
 

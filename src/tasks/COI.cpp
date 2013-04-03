@@ -33,6 +33,10 @@
 #include "COI.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <stdexcept>
+#include "oi_tools.hpp"
+// TODO: Figure out how to pull in additional calibrator models
+#include "CUniformDisk.h"
 
 #include "CModelList.h"
 
@@ -72,9 +76,63 @@ COI::~COI()
 }
 
 /// \brief Creates a new data set via. bootstrapping and replacing currently loaded data.
-void COI::BootstrapNext()
+void COI::BootstrapNext(unsigned int maxBootstrapFailures)
 {
+	unsigned int nBootstrapFailures;
 
+	// If this is our first bootstrap, copy the OIDataList into local memory.
+	if(mData.size() == 0)
+	{
+		int nData = mLibOI->GetNDataSets();
+		for(int data_set = 0; data_set < nData; data_set++)
+			mData.push_back(mLibOI->GetData(data_set));
+	}
+
+	// TODO: Calibrator information is hard-coded for eps Aur. This should be read in from elsewhere.
+	pair<double, double> old_cal_prop(0.419 * MAS_TO_RAD, 0.063 * MAS_TO_RAD);		// eta Aur MIRC calibrator size
+	pair<double, double> new_cal_prop(0.453 * MAS_TO_RAD, 0.012 * MAS_TO_RAD);		// eta Aur from Maestro et al 2013.
+
+	std::default_random_engine generator;
+	std::normal_distribution<double> new_cal_distribution(new_cal_prop.first, new_cal_prop.second);
+
+	// Setup the old calibrator
+	OICalibratorPtr old_cal = OICalibratorPtr( new ccoifits::CUniformDisk(old_cal_prop.first) );
+	OICalibratorPtr new_cal = OICalibratorPtr( new ccoifits::CUniformDisk(new_cal_distribution(generator)) );
+
+	// Recalibrate the data.
+	// TODO: Note this function assumes the SAME calibrator is used on ALL data sets. This probably isn't true.
+	// This issue is listed in https://github.com/bkloppenborg/simtoi/issues/53.
+	for(int i = 0; i < mData.size(); i++)
+	{
+		auto data = mData[i];
+
+		// Recalibrate, bootstrap, then push to the OpenCL device:
+		OIDataList t_data = Recalibrate(data, old_cal, new_cal);
+		t_data = Bootstrap_Spectral(t_data);
+
+		// Replace the 0th entry with temp.
+		// Due to a bug in ccoifits the total data size may not be preserved, so we need to
+		// catch and repeat.
+		try
+		{
+			mLibOI->ReplaceData(i, t_data);
+		}
+		catch(length_error& l)
+		{
+			// Generate an error message on stderr.
+			cerr << " Warning: " << l.what() << " " << "Generating a new bootstrapped data set." << endl;
+			nBootstrapFailures += 1;
+			i--;
+
+			// If we haven't exceeded the maximum number of bootstrap failures, repeat
+			// this iteration.
+			if(nBootstrapFailures < maxBootstrapFailures)
+				continue;
+			else
+				throw runtime_error("Too many bootstrap data generation failures.");
+		}
+		nBootstrapFailures = 0;
+	}
 }
 
 CTaskPtr COI::Create(CWorkerThread * WorkerThread)

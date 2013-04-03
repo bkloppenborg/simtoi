@@ -29,11 +29,11 @@ CTaskList::~CTaskList()
 
 }
 
-void CTaskList::BootstrapNext()
+void CTaskList::BootstrapNext(unsigned int maxBootstrapFailures)
 {
 	for(auto task: mTasks)
 	{
-		task->BootstrapNext();
+		task->BootstrapNext(maxBootstrapFailures);
 	}
 }
 

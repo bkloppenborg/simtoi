@@ -66,7 +66,7 @@ CPhotometry::~CPhotometry()
 }
 
 /// \brief Creates a new data set by selecting a subset of the loaded data
-void CPhotometry::BootstrapNext()
+void CPhotometry::BootstrapNext(unsigned int maxBootstrapFailures)
 {
 
 }

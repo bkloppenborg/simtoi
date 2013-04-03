@@ -110,11 +110,12 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
 }
 
 /// \brief Instructs the task lists to prepare a bootstrapped data set
-void CWorkerThread::BootstrapNext()
+void CWorkerThread::BootstrapNext(unsigned int maxBootstrapFailures)
 {
 	// Get exclusive access to the worker
 	QMutexLocker lock(&mWorkerMutex);
 
+	mTempUint = maxBootstrapFailures;
 	Enqueue(BOOTSTRAP_NEXT);
 
 	// Wait for the operation to complete.
@@ -423,7 +424,8 @@ void CWorkerThread::run()
 			break;
 
 		case BOOTSTRAP_NEXT:
-			mTaskList->BootstrapNext();
+			mTaskList->BootstrapNext(mTempUint);
+			mWorkerSemaphore.release(1);
 			break;
 
 		case EXPORT:

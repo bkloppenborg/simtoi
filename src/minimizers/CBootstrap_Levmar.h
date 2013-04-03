@@ -8,13 +8,15 @@
 #ifndef CBOOTSTRAP_LEVMAR_H_
 #define CBOOTSTRAP_LEVMAR_H_
 
-#include "CLevmar.h"
+#include "CMinimizerThread.h"
 
-class CBootstrap_Levmar: public CLevmar
+class CBootstrap_Levmar: public CMinimizerThread
 {
 public:
 	CBootstrap_Levmar();
 	virtual ~CBootstrap_Levmar();
+
+	static CMinimizerPtr Create();
 
 protected:
 	unsigned int mBootstrapFailures;
@@ -23,9 +25,15 @@ protected:
 
 	ofstream mOutputFile;
 
+	CMinimizerPtr mLevmar;
+
 public:
 	virtual void ExportResults();
+	void Init(shared_ptr<CWorkerThread> worker_thread);
+
 	virtual void run();
+
+	virtual void stop();
 };
 
 #endif /* CBOOTSTRAP_LEVMAR_H_ */

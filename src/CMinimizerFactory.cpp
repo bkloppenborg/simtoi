@@ -47,13 +47,14 @@ using namespace std;
 #ifdef _ADD_MULTINEST
 #include "minimizers/CMultiNest.h"
 #endif // _ADD_MULTINEST
+#include "minimizers/CBootstrap_Levmar.h"
 
 /// \brief Private constructor. Use `Instance()` instead.
 CMinimizerFactory::CMinimizerFactory()
 {
 	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
 	Register("benchmark", &CBenchmark::Create);
-//	Register("bootstrap_levmar", &CBoostrap_Levmar::Create);
+	Register("bootstrap_levmar", &CBootstrap_Levmar::Create);
 	Register("gridsearch", &CGridSearch::Create);
 	Register("levmar", &CLevmar::Create);
 #ifdef _ADD_MULTINEST

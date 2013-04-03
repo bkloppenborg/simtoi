@@ -61,7 +61,7 @@ public:
 	CTask(CWorkerThread * WorkerThread);
 	virtual ~CTask();
 
-	virtual void BootstrapNext() = 0;
+	virtual void BootstrapNext(unsigned int maxBootstrapFailures) = 0;
 
 	virtual void Export(string folder_name) = 0;
 

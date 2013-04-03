@@ -55,11 +55,13 @@ protected:
 
 	float * mTempFloat;
 
+	vector<OIDataList> mData;	/// A copy of the original data. Used when bootstrapping
+
 public:
 	COI(CWorkerThread * WorkerThread);
 	virtual ~COI();
 
-	virtual void BootstrapNext();
+	virtual void BootstrapNext(unsigned int maxBootstrapFailures);
 
 	static CTaskPtr Create(CWorkerThread * worker);
 
