@@ -7,7 +7,9 @@ import re
 from scipy.stats import norm, cauchy
 import matplotlib.mlab as mlab
 
-def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=False, save_basename='', save_format='svg', trimends=False):
+def plot_histogram(filename, 
+    column_names=[], skip_cols=[], nbins=10, trimends=False,
+    autosave=False, save_directory='', save_format='svg', delimiter=None):
     """
     Plots a histogram formed from the columns of the specified file.
 
@@ -19,7 +21,10 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
     In this scheme the last column in a row is -1.
     """
     infile = open(filename, 'r')
-    data = loadtxt(infile, dtype=float, delimiter=',')
+    if(delimiter):
+        data = loadtxt(infile, dtype=float, delimiter=',')
+    else:
+        data = loadtxt(infile, dtype=float)       
     infile.close()
 
     end_col = data.shape[1]
@@ -78,7 +83,7 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
         plt.legend(loc='best')
         
         if autosave:
-            plt.savefig(save_basename + 'hist_' + title + '.' + save_format, transparent=True, format=save_format)    
+            plt.savefig(save_directory + 'stats_hist_' + title + '.' + save_format, transparent=True, format=save_format)    
             plt.close()
         else:
             plt.show()
@@ -92,12 +97,12 @@ def plot_histogram(filename, column_names=[], skip_cols=[], nbins=10, autosave=F
     if(not autosave):
         print "Normal Statistics:"
         
-    write_statistics(save_basename + '_stats_normal.txt', norm_stats, autosave)
+    write_statistics(save_directory + 'stats_normal.txt', norm_stats, autosave)
     
     if(not autosave):
         print "Cauchy Statistics:"
         
-    write_statistics(save_basename + '_stats_cauchy.txt', cauchy_stats, autosave)
+    write_statistics(save_directory + 'stats_cauchy.txt', cauchy_stats, autosave)
 
 
 def col_names(filename):
@@ -138,15 +143,17 @@ def main():
     # Set parameters specifying columns that should not be plotted
     # and attempt to find the namefile:
     skip_cols=[]
-    basename = ''
+    directory = ''
+    delimiter = None
     if re.search('bootstrap_', filename):
-        tmp = re.split('bootstrap', filename)
-        basename = tmp[0]
+        tmp = re.split('bootstrap_', filename)
+        directory = tmp[0]
         skip_cols = [-1]
+        delimiter = ','
         print "Found bootstrap file."
-    elif re.search('multinest', filename):
-        tmp = re.split('multinest', filename)
-        basename = tmp[0]
+    elif re.search('multinest.txt', filename):
+        tmp = re.split('multinest.txt', filename)
+        directory = tmp[0]
         skip_cols = [0,1]
         print "Found MultiNest file."
     else:
@@ -154,11 +161,10 @@ def main():
 
 
     column_names = []
-    if len(basename) > 1:
-        column_names = col_names(basename + '_param_names.txt')
-        print column_names
+    if len(directory) > 1:
+        column_names = col_names(directory + 'param_names.txt')
 
-    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins, autosave=options.autosave, save_basename=basename, save_format=options.savefmt, trimends=options.trimends)
+    plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins, autosave=options.autosave, save_directory=directory, save_format=options.savefmt, trimends=options.trimends, delimiter=delimiter)
    
    
 def write_statistics(filename, statistics, save_to_file):
