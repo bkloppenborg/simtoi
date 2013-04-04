@@ -83,7 +83,7 @@ public:
 	bool mRun;				/// Boolean to indicate if the minimizer should continue to run.
 							/// The programmer MUST check this and terminate the minimizer if false.
 							///
-	string mSaveFolder;		///< Folder to which minimizer save files and exported data are saved.
+	string mSaveDirectory; ///< Directory to which minimizer save files and exported data are saved.
 
 	string mMinimizerName;	///< Human-friendly name for the minimizer.
 	string mMinimizerID;	///< Unique ID for the minimizer.
@@ -107,7 +107,7 @@ public:
 	// Pure virtual function, each minimizer must implement this.
 	virtual void run() = 0;
 
-	void SetSaveFolder(string filename);
+	void SetSaveDirectory(string filename);
 	virtual void stop();
 
 	template <class T>

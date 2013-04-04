@@ -48,6 +48,9 @@ class CGLWidget : public QGLWidget
     Q_OBJECT
     
 protected:
+    // save directory
+    string mSaveDirectory;
+
     // Worker thread
     shared_ptr<CWorkerThread> mWorker;
 
@@ -99,7 +102,7 @@ public:
     void SetScale(double scale);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetMinimizer(CMinimizerPtr minimizer);
-    void SetSaveFileBasename(string filename);
+    void SetSaveDirectory(string directory_path);
     void SetSize(unsigned int width, unsigned int height);
     void startMinimizer();
     void startRendering();

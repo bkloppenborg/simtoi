@@ -43,7 +43,7 @@ CMinimizerThread::CMinimizerThread()
 	mNParams = 0;
 	mRun = false;
 	mIsRunning = false;
-	mSaveFolder = "/tmp/model";
+	mSaveDirectory = "/tmp/model";
 	mMinimizerName = "";
 	mMinimizerID = "";
 }
@@ -83,7 +83,7 @@ void CMinimizerThread::ExportResults()
 
 	// Open the statistics file for writing:
 	filename.str("");
-	filename << mSaveFolder << "/best_fit.txt";
+	filename << mSaveDirectory << "/best_fit.txt";
 	outfile.open(filename.str().c_str());
 	outfile.width(15);
 	outfile.precision(8);
@@ -103,7 +103,7 @@ void CMinimizerThread::ExportResults()
 	model_list->SetFreeParameters(mParams, mNParams, false);
 
 	// Tell the worker thread to save files.
-	QString save_folder = QString::fromStdString(mSaveFolder);
+	QString save_folder = QString::fromStdString(mSaveDirectory);
 	mWorkerThread->ExportResults(save_folder + "/");
 }
 
@@ -146,17 +146,17 @@ void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 	mUncertainties = valarray<double>(n_data);
 }
 
-/// \brief Changes the default filename which the minimizer uses for savefiles.
+/// \brief Changes the default directory to which the minimizer saves files.
 ///
 /// Some minimization engines may write out intermediate files during the
 /// minimization process. This function permits you to set an absolute path
 /// and filename prefix which is used by the minimizers.
 ///
 /// \param filename An absolute path prefix for minimizer files.
-void CMinimizerThread::SetSaveFolder(string folder_name)
+void CMinimizerThread::SetSaveDirectory(string folder_name)
 {
 	if(folder_name.size() > 0)
-		mSaveFolder = folder_name;
+		mSaveDirectory = folder_name;
 }
 
 /// \brief Stops the minimizer.

@@ -152,7 +152,7 @@ void CGridSearch::run()
 	// Open the statistics file for writing:
 	stringstream filename;
 	filename.str("");
-	filename << mSaveFolder << "/gridsearch.txt";
+	filename << mSaveDirectory << "/gridsearch.txt";
 	mOutputFile.open(filename.str().c_str());
 	mOutputFile.width(15);
 	mOutputFile.precision(8);

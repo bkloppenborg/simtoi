@@ -63,7 +63,7 @@ void CBootstrap_Levmar::run()
 	// Open the statistics file for writing:
 	stringstream filename;
 	filename.str("");
-	filename << mSaveFolder << "/bootstrap_levmar.txt";
+	filename << mSaveDirectory << "/bootstrap_levmar.txt";
 	mOutputFile.open(filename.str().c_str());
 	mOutputFile.width(15);
 	mOutputFile.precision(8);

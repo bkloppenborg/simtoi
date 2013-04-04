@@ -146,7 +146,7 @@ void CMultiNest::run()
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	const std::string path = mSaveFolder + "/multinest";		// root for output files
+	const std::string path = mSaveDirectory + "/multinest";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
 	int resume = 0;					// resume from a previous job?

@@ -61,6 +61,8 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 
 	// This signal-slot would not connect automatically, so we do it explicitly here.
 	connect(&mTreeModel, SIGNAL(parameterUpdated()), this, SLOT(on_mTreeModel_parameterUpdated()));
+
+	mSaveDirectory = "";
 }
 
 CGLWidget::~CGLWidget()
@@ -303,6 +305,12 @@ void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
 	stopMinimizer();
 	mMinimizer = minimizer;
 	mMinimizer->Init(mWorker);
+	mMinimizer->SetSaveDirectory(mSaveDirectory);
+}
+
+void CGLWidget::SetSaveDirectory(string directory_path)
+{
+	mSaveDirectory = directory_path;
 }
 
 void CGLWidget::SetSize(unsigned int width, unsigned int height)

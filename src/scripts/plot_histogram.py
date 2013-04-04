@@ -139,13 +139,13 @@ def main():
     # and attempt to find the namefile:
     skip_cols=[]
     basename = ''
-    if re.search('_bootstrap', filename):
-        tmp = re.split('_bootstrap', filename)
+    if re.search('bootstrap_', filename):
+        tmp = re.split('bootstrap', filename)
         basename = tmp[0]
         skip_cols = [-1]
         print "Found bootstrap file."
-    elif re.search('_multinest', filename):
-        tmp = re.split('_multinest', filename)
+    elif re.search('multinest', filename):
+        tmp = re.split('multinest', filename)
         basename = tmp[0]
         skip_cols = [0,1]
         print "Found MultiNest file."
