@@ -263,102 +263,6 @@ void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, 
 	mAutoClose = close_simtoi;
 }
 
-/// Exports the current rendered model to a floating point FITS file
-void gui_main::ExportFITS()
-{
-//    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-//    if(!sw)
-//    	return;
-//
-//	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-////	widget->EnqueueOperation(CLT_Init);
-//
-//    string filename;
-//    QStringList fileNames;
-//    QFileDialog dialog(this);
-//    dialog.setFileMode(QFileDialog::AnyFile);
-//    dialog.setNameFilter(tr("FITS Files (*.fits)"));
-//    dialog.setViewMode(QFileDialog::Detail);
-//    dialog.setAcceptMode(QFileDialog::AcceptSave);
-//
-//	if (dialog.exec())
-//	{
-//
-//		fileNames = dialog.selectedFiles();
-//		filename = fileNames.first().toStdString();
-//
-//		// Add an extension if it doesn't already exist
-//		if(filename.substr(filename.size() - 5, 5) != ".fits")
-//			filename += ".fits";
-//
-//		// Automatically overwrite files if they already exist.  The dialog should prompt for us.
-//		filename = "!" + filename;
-//
-//		widget->SaveImage(filename);
-//	}
-}
-
-/// Animates the display, exporting the photometry at specified intervals
-void gui_main::ExportPhotometry()
-{
-//    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-//    if(!sw)
-//    	return;
-//
-//	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-////	widget->EnqueueOperation(CLT_Init);
-//
-//    double t = this->spinTimeStart->value();
-//    double step = this->spinTimeStep->value();
-//    double duration = this->spinTimeDuration->value();
-//    double stop = t + duration;
-//    vector< pair<float, float> > output;
-//    float flux;
-//
-//    string filename;
-//    QStringList fileNames;
-//    QFileDialog dialog(this);
-//    dialog.setFileMode(QFileDialog::AnyFile);
-//    dialog.setNameFilter(tr("Text Files (*.txt)"));
-//    dialog.setViewMode(QFileDialog::Detail);
-//    dialog.setAcceptMode(QFileDialog::AcceptSave);
-//
-//	if (dialog.exec())
-//	{
-//		// Compute the flux
-//		while(t < stop)
-//		{
-////			widget->SetTime(t);
-////			widget->EnqueueOperation(GLT_RenderModels);
-////			flux = widget->GetFlux();
-//
-//			output.push_back( pair<float, float>(t, flux));
-//			t += step;
-//		}
-//
-//		fileNames = dialog.selectedFiles();
-//		filename = fileNames.first().toStdString();
-//
-//		if(filename.substr(filename.size() - 4, 4) != ".txt")
-//			filename += ".txt";
-//	}
-//
-//	ofstream outfile;
-//	outfile.open(filename.c_str());
-//	outfile.precision(4);
-//	outfile.setf(ios::fixed,ios::floatfield);
-//	outfile << "# Time Flux" << endl;
-//	//outfile << "# Created using the following parameters: " << endl;
-//
-//	for(int i = 0; i < output.size(); i++)
-//	{
-//		outfile << output[i].first << " " << -2.5*log10(output[i].second) << endl;
-//	}
-//
-//	outfile.close();
-
-}
-
 /// Runs initialization routines for the main this->
 void gui_main::Init(void)
 {
@@ -444,7 +348,7 @@ void gui_main::minimizerFinished()
 		// Close the calling subwindow
 		sw->close();
 
-		// If there are more open subwindows and auto-close is set, close SIMTOI
+		// If there are no more open subwindows, close SIMTOI
 		if(this->mdiArea->subWindowList().size() == 0)
 			close();
 	}

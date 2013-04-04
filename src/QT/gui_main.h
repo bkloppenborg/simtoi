@@ -85,8 +85,6 @@ protected:
 private slots:
     void Animation_StartStop();
     void Animation_Reset();
-    void ExportPhotometry();
-    void ExportFITS();
     void render();
     void SetSavePath();
     void SetTime();
