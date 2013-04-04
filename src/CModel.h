@@ -1,10 +1,8 @@
 /*
- * CModel.h
+ * \file CModel.h
  *
  *  Created on: Nov 7, 2011
- *      Author: bkloppenborg
- *
- *  A Virtual base class for model objects.
+ *  \author bkloppenborg
  */
  
  /* 
@@ -38,13 +36,12 @@
 // Headers for OpenGL functions
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <memory>
 
 #include "CParameters.h"
 #include "CPosition.h"
-#include "CGLShaderList.h"
-#include "CGLShaderWrapper.h"
-#include "CCL_GLThread.h"
-//#include "enumerations.h"
+#include "CShader.h"
+#include "CWorkerThread.h"
 #include "CModelList.h"
 
 #include <cstdlib>
@@ -52,6 +49,9 @@
 #include <cmath>
 #include <cstdio>
 #include <cassert>
+#include <memory>
+
+using namespace std;
 
 #ifndef PI
 #ifdef M_PI
@@ -61,28 +61,32 @@
 #endif // M_PI
 #endif // PI
 
-using namespace std;
-
 class CPosition;
-//class CFeature;
-//class CFeatureList;
-class CGLShaderWrapper;
+typedef shared_ptr<CPosition> CPositionPtr;
 
+class CShader;
+typedef shared_ptr<CShader> CShaderPtr;
+
+/// \brief A base class for all models in SIMTOI
+///
+/// This class serves as a basis from which all models in SIMTOI are derived.
+/// It implements methods for saving and restoring (`Serialize()` and `Restore()`)
+/// models from SIMTOI save files and for basic OpenGL operations such as rotation
+/// and translation.
+///
+/// At a minimum, all models should override the `Render()` and `GetID()` functions.
+/// See `CModelSphere` for a simple example.
+///
+/// This class is derived from `CParameters` which is used to store the
+/// values of model parameters.
 class CModel : public CParameters
 {
 protected:
-	// Datamembers
-//	bool is_analytic;
-	int mBaseParams;
+	int mBaseParams;	///< The number of parameters used in the CModel base class.
 
-	CModelList::ModelTypes mType;
+	CPositionPtr mPosition;	///< A shared pointer to the position object.
 
-	CPosition * mPosition;
-
-//	CFeatureList * features;
-
-	CGLShaderWrapperPtr mShader;
-	bool mShaderLoaded;
+	CShaderPtr mShader;	///< A shared pointer to the shader object.
 	double mScale;
 
 protected:
@@ -93,44 +97,43 @@ protected:
 public:
 	static void CircleTable( double * sint, double * cost, const int n );
 
+	void GetAllParameters(double * params, int n_params);
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
 	void GetFreeParameters(double * params, int n_params, bool scale_params);
 	vector<string> GetFreeParameterNames();
-	double GetFreePriorProd();
 	vector< pair<double, double> > GetFreeParamMinMaxes();
+	void GetFreeParameterSteps(double * steps, unsigned int size);
+
 	void SetFreeParameters(double * params, int n_params, bool scale_params);
-	void GetAllParameters(double * params, int n_params);
+
 
 public:
 	CModel(int n_params);
 	virtual ~CModel();
 
-	//void AppendFeature(CFeature * feature);
-	//void DeleteFeature();
-
-	int GetNFeatureFreeParameters() { return 0; };
-	int GetNModelFreeParameters() { return mNFreeParams; };
-	int GetNPositionFreeParameters() { return mPosition->GetNFreeParams(); };
-	int GetNShaderFreeParameters() { return mShader->GetNFreeParams(); };
-	CPosition * GetPosition(void) { return mPosition; };
-	CGLShaderWrapperPtr GetShader(void) { return mShader; };
+	virtual string GetID();
+	int GetNModelFreeParameters();
+	int GetNPositionFreeParameters();
+	int GetNShaderFreeParameters();
+	CPositionPtr GetPosition(void);
+	CShaderPtr GetShader(void);
 	int GetTotalFreeParameters();
-	CModelList::ModelTypes GetType(void) { return mType; };
 
 	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
 public:
-	void Restore(Json::Value input, CGLShaderList * shader_list);
+	void Restore(Json::Value input);
 
 public:
 	Json::Value Serialize();
 	void SetAnglesFromPosition();
-	void SetPositionType(CPosition::PositionTypes type);
-	virtual void SetShader(CGLShaderWrapperPtr shader);
+	void SetPositionModel(string position_id);
+	void SetPositionModel(CPositionPtr position);
+
+	virtual void SetShader(string shader_id);
+	virtual void SetShader(CShaderPtr shader);
 	void SetTime(double time);
 protected:
 	void SetupMatrix();
-public:
-	bool ShaderLoaded(void) { return mShaderLoaded; };
 
 protected:
 	void UseShader(double min_xyz[3], double max_xyz[3]);

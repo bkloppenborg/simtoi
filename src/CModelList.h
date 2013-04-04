@@ -42,69 +42,43 @@
 #include <vector>
 using namespace std;
 
-#include "enumerations.h"
 #include "CPosition.h"
 
 class CModel;
-class CGLShaderWrapper;
-class CGLShaderList;
-
 typedef shared_ptr<CModel> CModelPtr;
-typedef shared_ptr<CGLShaderWrapper> CGLShaderWrapperPtr;
 
-// A container for a list of models.
+/// \brief A container class for a list of models.
 class CModelList
 {
 protected:
 	vector<CModelPtr> mModels;
 
-public:
-	/// Enumerated Model Names.
-	/// Note, when adding a new model, list it in this enum and add it to functions:
-	///       GetTypes() and in GetNewModel().  We want to change this, see issue #50.
-	enum ModelTypes
-	{
-		NONE,
-		SPHERE,
-		DISK,
-		DISK_A,
-		DISK_B,
-		DISK_C,
-		DISK_CONCENTRIC_RINGS,
-		LAST_VALUE // must be the last value in this list.
-	};
-
 protected:
-	double mTime;
-	double mTimestep;
+	double mTime;	///< The current time for the models in this list.
 
 public:
 	CModelList();
 	virtual ~CModelList();
 
-	CModelPtr AddNewModel(ModelTypes model_id);
+	void AddModel(CModelPtr model);
 
 	int GetNFreeParameters();
 	void GetAllParameters(double * params, int n_params);
 	vector< pair<double, double> > GetFreeParamMinMaxes();
 	void GetFreeParameters(double * params, int n_params, bool scale_params);
 	void GetFreeParametersScaled(double * params, int n_params);
-	double GetFreeParameterPriorProduct();
+	void GetFreeParameterSteps(double * steps, unsigned int size);
 	vector<string> GetFreeParamNames();
 	CModelPtr GetModel(int i) { return mModels.at(i); };
 	double GetTime() { return mTime; };
 
-	static vector< pair<ModelTypes, string> > GetTypes(void);
-
-	void IncrementTime();
+	static vector<string> GetTypes(void);
 
 	void Render(GLuint fbo, int width, int height);
-	void Restore(Json::Value input, CGLShaderList * shader_list);
+	void Restore(Json::Value input);
 
 	Json::Value Serialize();
 	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
-	void SetPositionType(unsigned int model_id, CPosition::PositionTypes pos_type);
-	void SetShader(unsigned int model_id, CGLShaderWrapperPtr shader);
 	void SetTime(double t);
 	void SetTimestep(double dt);
 	unsigned int size() { return mModels.size(); };

@@ -27,52 +27,39 @@
 #ifndef GUI_ADDMODEL_H
 #define GUI_ADDMODEL_H
 
+#include "ui_gui_model.h"
+#include "gui_common.h"
 
 #include <QtGui/QWidget>
-#include "ui_gui_model.h"
 #include <QDialog>
 #include <utility>
 #include <vector>
-#include "CModelList.h"
-#include "CGLShaderList.h"
-#include "CModelList.h"
+#include <memory>
 
 using namespace std;
+
+class CModel;
 
 class gui_model : public QDialog
 {
     Q_OBJECT
+
 private:
     Ui::gui_addmodelClass ui;
 
 protected:
-    CGLShaderList::ShaderTypes mShaderType;
-    CModelList::ModelTypes mModelType;
-    CPosition::PositionTypes mPositionType;
+    string mShaderName;
+    string mModelName;
+    string mPositionName;
 
 public:
     gui_model(QWidget *parent = 0);
+    gui_model(QWidget *parent, shared_ptr<CModel> model);
     virtual ~gui_model();
 
-    CModelList::ModelTypes GetModelType() { return mModelType; };
-    CGLShaderList::ShaderTypes GetShaderType() { return mShaderType; };
-    CPosition::PositionTypes GetPositionType() { return mPositionType; };
+    shared_ptr<CModel> GetModel();
 
-    //void SetFeaturesType(vector<int> feature_ids);
-    void SetFeatureTypes(vector< pair<int, string> > feature_info);
-
-    void SetModelType(CModelList::ModelTypes value);
-    void SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info);
-
-    void SetPositionType(CPosition::PositionTypes value);
-    void SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info);
-
-    void SetShaderType(CGLShaderList::ShaderTypes value);
-    void SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info);
-
-    public slots:
-    void ValuesAccepted();
-
+    void SetupUI();
 };
 
 #endif // GUI_ADDMODEL_H

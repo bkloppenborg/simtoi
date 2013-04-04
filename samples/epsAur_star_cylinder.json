@@ -1,0 +1,56 @@
+// Model save file from SIMTOI in JSON format.
+
+{
+	"model_0" : 
+	{
+		"base" : 
+		{
+			"Color" : [ 1.0, 0.0, 0.0, false ],
+			"Diameter" : [ 2.0, 2.0, 3.0, true ],
+			"Inclination" : [ 0.0, 0.0, 0.0, false ],
+			"Pos. Angle" : [ 0.0, 0.0, 0.0, false ],
+			"Rotation" : [ 0.0, 0.0, 0.0, false ],
+			"type" : 1
+		},
+		"position" : 
+		{
+			"E" : [ 0.0, 0.0, 0.0, false ],
+			"N" : [ 0.0, 0.0, 0.0, false ],
+			"type" : 1
+		},
+		"shader" : 
+		{
+			"alpha" : [ 0.50, 0.1000000014901161, 1.0, true ],
+			"type" : 1
+		}
+	},
+	"model_1" : 
+	{
+		"base" : 
+		{
+			"Color" : [ 0.0, 0.0, 0.0, false ],
+			"Diameter" : [ 14, 3.0, 20.0, false ],
+			"Height" : [ 1.0, 0.8, 1.2, true ],
+			"Inclination" : [ 88.573, 85.0, 90.0, false ],
+			"Pos. Angle" : [ 296.89, 20.0, 40.0, false ],
+			"Rotation" : [ 0.0, 0.0, 0.0, false ],
+			"type" : 2
+		},
+		"position" : 
+		{
+			"Alpha" : [ 43.36, 10.0, 50.0, false ],
+			"Inc" : [ 89.17, 85.0, 90.0, false ],
+			"Omega" : [ 297.0, 295, 299, true ],
+			"T" : [ 9896.0, 0.0, 0.0, false ],
+			"e" : [ 0.2269999980926514, 0.0, 0.0, false ],
+			"omega" : [ 219.1999969482422, 0.0, 0.0, false ],
+			"tau" : [ 2454515.0, 0.0, 0.0, false ],
+			"type" : 3
+		},
+		"shader" : 
+		{
+			"Beta" : [ 1.910, 0.1000000014901161, 10.0, true ],
+			"type" : 2
+		}
+	}
+}

@@ -68,6 +68,8 @@ void CParameterItem::setData(const QVariant & value, int role)
 			mParent->SetMin(mID, float(value.toDouble()));
 		if(col == 4)	// max value
 			mParent->SetMax(mID, float(value.toDouble()));
+		if(col == 5)
+			mParent->SetStepSize(mID, float(value.toDouble()));
 	}
 
 	QStandardItem::setData(value, role);

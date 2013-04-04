@@ -26,23 +26,24 @@
 #ifndef CMAINGUI_H
 #define CMAINGUI_H
 
+#include "ui_gui_main.h"
+#include "gui_common.h"
+
 #include <QtGui/QMainWindow>
-#include <string>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include "ui_gui_main.h"
-
-class CParameters;
-class CParameterItem;
+#include <string>
 
 using namespace std;
 
-class gui_main : public QMainWindow
+class CParameters;
+class CParameterItem;
+class CGLWidget;
+
+class gui_main : public QMainWindow, private Ui::cmainguiClass
 {
     Q_OBJECT
 
-protected:
-    Ui::cmainguiClass ui;
     string mShaderSourceDir;
     string mKernelSourceDir;
     bool mAnimating;
@@ -58,52 +59,51 @@ public:
     virtual ~gui_main();
 
 protected:
-    QMdiSubWindow * AddGLArea(int model_width, int model_height, double model_scale);
-
+    QMdiSubWindow * AddGLArea(CGLWidget * widget);
+    void AddData(QStringList & filenames, QMdiSubWindow * sw);
 public:
     void AutoClose(bool auto_close, QMdiSubWindow * sw);
 
 protected:
     void ButtonCheck();
+
     void close();
     void closeEvent(QCloseEvent *evt);
-
 public:
-    void CommandLine(QStringList & data_files, QStringList & model_files, int minimizer, int size, double scale, bool close_simtoi);
+    void CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, bool close_simtoi);
 
 protected:
-    void DataAdd(QStringList & filenames, QMdiSubWindow * sw);
-
-    void MinimizerRun(int minimizer_id, QMdiSubWindow * sw);
+    void MinimizerRun(string MinimizerID, QMdiSubWindow * sw);
     void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
 
-    void SetupComboBoxes();
+public:
+    void Open(QStringList & filenames);
+
+protected:
     void Init();
 
 private slots:
-    void AddGLArea();
     void Animation_StartStop();
     void Animation_Reset();
-    void AutoClose(QWidget * widget);
-    void DataAdd(void);
-    void DataRemove();
-    void DeleteGLArea();
     void ExportPhotometry();
     void ExportFITS();
     void render();
-    void MinimizerRun();
-    void MinimizerStop();
-	void ModelAdd(void);
-	void ModelDelete(void);
-	void ModelEdit(void);
-    void ModelOpen();
-    void ModelSave();
     void SetSavePath();
     void SetTime();
 
+    void minimizerFinished();
+    void on_actionExport_triggered();
+    void on_actionOpen_triggered();
+    void on_actionSave_triggered();
+    void on_btnAddData_clicked();
+    void on_btnAddModel_clicked();
+    void on_btnEditModel_clicked();
+    void on_btnRemoveData_clicked();
+    void on_btnDeleteModel_clicked();
+    void on_btnMinimizerStartStop_clicked();
+    void on_btnNewModelArea_clicked();
+    void on_mdiArea_subWindowActivated();
 
-public slots:
-	void subwindowSelected(QMdiSubWindow * window);
 };
 
 #endif // CMAINGUI_H

@@ -46,6 +46,8 @@
 
 using namespace std;
 
+extern string EXE_FOLDER;
+
 // The main routine.
 int main(int argc, char *argv[])
 {
@@ -59,32 +61,33 @@ int main(int argc, char *argv[])
 	// Pass off to the GUI:
     QApplication app(argc, argv);
 
+    // determine the absolute directory from which SIMTOI is running
+    EXE_FOLDER = app.applicationDirPath().toStdString();
+
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
     QStringList data_files;
     QStringList model_files;
-    int minimizer = 0;
-    int width = 0;
-    double scale = 0;
+    string minimizer = "";
     bool close_simtoi = false;
 
     // If there were command-line options, parse them
     if(args.size() > 0)
-    	ParseArgs(args, data_files, model_files, minimizer, width, scale, close_simtoi);
+    	ParseArgs(args, data_files, model_files, minimizer, close_simtoi);
 
     // Startup the GUI:
     gui_main main_window;
     main_window.show();
 
-    if(width > 0 && scale > 0)
-    	main_window.CommandLine(data_files, model_files, minimizer, width, scale, close_simtoi);
+    if(data_files.size() > 0)
+    	main_window.CommandLine(data_files, model_files, minimizer, close_simtoi);
 
 
     return app.exec();
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, int &  minimizer, int & size, double & scale, bool & close_simtoi)
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, string &  minimizer, bool & close_simtoi)
 {
 	unsigned int n_items = args.size();
 
@@ -104,7 +107,7 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 
 		// minimization engine
 		if(value == "-e")
-			minimizer = args.at(i + 1).toInt();
+			minimizer = args.at(i + 1).toStdString();
 
 		if(value == "-h" || value == "-help")
 			PrintHelp();
@@ -115,15 +118,6 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 
 //		if(value == "-o")
 //			savefile.append(tmp.absoluteFilePath(args.at(i + 1)));
-
-		// model area scale
-		if(value == "-s")
-			scale = args.at(i+1).toDouble();
-
-		// model area width
-		if(value == "-w")
-			size = args.at(i+1).toInt();
-
 	}
 }
 
@@ -140,8 +134,6 @@ void PrintHelp()
 	cout << "  " << "               " << "many data files." << endl;
 	cout << "  " << "-e           : " << "Minimization engine ID (see Wiki or CMinimizer.h)" << endl;
 	cout << "  " << "-m           : " << "Model input file" << endl;
-	cout << "  " << "-s           : " << "Scale for model in mas/pixel (float > 0)" << endl;
-	cout << "  " << "-w           : " << "Width of model area in pixels (int > 0)" << endl;
 	cout << endl;
 	cout << "SIMTOI also supports QT commands. For instance you can run SIMTOI from a: " << endl;
 	cout << "remotely executed script (or from gnu screen) by adding: " << endl;

@@ -24,61 +24,71 @@
  */
 
 #include "CGLWidget.h"
+
+#include <QMdiSubWindow>
+#include <stdexcept>
+#include "textio.hpp"
+#include "json/json.h"
+using namespace std;
+
+
 #include "CTreeModel.h"
 
-#include "CMinimizer.h"
+#include "CMinimizerThread.h"
 
 #include "CModel.h"
 #include "CModelList.h"
 #include "CTreeModel.h"
 #include "CParameterItem.h"
 
+extern string EXE_FOLDER;
+
 CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
-    : QGLWidget(widget_parent), mGLT(this, shader_source_dir, cl_kernel_dir), mMinThread()
+    : QGLWidget(widget_parent)
 { 
-    setAutoBufferSwap(false);
+	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context
+	setAutoBufferSwap(false);
     this->doneCurrent();
 
-    mOpenFileModel = new QStandardItemModel();
+    // Immediately initialize the worker thread. This will claim the OPenGL context.
+	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
+
 	QStringList labels = QStringList();
 	labels << "File" << "Mean JD";
-	mOpenFileModel->clear();
-	mOpenFileModel->setColumnCount(2);
-	mOpenFileModel->setHorizontalHeaderLabels(labels);
+	mOpenFileModel.clear();
+	mOpenFileModel.setColumnCount(2);
+	mOpenFileModel.setHorizontalHeaderLabels(labels);
 
-    mTreeModel = new CTreeModel();
+	// This signal-slot would not connect automatically, so we do it explicitly here.
+	connect(&mTreeModel, SIGNAL(parameterUpdated()), this, SLOT(on_mTreeModel_parameterUpdated()));
+
+	mSaveDirectory = "";
 }
 
 CGLWidget::~CGLWidget()
 {
+	// Stop any running threads
+	stopMinimizer();
 	stopRendering();
-	delete mOpenFileModel;
-	delete mTreeModel;
 }
 
-void CGLWidget::AddModel(CModelList::ModelTypes model_type)
+void CGLWidget::AddModel(shared_ptr<CModel> model)
 {
 	// Instruct the thread to add the model to it's list:
-	mGLT.AddModel(model_type);
+	mWorker->AddModel(model);
 
 	RebuildTree();
 }
 
 void CGLWidget::closeEvent(QCloseEvent *evt)
 {
-	StopMinimizer();
     stopRendering();
     QGLWidget::closeEvent(evt);
 }
 
-void CGLWidget::EnqueueOperation(CL_GLT_Operations op)
+void CGLWidget::Export(QString save_folder)
 {
-	mGLT.EnqueueOperation(op);
-}
-
-string CGLWidget::GetSaveFileBasename()
-{
-	return mMinThread.GetSaveFileBasename();
+	mWorker->ExportResults(save_folder);
 }
 
 void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
@@ -120,6 +130,12 @@ void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * para
 		item->setData(QVariant((double)parameters->GetMax(j)), Qt::DisplayRole);
 		items << item;
 
+		// Maximum step size
+		item = new CParameterItem(parameters, j);
+		item->setEditable(true);
+		item->setData(QVariant((double)parameters->GetStepSize(j)), Qt::DisplayRole);
+		items << item;
+
 		parent_widget->appendRow(items);
 	}
 }
@@ -138,44 +154,94 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	return items;
 }
 
-void CGLWidget::LoadMinimizer(CMinimizer::MinimizerTypes minimizer_type)
+/// Returns a list of file filters for use in QFileDialog
+QStringList CGLWidget::GetFileFilters()
 {
-	// TODO: Permit loading of different minimizers here.
-	CMinimizer * tmp = CMinimizer::GetMinimizer(minimizer_type, &mGLT);
-	mMinThread.SetMinimizer(tmp);
+	return mWorker->GetFileFilters();
 }
 
-void CGLWidget::MinimizerExit(void)
+/// Returns the Minimizer's ID if one is loaded, otherwise an empty string.
+string CGLWidget::GetMinimizerID()
 {
-	emit( MinimizationFinished(dynamic_cast<QWidget*>(parent()) ) );
+	if(mMinimizer)
+		return mMinimizer->GetID();
+
+	return "";
+}
+
+bool CGLWidget::GetMinimizerRunning()
+{
+	if(!mMinimizer)
+		return false;
+
+	return mMinimizer->isRunning();
+}
+
+void CGLWidget::on_mTreeModel_parameterUpdated()
+{
+	mWorker->Render();
+}
+
+void CGLWidget::on_minimizer_finished(void)
+{
+	emit minimizerFinished();
 }
 
 void CGLWidget::Open(string filename)
 {
-	mGLT.Open(filename);
+	Json::Reader reader;
+	Json::Value input;
+	string file_contents = ReadFile(filename, "Could not SIMTOI save file: '" + filename + "'.");
+	bool parsingSuccessful = reader.parse(file_contents, input);
+	if(!parsingSuccessful)
+		throw runtime_error("JSON parse error in SIMTOI save file '" + filename + "'. File cannot be opened.");
+
+	int width = input["area_width"].asInt();
+	int height = input["area_height"].asInt();
+	double scale = input["area_scale"].asDouble();
+
+	// If the width and height are nonsense, override them.
+	if(width < 1 || height < 1)
+	{
+		width = 128;
+		height = 128;
+	}
+
+	// Set the area scale and height
+	mWorker->SetSize(width, height);
+	mWorker->SetScale(scale);
+
+	// Now have the Worker thread open the remainder of the file.
+	mWorker->Restore(input);
+
 	RebuildTree();
+}
+
+void CGLWidget::OpenData(string filename)
+{
+	mWorker->OpenData(filename);
 }
 
 void CGLWidget::paintEvent(QPaintEvent *)
 {
-    mGLT.EnqueueOperation(GLT_RenderModels);
+    mWorker->Render();
 }
 
 void CGLWidget::RebuildTree()
 {
 	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value" << "Min" << "Max";
-	mTreeModel->clear();
-	mTreeModel->setColumnCount(5);
-	mTreeModel->setHorizontalHeaderLabels(labels);
-	CModelList * model_list = mGLT.GetModelList();
+	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
+	mTreeModel.clear();
+	mTreeModel.setColumnCount(5);
+	mTreeModel.setHorizontalHeaderLabels(labels);
+	CModelListPtr model_list = mWorker->GetModelList();
 
 	QList<QStandardItem *> items;
 	QStandardItem * item;
 	QStandardItem * item_parent;
-	CModel * model;
-	CPosition * position;
-	CGLShaderWrapper * shader;
+	shared_ptr<CModel> model;
+	shared_ptr<CPosition> position;
+	CShader * shader;
 
 	// Now pull out the pertinent information
 	// NOTE: We drop the shared_ptrs here
@@ -183,19 +249,19 @@ void CGLWidget::RebuildTree()
 	for(int i = 0; i < model_list->size(); i++)
 	{
 		// First pull out the model parameters
-		model = model_list->GetModel(i).get();
+		model = model_list->GetModel(i);
 
-		items = LoadParametersHeader(QString("Model"), model);
+		items = LoadParametersHeader(QString("Model"), model.get());
 		item_parent = items[0];
-		mTreeModel->appendRow(items);
-		LoadParameters(item_parent, model);
+		mTreeModel.appendRow(items);
+		LoadParameters(item_parent, model.get());
 
 		// Now for the Position Parameters
 		position = model->GetPosition();
-		items = LoadParametersHeader(QString("Position"), position);
+		items = LoadParametersHeader(QString("Position"), position.get());
 		item = items[0];
 		item_parent->appendRow(items);
-		LoadParameters(item, position);
+		LoadParameters(item, position.get());
 
 		// Lastly for the shader:
 		shader = model->GetShader().get();
@@ -204,62 +270,80 @@ void CGLWidget::RebuildTree()
 		item_parent->appendRow(items);
 		LoadParameters(item, shader);
 	}
-
-
 }
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
-    mGLT.resizeViewport(evt->size());
+	// do nothing, the area cannot be resized once created
 }
 
-void CGLWidget::RunMinimizer()
+void CGLWidget::Save(string filename)
 {
-	mMinThread.start();
+	Json::StyledStreamWriter writer;
+	Json::Value output;
 
-	connect(&mMinThread, SIGNAL(finished(void)), this, SLOT(MinimizerExit(void)));
+	// Serialize the mWorker object first
+	output = mWorker->Serialize();
+	output.setComment("// Model save file from SIMTOI in JSON format.", Json::commentBefore);
+
+	// Now save the OpenGL area information.
+	output["area_width"] = mWorker->GetImageWidth();
+	output["area_height"] = mWorker->GetImageHeight();
+	output["area_scale"] = mWorker->GetImageScale();
+
+	std::ofstream outfile(filename.c_str());
+	writer.write(outfile, output);
+}
+
+void CGLWidget::SetScale(double scale)
+{
+	mWorker->SetScale(scale);
+}
+
+void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
+{
+	stopMinimizer();
+	mMinimizer = minimizer;
+	mMinimizer->Init(mWorker);
+	mMinimizer->SetSaveDirectory(mSaveDirectory);
+}
+
+void CGLWidget::SetSaveDirectory(string directory_path)
+{
+	mSaveDirectory = directory_path;
+}
+
+void CGLWidget::SetSize(unsigned int width, unsigned int height)
+{
+	mWorker->SetSize(width, height);
 }
 
 void CGLWidget::startRendering()
 {
 	// Tell the thread to start.
-    mGLT.start();
+    mWorker->start();
 }
 
 void CGLWidget::stopRendering()
 {
-    mGLT.stop();
-    mGLT.wait();
+    mWorker->stop();
 }
 
-void CGLWidget::SetFreeParameters(double * params, int n_params, bool scale_params)
+void CGLWidget::startMinimizer()
 {
-	mGLT.SetFreeParameters(params, n_params, scale_params);
+	if(!mMinimizer)
+		return;
+
+	mMinimizer->start();
+	connect(mMinimizer.get(), SIGNAL(finished()), this, SLOT(on_minimizer_finished(void)));
 }
 
-void CGLWidget::SetSaveFileBasename(string filename)
+void CGLWidget::stopMinimizer()
 {
-	mMinThread.SetSaveFileBasename(filename);
+	if(!mMinimizer)
+		return;
+
+	// Stop the thread. If it was running, join it.
+	mMinimizer->stop();
 }
 
-void CGLWidget::SetScale(double scale)
-{
-	mGLT.SetScale(scale);
-}
-
-void CGLWidget::SetShader(int model_id, CGLShaderList::ShaderTypes shader)
-{
-	mGLT.SetShader(model_id, shader);
-	RebuildTree();
-}
-
-void CGLWidget::SetPositionType(int model_id, CPosition::PositionTypes pos_type)
-{
-	mGLT.SetPositionType(model_id, pos_type);
-	RebuildTree();
-}
-
-void CGLWidget::StopMinimizer()
-{
-	mMinThread.stop();
-}

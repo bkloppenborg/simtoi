@@ -1,0 +1,15 @@
+// SIMTOI shader configuration file in JSON format.
+
+{
+    "filename" : "power_law_z",
+    "human_name" : "Power Law: Z",
+	"param_0":
+	{
+		"name" : "Beta",
+        "min" : 0.01,
+        "max" : 1,
+        "default" : 0.1
+	},
+	"shader_id" : "power_law_z"
+}
+

@@ -32,15 +32,45 @@
 
 #include "CParameters.h"
 #include <cmath>
+#include <stdexcept>
 
 #include "misc.h"	// needed for pull_params
-
-// TODO: Note, none of the store/set operations here are thread safe!
 
 // A number after which we consider a parameter to be zero.
 #define ZERO_COMP 1E-8
 
-CParameters::CParameters(int n_params)
+/// \brief Copy constructor
+CParameters::CParameters(const CParameters & other)
+{
+	// Init the parameter storage location
+	mNParams = other.mNParams;
+	mNFreeParams = other.mNFreeParams;
+	mParams = new double[mNParams];
+	mFreeParams = new bool[mNParams];
+	mScales = new double[mNParams];
+	mMinMax = new pair<double,double>[mNParams];
+	mName = other.mName;
+	mSteps = new double[mNParams];
+
+	// Init parameter values.
+	for(int i = 0; i < mNParams; i++)
+	{
+		mParams[i] = other.mParams[i];
+		mFreeParams[i] = other.mFreeParams[i];
+		mScales[i] = other.mScales[i];
+		mMinMax[i] = pair<double,double>(0.0, 0.0);
+		mMinMax[i].first = other.mMinMax[i].first;
+		mMinMax[i].second = other.mMinMax[i].second;
+		mParamNames.push_back(other.mParamNames[i]);
+		mSteps[i] = other.mSteps[i];
+	}
+}
+
+/// \brief Default constructor
+///
+/// Construct a CParameters object of size n_params.
+/// \param n_params The number of parameters for this object.
+CParameters::CParameters(unsigned int n_params)
 {
 	// Init the parameter storage location
 	mNParams = n_params;
@@ -50,6 +80,7 @@ CParameters::CParameters(int n_params)
 	mScales = new double[mNParams];
 	mMinMax = new pair<double,double>[mNParams];
 	mName = "";
+	mSteps = new double[mNParams];
 
 	// Init parameter values.
 	for(int i = 0; i < mNParams; i++)
@@ -58,6 +89,7 @@ CParameters::CParameters(int n_params)
 		mFreeParams[i] = false;
 		mScales[i] = 1;
 		mMinMax[i] = pair<double,double>(0.0, 0.0);
+		mSteps[i] = 0;
 	}
 }
 
@@ -67,9 +99,11 @@ CParameters::~CParameters()
 	delete[] mFreeParams;
 	delete[] mScales;
 	delete[] mMinMax;
+	delete[] mSteps;
 }
 
-/// Counts the number of free parameters, sets that value to mNFreeParams
+/// \brief Counts the number of free parameters in this object
+/// 	and stores the result in mNFreeParams.
 void CParameters::CountFree(void)
 {
 	mNFreeParams = 0;
@@ -80,34 +114,54 @@ void CParameters::CountFree(void)
 	}
 }
 
-/// Returns the maximum allowable value of the specified parameter, -1 if param_num is out of bounds.
-double CParameters::GetMax(int param_num)
+/// \brief Returns the maximum allowable value of the specified parameter.
+///
+/// If the parameter is out of bounds, this function throws a out_of_range
+/// exception.
+double CParameters::GetMax(unsigned int param_num)
 {
 	if(param_num < mNParams)
 		return mMinMax[param_num].second;
 
-	return -1;
+	throw std::out_of_range("Attempt to access an out-of-bound parameter. CParameters::GetMax().");
+
+	return 0;
 }
 
-/// Returns the minimum allowable value of the specified parameter, -1 if param_num is out of bounds.
-double CParameters::GetMin(int param_num)
+/// \brief Returns the minimum allowable value of the specified parameter.
+///
+/// If the parameter is out of bounds, this function throws a out_of_range
+/// exception.
+double CParameters::GetMin(unsigned int param_num)
 {
 	if(param_num < mNParams)
 		return mMinMax[param_num].first;
 
-	return -1;
+	throw std::out_of_range("Attempt to access an out-of-bound parameter. CParameters::GetMin().");
+
+	return 0;
 }
 
-/// Gets the vale of the specified parameter, returns -1 if outside of bounds:
-double CParameters::GetParam(int param_n)
+/// \brief Returns the value of the specified parameter.
+///
+/// If the parameter is out of bounds, this function throws a out_of_range
+/// exception.
+double CParameters::GetParam(unsigned int param_n)
 {
 	if(param_n < mNParams)
 		return mParams[param_n];
 
-	return -1;
+	throw std::out_of_range("Attempt to access an out-of-bound parameter. CParameters::GetMax().");
+
+	return 0;
 }
 
-/// Gets all of the parameter values for this object, returning them in intervals x_i = [param[i].min ... param[i].max].
+/// \brief Gets all of the parameter values for this object
+///
+/// Copies up to `n_params` parameter values from this object to `out_params`.
+/// Values are returned in the interval x_i = [param[i].min ... param[i].max].
+/// \param out_params A pre-allocated array into which values are copied.
+/// \param n_params The size of out_params.
 void CParameters::GetParams(double * out_params, unsigned int n_params)
 {
 	// Copy the current parameter value into out_params
@@ -118,15 +172,8 @@ void CParameters::GetParams(double * out_params, unsigned int n_params)
 	}
 }
 
-/// Returns the prior for the i-th parameter:
-/// NOTE: at the moment all parameters have uniform priors.
-double CParameters::GetPrior(int i)
-{
-	// compute a uniform prior.
-	return 1.0 / (mMinMax[i].second - mMinMax[i].first);
-}
-
-/// Returns a vector of pairs containing the min/max values for the parameters.
+/// \brief Returns a vector of pairs containing the min/max values for
+/// 	the free parameters.
 vector< pair<double, double> > CParameters::GetFreeMinMaxes()
 {
 	vector< pair<double, double> > tmp;
@@ -139,9 +186,16 @@ vector< pair<double, double> > CParameters::GetFreeMinMaxes()
 	return tmp;
 }
 
-/// Gets the values of the free parameters for this object, scales them into
-// If scale_params = false, parameters are returned within the interval x = [0...1] otherwise, x = [param.min ... param.max]
-void CParameters::GetFreeParams(double * out_params, int n_params, bool scale_params)
+/// \brief Gets the values of the free parameters for this object
+///
+/// Copies up to `n_params` parameter values from this object into `out_params`
+///
+/// \param out_params A pre-allocated buffer into which parameter values are placed
+/// \param n_params The size of `out_params`
+/// \param scale_params If true, parameters are returned in the interval
+///		x = [param.min ... param.max]. Otherwise, parameters are returned on a unit
+/// 	hypercube x = [0...1].
+void CParameters::GetFreeParams(double * out_params, unsigned int n_params, bool scale_params)
 {
 	// Get the scaled parameter values
 	pull_params(mParams, mNParams, out_params, n_params, mFreeParams);
@@ -161,20 +215,8 @@ void CParameters::GetFreeParams(double * out_params, int n_params, bool scale_pa
 	}
 }
 
-/// Returns the product of the priors for the free parameters
-double CParameters::GetFreePriorProd()
-{
-	double tmp = 1;
-	for(int i = 0; i < mNParams; i++)
-	{
-		if(mFreeParams[i])
-			tmp *= GetPrior(i);
-	}
 
-	return tmp;
-}
-
-/// Returns a vector of strings containing the names of the free parameters
+/// \brief Returns a vector of strings containing the names of the free parameters
 /// prefixed with the name of the parent object.
 vector<string> CParameters::GetFreeParamNames()
 {
@@ -188,13 +230,26 @@ vector<string> CParameters::GetFreeParamNames()
 	return tmp;
 }
 
-/// Returns all of the parameter names as a vector of strints
+/// \brief Returns all of the parameter names as a vector of strings
 vector<string> CParameters::GetParamNames()
 {
 	return mParamNames;
 }
 
-/// Returns all of the parameters as a vector of pairs in (id, name) format
+void CParameters::GetFreeParamSteps(double * steps, unsigned int size)
+{
+	int j = 0;
+	for(int i = 0; i < mNParams && j < size; i++)
+	{
+		if(mFreeParams[i])
+		{
+			steps[j] = mSteps[i];
+			j++;
+		}
+	}
+}
+
+/// \brief Returns all of the parameters as a vector of pairs in (id, name) format
 vector< pair<int, string> > CParameters::GetParamIDsNames()
 {
 	vector< pair<int, string> > tmp;
@@ -205,23 +260,52 @@ vector< pair<int, string> > CParameters::GetParamIDsNames()
 	return tmp;
 }
 
-string CParameters::GetParamName(unsigned int i)
+/// \brief Returns the name of the specified parameter.
+///
+/// If `param_num` is out of bounds, an `out_of_range` exception will be thrown.
+string CParameters::GetParamName(unsigned int param_n)
 {
-	if(i < mParamNames.size())
-		return mParamNames[i];
+	if(param_n < mParamNames.size())
+		return mParamNames[param_n];
 
-	return "! NotFound !";
+	throw std::out_of_range("Attempt to access an out-of-bound parameter. CParameters::GetParamName().");
+
+	return 0;
 }
 
-bool CParameters::IsFree(int param_num)
+/// \brief Returns the value of the specified parameter.
+///
+/// If the parameter is out of bounds, this function throws a out_of_range
+/// exception.
+double CParameters::GetStepSize(unsigned int param_n)
+{
+	if(param_n < mNParams)
+		return mSteps[param_n];
+
+	throw std::out_of_range("Attempt to access an out-of-bound parameter. CParameters::GetStepSize().");
+
+	return 0;
+}
+
+/// \brief Returns true of the specified parameter is free.
+///
+/// If `param_num` is out of bounds, an `out_of_range` exception will be thrown.
+bool CParameters::IsFree(unsigned int param_num)
 {
 	if(param_num < mNParams)
 		return mFreeParams[param_num];
 
+	throw std::out_of_range("Attempt to access an out-of-bound parameter. CParameters::IsFree().");
+
 	return false;
 }
 
-/// Restores parameters values from the JSON value
+/// \brief Restores parameters values from the JSON value
+///
+/// Restores parameter values, names, and min/max values from a SIMTOI JSON save file.
+/// Parameters are imported by the name specified in `mParamNames`. If the parameter
+/// is not found in the JSON file, the default values provided in the `CParameters::CParameters()`
+/// constructor are left intact.
 void CParameters::Restore(Json::Value input)
 {
 	// Restore parameters.  Check that the parameter is set in the file before attempting
@@ -232,18 +316,24 @@ void CParameters::Restore(Json::Value input)
 		name = mParamNames[i];
 		if(input.isMember(name))
 		{
-			//
+			// Note, we do not need to check the sizes of input[name] here
+			// because JSONcpp will automatically fill in zeros for undefined
+			// values.
 			mParams[i] =        double( input[name][0u].asDouble() );
 			mMinMax[i].first =  double( input[name][1u].asDouble() );
 			mMinMax[i].second = double( input[name][2u].asDouble() );
-			mFreeParams[i] =    bool ( input[name][3u].asBool()   );
+			mFreeParams[i] =    bool  ( input[name][3u].asBool()   );
+			mSteps[i] = 		double( input[name][4u].asDouble() );
 		}
 	}
 
 	CountFree();
 }
 
-/// Toggles the state of all variables to free (is_free = true) or fixed (is_free = false)
+/// \brief Toggles the state of all variables to free or fixed.
+///
+/// \param is_free If true, all parameters in this object are set to free.
+///		If false, all parameters will be regarded as fixed.
 void CParameters::SetAllFree(bool is_free)
 {
 	for(int i = 0; i < mNParams; i++)
@@ -252,10 +342,20 @@ void CParameters::SetAllFree(bool is_free)
 	CountFree();
 }
 
-/// Sets the values for the parameters for this object
-/// If scale_params = true then the values are scaled into their native interval, [param.min ... param.max],
-/// otherwise if scale_params = false the parameters are assumed to be scaled.
-void CParameters::SetFreeParams(double * in_params, int n_params, bool scale_params)
+/// \brief Sets the values for the parameters for this object.
+///
+/// Sets the values of the parameters in this object to the corresponding
+/// values in `in_params`. By default, parameters are expected to be in native
+/// units (i.e. x_i = [param.min ... param.max]; however, scaling can be done
+/// inside of this object if needed by setting `scale_params = true`. Scaling
+/// happens via. linear interpolation between the minimum and maximum values
+/// specified for the parameter.
+///
+/// \param in_params The values to be set
+/// \param n_params The size of `in_params`
+/// \param scale_params If true, the values in `in_params` are on a unit hypercube
+///		and need to be scaled to native values.
+void CParameters::SetFreeParams(double * in_params, unsigned int n_params, bool scale_params = false)
 {
 	// Set the parameter values
 	push_params(in_params, n_params, mParams, mNParams, mFreeParams);
@@ -274,8 +374,8 @@ void CParameters::SetFreeParams(double * in_params, int n_params, bool scale_par
 	}
 }
 
-/// Sets the specified parameter as free (is_free = true) or fixed (is_free = false)
-void CParameters::SetFree(int param_num, bool is_free)
+/// \brief Sets the specified parameter as free (is_free = true) or fixed (is_free = false)
+void CParameters::SetFree(unsigned int param_num, bool is_free)
 {
 	if(param_num <= mNParams)
 		mFreeParams[param_num] = is_free;
@@ -284,29 +384,48 @@ void CParameters::SetFree(int param_num, bool is_free)
 	CountFree();
 }
 
-/// Sets the specified parameter's minimum value.
-void CParameters::SetMin(int param_num, double value)
+/// \brief Sets the specified parameter's minimum value.
+void CParameters::SetMin(unsigned int param_num, double value)
 {
 	if(param_num < mNParams)
 		mMinMax[param_num].first = value;
 }
 
-/// Sets the specified paramter's maximum value.
-void CParameters::SetMax(int param_num, double value)
+/// \brief Sets the specified paramter's maximum value.
+void CParameters::SetMax(unsigned int param_num, double value)
 {
 	if(param_num < mNParams)
 		mMinMax[param_num].second = value;
 }
 
-/// Sets the specified parameter to the indicated value.
-/// Note, scaling from the unit hypercube is not applied.
-void CParameters::SetParam(int n_param, double value)
+/// \brief Sets the specified parameter to the indicated value.
+///
+/// NOTE: It is expected value is in native units. Scaling from a unit hypercube
+/// is not performed
+void CParameters::SetParam(unsigned int param_num, double value)
 {
-	if(n_param < mNParams)
-		mParams[n_param] = value;
+	if(param_num < mNParams)
+		mParams[param_num] = value;
 }
 
-/// Serializes the parameters to a Json::Value object
+/// \brief Sets the specified step size to the indicated value.
+///
+/// NOTE: It is expected value is in native units. Scaling from a unit hypercube
+/// is not performed
+void CParameters::SetStepSize(unsigned int param_num, double value)
+{
+	if(param_num < mNParams)
+		mSteps[param_num] = value;
+}
+
+/// \brief Serializes the parameters to a Json::Value object
+///
+/// Copies the parameter value, minimum/maximum, and free state into a Json::Value
+/// object in the format: `[name, value, min, max]`.
+///
+/// NOTE: This method can be overridden; however, it is suggested that this function
+/// be called by any overriding classes to ensure proper object serialization.
+/// For example, see `CModel::Serialize`.
 Json::Value CParameters::Serialize()
 {
 	Json::Value output;
@@ -319,6 +438,7 @@ Json::Value CParameters::Serialize()
 		tmp.append(Json::Value(mMinMax[i].first));
 		tmp.append(Json::Value(mMinMax[i].second));
 		tmp.append(Json::Value(mFreeParams[i]));
+		tmp.append(Json::Value(mSteps[i]));
 		output[mParamNames[i]] = tmp;
 	}
 

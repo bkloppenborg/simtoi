@@ -1,0 +1,7 @@
+// Model save file from SIMTOI in JSON format.
+
+{
+    "filename" : "default",
+    "human_name" : "Default (None)",
+	"shader_id" : "default"
+}

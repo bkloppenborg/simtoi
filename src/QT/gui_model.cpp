@@ -24,18 +24,32 @@
  */
 
 #include "gui_model.h"
-#include "gui_general.h"
+#include "gui_common.h"
+#include "CModel.h"
+#include "CModelFactory.h"
+#include "CPositionFactory.h"
+#include "CShaderFactory.h"
 
 gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
 {
-	ui.setupUi(this);
+	SetupUI();
 
-	mModelType = CModelList::NONE;
-	mShaderType = CGLShaderList::NONE;
+}
 
-	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(ValuesAccepted()));
-	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+gui_model::gui_model(QWidget *parent, shared_ptr<CModel> model)
+{
+	SetupUI();
+
+	// Find the model, position, and shader IDs from the combo boxes:
+	int model_id = ui.cboModels->findText(QString::fromStdString(model->GetID()));
+	int position_id = ui.cboPositions->findText(QString::fromStdString(model->GetPosition()->GetID()));
+	int shader_id = ui.cboShaders->findText(QString::fromStdString(model->GetShader()->GetID()));
+
+	// Set the current selected text based upon the model IDs
+	ui.cboModels->setCurrentIndex(model_id);
+	ui.cboPositions->setCurrentIndex(position_id);
+	ui.cboShaders->setCurrentIndex(shader_id);
 }
 
 gui_model::~gui_model()
@@ -43,66 +57,36 @@ gui_model::~gui_model()
 
 }
 
-void gui_model::SetFeatureTypes(vector< pair<int, string> > feature_info)
+/// Returns a copy of the selected model.
+shared_ptr<CModel> gui_model::GetModel(void)
 {
-//	SetupComboOptions(ui.listFeatures, feature_info);
+	auto factory = CModelFactory::Instance();
+
+	string model_id = ui.cboModels->currentText().toStdString();
+	shared_ptr<CModel> model = factory.CreateModel(model_id);
+
+	string position_id = ui.cboPositions->currentText().toStdString();
+	model->SetPositionModel(position_id);
+
+	string shader_id = ui.cboShaders->currentText().toStdString();
+	model->SetShader(shader_id);
+
+	return model;
 }
 
-void gui_model::SetModelType(CModelList::ModelTypes value)
+void gui_model::SetupUI()
 {
-	int index = ui.cboModels->findData(value);
-	if (index != -1)
-		ui.cboModels->setCurrentIndex(index);
-}
+	// setup the UI
+	ui.setupUi(this);
 
-void gui_model::SetModelTypes(vector< pair<CModelList::ModelTypes, string> > model_info)
-{
-	gui_general::SetupComboOptions(ui.cboModels, model_info);
-}
+	auto models = CModelFactory::Instance();
+	auto positions = CPositionFactory::Instance();
+	auto shaders = CShaderFactory::Instance();
 
-void gui_model::SetPositionType(CPosition::PositionTypes value)
-{
-	int index = ui.cboPositions->findData(value);
-	if (index != -1)
-		ui.cboPositions->setCurrentIndex(index);
-}
+	gui_common::SetupComboOptions(ui.cboModels, models.GetModelList());
+	gui_common::SetupComboOptions(ui.cboPositions, positions.GetPositionList());
+	gui_common::SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
 
-
-void gui_model::SetPositionTypes(vector< pair<CPosition::PositionTypes, string> > position_info)
-{
-	gui_general::SetupComboOptions(ui.cboPositions, position_info);
-}
-
-void gui_model::SetShaderType(CGLShaderList::ShaderTypes value)
-{
-	int index = ui.cboShaders->findData(value);
-	if (index != -1)
-		ui.cboShaders->setCurrentIndex(index);
-}
-
-void gui_model::SetShaderTypes(vector< pair<CGLShaderList::ShaderTypes, string> > shader_info)
-{
-	gui_general::SetupComboOptions(ui.cboShaders, shader_info);
-}
-
-void gui_model::ValuesAccepted(void)
-{
-	// First pull out the model
-	int value = ui.cboModels->itemData(ui.cboModels->currentIndex()).toInt();
-	if(value > CModelList::NONE && value < CModelList::LAST_VALUE)
-		mModelType = CModelList::ModelTypes(value);
-
-	// Position
-	value = ui.cboPositions->itemData(ui.cboPositions->currentIndex()).toInt();
-	if(value > CPosition::NONE && value < CPosition::LAST_VALUE)
-		mPositionType = CPosition::PositionTypes(value);
-
-	// Shader
-	value = ui.cboShaders->itemData(ui.cboShaders->currentIndex()).toInt();
-	if(value > CGLShaderList::NONE && value < CGLShaderList::LAST_VALUE)
-		mShaderType = CGLShaderList::ShaderTypes(value);
-
-
-	// Now call the default close function.
-	done(1);
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }

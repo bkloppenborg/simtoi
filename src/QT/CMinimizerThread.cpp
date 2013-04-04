@@ -1,11 +1,11 @@
 /*
- * CMinimizerThread.cpp
+ * CMinimizer.cpp
  *
- *  Created on: Jan 30, 2012
+ *  Created on: Dec 8, 2011
  *      Author: bkloppenborg
  */
  
- /* 
+ /*
  * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
@@ -31,55 +31,145 @@
  */
 
 #include "CMinimizerThread.h"
-#include "CMinimizer.h"
+#include "CWorkerThread.h"
+#include "CModelList.h"
+#include <QDir>
+
+using namespace std;
 
 CMinimizerThread::CMinimizerThread()
 {
-	mMinimizer = NULL;
-	mSaveFileBasename = "/tmp/model";
-
-	// Get this thing to run as often as possible.
-	//Priority = QThread::TimeCriticalPriority;
+	mParams = NULL;
+	mNParams = 0;
+	mRun = false;
+	mIsRunning = false;
+	mSaveDirectory = "/tmp/model";
+	mMinimizerName = "";
+	mMinimizerID = "";
 }
 
 CMinimizerThread::~CMinimizerThread()
 {
-	// Free memory (if it's still allocated)
-	delete mMinimizer;
+	// Cleanly stop the thread
+	stop();
+
+	// Clear up memory
+	delete[] mParams;
 }
 
-void CMinimizerThread::run()
+double CMinimizerThread::ComputeChi2r(valarray<double> & chis, unsigned int n_params)
 {
-	if(!mMinimizer)
-		return;
+	// Square the numerator, divide by the uncertainties
+	chis *= chis;
 
-	// Call init before running the minimzer to setup memory.
-	mMinimizer->Init();
-	mMinimizer->SetSaveFileBasename(mSaveFileBasename);
-	mMinimizer->run();
-	exit();
+	double chi2_sum = chis.sum();
+
+	// Now compute the sum dividied by (n_data - n_params - 1)
+	return chi2_sum / (chis.size() - n_params - 1);
 }
 
-/// Sets the minimizer, freeing the old minimizer if needed.
-void CMinimizerThread::SetMinimizer(CMinimizer * minimizer)
+/// \brief Exports the parameter names, best-fit values, and model data.
+///
+/// Exports minimization results using the best-fit parameters stored in
+/// the mParams buffer.
+void CMinimizerThread::ExportResults()
 {
-	// If the minimizer exists and it is running, do nothing.
-	if(mMinimizer != NULL && mMinimizer->IsRunning())
-		return;
+	stringstream filename;
+	ofstream outfile;
 
-	// Free memory and set the new minimizer
-	delete mMinimizer;
-	mMinimizer = minimizer;
+	// Get a pointer to the model list;
+    CModelListPtr model_list = mWorkerThread->GetModelList();
+	vector<string> names = model_list->GetFreeParamNames();
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mSaveDirectory << "/best_fit.txt";
+	outfile.open(filename.str().c_str());
+	outfile.width(15);
+	outfile.precision(8);
+	outfile << "# Parameter names in a column." << endl;
+	outfile << "# Param0, ..., ParamN" << endl;
+	WriteRow(names, outfile);
+
+	// Now insert the best-fit parameters
+	vector<double> best_fit;
+	for(int i = 0; i < mNParams; i++)
+		best_fit.push_back(mParams[i]);
+
+	WriteRow(best_fit, outfile);
+	outfile.close();
+
+	// Set the best-fit parameter values
+	model_list->SetFreeParameters(mParams, mNParams, false);
+
+	// Tell the worker thread to save files.
+	QString save_folder = QString::fromStdString(mSaveDirectory);
+	mWorkerThread->ExportResults(save_folder + "/");
 }
 
-void CMinimizerThread::SetSaveFileBasename(string filename)
+/// \brief Returns the unique ID assigned to this minimizer.
+string CMinimizerThread::GetID()
 {
-	mSaveFileBasename = filename;
+	return mMinimizerID;
 }
 
+/// \brief Returns the best-fit parameters after minimization has completed.
+///
+/// Once the minimization is complete the minimizer is *required* to set the `mParams`
+/// variable to the best-fit minimization parameters. This function can be used
+/// to copy the first `n_params` values into the `results` buffer.
+///
+/// \param results A pre-allocated buffer of size `n_params` to which results are written.
+/// \param n_params The size of the `results` buffer.
+void CMinimizerThread::GetResults(double * results, int n_params)
+{
+	// Copy the values
+	for(int i = 0; i < mNParams && i < n_params; i++)
+		results[i] = mParams[i];
+}
 
+/// \brief Initialization function.
+///
+/// \param worker_thread A shared pointer to the worker thread
+void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
+{
+	mWorkerThread = worker_thread;
+
+	CModelListPtr model_list = mWorkerThread->GetModelList();
+	mNParams = model_list->GetNFreeParameters();
+	mParams = new double[mNParams];
+	mRun = true;
+
+	// Allocate storage for the residuals and uncertainties
+	unsigned int n_data = mWorkerThread->GetDataSize();
+	mChis = valarray<double>(n_data);
+	mUncertainties = valarray<double>(n_data);
+}
+
+/// \brief Changes the default directory to which the minimizer saves files.
+///
+/// Some minimization engines may write out intermediate files during the
+/// minimization process. This function permits you to set an absolute path
+/// and filename prefix which is used by the minimizers.
+///
+/// \param filename An absolute path prefix for minimizer files.
+void CMinimizerThread::SetSaveDirectory(string folder_name)
+{
+	if(folder_name.size() > 0)
+		mSaveDirectory = folder_name;
+}
+
+/// \brief Stops the minimizer.
 void CMinimizerThread::stop()
 {
-	if(mMinimizer != NULL)
-		mMinimizer->Stop();
+	mRun = false;
+}
+
+/// \brief Writes a row of data to the output file.
+void CMinimizerThread::WriteRow(double * data, unsigned int size, double chi2r, ofstream & output)
+{
+	for(int i = 0; i < size; i++)
+		output << data[i] << ", ";
+
+	output << chi2r << endl;
 }
