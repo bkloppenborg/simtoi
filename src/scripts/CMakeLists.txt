@@ -4,4 +4,5 @@ project(simtoi)
 # Copy some scripts into the binary output directory.
 
 file(COPY InsertSpaces.awk DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+file(COPY plot_data.py DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 file(COPY plot_histogram.py DESTINATION ${EXECUTABLE_OUTPUT_PATH})
