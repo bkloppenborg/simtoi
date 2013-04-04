@@ -582,13 +582,6 @@ void gui_main::render()
     }
 }
 
-void gui_main::SetSavePath(void)
-{
-	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow*>(sender());
-
-
-}
-
 /// Sets the time from the current selected datafile.
 void gui_main::SetTime(void)
 {

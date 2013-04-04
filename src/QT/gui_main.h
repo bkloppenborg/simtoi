@@ -86,7 +86,6 @@ private slots:
     void Animation_StartStop();
     void Animation_Reset();
     void render();
-    void SetSavePath();
     void SetTime();
 
     void minimizerFinished();
