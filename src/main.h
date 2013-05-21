@@ -40,7 +40,7 @@ using namespace std;
 string EXE_FOLDER;
 
 int main(int argc, char** argv);
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & model, string &  minimizer, bool & close_simtoi);
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & model, string &  minimizer, bool & close_simtoi, string & output_dir);
 void PrintHelp();
 
 #endif /* MAIN_H_ */

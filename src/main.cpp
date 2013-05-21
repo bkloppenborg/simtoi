@@ -69,15 +69,18 @@ int main(int argc, char *argv[])
     QStringList data_files;
     QStringList model_files;
     string minimizer = "";
+    string output_dir = "/tmp/model";
     bool close_simtoi = false;
 
     // If there were command-line options, parse them
     if(args.size() > 0)
-    	ParseArgs(args, data_files, model_files, minimizer, close_simtoi);
+    	ParseArgs(args, data_files, model_files, minimizer, close_simtoi, output_dir);
 
     // Startup the GUI:
     gui_main main_window;
     main_window.show();
+
+    main_window.SetOutputDir(output_dir);
 
     if(data_files.size() > 0)
     	main_window.CommandLine(data_files, model_files, minimizer, close_simtoi);
@@ -87,7 +90,7 @@ int main(int argc, char *argv[])
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, string &  minimizer, bool & close_simtoi)
+void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, string &  minimizer, bool & close_simtoi, string & output_dir)
 {
 	unsigned int n_items = args.size();
 
@@ -116,8 +119,8 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 		if(value == "-m")
 			models.append(tmp.absoluteFilePath(args.at(i + 1)));
 
-//		if(value == "-o")
-//			savefile.append(tmp.absoluteFilePath(args.at(i + 1)));
+		if(value == "-o")
+			output_dir = tmp.absoluteFilePath(args.at(i + 1)).toStdString();
 	}
 }
 
@@ -130,10 +133,11 @@ void PrintHelp()
 	cout << "Options:" << endl;
 	cout << "  " << "-h, --help   : " << "Show this help message and exit" << endl;
 	cout << "  " << "-c           : " << "Close SIMTOI after minimization completes [default: off]" << endl;
-	cout << "  " << "-d           : " << "Input OIFITS data file. Specify multiple -d to include " << endl;
+	cout << "  " << "-d           : " << "Input data file. Specify multiple -d to include " << endl;
 	cout << "  " << "               " << "many data files." << endl;
-	cout << "  " << "-e           : " << "Minimization engine ID (see Wiki or CMinimizer.h)" << endl;
+	cout << "  " << "-e           : " << "Minimization engine ID (see Wiki)" << endl;
 	cout << "  " << "-m           : " << "Model input file" << endl;
+	cout << "  " << "-o           : " << "Output directory" << endl;
 	cout << endl;
 	cout << "SIMTOI also supports QT commands. For instance you can run SIMTOI from a: " << endl;
 	cout << "remotely executed script (or from gnu screen) by adding: " << endl;

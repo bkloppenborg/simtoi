@@ -82,6 +82,9 @@ public:
 protected:
     void Init();
 
+public:
+    void SetOutputDir(string folder_name);
+
 private slots:
     void Animation_StartStop();
     void Animation_Reset();

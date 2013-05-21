@@ -335,6 +335,13 @@ void gui_main::Open(QStringList & filenames)
 	}
 }
 
+void gui_main::SetOutputDir(string folder_name)
+{
+	mDefaultSaveDir = folder_name;
+
+	this->textSaveFolder->setText(mDefaultSaveDir.c_str());
+}
+
 void gui_main::minimizerFinished()
 {
 	QMdiSubWindow * sw = dynamic_cast<QMdiSubWindow*>(sender());
