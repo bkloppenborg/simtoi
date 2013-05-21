@@ -85,6 +85,7 @@ public:
     CTreeModel * GetTreeModel() { return &mTreeModel; };
     unsigned int GetImageWidth() { return mWorker->GetImageWidth(); };
     unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
+    string GetSaveFolder() { return mSaveDirectory; };
 
 protected:
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
