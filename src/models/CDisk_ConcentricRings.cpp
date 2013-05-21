@@ -81,6 +81,10 @@ double CDisk_ConcentricRings::MidplaneTransparency(double radius)
 	const double r_out = mParams[mBaseParams + 2];
 	const double alpha = mParams[mBaseParams + 4];
 
+	// If alpha exceeds its bounds, return 1 for the transparency (per the documentation)
+	if(alpha < mMinMax[mBaseParams + 4].first || alpha > mMinMax[mBaseParams + 4].second)
+		return 1;
+
 	return (1 - pow((radius - r_in) / (r_out - r_in), alpha));
 }
 
@@ -138,5 +142,10 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, int hei
 double CDisk_ConcentricRings::Transparency(double half_height, double at_z)
 {
 	const double beta  = mParams[mBaseParams + 5];
+
+	// If beta exceeds its bounds, return 1 for the transparency (per the documentation)
+	if(beta < mMinMax[mBaseParams + 5].first || beta > mMinMax[mBaseParams + 5].second)
+		return 1;
+
 	return 1 - pow(abs(at_z) / half_height, beta);
 }

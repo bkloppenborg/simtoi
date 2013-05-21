@@ -14,6 +14,9 @@
  *  	beta : the z power law decay coefficient for transparency
  *  	n_rings: the number of concentric rings between r_in and r_out (> 0)
  *
+ *  NOTE: If either alpha or beta are set outside of their specified bounds, the transparency
+ *  in the corresponding direction will be set to zero (i.e. 100% opaque).
+ *
  *  WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
  */
 
