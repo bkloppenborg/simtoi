@@ -36,13 +36,13 @@ CDisk_ConcentricRings::CDisk_ConcentricRings()
 	SetMax(mBaseParams + 3, 2.0);
 	SetMin(mBaseParams + 3, 0.1);
 
-	mParamNames.push_back("Alpha (r)");
+	mParamNames.push_back("Alpha (radius)");
 	SetParam(mBaseParams + 4, 1);
 	SetFree(mBaseParams + 4, true);
 	SetMax(mBaseParams + 4, 10);
 	SetMin(mBaseParams + 4, 0.1);
 
-	mParamNames.push_back("Beta (z)");
+	mParamNames.push_back("Beta (height)");
 	SetParam(mBaseParams + 5, 1);
 	SetFree(mBaseParams + 5, true);
 	SetMax(mBaseParams + 5, 10);

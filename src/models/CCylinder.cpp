@@ -71,27 +71,27 @@ void CCylinder::Draw()
 	DrawDisk(0, radius, -half_height);
 }
 
-void CCylinder::DrawDisk(double radius, double at_z)
+void CCylinder::DrawDisk(double radius, double at_y)
 {
-	DrawDisk(0, radius, at_z);
+	DrawDisk(0, radius, at_y);
 }
 
 /// Draws a flat (planar) disk
-void CCylinder::DrawDisk(double r_in, double r_out, double at_z)
+void CCylinder::DrawDisk(double r_in, double r_out, double at_y)
 {
     double color = mParams[3];
     glBegin(GL_QUAD_STRIP);
 
-		if(at_z < 0)
-			glNormal3d( 0.0, 0.0, -1.0 );
+		if(at_y < 0)
+			glNormal3d( 0.0, -1.0, 0.0);
 		else
-			glNormal3d(0.0, 0.0, 1.0);
+			glNormal3d(0.0, 1.0, 0.0);
 
 		for(int j = 0; j <= mSlices; j++ )
 		{
 			glColor4d(color, 0.0, 0.0, MidplaneTransparency(r_in));
-			glVertex3d(mCosT[ j ] * r_in, mSinT[ j ] * r_in, at_z);
-			glVertex3d(mCosT[ j ] * r_out, mSinT[ j ] * r_out ,at_z);
+			glVertex3d(mCosT[ j ] * r_in,  at_y, mSinT[ j ] * r_in);
+			glVertex3d(mCosT[ j ] * r_out, at_y, mSinT[ j ] * r_out);
 		}
 
 	glEnd();
@@ -101,9 +101,9 @@ void CCylinder::DrawDisk(double r_in, double r_out, double at_z)
 void CCylinder::DrawSides(double radius, double total_height)
 {
 	double transparency = 0;
-    double z0 = 0;
-    double z1 = 0;
-    double zStep = 0;
+    double y0 = 0;
+    double y1 = 0;
+    double yStep = 0;
     double r0 = 0;
     double r1 = 0;
     double half_height = total_height / 2;
@@ -112,29 +112,29 @@ void CCylinder::DrawSides(double radius, double total_height)
 
     // Divide the z direction into mStacks equal steps
     // Stop when we get to mScale in height.
-    zStep = total_height / mStacks;
+    yStep = total_height / mStacks;
 
-	z0 = -half_height;
-	z1 = z0 + zStep;
+	y0 = -half_height;
+	y1 = y0 + yStep;
 
-	while(z0 < half_height)
+	while(y0 < half_height)
 	{
-		glColor4d(color, 0.0, 0.0, MidplaneTransparency(radius) * Transparency(half_height, z0));
-		r0 = GetRadius(half_height, z0, zStep, radius);
-		r1 = GetRadius(half_height, z1, zStep, radius);
+		glColor4d(color, 0.0, 0.0, MidplaneTransparency(radius) * Transparency(half_height, y0));
+		r0 = GetRadius(half_height, y0, yStep, radius);
+		r1 = GetRadius(half_height, y1, yStep, radius);
 
 		// Draw the top half
 		glBegin( GL_QUAD_STRIP );
 		for(int j = 0; j <= mSlices; j++ )
 		{
-			glNormal3d( mCosT[ j ],      mSinT[ j ],      0.0 );
-			glVertex3d( mCosT[ j ] * r0, mSinT[ j ] * r0, z0  );
-			glVertex3d( mCosT[ j ] * r1, mSinT[ j ] * r1 ,z1  );
+			glNormal3d( mCosT[ j ],      0.0, mSinT[ j ]       );
+			glVertex3d( mCosT[ j ] * r0,  y0, mSinT[ j ] * r0  );
+			glVertex3d( mCosT[ j ] * r1,  y1, mSinT[ j ] * r1  );
 		}
 		glEnd( );
 
-		z0 = z1;
-		z1 += zStep;
+		y0 = y1;
+		y1 += yStep;
 	}
 }
 

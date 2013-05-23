@@ -32,8 +32,11 @@
  
  /*
  *  Implements a simple disk model which has two parameters: diameter and height.
- *  When rendered, this model is a cylinder.  Inheriting classes should call
- *  the CModelDisk(int) function and start numbering additional parameters at 3.
+ *  When rendered, this model is a cylinder. The cylinder is centered on the x-z plane
+ *  and extends in the y-direction.
+ *
+ *  Inheriting classes should call the CModelDisk(int) function and start numbering
+ *  additional parameters at 3.
  */
 
 #ifndef CCYLINDER_H_
@@ -59,8 +62,8 @@ public:
 	static shared_ptr<CModel> Create();
 
 	virtual void Draw();
-	virtual void DrawDisk(double radius, double at_z);
-	virtual void DrawDisk(double r_in, double r_out, double at_z);
+	virtual void DrawDisk(double radius, double at_y);
+	virtual void DrawDisk(double r_in, double r_out, double at_y);
 	virtual void DrawSides(double radius, double height);
 
 	virtual string GetID() { return "cylinder"; };
