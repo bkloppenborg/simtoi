@@ -57,8 +57,12 @@ CPositionPtr CPositionXY::Create()
 
 void CPositionXY::GetXYZ(double & x, double & y, double & z)
 {
-	x = mParams[0];
-	y = mParams[1];
+	// Astronomical convention has (North,East) = (Up,Left),
+	// OpenGL has (x,y) = (right,up)
+	// So we reassign (x,y) = (-East, North)
+
+	x = -1 * mParams[1];
+	y = mParams[0];
 
 	// By default
 	z = 0;
