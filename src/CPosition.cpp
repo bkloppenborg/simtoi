@@ -43,7 +43,9 @@ CPosition::~CPosition()
 
 }
 
-/// Baseclass function, set all zeros
+/// Returns the position of the object in OpenGL coordinates
+///
+/// OpenGL coordinates have (x,y,z) = (right, up, toward)
 void CPosition::GetXYZ(double & x, double & y, double & z)
 {
 	x = 0;
