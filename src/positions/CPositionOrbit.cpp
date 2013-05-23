@@ -47,6 +47,7 @@ CPositionOrbit::CPositionOrbit()
 	mTime = 0;
 	mName = "Orbit";
 	mPositionID = "orbit_bound";
+	mPositionType = DYNAMIC;
 
 	mParamNames.push_back("Omega");	// Omega, keep as elements 0 for CModel::SetAnglesFromPosition
 	mParamNames.push_back("Inc");	// Inclination, keep as element 1 for CModel::SetAnglesFromPosition
@@ -155,17 +156,13 @@ void CPositionOrbit::Compute_xyz(double a, double beta, double e,
 		double cos_E, double sin_E,
 		double & x, double & y, double & z)
 {
-	double astro_north;
-	double astro_east;
-	double astro_z;
-
-    astro_north = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);
-    astro_east = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);
-    astro_z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);
+	double astro_north = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);;
+	double astro_east = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);;
+	double astro_z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);;
 
     x = -astro_east;
     y = astro_north;
-    z = -astro_z;
+    z = astro_z;
 }
 
 CPositionPtr CPositionOrbit::Create()

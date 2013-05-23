@@ -125,7 +125,6 @@ public:
 
 public:
 	Json::Value Serialize();
-	void SetAnglesFromPosition();
 	void SetPositionModel(string position_id);
 	void SetPositionModel(CPositionPtr position);
 

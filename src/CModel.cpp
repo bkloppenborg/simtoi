@@ -261,15 +261,35 @@ int CModel::GetTotalFreeParameters()
 
 /// \brief Runs OpenGL calls to rotate the model according to the inclination
 /// 	position angle, and rotation angle (rotational phase).
+///
+/// This function runs the necessary OpenGL calls to rotate the model according
+/// to the inclination, position angle, and rotation angle specified in the model.
+/// If the position model is DYNAMIC (i.e. an orbit), the position angle of the model
+/// is specified relative to the orbital plane.
 void CModel::Rotate()
 {
 	// Rotations are implemented in the standard way, namely
 	//  R_x(gamma) * R_y(beta) * R_z(alpha)
 	// where gamma = pitch, beta = roll, alpha = yaw.
 
-	glRotatef(mParams[0], 0, 0, 1); // position angle about z-axis
-	glRotatef(mParams[1], 1, 0, 0); // inclination about x-axis
-	glRotatef(mParams[2], 0, 1, 0); // omega about y-axis
+	double Omega = mParams[0];
+	double inc = mParams[1];
+	double omega = mParams[2];
+
+	// TODO: At the moment I'm not sure if +90 or -90 is correct here.
+	// so we might have models displaying tilted slightly the wrong direction.
+	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
+	{
+		// position angle
+		Omega += mPosition->GetParam(0) - 90;
+
+		// the inclination
+		inc += mPosition->GetParam(1) - 90;
+	}
+
+	glRotatef(Omega, 0, 0, 1); // position angle about z-axis
+	glRotatef(inc  , 1, 0, 0); // inclination about x-axis
+	glRotatef(omega, 0, 1, 0); // omega about y-axis
 	CWorkerThread::CheckOpenGLError("CModel::Rotate()");
 }
 
@@ -346,29 +366,6 @@ Json::Value CModel::Serialize()
 	return output;
 }
 
-/// \brief Sets the inclination and position angle relative to dynamic
-///		position model parameters.
-///
-/// If the position models are dynamic, they are often determined from
-/// orbits. This function simplifies the setting of the position angle
-/// and inclination to be relative to their orbital counterparts.
-void CModel::SetAnglesFromPosition()
-{
-	if(mPosition == NULL)
-		return;
-
-//	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
-//	{
-//		// the inclination
-//		if(!this->IsFree(0))
-//			mParams[0] += mPosition->GetParam(0);
-//
-//		// position angle
-//		if(!this->IsFree(1))
-//			mParams[1] += mPosition->GetParam(1);
-//	}
-}
-
 /// \brief Sets the free parameters for the model, position, and shader objects.
 ///
 /// Iteratively sets the free parameters for the model, position, and shader
@@ -395,9 +392,6 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	}
 	// Lastly the features
 	//features->SetParams(in_params + n, n_params - n);
-
-	// Now copy angles over from the orbit object (if they are not free)
-	SetAnglesFromPosition();
 }
 
 /// \brief Assigns the position object from a position id
