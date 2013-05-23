@@ -48,8 +48,8 @@ CPositionOrbit::CPositionOrbit()
 	mName = "Orbit";
 	mPositionID = "orbit_bound";
 
-	mParamNames.push_back("Inc");	// Inclination, keep as element 0 for CModel::SetAnglesFromPosition
-	mParamNames.push_back("Omega");	// Omega, keep as elements 1 for CModel::SetAnglesFromPosition
+	mParamNames.push_back("Omega");	// Omega, keep as elements 0 for CModel::SetAnglesFromPosition
+	mParamNames.push_back("Inc");	// Inclination, keep as element 1 for CModel::SetAnglesFromPosition
 	mParamNames.push_back("omega");
 	mParamNames.push_back("Alpha");
 	mParamNames.push_back("e");
@@ -151,13 +151,21 @@ void CPositionOrbit::Compute_Coefficients(double Omega, double inc, double omega
 // Computes the (x, y, z) position of the orbit.
 // Uses the equations defined in "Orbital Motions" by A. E. Roy 2005 pg. 93
 void CPositionOrbit::Compute_xyz(double a, double beta, double e,
-		double l1, double l2, double m1, double m2, double n1, double n2,
+		double l1, double m1, double n1, double l2, double m2, double n2,
 		double cos_E, double sin_E,
 		double & x, double & y, double & z)
 {
-    x = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);
-    y = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);
-    z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);
+	double astro_north;
+	double astro_east;
+	double astro_z;
+
+    astro_north = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);
+    astro_east = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);
+    astro_z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);
+
+    x = -astro_east;
+    y = astro_north;
+    z = -astro_z;
 }
 
 CPositionPtr CPositionOrbit::Create()
@@ -169,9 +177,9 @@ void CPositionOrbit::GetXYZ(double & x, double & y, double & z)
 {
 	// Local variables (mostly renaming mParams variables for convenience).
 	// Remember to convert the angular parameters into radians.
-    double l1, l2, m1, m2, n1, n2;
-    double inc = mParams[0] * PI / 180.0;
-    double Omega = mParams[1] * PI / 180.0;
+    double l1, m1, n1, l2, m2, n2;
+    double Omega = mParams[0] * PI / 180.0;
+    double inc = mParams[1] * PI / 180.0;
     double omega = mParams[2] * PI / 180.0;
     double alpha = mParams[3];
     double e = mParams[4];
@@ -190,5 +198,5 @@ void CPositionOrbit::GetXYZ(double & x, double & y, double & z)
 
     // Now compute the orbital coefficients
     Compute_Coefficients(Omega, inc, omega, l1, m1, n1, l2, m2, n2);
-    Compute_xyz(alpha, beta, e, l1, l2, m1, m2, n1, n2, cos_E, sin_E, x, y, z);
+    Compute_xyz(alpha, beta, e, l1, m1, n1, l2, m2, n2, cos_E, sin_E, x, y, z);
 }

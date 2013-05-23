@@ -53,12 +53,12 @@ CModel::CModel(int n_params)
 	mShader = CShaderPtr();
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
-	mParamNames.push_back("Inclination");
-	SetParam(0, 0);
-	SetFree(0, false);
 	mParamNames.push_back("Pos. Angle");
 	SetParam(1, 0);
 	SetFree(1, false);
+	mParamNames.push_back("Inclination");
+	SetParam(0, 0);
+	SetFree(0, false);
 	mParamNames.push_back("Rotation");
 	SetParam(2, 0);
 	SetFree(2, false);
@@ -267,9 +267,9 @@ void CModel::Rotate()
 	//  R_x(gamma) * R_y(beta) * R_z(alpha)
 	// where gamma = pitch, beta = roll, alpha = yaw.
 
-	glRotatef(mParams[0], 1, 0, 0);	// inclination
-	glRotatef(mParams[1], 0, 1, 0); // position angle
-	glRotatef(mParams[2], 0, 0, 1); // roll
+	glRotatef(mParams[0], 0, 0, 1); // position angle about z-axis
+	glRotatef(mParams[1], 1, 0, 0); // inclination about x-axis
+	glRotatef(mParams[2], 0, 1, 0); // omega about y-axis
 	CWorkerThread::CheckOpenGLError("CModel::Rotate()");
 }
 
@@ -316,13 +316,10 @@ void CModel::Restore(Json::Value input)
 /// \brief Sets up the matrix mode for rendering models.
 void CModel::SetupMatrix()
 {
-    // Rotate from (x,y,z) to (North, East, Away).  Note, we are following the (x,y,z)
-    // convention of the orbital equations here.
+    // Keep the matrix in standard OpenGL coordinates, namely
+	// (x,y,z) = (right, up, towards)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glRotatef(90, 0, 0, 1);
-	glScalef(1, 1, -1);
-
 }
 
 /// \brief Serializes a model object into a JSON object.
@@ -360,16 +357,16 @@ void CModel::SetAnglesFromPosition()
 	if(mPosition == NULL)
 		return;
 
-	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
-	{
-		// the inclination
-		if(!this->IsFree(0))
-			mParams[0] += mPosition->GetParam(0);
-
-		// position angle
-		if(!this->IsFree(1))
-			mParams[1] += mPosition->GetParam(1);
-	}
+//	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
+//	{
+//		// the inclination
+//		if(!this->IsFree(0))
+//			mParams[0] += mPosition->GetParam(0);
+//
+//		// position angle
+//		if(!this->IsFree(1))
+//			mParams[1] += mPosition->GetParam(1);
+//	}
 }
 
 /// \brief Sets the free parameters for the model, position, and shader objects.
