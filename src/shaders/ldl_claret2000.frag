@@ -25,7 +25,7 @@
  */
  
 // Four-parameter limb darkening implemented according to Claret (2003)
-// Implemented using alpha blending.
+// Implemented by decreasing the flux (color.x) of the vertex.
 in vec3 normal;
 in vec4 color;
 uniform float a1;
@@ -44,5 +44,5 @@ void main(void)
 	intensity -= a3 * (1 - pow(mu, 1.5));
 	intensity -= a4 * (1 - pow(mu, 2));
 
-    gl_FragColor = vec4(color.x, 0, 0, intensity * color.w);
+    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
 }

@@ -9,7 +9,7 @@ If you are building SIMTOI from scratch, you will need a C, C++, and Fortran
 compiler along with the CMake build system. On a Debian-based system these
 can be installed using `apt-get`:
 
-    sudo apt-get install build-essentials cmake gfortran
+    sudo apt-get install build-essential cmake gfortran
 
 If you intend to use Git to checkout the repository, you also need to install it
 
@@ -19,7 +19,7 @@ All of the minimization engines presently used in SIMTOI use LAPACK and/or BLAS
 for solving linear systems of equations. SIMTOI also requires ccfits, cfitsio
 QT4 and an OpenGL library. These can all be installed via. `apt-get`:
 
-    sudo apt-get install liblapack-dev libblas-dev libccfits0 libccfits-dev libqt4-dev libglumesa1 libglumesa1-dev
+    sudo apt-get install liblapack-dev libblas-dev libccfits0 libccfits-dev libqt4-dev libglu1-mesa libglu1-mesa-dev
 
 In order to run SIMTOI you must also have an installation of OpenCL for your graphics
 card. If you have an NVidia GPU simply install the video card drivers. On ATI GPUs
