@@ -25,7 +25,7 @@
  */
  
 // Quadratic limb darkening
-// Implemented using alpha blending.
+// Implemented by decreasing the flux (color.x) of the vertex.
 in vec3 normal;
 in vec4 color;
 uniform float a1;
@@ -40,5 +40,5 @@ void main(void)
 	intensity -= a1 * (1 - mu);
 	intensity -= a2 * pow( (1 - mu), 2);
 
-    gl_FragColor = vec4(color.x, 0, 0, intensity * color.w);
+    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
 }
