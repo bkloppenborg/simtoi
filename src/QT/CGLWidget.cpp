@@ -191,10 +191,14 @@ void CGLWidget::Open(string filename)
 {
 	Json::Reader reader;
 	Json::Value input;
-	string file_contents = ReadFile(filename, "Could not SIMTOI save file: '" + filename + "'.");
+	string file_contents = ReadFile(filename, "Could not read SIMTOI save file: '" + filename + "'. Does the file exist?");
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(!parsingSuccessful)
-		throw runtime_error("JSON parse error in SIMTOI save file '" + filename + "'. File cannot be opened.");
+	{
+		string error_messages = reader.getFormatedErrorMessages();
+		throw runtime_error("Could not parse SIMTOI save file '" + filename + "'.\n" + error_messages);
+
+	}
 
 	int width = input["area_width"].asInt();
 	int height = input["area_height"].asInt();
