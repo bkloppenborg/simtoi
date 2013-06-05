@@ -255,7 +255,9 @@ void CWorkerThread::ExportResults(QString save_folder)
 
 	mTempString = save_folder.toStdString();
 	Enqueue(EXPORT);
-	mWorkerSemaphore.release(1);
+
+	// Wait for the export operation to finish
+	mWorkerSemaphore.acquire(1);
 }
 
 void CWorkerThread::GetChi(double * chi, unsigned int size)
