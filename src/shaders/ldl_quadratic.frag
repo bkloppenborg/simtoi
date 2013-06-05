@@ -38,7 +38,7 @@ void main(void)
     // Simple quadratic limb darkening:
     float intensity = 1;
 	intensity -= a1 * (1 - mu);
-	intensity -= a2 * pow( (1 - mu), 2);
+	intensity -= a2 * pow( (1 - mu), 2.0);
 
     gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
 }

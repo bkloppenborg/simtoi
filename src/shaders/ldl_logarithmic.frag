@@ -35,7 +35,7 @@ void main(void)
 {
     float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
     
-    // Simple quadratic limb darkening:
+    // Simple logarithmic limb darkening:
     float intensity = 1;
 	intensity -= a1 * (1 - mu);
 	intensity -= a2 * mu * log(mu);
