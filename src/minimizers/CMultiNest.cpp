@@ -142,7 +142,7 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 	lnew = ComputeLogZ(minimizer->mChis, minimizer->mUncertainties);
 	double temp = lnew;
 
-	// TODO: Add in priors
+	// Add in the priors:
 	lnew += minimizer->ComputePriors(params, npars);
 }
 
