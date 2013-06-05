@@ -52,6 +52,7 @@ CShaderFactory::CShaderFactory()
 	Register(EXE_FOLDER + "/shaders/ldl_quadratic.json");
 	Register(EXE_FOLDER + "/shaders/ldl_square_root.json");
 	Register(EXE_FOLDER + "/shaders/power_law_z.json");
+	Register(EXE_FOLDER + "/shaders/ldl_fields2003.json");
 }
 
 CShaderFactory::~CShaderFactory() \
