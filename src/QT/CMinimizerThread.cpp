@@ -74,24 +74,17 @@ double CMinimizerThread::ComputeChi2r(valarray<double> & chis, unsigned int n_pa
 /// the mParams buffer.
 void CMinimizerThread::ExportResults()
 {
-	stringstream filename;
 	ofstream outfile;
 
 	// Get a pointer to the model list;
     CModelListPtr model_list = mWorkerThread->GetModelList();
 	vector<string> names = model_list->GetFreeParamNames();
 
-	// Open the statistics file for writing:
-	filename.str("");
-	filename << mSaveDirectory << "/best_fit.txt";
-	outfile.open(filename.str().c_str());
-	outfile.width(15);
-	outfile.precision(8);
-	outfile << "# Parameter names in a column." << endl;
-	outfile << "# Param0, ..., ParamN" << endl;
-	WriteRow(names, outfile);
+	OpenStatisticsFile(outfile);
 
-	// Now insert the best-fit parameters
+	// Write out the save file header, including the parameter names:
+	WriteHeader(names, outfile);
+
 	vector<double> best_fit;
 	for(int i = 0; i < mNParams; i++)
 		best_fit.push_back(mParams[i]);
@@ -146,6 +139,25 @@ void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 	mUncertainties = valarray<double>(n_data);
 }
 
+/// \brief Opens the statistics file and sets the properties for the ofstream
+///
+/// \param file An uninitialized ofstream for the statistics files
+void CMinimizerThread::OpenStatisticsFile(ofstream & file)
+{
+	stringstream filename;
+
+	if(file.is_open())
+		file.close();
+
+	// Open the statistics file for writing:
+	filename.str("");
+	filename << mSaveDirectory << "/best_fit.txt";
+	file.open(filename.str().c_str());
+	file.width(15);
+	file.precision(8);
+}
+
+
 /// \brief Changes the default directory to which the minimizer saves files.
 ///
 /// Some minimization engines may write out intermediate files during the
@@ -172,4 +184,12 @@ void CMinimizerThread::WriteRow(double * data, unsigned int size, double chi2r, 
 		output << data[i] << ", ";
 
 	output << chi2r << endl;
+}
+
+/// \brief Writes the parameter names
+void CMinimizerThread::WriteHeader(vector<string> & param_names, ofstream & outfile)
+{
+	outfile << "# Parameter names in a column." << endl;
+	outfile << "# Param0, ..., ParamN" << endl;
+	WriteRow(param_names, outfile);
 }
