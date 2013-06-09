@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import re
 from scipy.stats import norm, cauchy
 import matplotlib.mlab as mlab
+import os
 
 def plot_histogram(filename, 
     column_names=[], skip_cols=[], nbins=10, trimends=False,
@@ -83,7 +84,7 @@ def plot_histogram(filename,
         plt.legend(loc='best')
         
         if autosave:
-            plt.savefig(save_directory + 'stats_hist_' + title + '.' + save_format, transparent=True, format=save_format)    
+            plt.savefig(save_directory + '/stats_hist_' + title + '.' + save_format, transparent=True, format=save_format)    
             plt.close()
         else:
             plt.show()
@@ -97,15 +98,19 @@ def plot_histogram(filename,
     if(not autosave):
         print "Normal Statistics:"
         
-    write_statistics(save_directory + 'stats_normal.txt', norm_stats, autosave)
+    write_statistics(save_directory + '/stats_normal.txt', norm_stats, autosave)
     
     if(not autosave):
         print "Cauchy Statistics:"
         
-    write_statistics(save_directory + 'stats_cauchy.txt', cauchy_stats, autosave)
+    write_statistics(save_directory + '/stats_cauchy.txt', cauchy_stats, autosave)
 
 
 def col_names(filename):
+    """
+    Reads in the column names from the `best_fit.txt` files.
+    Column names will always occur on the first non-comment line in the file.
+    """
     infile = open(filename, 'r')
     
     columns = list()
@@ -143,17 +148,13 @@ def main():
     # Set parameters specifying columns that should not be plotted
     # and attempt to find the namefile:
     skip_cols=[]
-    directory = ''
+    directory = os.path.dirname(os.path.realpath(filename))
     delimiter = None
-    if re.search('bootstrap_', filename):
-        tmp = re.split('bootstrap_', filename)
-        directory = tmp[0]
+    if re.search('bootstrap_levmar', filename):
         skip_cols = [-1]
         delimiter = ','
         print "Found bootstrap file."
     elif re.search('multinest.txt', filename):
-        tmp = re.split('multinest.txt', filename)
-        directory = tmp[0]
         skip_cols = [0,1]
         print "Found MultiNest file."
     else:
@@ -162,7 +163,7 @@ def main():
 
     column_names = []
     if len(directory) > 1:
-        column_names = col_names(directory + 'param_names.txt')
+        column_names = col_names(directory + '/best_fit.txt')
 
     plot_histogram(filename, column_names=column_names, skip_cols=skip_cols, nbins=options.nbins, autosave=options.autosave, save_directory=directory, save_format=options.savefmt, trimends=options.trimends, delimiter=delimiter)
    

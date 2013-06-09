@@ -104,11 +104,15 @@ public:
 	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
 	bool IsRunning();
 
+	void OpenStatisticsFile(ofstream & file);
+
 	// Pure virtual function, each minimizer must implement this.
 	virtual void run() = 0;
 
 	void SetSaveDirectory(string filename);
 	virtual void stop();
+
+	void WriteHeader(vector<string> & param_names, ofstream & outfile);
 
 	template <class T>
 	void WriteTable(vector< vector<T> > & data, ofstream & output)

@@ -1,12 +1,6 @@
-/*
- * CMMultiNest.h
- *
- *  Created on: Jan 26, 2012
- *      Author: bkloppenborg
- */
- 
- /* 
- * Copyright (c) 2012 Brian Kloppenborg
+#version 120
+/* 
+ * Copyright (c) 2013 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -29,32 +23,20 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+// A flux-conserving square-root limb darkening law based on Fields (2003)
+// Implemented by decreasing the flux (color.x) of the vertex.
+in vec3 normal;
+in vec4 color;
+uniform float A;
+uniform float B;
 
-#ifndef CMULTINEST_H_
-#define CMULTINEST_H_
-
-#include "CMinimizerThread.h"
-#include "multinest.h"
-
-class CMultiNest: public CMinimizerThread
+void main(void)
 {
+    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
+    float intensity = 1;
+    intensity -= A * (1 - 1.5*mu);
+    intensity -= B * (1 - 2.5*sqrt(mu));
 
-public:
-	CMultiNest();
-	virtual ~CMultiNest();
-
-	virtual double ComputePriors(double * params, int n_params);
-	static shared_ptr<CMinimizerThread> Create();
-
-	static double ComputeLogZ(valarray<double> & residuals, const valarray<double> & uncertainties);
-
-	static void dumper(int & nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double **paramConstr, double &maxLogLike, double &logZ, double &logZerr, void * misc);
-
-	static void log_likelihood(double * Cube, int & ndim, int & npars, double & lnew, void * misc);
-
-	void ResultFromSummaryFile(string multinest_output_dir);
-	void run();
-
-};
-
-#endif /* CMULTINEST_H_ */
+    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
+}

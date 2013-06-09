@@ -36,6 +36,7 @@
 
 #include "CWorkerThread.h"
 #include "CModelList.h"
+#include "textio.hpp"
 
 #ifndef PI
 #define PI M_PI
@@ -100,18 +101,23 @@ void CMultiNest::dumper(int &nSamples, int &nlive, int &nPar, double **physLive,
 //   paramConstr(nPar*2+1) to paramConstr(3*nPar)  	= best-fit (maxlike) parameters
 //   paramConstr(nPar*4+1) to paramConstr(4*nPar)  	= MAP (maximum-a-posteriori) parameters
 */
-	// If we haven't been requested to stop, copy the values over to a save-able array:
-	if(maxLogLike < numeric_limits<double>::max())
-	{
-		CMultiNest * minimizer = reinterpret_cast<CMultiNest*>(misc);
-		CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
 
-		for(int i = 0; i < nPar; i++)
-			minimizer->mParams[i] = paramConstr[0][i];
+	// In our experimentation the dumper doesn't appear to be called with the maximum likelihood parameters
+	// at the end of execution. So we'll parse the multinestsummary.txt file instead of attempting
+	// to store the best-fit values here.
 
-		model_list->SetFreeParameters(minimizer->mParams, nPar, true);
-		model_list->GetFreeParameters(minimizer->mParams, nPar, true);
-	}
+//	// If we haven't been requested to stop, copy the values over to a save-able array:
+//	if(maxLogLike < numeric_limits<double>::max())
+//	{
+//		CMultiNest * minimizer = reinterpret_cast<CMultiNest*>(misc);
+//		CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
+//
+//		for(int i = 0; i < nPar; i++)
+//			minimizer->mParams[i] = paramConstr[0][i];
+//
+//		model_list->SetFreeParameters(minimizer->mParams, nPar, true);
+//		model_list->GetFreeParameters(minimizer->mParams, nPar, true);
+//	}
 }
 
 void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double & lnew, void * misc)
@@ -136,10 +142,46 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 	lnew = ComputeLogZ(minimizer->mChis, minimizer->mUncertainties);
 	double temp = lnew;
 
-	// TODO: Add in priors
+	// Add in the priors:
 	lnew += minimizer->ComputePriors(params, npars);
 }
 
+/// Reads in the 'multinestsummary.txt' file and extracts the
+void CMultiNest::ResultFromSummaryFile(string multinest_root)
+{
+	double best_logZ = -numeric_limits<double>::max();
+	double logZ = 0;
+
+	vector<string> lines = ReadFile(multinest_root + "summary.txt", "", "Could not read multinestsummary.txt file.");
+
+	for(auto line : lines)
+	{
+		// Tokenize the line. According to the MultiNest documentation:
+		// There is one line per mode with nPar*4+2 values in each line in this file. Each line has the following values
+		// in its column mean parameter values, standard deviations of the parameters, bestfit (maxlike) parameter values,
+		// MAP (maximum-a-posteriori) parameter values, local log evidence, maximum loglike value
+		vector<string> values = Tokenize(line);
+		StripWhitespace(values);
+
+		// The logZ value is the last element in each row in the file.
+		string temp = values.back();
+		logZ = atof(values.back().c_str());
+
+		// if this logZ is better than our best-estimate, copy over the best-fit parameters
+		if(logZ > best_logZ)
+		{
+			best_logZ = logZ;
+
+			for(int i = 0; i < mNParams; i++)
+			{
+				// Grab the mean parameter values
+				mParams[i] = atof(values[i].c_str());
+			}
+		}
+
+	}
+
+}
 
 /// Runs MultiNest.
 void CMultiNest::run()
@@ -167,7 +209,7 @@ void CMultiNest::run()
 	for(int i = 0; i < ndims; i++)
 	    pWrap[i] = 0;
 
-	const std::string path = mSaveDirectory + "/multinest";		// root for output files
+	const std::string multinest_root = mSaveDirectory + "/multinest";		// root for output files
 	int seed = -1;					// random no. generator seed, if < 0 then take the seed from system clock
 	int fb = 1;					    // need feedback on standard output?
 	int resume = 0;					// resume from a previous job?
@@ -184,7 +226,7 @@ void CMultiNest::run()
     // Run the nested sampling algorithm
     nested::run(mmodal, ceff, nlive, tol,
         efr, ndims, nPar, nClsPar,
-        maxModes, updInt, Ztol, path,
+        maxModes, updInt, Ztol, multinest_root,
         seed, pWrap, fb, resume,
         outfile, initMPI, logZero, maxIterations,
         CMultiNest::log_likelihood,
@@ -193,7 +235,11 @@ void CMultiNest::run()
 
     mIsRunning = false;
 
-    // TODO: For some reason the parameters are getting mangled when they come from MultiNest
-    // resulting in a mangled image for data exporting.
+    // We should be able to rely on the dumper to get the best-fit parameters
+    // at the last MultiNest execution, but this doesn't appear to happen. Instead
+    // we will parse the multinestsummary.txt file for the best-fit parameters
+    // and set them to mParams prior to running ExportResults.
+    ResultFromSummaryFile(multinest_root);
+
     ExportResults();
 }

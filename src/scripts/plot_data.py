@@ -79,7 +79,7 @@ def plot_t3_amp(data_file, model_file,
     Plots T3 amplitudes in a split data/model and residual plot
     """
     split_plot(data_file, 6, 7, 8, model_file, 6, 7, 
-    "T$_3$ Amplitude", "Residual\n$\Delta$ T$_3$ Amplitude", 
+    "T$_3$ Amplitude", "Error  ($\sigma T$_3$ Amp$)", 
     autosave=autosave, saveformat=saveformat)
     
 def plot_t3_phi(data_file, model_file, 
@@ -88,7 +88,7 @@ def plot_t3_phi(data_file, model_file,
     Plots T3 phases in a split data/model and residual plot
     """
     split_plot(data_file, 6, 9, 10, model_file, 6, 9, 
-    "T3$_\phi$\n(Degrees)", "Residual\n$\Delta$ T3$_\phi$ ",
+    "T3$_\phi$\n(Degrees)", "Error ($\sigma T3$_\phi$)",
     ylimits=[-180,180], autosave=autosave, saveformat=saveformat)    
 
 def plot_v2(data_file, model_file, 
@@ -96,7 +96,7 @@ def plot_v2(data_file, model_file,
     """
     Plots V2 in a split data/model and residual plot
     """
-    split_plot(data_file, 2, 3, 4, model_file, 2, 3, "$V^2$", "Residual\n($\Delta V^2$)",
+    split_plot(data_file, 2, 3, 4, model_file, 2, 3, "$V^2$", "Error ($\sigma {V^2}$)",
     autosave=autosave, saveformat=saveformat)
 
 def split_plot(data_file, data_xcol, data_ycol, data_errcol, 
@@ -153,7 +153,7 @@ def split_plot(data_file, data_xcol, data_ycol, data_errcol,
     top.set_ylabel(primary_plot_ylabel)
     
     # Bottom plot: Residuals  
-    bottom.errorbar(obs_x, obs_y - mod_y, yerr=obs_yerr, fmt='o')
+    bottom.errorbar(obs_x, (obs_y - mod_y)/obs_yerr, yerr=obs_yerr, fmt='o')
     bottom.grid(True)
     bottom.set_ylabel(residual_plot_ylabel)
         

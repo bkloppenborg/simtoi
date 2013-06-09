@@ -37,14 +37,21 @@ CMinimizerPtr CBootstrap_Levmar::Create()
 	return CMinimizerPtr(new CBootstrap_Levmar());
 }
 
-/// \brief Overwride the CMinimizerThread::ExportResult function to do nothing.
+/// \brief Overwride the CMinimizerThread::ExportResult
 ///
 /// The CLevmar::run() function calls CMinimizerThread::ExportResult whenever a minimization
-///	run completes. This writes out files which we don't need when bootstrapping. So we overwride
-/// the CMinimizerThread::ExportResult function here with one that does nothing.
+///	run completes. This writes out files which we don't need when bootstrapping. Here we
+/// override that functionality and only write out the names of the best-fit parameters.
 void CBootstrap_Levmar::ExportResults()
 {
-	// do nothing
+	ofstream outfile;
+
+	// Get a pointer to the model list;
+    CModelListPtr model_list = mWorkerThread->GetModelList();
+	vector<string> names = model_list->GetFreeParamNames();
+
+	OpenStatisticsFile(outfile);
+	WriteHeader(names, outfile);
 }
 
 void CBootstrap_Levmar::Init(shared_ptr<CWorkerThread> worker_thread)
