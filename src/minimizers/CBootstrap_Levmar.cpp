@@ -52,6 +52,9 @@ void CBootstrap_Levmar::ExportResults()
 
 	OpenStatisticsFile(outfile);
 	WriteHeader(names, outfile);
+
+	outfile.flush();
+	outfile.close();
 }
 
 void CBootstrap_Levmar::Init(shared_ptr<CWorkerThread> worker_thread)
@@ -75,7 +78,7 @@ void CBootstrap_Levmar::run()
 	mOutputFile.width(15);
 	mOutputFile.precision(8);
 	// write a somewhat descriptive header
-	mOutputFile << "Param0, Param1, ..., ParamN, chi2r" << endl;
+	mOutputFile << "# Param0, Param1, ..., ParamN, chi2r" << endl;
 
 	// init local storage
 	double chi2r_ave = 0;
