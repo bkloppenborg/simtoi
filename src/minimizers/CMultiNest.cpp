@@ -193,15 +193,16 @@ void CMultiNest::run()
 	void * misc = reinterpret_cast<void*>(this);
 
 	// set the MultiNest sampling parameters
-	int mmodal = 1;					// do mode separation?
+	int IS = 1;						// do Nested Importance Sampling?
+	int mmodal = 0;					// do mode separation?
 	int ceff = 0;					// run in constant efficiency mode?
 	int nlive = 200;				// number of live points
 	double efr = 0.8;				// set the required efficiency
 	double tol = 1000;				// tol, defines the stopping criteria
 	int ndims = mNParams;			// dimensionality (no. of free parameters)
-	int nPar = mNParams;				// total no. of parameters including free & derived parameters
-	int nClsPar = 1;			// no. of parameters to do mode separation on
-	int updInt = 1;				// after how many iterations feedback is required & the output files should be updated
+	int nPar = mNParams;			// total no. of parameters including free & derived parameters
+	int nClsPar = 1;				// no. of parameters to do mode separation on
+	int updInt = 1;					// after how many iterations feedback is required & the output files should be updated
 									// note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	double Ztol = -1E90;			// all the modes with logZ < Ztol are ignored
 	int maxModes = 10;				// expected max no. of modes (used only for memory allocation)
@@ -219,19 +220,18 @@ void CMultiNest::run()
 
 	double logZero = -numeric_limits<double>::max();		// points with loglike < logZero will be ignored by MultiNest
 //	int context = 0;				// not required by MultiNest, any additional information user wants to pass
-	int maxIterations = 1E9;
+	int maxIterations = 1E7;
 
 	mIsRunning = true;
 
-    // Run the nested sampling algorithm
-    nested::run(mmodal, ceff, nlive, tol,
-        efr, ndims, nPar, nClsPar,
-        maxModes, updInt, Ztol, multinest_root,
-        seed, pWrap, fb, resume,
-        outfile, initMPI, logZero, maxIterations,
-        CMultiNest::log_likelihood,
-        CMultiNest::dumper,
-        misc);
+	nested::run(IS, mmodal, ceff, nlive, tol,
+			efr, ndims, nPar, nClsPar,
+			maxModes, updInt, Ztol, multinest_root,
+			seed, pWrap, fb, resume,
+			outfile, initMPI, logZero, maxIterations,
+	        CMultiNest::log_likelihood,
+	        CMultiNest::dumper,
+	        misc);
 
     mIsRunning = false;
 
