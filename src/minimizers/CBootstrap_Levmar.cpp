@@ -86,31 +86,24 @@ void CBootstrap_Levmar::run()
 	int exit_value = 0;
 
 	// The maximum chi2r that will be accepted. Iterations exceeding this value will be repeated.
-	float chi2_threshold = 10;
+	float chi2_threshold = 15;
 	int chi2r_exceeded = 0;
 	int nData = 0;
-
-	// Setup the random number generator:
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	std::default_random_engine generator (seed);
-	uniform_real_distribution<double> distribution (0.0,1.0);
 
 	// Set the parameters (note, they are not scaled to unit magnitude)
 	CModelListPtr model_list = mWorkerThread->GetModelList();
 
-	vector< pair<double, double> > min_max = model_list->GetFreeParamMinMaxes();
+	// Look up the nominal parameters from the model.
+	valarray<double> nominal_params(mLevmar->mNParams);
+	model_list->GetFreeParameters(&nominal_params[0], mLevmar->mNParams, false);
 
 	for(int iteration = 0; iteration < mIterations; iteration++)
 	{
 		if(!mRun)
 			break;
 
-		// Randomize the starting position of the minimizer
-		for(int i = 0; i < mLevmar->mNParams; i++)
-			mLevmar->mParams[i] = distribution(generator);
-
 		// Set the starting position.  Note these values are [0...1] and need to be scaled.
-		model_list->SetFreeParameters(mLevmar->mParams, mLevmar->mNParams, true);
+		model_list->SetFreeParameters(&nominal_params[0], mLevmar->mNParams, true);
 
 		// Print a status message:
 		cout << endl << "Starting iteration " << iteration + 1 << endl;
@@ -126,8 +119,8 @@ void CBootstrap_Levmar::run()
 		// If the average reduced chi2 is too high automatically redo the bootstrap
 		if(chi2r_ave > chi2_threshold)
 		{
-			cerr << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
-			cout << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration << "." << endl;
+			cerr << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration + 1 << "." << endl;
+			cout << " Average Chi2r = " << chi2r_ave << " exceeds chi2_threshold = " << chi2_threshold << " repeating iteration " << iteration + 1 << "." << endl;
 			chi2r_exceeded += 1;
 			iteration--;
 
@@ -145,6 +138,8 @@ void CBootstrap_Levmar::run()
 		// Get the next bootstrapped data set and repeat.
 		mWorkerThread->BootstrapNext(mMaxBootstrapFailures);
 	}
+
+	ExportResults();
 
 }
 
