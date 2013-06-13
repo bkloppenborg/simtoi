@@ -66,8 +66,15 @@ def plot_photometry(data_file, model_file,
     # Set the plot layout and save the output
     plt.tight_layout(h_pad = 0)
     if(autosave):
-        savefile = re.sub('\.*', '\.'+ saveformat)
-        plt.savefig(savefile, transparent=True, format=save_format)    
+        # Create the savefile name. Simply replace the extension on the file with
+        # saveformat. We know the data files end in '.txt' so we'll split on all
+        # periods, and replace the last instance
+        savefile = re.split('\.', data_file)
+        savefile[len(savefile) - 1] = saveformat
+        savefile = '.'.join(savefile)
+    
+        # Write out the figure:
+        plt.savefig(savefile, transparent=True, format=saveformat)    
         plt.close()
     else:
         plt.show()
@@ -161,8 +168,15 @@ def split_plot(data_file, data_xcol, data_ycol, data_errcol,
     plt.tight_layout(h_pad = 0)
     
     if(autosave):
-        savefile = re.sub('\.*', '\.'+ saveformat)
-        plt.savefig(savefile, transparent=True, format=save_format)    
+        # Create the savefile name. Simply replace the extension on the file with
+        # saveformat. We know the data files end in '.txt' so we'll split on all
+        # periods, and replace the last instance
+        savefile = re.split('\.', data_file)
+        savefile[len(savefile) - 1] = saveformat
+        savefile = '.'.join(savefile)
+    
+        # Write out the figure:
+        plt.savefig(savefile, transparent=True, format=saveformat)    
         plt.close()
     else:
         plt.show()
