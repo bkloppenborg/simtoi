@@ -77,7 +77,6 @@ void CDisk_ConcentricRings::SetShader(CShaderPtr shader)
 
 double CDisk_ConcentricRings::MidplaneTransparency(double radius)
 {
-	const double r_in  = mParams[mBaseParams + 1];
 	const double r_out = mParams[mBaseParams + 2];
 	const double alpha = mParams[mBaseParams + 4];
 
@@ -85,7 +84,7 @@ double CDisk_ConcentricRings::MidplaneTransparency(double radius)
 	if(alpha < mMinMax[mBaseParams + 4].first || alpha > mMinMax[mBaseParams + 4].second)
 		return 1;
 
-	return (1 - pow((radius - r_in) / (r_out - r_in), alpha));
+	return (1 - pow((radius) / (r_out), alpha));
 }
 
 void CDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, int height)
