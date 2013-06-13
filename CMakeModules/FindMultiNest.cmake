@@ -58,13 +58,13 @@ IF(MULTINEST_INCLUDES)
 ENDIF (MULTINEST_INCLUDES)
 
 FIND_PATH(MULTINEST_ROOT_DIR
-    NAMES includes/multinest.h
+    NAMES include/multinest.h
     HINTS /usr/local/multinest ${MULTINEST_ROOT_HINT} 
     DOC "MULTINEST root directory.")
     
 FIND_PATH(_MULTINEST_INCLUDE_DIRS
     NAMES multinest.h
-    HINTS ${MULTINEST_ROOT_DIR}/includes
+    HINTS ${MULTINEST_ROOT_DIR}/include
     DOC "MULTINEST Include directory")
     
 FIND_PATH(MULTINEST_MODULE_DIRS
