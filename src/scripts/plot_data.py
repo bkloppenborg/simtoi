@@ -163,6 +163,7 @@ def split_plot(data_file, data_xcol, data_ycol, data_errcol,
     bottom.errorbar(obs_x, (obs_y - mod_y)/obs_yerr, yerr=obs_yerr, fmt='o')
     bottom.grid(True)
     bottom.set_ylabel(residual_plot_ylabel)
+    bottom.set_ylim([-10,10])   # Set ylimits to 10 sigma
         
     # Set the plot layout and save the output
     plt.tight_layout(h_pad = 0)
