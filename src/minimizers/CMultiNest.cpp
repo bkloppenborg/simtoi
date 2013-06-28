@@ -179,6 +179,10 @@ void CMultiNest::ResultFromSummaryFile(string multinest_root)
 			}
 		}
 
+		// As of MultiNest 3.0 the first line contains the global solution, so we only need the first line.
+		// TODO: In a future version we should rewrite this function to only use the first line.
+		break;
+
 	}
 
 }
