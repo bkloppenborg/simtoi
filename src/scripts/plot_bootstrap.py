@@ -93,10 +93,17 @@ def plot_bootstrap(filename,
             label='Binned data', histtype='step')
         
         plt.title(title)
+
+        # Create a label for the best-fit value:
+        value_label = r'$' + "{0:.3f}".format(best_fit) + \
+            '^{+' + "{0:.3f}".format(r_sigma) + '}' + \
+            "_{-" + "{0:.3f}".format(l_sigma) + '}$'
         
-        plt.axvline(best_fit, color='red')
-        plt.axvline(best_fit - l_sigma, color='green')
-        plt.axvline(best_fit + r_sigma, color='green')
+        plt.axvline(best_fit, color='red', label=value_label)
+        plt.axvspan(best_fit - l_sigma, best_fit + r_sigma, color='red', 
+            alpha=0.2)
+        
+        plt.legend()
         
         if autosave:
             plt.savefig(save_directory + '/stats_hist_' + title + '.' + 
