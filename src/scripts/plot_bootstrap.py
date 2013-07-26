@@ -64,10 +64,12 @@ def mirrored_stdev(array, mirror_point):
 
 def plot_bootstrap(filename, 
     column_names=None, skip_cols=[], nbins=10, trimends=False,
-    autosave=False, save_directory='', save_format='svg', delimiter=','):
+    autosave=False, save_directory='', save_format='svg', delimiter=',',
+    data_start=0):
     
     # Create a custom reader with no header and CSV values
-    data = ascii.read(filename, header_start=None, delimiter=delimiter)
+    data = ascii.read(filename, header_start=None, delimiter=delimiter,
+        data_start=data_start)
     
     for col_num in range(1, len(data.colnames)):
         col_id = 'col' + str(col_num)
@@ -87,7 +89,8 @@ def plot_bootstrap(filename,
         print [l_sigma, best_fit, r_sigma]
         
         nbins=25
-        [n, bins, patches] = plt.hist(col, bins=nbins, normed=True, label='Binned data', histtype='step')
+        [n, bins, patches] = plt.hist(col, bins=nbins, normed=True, 
+            label='Binned data', histtype='step')
         
         plt.title(title)
         
@@ -96,7 +99,8 @@ def plot_bootstrap(filename,
         plt.axvline(best_fit + r_sigma, color='green')
         
         if autosave:
-            plt.savefig(save_directory + '/stats_hist_' + title + '.' + save_format, transparent=True, format=save_format)    
+            plt.savefig(save_directory + '/stats_hist_' + title + '.' + 
+                save_format, transparent=True, format=save_format)    
             plt.close()
         else:
             plt.show()
