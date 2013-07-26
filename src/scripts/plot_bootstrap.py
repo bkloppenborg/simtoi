@@ -86,14 +86,15 @@ def plot_bootstrap(filename,
         # standard deviations
         [l_sigma, r_sigma] = mirrored_stdev(col, best_fit)
         
-        print [l_sigma, best_fit, r_sigma]
         
         nbins=25
-        [n, bins, patches] = plt.hist(col, bins=nbins, normed=True, 
+        [n, bins, patches] = plt.hist(col, bins=nbins, normed=False, 
             label='Binned data', histtype='step')
         
         plt.title(title)
-
+        plt.xlabel("Value")
+        plt.ylabel("Frequency")
+        
         # Create a label for the best-fit value:
         value_label = r'$' + "{0:.3f}".format(best_fit) + \
             '^{+' + "{0:.3f}".format(r_sigma) + '}' + \
@@ -111,6 +112,9 @@ def plot_bootstrap(filename,
             plt.close()
         else:
             plt.show()
+            
+        # Write a little information out to the console.
+        print title, l_sigma, best_fit, r_sigma
 
 
 def main():
