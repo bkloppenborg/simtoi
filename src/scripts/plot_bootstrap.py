@@ -3,12 +3,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 from optparse import OptionParser
 import os
+import re
 
 def simtoi_col_names(filename):
     """Parses the best_fit.txt file written by SIMTOI and returns
     the column names as a list.
     """
-    infile = ascii.read(filename, header_start=None, delimiter=',')
+    try:
+        # try to read in the file with astropy.ascii.read
+        infile = ascii.read(filename, header_start=None, delimiter=',')
+    except:
+        # it will fail when the file contains no delimiter (obviously)
+        # so just read in the lines, add a delimiter to each
+        # and have astropy.io.ascii re-read the lines
+        infile = open(filename)
+        values = list()
+        for line in infile:
+            if re.match('#', line):
+                continue
+                
+            line = line.strip()    
+            values.append(line + ",")
+            
+        infile = ascii.read(values, header_start=None, delimiter=',')
+        print infile
+        quit()
     
     return infile[0]
 
@@ -63,7 +82,7 @@ def mirrored_stdev(array, mirror_point):
     return [sigma_lb, sigma_ub]
 
 def plot_bootstrap(filename, 
-    column_names=None, skip_cols=[], nbins=10, trimends=False,
+    column_names=None, skip_cols=[], nbins=25, trimends=False,
     autosave=False, save_directory='', save_format='svg', delimiter=',',
     data_start=0):
     
@@ -86,8 +105,6 @@ def plot_bootstrap(filename,
         # standard deviations
         [l_sigma, r_sigma] = mirrored_stdev(col, best_fit)
         
-        
-        nbins=25
         [n, bins, patches] = plt.hist(col, bins=nbins, normed=False, 
             label='Binned data', histtype='step')
         
