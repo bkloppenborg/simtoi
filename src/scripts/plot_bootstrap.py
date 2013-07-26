@@ -119,8 +119,14 @@ def main():
 
     (options, args) = parser.parse_args()
 
-    # now read the filenames
-    filename = args[0]    
+    # Ensure the filename is specified. If not, print the help and quit
+    try:
+        filename = args[0]    
+    except:
+        print "Error: bootstrap file not specified.\n"
+        parser.print_help()
+        quit()
+        
     directory = os.path.dirname(os.path.realpath(filename))
     delimiter = ','
 
