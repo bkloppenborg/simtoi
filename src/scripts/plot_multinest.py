@@ -1,31 +1,30 @@
 from astropy.io import ascii
-import numpy as np
 import matplotlib.pyplot as plt
 from optparse import OptionParser
 import os
-from simtoi_common import mirrored_stdev, simtoi_col_names, find_index
+from simtoi_common import mirrored_stdev, simtoi_col_names, find_index, simtoi_best_fit
 
 def plot_multinest(filename, best_fit_vals,
     column_names=None, skip_cols=[], nbins=25, trimends=False,
-    autosave=False, save_directory='', save_format='svg', delimiter=',',
+    autosave=False, save_directory='', save_format='svg',
     data_start=0):
     
     # Create a custom reader with no header and CSV values
-    data = ascii.read(filename, header_start=None, delimiter=delimiter,
-        data_start=data_start)
+    data = ascii.read(filename, header_start=None)
     
     print "Param, best_fit, lower_bound, upper_bound"
-    
-    for col_num in range(1, len(data.colnames)):
-        col_id = 'col' + str(col_num)
-        col = data[col_id]
+
+    for col_num in range(3, len(data.colnames) + 1):
+        col_id = 'col' + str(col_num - 2)
+        multinest_col = 'col' + str(col_num)
+        col = data[multinest_col]
         
         title = ""
         if column_names != None:
             title = column_names[col_id]
           
         # the first record contains the best-fit value
-        best_fit = col[0]
+        best_fit = best_fit_vals[col_id]
         
         # Determine the lower and upper error bars by mirrored
         # standard deviations
@@ -91,12 +90,12 @@ def main():
     column_names = []
     if len(directory) > 1:
         column_names = simtoi_col_names(directory + '/best_fit.txt')
-
+        
+    best_fit = simtoi_best_fit(directory + '/best_fit.txt')
     
-    plot_multinest(filename, column_names=column_names, nbins=options.nbins,
+    plot_multinest(filename, best_fit, column_names=column_names, nbins=options.nbins,
         autosave=options.autosave, save_directory=directory, 
-        save_format=options.savefmt, trimends=options.trimends, 
-        delimiter=delimiter)
+        save_format=options.savefmt, trimends=options.trimends)
     
 # Run the main function if this is a top-level script:
 if __name__ == "__main__":

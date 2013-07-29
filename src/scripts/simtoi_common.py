@@ -2,6 +2,16 @@
 """
 import re
 from astropy.io import ascii
+import numpy as np
+
+def simtoi_best_fit(filename):
+    """Extracts the best-fit values from best_fit.txt and returns these
+    values in a astropy.table with columns named 'col1, ... , colN'
+    """
+    
+    infile = ascii.read(filename, header_start=None, delimiter=',')
+    
+    return infile[0]
 
 def simtoi_col_names(filename):
     """Parses the best_fit.txt file written by SIMTOI and returns
@@ -9,7 +19,7 @@ def simtoi_col_names(filename):
     """
     try:
         # try to read in the file with astropy.ascii.read
-        infile = ascii.read(filename, header_start=None, delimiter=',')
+        infile = ascii.read(filename, header_start=None, delimiter=',', data_start=0)
     except:
         # it will fail when the file contains no delimiter (obviously)
         # so just read in the lines, add a delimiter to each
@@ -23,7 +33,7 @@ def simtoi_col_names(filename):
             line = line.strip()    
             values.append(line + ",")
             
-        infile = ascii.read(values, header_start=None, delimiter=',')
+        infile = ascii.read(values, header_start=None, delimiter=',', data_start=0)
     
     return infile[0]
     
