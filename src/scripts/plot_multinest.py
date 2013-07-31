@@ -32,6 +32,8 @@ def plot_multinest(filename, best_fit_vals,
         
         [n, bins, patches] = plt.hist(col, bins=nbins, normed=False, 
             label='Binned data', histtype='step')
+            
+        plt.ylim([0, max(n) + 5])
         
         plt.title(title)
         plt.xlabel("Value")
