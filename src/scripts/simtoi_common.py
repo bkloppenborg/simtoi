@@ -86,3 +86,72 @@ def mirrored_stdev(array, mirror_point):
     #plt.show()
     
     return [sigma_lb, sigma_ub]
+    
+def read_ccoifits_v2(filename, uv_scale=None):
+    """Reads in the squared visibility output format for ccoifits.
+    """
+    
+    data = ascii.read(filename)
+    
+    data.rename_column('col1', 'u')
+    data.rename_column('col2', 'v')
+    data.rename_column('col3', 'uv_mag')
+    data.rename_column('col4', 'v2')
+    data.rename_column('col5', 'v2_err')
+    
+    # rescale the UV points           
+    if uv_scale:    
+        data['u'] /= uv_scale
+        data['v'] /= uv_scale
+        data['uv_mag'] /= uv_scale
+    
+    return data
+    
+def read_ccoifits_t3(filename, uv_scale=None):
+    
+    data = ascii.read(filename)
+    
+    data.rename_column('col1', 'u1')
+    data.rename_column('col2', 'v1')
+    data.rename_column('col3', 'u2')
+    data.rename_column('col4', 'v2')
+    data.rename_column('col5', 'u3')
+    data.rename_column('col6', 'v3')
+    data.rename_column('col7', 'uv_mag')   
+    data.rename_column('col8', 't3_amp')
+    data.rename_column('col9', 't3_amp_err')
+    data.rename_column('col10', 't3_phi')
+    data.rename_column('col11', 't3_phi_err')
+      
+    # rescale the UV points           
+    if uv_scale:    
+        data['u1'] /= uv_scale
+        data['v1'] /= uv_scale
+        data['u2'] /= uv_scale
+        data['v2'] /= uv_scale
+        data['u3'] /= uv_scale
+        data['v3'] /= uv_scale
+        data['uv_mag'] /= uv_scale
+                    
+    return data
+
+
+def read_simtoi_photometry(filename):
+    """Reads a simulated photometry file from SIMTOI
+    """
+    try:
+        data = ascii.read(filename)
+    except:
+        print "Could not parse photometric data file:\n " + filename
+        
+        quit()
+    
+    # at present SIMTOI columns are not named, give them names:
+    data.rename_column('col1', 'date')
+    data.rename_column('col2', 'mag')
+    
+    # data files should have error columns (model files may not)
+    if len(data.colnames) > 2:
+        data.rename_column('col3', 'mag_err')
+    
+    return data
