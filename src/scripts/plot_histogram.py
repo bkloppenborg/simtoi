@@ -160,7 +160,6 @@ def main():
     else:
         print "Unknown file format found, I'll do the best I can."
 
-
     column_names = []
     if len(directory) > 1:
         column_names = col_names(directory + '/best_fit.txt')

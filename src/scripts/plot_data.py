@@ -7,7 +7,7 @@ from optparse import OptionParser
 from simtoi_common import read_simtoi_photometry, read_ccoifits_v2, read_ccoifits_t3
 
 def plot_photometry(data_file, model_file, overplot_file=None, autosave=False, 
-    saveformat='svg', title=None):
+    saveformat='svg', title=None, figsize=(10,5)):
     """Plots the data and model files from SIMTOI's photometric output.
     data_file is the true photometry
     model_file is the SIMTOI simulated photometry
@@ -26,7 +26,7 @@ def plot_photometry(data_file, model_file, overplot_file=None, autosave=False,
     
     # Create a split plot. The top will have a plot of only the data
     # the bottom plot will contain residuals
-    fig, (top, bottom) = plt.subplots(2, 1, sharex='date', sharey=False)
+    fig, (top, bottom) = plt.subplots(2, 1, sharex='date', sharey=False, figsize=figsize)
     
     # Create the top plot. First plot the real data
     top.errorbar(data['date'], data['mag'], yerr=data['mag_err'], fmt='+', label="Data")
@@ -47,13 +47,13 @@ def plot_photometry(data_file, model_file, overplot_file=None, autosave=False,
     top.legend(numpoints=1)    
         
     # The bottom plot will contain residuals:
-    residuals = data['mag'] - model['mag']    
-    bottom.errorbar(data['date'], residuals, yerr=data['mag_err'], fmt='+')
+    residuals = model['mag'] - data['mag']    
+    bottom.errorbar(data['date'], residuals, yerr=data['mag_err'], fmt='+', color='red')
     
     # set the plotting options
     bottom.invert_yaxis()
     bottom.grid(True)
-    bottom.set_ylabel("Residuals (d-m) (mag)")
+    bottom.set_ylabel("Residuals (m-d) (mag)")
     
     
     if autosave:
@@ -61,7 +61,7 @@ def plot_photometry(data_file, model_file, overplot_file=None, autosave=False,
     else:
         plt.show()
         
-def plot_v2(data_file, model_file, autosave=False, saveformat='svg', title=None):
+def plot_v2(data_file, model_file, autosave=False, saveformat='svg', title=None, figsize=(10,5)):
 
     # read in the data, assert they are of the same size
     data = read_ccoifits_v2(data_file, uv_scale=1E6)
@@ -69,31 +69,44 @@ def plot_v2(data_file, model_file, autosave=False, saveformat='svg', title=None)
     assert(len(data) == len(model))
     
     # create the figure
-    fig, (top, bottom) = plt.subplots(2, 1, sharex='uv_mag', sharey=False)
+    fig, (top, bottom) = plt.subplots(2, 1, sharex='uv_mag', sharey=False, figsize=figsize)
     
     # in the top plot, put the data and model
-    top.errorbar(data['uv_mag'], data['v2'], yerr=data['v2_err'], fmt='+', label="Data")
-    top.errorbar(model['uv_mag'], model['v2'], fmt='x', label="Model")
+    legend_data = top.errorbar(data['uv_mag'], data['v2'], yerr=data['v2_err'], 
+        fmt='+', label="Data")
+    legend_model = top.errorbar(model['uv_mag'], model['v2'], fmt='x', 
+        label="Model")
     top.set_ylabel("$V^2$")
     top.grid(True)
-    top.legend(numpoints=1, loc='lower left')
+    #top.legend(numpoints=1, loc='lower left')
     top.set_yscale('log')
     
     # in the bottom plot, put the residuals
-    error = (model['v2'] - data['v2']) / data['v2_err']
-    bottom.errorbar(data['uv_mag'], error, fmt='+')
+    ylimits = [-5, 5]
+    residuals = model['v2'] - data['v2']
+    errors = (residuals) / data['v2_err']
+    errors, lb, ub = clip(errors, ylimits)
+    legend_residuals = bottom.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
+    legend_lb = bottom.errorbar(data['uv_mag'], lb, fmt='v', color='red')
+    legend_ub = bottom.errorbar(data['uv_mag'], ub, fmt='^', color='red')
+    
     bottom.set_ylabel("Residuals ($(m-d)/\sigma$)")
     bottom.set_xlabel("Baseline length (mega-$\lambda$)")
-    max_error = max(abs(error))
-    bottom.set_ylim([-max_error, max_error])
+    bottom.set_ylim([-6, 6])
     bottom.grid(True)
+    
+    legend = top.legend([legend_data, legend_model, legend_residuals, legend_lb, legend_ub], 
+        ["Data", "Model", "Residuals", 'Lower', 'Higher'], numpoints=1, 
+        loc='upper center', bbox_to_anchor=(0.5, 0.05), ncol=5)
+        
+    legend.draw_frame(False)
     
     if autosave:
         save_plot(data_file, saveformat=saveformat)
     else:
         plt.show()
 
-def plot_t3(data_file, model_file, autosave=False, saveformat='svg', title=None):
+def plot_t3(data_file, model_file, autosave=False, saveformat='svg', title=None, figsize=(10,10)):
 
     # read in the data, assert they are of the same size
     data = read_ccoifits_t3(data_file, uv_scale=1E6)
@@ -105,22 +118,27 @@ def plot_t3(data_file, model_file, autosave=False, saveformat='svg', title=None)
     # B - t3_amplitude residuals
     # C - t3_phase
     # D - t3_phase residuals
-    fig, (A, B, C, D) = plt.subplots(4, 1, sharex='uv_mag', sharey=False)
+    fig, (A, B, C, D) = plt.subplots(4, 1, sharex='uv_mag', sharey=False, figsize=figsize)
     
     # in the top plot, put the data and model
-    A.errorbar(data['uv_mag'], data['t3_amp'], yerr=data['t3_amp_err'], fmt='+', label="Data")
-    A.errorbar(model['uv_mag'], model['t3_amp'], fmt='x', label="Model")
+    legend_data = A.errorbar(data['uv_mag'], data['t3_amp'], 
+        yerr=data['t3_amp_err'], fmt='+', label="Data")
+    legend_model = A.errorbar(model['uv_mag'], model['t3_amp'], fmt='x', label="Model")
     A.set_ylabel("$T_3$ A")
     A.grid(True)
-    A.legend(numpoints=1, loc='upper right')
+    #A.legend(numpoints=1, loc='lower left')
     A.set_yscale('log')
     
     # in the bottom plot, put the residuals
-    error = (model['t3_amp'] - data['t3_amp']) / data['t3_amp_err']
-    B.errorbar(data['uv_mag'], error, fmt='+')
+    ylimits = [-5, 5]
+    residuals = model['t3_amp'] - data['t3_amp']
+    errors = (residuals) / data['t3_amp_err']
+    errors, lb, ub = clip(errors, ylimits)
+    legend_residuals = B.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
+    B.errorbar(data['uv_mag'], lb, fmt='v', color='red')
+    B.errorbar(data['uv_mag'], ub, fmt='^', color='red')
     B.set_ylabel("Residuals ($(m-d)/\sigma$)")
-    max_error = max(abs(error))
-    B.set_ylim([-max_error, max_error])
+    B.set_ylim([-6, 6])
     B.grid(True)
 
     # in the top plot, put the data and model
@@ -132,22 +150,63 @@ def plot_t3(data_file, model_file, autosave=False, saveformat='svg', title=None)
     C.set_ylim([-200, 200])
     
     # in the bottom plot, put the residuals
-    error = (model['t3_phi'] - data['t3_phi']) / data['t3_phi_err']
-    D.errorbar(data['uv_mag'], error, fmt='+')
+    ylimits = [-5, 5]
+    residuals = model['t3_phi'] - data['t3_phi']
+    errors = (residuals) / data['t3_phi_err']
+    errors, lb, ub = clip(errors, ylimits)
+    
+    #residuals %= 180
+    D.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
+    legend_lb = D.errorbar(data['uv_mag'], lb, fmt='v', color='red')
+    legend_ub = D.errorbar(data['uv_mag'], ub, fmt='^', color='red')
+    
     D.set_ylabel("Residuals ($(m-d)/\sigma$)")
     D.set_xlabel("Baseline length (mega-$\lambda$)")
-    max_error = max(abs(error))
     D.set_ylim([-6, 6])
     D.grid(True)
+    
+    legend = A.legend([legend_data, legend_model, legend_residuals, legend_lb, legend_ub], 
+        ["Data", "Model", "Residuals", 'Lower', 'Higher'], numpoints=1, 
+        loc='upper center', bbox_to_anchor=(0.5, 0.05), ncol=5)
+        
+    legend.draw_frame(False)
     
     if autosave:
         save_plot(data_file, saveformat=saveformat)
     else:
         plt.show()
     
+def clip(values, limits):
+    """Clips a range of values by limits. Returns a tuple:
+    in_range, below_range, above_range
+    """
+    good = values.copy()
+    low = values.copy()
+    high = values.copy()
     
+    # pick off the lower and upper bounds
+    lb = limits[0]
+    ub = limits[1]
+    
+    for i in range(0, len(values)):
+        value = values[i]
+        
+        # if the value is outside of the limits, set A's value to NAN
+        if value < lb:
+            good[i] = float('NaN')
+            high[i] = float('NaN')
+            low[i] = lb
+        elif value > ub:
+            good[i] = float('NaN')
+            low[i] = float('NaN')  
+            high[i] = ub      
+        else:
+            high[i] = float('NaN') 
+            low[i] = float('NaN') 
+    
+    return [good, low, high]
 
-def plot_uv(v2_filename, t3_filename, autosave=False, saveformat='svg'):
+def plot_uv(v2_filename, t3_filename, autosave=False, saveformat='svg', figsize=(10,10)):
     """Creates a UV plot from SIMTOI/ccoifits text exports
     """
     
@@ -155,7 +214,7 @@ def plot_uv(v2_filename, t3_filename, autosave=False, saveformat='svg'):
     v2 = read_ccoifits_v2(v2_filename, uv_scale=1E6)
     t3 = read_ccoifits_t3(t3_filename, uv_scale=1E6)
     
-    fig = plt.figure()
+    fig = plt.figure(figsize=figsize)
     ax1 = fig.add_subplot(1,1,1, aspect='equal')
     
     # plot the in the v-u plane:
@@ -215,6 +274,13 @@ def main():
     directory = args[0]
     filenames = os.listdir(directory)
     
+    # If we are saving the file, try switching backends.
+    if options.autosave:
+        try:
+            matplotlib.use(options.savefmt)
+        except:
+            pass
+    
     for filename in filenames:
         if(re.search('_model.phot', filename)):
             model_file = directory + filename
@@ -233,6 +299,7 @@ def main():
             data_file = directory + re.sub('_model_t3.txt', '_t3.txt', filename)
             plot_t3(data_file, model_file, 
                 autosave=options.autosave, saveformat=options.savefmt)
+    
         
 
 if __name__ == "__main__":
