@@ -61,7 +61,9 @@ def plot_photometry(data_file, model_file, overplot_file=None, autosave=False,
     else:
         plt.show()
         
-def plot_v2(data_file, model_file, autosave=False, saveformat='svg', title=None, figsize=(10,5)):
+def v2_plot(data_file, model_file, autosave=False, saveformat='svg', title=None, figsize=(10,5)):
+    """Plots the v2 data from the data file and model file.
+    """
 
     # read in the data, assert they are of the same size
     data = read_ccoifits_v2(data_file, uv_scale=1E6)
@@ -71,29 +73,8 @@ def plot_v2(data_file, model_file, autosave=False, saveformat='svg', title=None,
     # create the figure
     fig, (top, bottom) = plt.subplots(2, 1, sharex='uv_mag', sharey=False, figsize=figsize)
     
-    # in the top plot, put the data and model
-    legend_data = top.errorbar(data['uv_mag'], data['v2'], yerr=data['v2_err'], 
-        fmt='+', label="Data")
-    legend_model = top.errorbar(model['uv_mag'], model['v2'], fmt='x', 
-        label="Model")
-    top.set_ylabel("$V^2$")
-    top.grid(True)
-    #top.legend(numpoints=1, loc='lower left')
-    top.set_yscale('log')
-    
-    # in the bottom plot, put the residuals
-    ylimits = [-5, 5]
-    residuals = model['v2'] - data['v2']
-    errors = (residuals) / data['v2_err']
-    errors, lb, ub = clip(errors, ylimits)
-    legend_residuals = bottom.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
-    legend_lb = bottom.errorbar(data['uv_mag'], lb, fmt='v', color='red')
-    legend_ub = bottom.errorbar(data['uv_mag'], ub, fmt='^', color='red')
-    
-    bottom.set_ylabel("Residuals ($(m-d)/\sigma$)")
-    bottom.set_xlabel("Baseline length (mega-$\lambda$)")
-    bottom.set_ylim([-6, 6])
-    bottom.grid(True)
+    legend_data, legend_model = plot_v2(data, model, top)
+    legend_residuals, legend_lb, legend_ub = plot_v2_residuals(data, model, bottom)
     
     legend = top.legend([legend_data, legend_model, legend_residuals, legend_lb, legend_ub], 
         ["Data", "Model", "Residuals", 'Lower', 'Higher'], numpoints=1, 
@@ -105,8 +86,50 @@ def plot_v2(data_file, model_file, autosave=False, saveformat='svg', title=None,
         save_plot(data_file, saveformat=saveformat)
     else:
         plt.show()
+    
+def plot_v2(data, model, axis):
+    """Plots the v2 data and model on the same axis.
+    Returns a tuple containing the plotlines for data and model plots.
+    """
+    
+    # in the top plot, put the data and model
+    plotline_data = axis.errorbar(data['uv_mag'], data['v2'], yerr=data['v2_err'], 
+        fmt='+', label="Data")
+    plotline_model = axis.errorbar(model['uv_mag'], model['v2'], fmt='x', 
+        label="Model")
+    axis.set_ylabel("$V^2$")
+    axis.grid(True)
+    #top.legend(numpoints=1, loc='lower left')
+    axis.set_yscale('log')
+    
+    return plotline_data, plotline_model
 
-def plot_t3(data_file, model_file, autosave=False, saveformat='svg', title=None, figsize=(10,10)):
+def plot_v2_residuals(data, model, axis):
+    """Plots the residuals of model-data.
+    Returns a tuple containing the plotlines for the residual, lower bound, and 
+    upper bound plots.
+    """
+    
+    # in the bottom plot, put the residuals
+    ylimits = [-5, 5]
+    residuals = model['v2'] - data['v2']
+    errors = (residuals) / data['v2_err']
+    errors, lb, ub = clip(errors, ylimits)
+    plotline_residuals = axis.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
+    plotline_lb = axis.errorbar(data['uv_mag'], lb, fmt='v', color='red')
+    plotline_ub = axis.errorbar(data['uv_mag'], ub, fmt='^', color='red')
+    
+    axis.set_ylabel("Residuals ($(m-d)/\sigma$)")
+    axis.set_xlabel("Baseline length (mega-$\lambda$)")
+    axis.set_ylim([-6, 6])
+    axis.grid(True)
+    
+    return plotline_residuals, plotline_lb, plotline_ub
+
+def t3_plot(data_file, model_file, autosave=False, saveformat='svg', title=None, figsize=(10,10)):
+    """Plots the t3 amplitude and residuals along with t3 phase amplitude and residuals
+    from the data and model files.
+    """
 
     # read in the data, assert they are of the same size
     data = read_ccoifits_t3(data_file, uv_scale=1E6)
@@ -118,52 +141,13 @@ def plot_t3(data_file, model_file, autosave=False, saveformat='svg', title=None,
     # B - t3_amplitude residuals
     # C - t3_phase
     # D - t3_phase residuals
-    fig, (A, B, C, D) = plt.subplots(4, 1, sharex='uv_mag', sharey=False, figsize=figsize)
+    fig, (A, B, C, D) = plt.subplots(4, 1, sharex=True, sharey=False, figsize=figsize)
     
-    # in the top plot, put the data and model
-    legend_data = A.errorbar(data['uv_mag'], data['t3_amp'], 
-        yerr=data['t3_amp_err'], fmt='+', label="Data")
-    legend_model = A.errorbar(model['uv_mag'], model['t3_amp'], fmt='x', label="Model")
-    A.set_ylabel("$T_3$ A")
-    A.grid(True)
-    #A.legend(numpoints=1, loc='lower left')
-    A.set_yscale('log')
-    
-    # in the bottom plot, put the residuals
-    ylimits = [-5, 5]
-    residuals = model['t3_amp'] - data['t3_amp']
-    errors = (residuals) / data['t3_amp_err']
-    errors, lb, ub = clip(errors, ylimits)
-    legend_residuals = B.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
-    B.errorbar(data['uv_mag'], lb, fmt='v', color='red')
-    B.errorbar(data['uv_mag'], ub, fmt='^', color='red')
-    B.set_ylabel("Residuals ($(m-d)/\sigma$)")
-    B.set_ylim([-6, 6])
-    B.grid(True)
-
-    # in the top plot, put the data and model
-    C.errorbar(data['uv_mag'], data['t3_phi'], yerr=data['t3_phi_err'], fmt='+', label="Data")
-    C.errorbar(model['uv_mag'], model['t3_phi'], fmt='x', label="Model")
-    C.set_ylabel("$T_3 \phi$ (deg)")
-    C.grid(True)
-    #C.legend(numpoints=1, loc='lower left')
-    C.set_ylim([-200, 200])
-    
-    # in the bottom plot, put the residuals
-    ylimits = [-5, 5]
-    residuals = model['t3_phi'] - data['t3_phi']
-    errors = (residuals) / data['t3_phi_err']
-    errors, lb, ub = clip(errors, ylimits)
-    
-    #residuals %= 180
-    D.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
-    legend_lb = D.errorbar(data['uv_mag'], lb, fmt='v', color='red')
-    legend_ub = D.errorbar(data['uv_mag'], ub, fmt='^', color='red')
-    
-    D.set_ylabel("Residuals ($(m-d)/\sigma$)")
-    D.set_xlabel("Baseline length (mega-$\lambda$)")
-    D.set_ylim([-6, 6])
-    D.grid(True)
+    # Make the plots:
+    legend_data, legend_model = plot_t3_amp(data, model, A)
+    legend_residuals, legend_lb, legend_ub = plot_t3_amp_residuals(data, model, B)
+    plot_t3_phi(data, model, C)
+    plot_t3_phi_residuals(data, model, D)
     
     legend = A.legend([legend_data, legend_model, legend_residuals, legend_lb, legend_ub], 
         ["Data", "Model", "Residuals", 'Lower', 'Higher'], numpoints=1, 
@@ -175,6 +159,81 @@ def plot_t3(data_file, model_file, autosave=False, saveformat='svg', title=None,
         save_plot(data_file, saveformat=saveformat)
     else:
         plt.show()
+
+def plot_t3_amp(data, model, axis):
+    """Plots the t3 amplitude and phase
+    Returns plotlines for the data and model
+    """
+    
+    # in the top plot, put the data and model
+    plotline_data = axis.errorbar(data['uv_mag'], data['t3_amp'], 
+        yerr=data['t3_amp_err'], fmt='+', label="Data")
+    plotline_model = axis.errorbar(model['uv_mag'], model['t3_amp'], fmt='x', label="Model")
+    axis.set_ylabel("$T_3$ A")
+    axis.grid(True)
+    #A.legend(numpoints=1, loc='lower left')
+    axis.set_yscale('log')
+    
+    return plotline_data, plotline_model
+    
+def plot_t3_amp_residuals(data, model, axis):
+    """Plots the t3 residuals (model - data)
+    Returns plotlines for the residuals, lower bound, and upper bound
+    """
+    
+    # in the bottom plot, put the residuals
+    ylimits = [-5, 5]
+    residuals = model['t3_amp'] - data['t3_amp']
+    errors = (residuals) / data['t3_amp_err']
+    errors, lb, ub = clip(errors, ylimits)
+    plotline_residuals = axis.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
+    plotline_lb = axis.errorbar(data['uv_mag'], lb, fmt='v', color='red')
+    plotline_ub = axis.errorbar(data['uv_mag'], ub, fmt='^', color='red')
+    axis.set_ylabel("Residuals ($(m-d)/\sigma$)")
+    axis.set_ylim([-6, 6])
+    axis.grid(True)
+    
+    return plotline_residuals, plotline_lb, plotline_ub
+    
+def plot_t3_phi(data, model, axis):
+    """Plots the t3 phase from the data and model
+    Returns plotlines for the data and model
+    """
+
+    # in the top plot, put the data and model
+    plotline_data = axis.errorbar(data['uv_mag'], data['t3_phi'], 
+        yerr=data['t3_phi_err'], fmt='+', label="Data")
+    plotline_model = axis.errorbar(model['uv_mag'], model['t3_phi'], fmt='x', 
+        label="Model")
+    axis.set_ylabel("$T_3 \phi$ (deg)")
+    axis.grid(True)
+    #C.legend(numpoints=1, loc='lower left')
+    axis.set_ylim([-200, 200])
+    
+    return plotline_data, plotline_model
+
+def plot_t3_phi_residuals(data, model, axis):
+    """Plots the t3 phase residuals (model-data)
+    Returns plotslines for the residuals, lower bound, and upper bounds
+    """
+    
+    # in the bottom plot, put the residuals
+    ylimits = [-5, 5]
+    residuals = model['t3_phi'] - data['t3_phi']
+    errors = (residuals) / data['t3_phi_err']
+    errors, lb, ub = clip(errors, ylimits)
+    
+    #residuals %= 180
+    plotline_residuals = axis.errorbar(data['uv_mag'], errors, fmt='+', color='red', label="Error")
+    plotline_lb = axis.errorbar(data['uv_mag'], lb, fmt='v', color='red')
+    plotline_ub = axis.errorbar(data['uv_mag'], ub, fmt='^', color='red')
+    
+    axis.set_ylabel("Residuals ($(m-d)/\sigma$)")
+    axis.set_xlabel("Triplet length (mega-$\lambda$)")
+    axis.set_ylim([-6, 6])
+    axis.grid(True)
+    
+    return plotline_residuals, plotline_lb, plotline_ub
     
 def clip(values, limits):
     """Clips a range of values by limits. Returns a tuple:
@@ -281,6 +340,7 @@ def main():
         except:
             pass
     
+    # first generate data plots
     for filename in filenames:
         if(re.search('_model.phot', filename)):
             model_file = directory + filename
@@ -291,16 +351,15 @@ def main():
         elif(re.search('_model_v2.txt', filename)):
             model_file = directory + filename
             data_file = directory + re.sub('_model_v2.txt', '_v2.txt', filename)
-            plot_v2(data_file, model_file, 
+            v2_plot(data_file, model_file, 
                 autosave=options.autosave, saveformat=options.savefmt)
             
         elif(re.search('_model_t3.txt', filename)):
             model_file = directory + filename
             data_file = directory + re.sub('_model_t3.txt', '_t3.txt', filename)
-            plot_t3(data_file, model_file, 
+            t3_plot(data_file, model_file, 
                 autosave=options.autosave, saveformat=options.savefmt)
     
-        
 
 if __name__ == "__main__":
     main()
