@@ -92,6 +92,9 @@ def plot_v2(data, model, axis):
     Returns a tuple containing the plotlines for data and model plots.
     """
     
+    if data == None or model == None:
+        return None, None
+    
     # in the top plot, put the data and model
     plotline_data = axis.errorbar(data['uv_mag'], data['v2'], yerr=data['v2_err'], 
         fmt='+', label="Data")
@@ -109,6 +112,9 @@ def plot_v2_residuals(data, model, axis):
     Returns a tuple containing the plotlines for the residual, lower bound, and 
     upper bound plots.
     """
+
+    if data == None or model == None:
+        return None, None
     
     # in the bottom plot, put the residuals
     ylimits = [-5, 5]
@@ -164,6 +170,9 @@ def plot_t3_amp(data, model, axis):
     """Plots the t3 amplitude and phase
     Returns plotlines for the data and model
     """
+
+    if data == None or model == None:
+        return None, None
     
     # in the top plot, put the data and model
     plotline_data = axis.errorbar(data['uv_mag'], data['t3_amp'], 
@@ -180,6 +189,9 @@ def plot_t3_amp_residuals(data, model, axis):
     """Plots the t3 residuals (model - data)
     Returns plotlines for the residuals, lower bound, and upper bound
     """
+
+    if data == None or model == None:
+        return None, None
     
     # in the bottom plot, put the residuals
     ylimits = [-5, 5]
@@ -200,6 +212,9 @@ def plot_t3_phi(data, model, axis):
     Returns plotlines for the data and model
     """
 
+    if data == None or model == None:
+        return None, None
+
     # in the top plot, put the data and model
     plotline_data = axis.errorbar(data['uv_mag'], data['t3_phi'], 
         yerr=data['t3_phi_err'], fmt='+', label="Data")
@@ -216,6 +231,9 @@ def plot_t3_phi_residuals(data, model, axis):
     """Plots the t3 phase residuals (model-data)
     Returns plotslines for the residuals, lower bound, and upper bounds
     """
+
+    if data == None or model == None:
+        return None, None
     
     # in the bottom plot, put the residuals
     ylimits = [-5, 5]
