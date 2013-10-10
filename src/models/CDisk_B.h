@@ -33,7 +33,7 @@
  /*
  *  Disk Model A:
  *  This model modifies the edges of the simple CModelDisk to extend radially outward
- *  with an decaying hight that follows a gaussian:
+ *  with an decaying height that follows a gaussian:
  *
  *  	h(r) = h0 * exp( -(r-r0)^2/(2*h_r^2 )
  *
