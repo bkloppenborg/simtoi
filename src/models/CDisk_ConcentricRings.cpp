@@ -122,11 +122,15 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, int hei
 		Translate();
 		Rotate();
 
-		// Iterate over the rings, also increment the radius
+		// Draw the inner wall first
+		DrawSides(r_in, total_height);
+
+		// Iterate over the remaining rings, filling in the gaps and drawing the vertical wall
+		// at the outer-edge of r+dr
 		for(double radius = r_in; radius < r_out + dr; radius += dr)
 		{
 			DrawDisk(radius, radius + dr, 0);
-			DrawSides(radius, total_height);
+			DrawSides(radius + dr, total_height);
 		}
 
 	glPopMatrix();
