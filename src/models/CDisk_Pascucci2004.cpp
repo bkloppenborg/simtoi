@@ -9,7 +9,7 @@
 #include "CShaderFactory.h"
 
 CDisk_Pascucci2004::CDisk_Pascucci2004()
-: 	CCylinder(9 - mDiskParams)
+: 	CCylinder(10 - mDiskParams)
 {
 	mName = "Flared Disk (Pascucci 2004)";
 
@@ -54,23 +54,29 @@ CDisk_Pascucci2004::CDisk_Pascucci2004()
 	SetMax(mBaseParams + 6, 10);
 	SetMin(mBaseParams + 6, 0.1);
 
-	mParamNames.push_back("radial cutoff");
-	SetParam(mBaseParams + 7, 20);
+	mParamNames.push_back("r_in");
+	SetParam(mBaseParams + 7, 0.1);
 	SetFree(mBaseParams + 7, false);
 	SetMax(mBaseParams + 7, 10);
 	SetMin(mBaseParams + 7, 0.1);
 
-	mParamNames.push_back("height cutoff");
-	SetParam(mBaseParams + 8, 5);
+	mParamNames.push_back("radial cutoff");
+	SetParam(mBaseParams + 8, 20);
 	SetFree(mBaseParams + 8, false);
 	SetMax(mBaseParams + 8, 10);
 	SetMin(mBaseParams + 8, 0.1);
 
-	mParamNames.push_back("n rings (int)");
-	SetParam(mBaseParams + 9, 50);
+	mParamNames.push_back("height cutoff");
+	SetParam(mBaseParams + 9, 5);
 	SetFree(mBaseParams + 9, false);
-	SetMax(mBaseParams + 9, 100);
-	SetMin(mBaseParams + 9, 1);
+	SetMax(mBaseParams + 9, 10);
+	SetMin(mBaseParams + 9, 0.1);
+
+	mParamNames.push_back("n rings (int)");
+	SetParam(mBaseParams + 10, 50);
+	SetFree(mBaseParams + 10, false);
+	SetMax(mBaseParams + 10, 100);
+	SetMin(mBaseParams + 10, 1);
 
 	// This model ALWAYS uses the default (pass-through) shader.
 	auto shaders = CShaderFactory::Instance();
@@ -91,7 +97,7 @@ shared_ptr<CModel> CDisk_Pascucci2004::Create()
 /// multiplied by the opacity.
 ///
 /// The density function in Pascucci 2004 is:
-///  \rho(r,z) = \rho_0  \left( \frac{r}{r_0}\right )^{-\alpha} \exp{\left[-\frac{1}{2} \left( \frac{z}{h_0 (r/r_0)^{\beta} \right)^{2}} \right ]}
+///  \rho(r,z) = \rho_0 \left( \frac{r}{r_0}\right )^{-\alpha} \exp{\left[-\frac{1}{2} \left( \frac{z}{h_0 (r/r_0)^{\beta}} \right)^{2} \right ]}
 /// and this is thrown in an exponential function exp(kappa * rho(r,z)) to yield
 /// the optical depth.
 double CDisk_Pascucci2004::Density(double radius, double height)
@@ -188,9 +194,10 @@ void CDisk_Pascucci2004::Render(GLuint framebuffer_object, int width, int height
 	const double h0 = mParams[mBaseParams + 4];
 	const double alpha = mParams[mBaseParams + 5];
 	const double beta = mParams[mBaseParams + 6];
-	const double r_cutoff  = mParams[mBaseParams + 7];
-	const double h_cutoff  = mParams[mBaseParams + 8];
-	int n_rings  = ceil(mParams[mBaseParams + 9]);
+	const double r_in = mParams[mBaseParams + 7];
+	const double r_cutoff  = mParams[mBaseParams + 8];
+	const double h_cutoff  = mParams[mBaseParams + 9];
+	int n_rings  = ceil(mParams[mBaseParams + 10]);
 
 	if(n_rings < 0)
 		n_rings = 1;
@@ -221,7 +228,7 @@ void CDisk_Pascucci2004::Render(GLuint framebuffer_object, int width, int height
 
 		// Iterate over the remaining rings, filling in the gaps and drawing the vertical wall
 		// at the outer-edge of r+dr
-		for(double radius = 0; radius < r_cutoff + dr; radius += dr)
+		for(double radius = r_in; radius < r_cutoff + dr; radius += dr)
 		{
 			DrawDisk(radius, radius + dr, Transparency(radius, 0, 0));
 			DrawSide(radius + dr);
