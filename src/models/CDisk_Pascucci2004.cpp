@@ -144,7 +144,7 @@ void CDisk_Pascucci2004::DrawSide(double radius)
     double r1 = 0;
 
     // Compute the cutoff location
-    double height_cutoff = mParams[mBaseParams + 8];
+    double height_cutoff = mParams[mBaseParams + 9];
 	double total_height  = height_cutoff * 2;
 
     double color = mParams[3];
