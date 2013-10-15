@@ -40,6 +40,7 @@
 #include "models/CDisk_B.h"
 #include "models/CDisk_C.h"
 #include "models/CDisk_ConcentricRings.h"
+#include "models/CDisk_Pascucci2004.h"
 
 /// \brief Private constructor. Call `Instance()` instead.
 CModelFactory::CModelFactory()
@@ -50,6 +51,7 @@ CModelFactory::CModelFactory()
 	Register("disk_b", &CDisk_B::Create);
 	Register("disk_c", &CDisk_C::Create);
 	Register("disk_concentric_rings", &CDisk_ConcentricRings::Create);
+	Register("disk_pascucci2004", &CDisk_Pascucci2004::Create);
 }
 
 CModelFactory::~CModelFactory() \
