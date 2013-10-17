@@ -116,62 +116,81 @@ double CDisk_Pascucci2004::Density(double radius, double height)
 	return rho0 * pow(radius / r0, -alpha) * exp(height_scaling);
 }
 
-/// Draws a flat (planar) ring between r_in and r_out with the specified transparency.
-void CDisk_Pascucci2004::DrawDisk(double r_in, double r_out, double transparency)
+/// Draws a flat (planar) ring between r_in and r_out.
+void CDisk_Pascucci2004::DrawDisk(double r_in, double r_out)
 {
-    double color = mParams[3];
-    glBegin(GL_QUAD_STRIP);
+	// lookup constants
+	double color = mParams[3];
 
-		glNormal3d(0.0, 1.0, 0.0);
+	// Compute the transparency at the inner/out radii
+	const double trans_in = Transparency(r_in, 0, 0);
+	const double trans_out = Transparency(r_out, 0, 0);
 
-		for(int j = 0; j <= mSlices; j++ )
-		{
-			glColor4d(color, 0.0, 0.0, transparency);
-			glVertex3d(mCosT[ j ] * r_in,  0, mSinT[ j ] * r_in);
-			glVertex3d(mCosT[ j ] * r_out, 0, mSinT[ j ] * r_out);
-		}
+	glBegin(GL_QUAD_STRIP);
+
+	glNormal3d(0.0, 1.0, 0.0);
+
+	for(int j = 0; j <= mSlices; j++ )
+	{
+		glColor4d(color, 0.0, 0.0, trans_in);
+		glVertex3d(mCosT[ j ] * r_in,  0, mSinT[ j ] * r_in);
+		glColor4d(color, 0.0, 0.0, trans_out);
+		glVertex3d(mCosT[ j ] * r_out, 0, mSinT[ j ] * r_out);
+	}
 
 	glEnd();
 }
 
 void CDisk_Pascucci2004::DrawSide(double radius)
 {
-	double transparency = 0;
     double y0 = 0;
     double y1 = 0;
     double yStep = 0;
     double r0 = 0;
     double r1 = 0;
+    double trans0 = 0;
+    double trans1 = 0;
 
-    // Compute the cutoff location
-    double height_cutoff = mParams[mBaseParams + 9];
+    // Look up cutoff values
+    const double height_cutoff = mParams[mBaseParams + 9];
+
 	double total_height  = height_cutoff * 2;
 
     double color = mParams[3];
 
     // Divide the z direction into mStacks equal steps
     // Stop when we get to mScale in height.
-    yStep = total_height / mStacks;
+    yStep = total_height / (mStacks);
 
+    // Compute the lower and upper bounds
 	y0 = -height_cutoff;
 	y1 = y0 + yStep;
 
+	// Compute the lower and upper transparency
+	trans0 = Transparency(radius, y0, 0);
+	trans1 = Transparency(radius, y1, 0);
+
 	while(y0 < height_cutoff)
 	{
-		glColor4d(color, 0.0, 0.0, Transparency(radius, y0, 0));
-
 		// Draw the top half
 		glBegin( GL_QUAD_STRIP );
 		for(int j = 0; j <= mSlices; j++ )
 		{
-			glNormal3d( mCosT[ j ],     0.0, mSinT[ j ]       );
+			//glNormal3d( mCosT[ j ],     0.0, mSinT[ j ]       );
+			glColor4d(color, 0.0, 0.0, trans0);
 			glVertex3d( mCosT[ j ] * radius,  y0, mSinT[ j ] * r0  );
+			glColor4d(color, 0.0, 0.0, trans1);
 			glVertex3d( mCosT[ j ] * radius,  y1, mSinT[ j ] * r1  );
 		}
 		glEnd( );
 
+		// Move the lower bound/transparency to the upper bound/transparency
 		y0 = y1;
+		trans0 = trans1;
+
+		// Update the upper bound/transparency
 		y1 += yStep;
+		trans1 = Transparency(radius, y1, 0);
 	}
 }
 
@@ -210,6 +229,9 @@ void CDisk_Pascucci2004::Render(GLuint framebuffer_object, int width, int height
 	double min_xyz[3] = {0, 0, 0};
 	double max_xyz[3] = {0, 0, 0};
 
+	double trans_in = 0;
+	double trans_out = 0;
+
 	glDisable(GL_DEPTH_TEST);
 
 	glPushMatrix();
@@ -230,7 +252,7 @@ void CDisk_Pascucci2004::Render(GLuint framebuffer_object, int width, int height
 		// at the outer-edge of r+dr
 		for(double radius = r_in; radius < r_cutoff + dr; radius += dr)
 		{
-			DrawDisk(radius, radius + dr, Transparency(radius, 0, 0));
+			DrawDisk(radius, radius + dr);
 			DrawSide(radius + dr);
 		}
 

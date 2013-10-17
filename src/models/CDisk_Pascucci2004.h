@@ -37,7 +37,7 @@ public:
 	static shared_ptr<CModel> Create();
 
 	double Density(double radius, double height);
-	void DrawDisk(double r_in, double r_out, double transparency);
+	void DrawDisk(double r_in, double r_out);
 	void DrawSide(double radius);
 
 	virtual string GetID() { return "disk_pascucci2004"; };
