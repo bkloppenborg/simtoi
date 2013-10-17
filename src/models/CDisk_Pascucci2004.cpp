@@ -176,7 +176,7 @@ void CDisk_Pascucci2004::DrawSide(double radius)
 		glBegin( GL_QUAD_STRIP );
 		for(int j = 0; j <= mSlices; j++ )
 		{
-			//glNormal3d( mCosT[ j ],     0.0, mSinT[ j ]       );
+			glNormal3d( mCosT[ j ],     0.0, mSinT[ j ]       );
 			glColor4d(color, 0.0, 0.0, trans0);
 			glVertex3d( mCosT[ j ] * radius,  y0, mSinT[ j ] * r0  );
 			glColor4d(color, 0.0, 0.0, trans1);
