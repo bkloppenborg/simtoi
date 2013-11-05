@@ -173,36 +173,75 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+//void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int height, GLuint & FBO_storage, GLuint & FBO_storage_texture)
+//{
+//    glGenTextures(1, &FBO_storage_texture); // Generate one texture
+//    glBindTexture(GL_TEXTURE_2D, FBO_storage_texture); // Bind the texture mFBOtexture
+//
+//    // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
+//    // Enable this one for alpha blending:
+//    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
+//    // These other formats might work, check that GL_BYTE is still correct for the higher precision.
+//    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+//    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
+//    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, mWidth, mHeight, 0, GL_RED, CL_HALF_FLOAT, NULL);
+//    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mWidth, mHeight, 0, GL_RED, GL_FLOAT, NULL);
+//
+//    // Setup the basic texture parameters
+//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//
+//    // Unbind the texture
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//
+//    glGenFramebuffers(1, &FBO_storage); // Generate one frame buffer and store the ID in mFBO
+//    glBindFramebuffer(GL_FRAMEBUFFER, FBO_storage); // Bind our frame buffer
+//
+//    // Attach the depth and texture buffer to the frame buffer
+//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO_storage_texture, 0);
+////    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
+//
+//    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+//
+//    // Check that status of our generated frame buffer
+//    if (status != GL_FRAMEBUFFER_COMPLETE)
+//    {
+//    	const GLubyte * errStr = gluErrorString(status);
+//        printf("Couldn't create storage frame buffer: %x %s\n", status, (char*)errStr);
+//        delete errStr;
+//        exit(0); // Exit the application
+//    }
+//
+//    // All done, bind back to the default framebuffer
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//}
+
 void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int height, GLuint & FBO_storage, GLuint & FBO_storage_texture)
 {
     glGenTextures(1, &FBO_storage_texture); // Generate one texture
-    glBindTexture(GL_TEXTURE_2D, FBO_storage_texture); // Bind the texture mFBOtexture
+    glBindTexture(GL_TEXTURE_3D, FBO_storage_texture); // Bind the texture mFBOtexture
 
-    // Create the texture in red channel only 8-bit (256 levels of gray) in GL_BYTE (CL_UNORM_INT8) format.
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, NULL);
-    // Enable this one for alpha blending:
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, NULL);
-    // These other formats might work, check that GL_BYTE is still correct for the higher precision.
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32, mWidth, mHeight, 0, GL_RED, GL_BYTE, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, mWidth, mHeight, 0, GL_RED, CL_HALF_FLOAT, NULL);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mWidth, mHeight, 0, GL_RED, GL_FLOAT, NULL);
+    unsigned int depth = 1;
+    glTexImage3D(GL_TEXTURE_3D,0,GL_R32F, width, height, depth, 0, GL_RED, GL_FLOAT, NULL);
+
 
     // Setup the basic texture parameters
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     // Unbind the texture
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_3D, 0);
 
     glGenFramebuffers(1, &FBO_storage); // Generate one frame buffer and store the ID in mFBO
     glBindFramebuffer(GL_FRAMEBUFFER, FBO_storage); // Bind our frame buffer
 
     // Attach the depth and texture buffer to the frame buffer
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO_storage_texture, 0);
-//    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mFBO_depth);
+    glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_3D, FBO_storage_texture, 0, 1);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
