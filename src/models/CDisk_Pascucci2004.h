@@ -25,9 +25,9 @@
 #ifndef CDISK_PASCUCCI2004_H_
 #define CDISK_PASCUCCI2004_H_
 
-#include "CCylinder.h"
+#include "CDensityDisk.h"
 
-class CDisk_Pascucci2004: public CCylinder
+class CDisk_Pascucci2004: public CDensityDisk
 {
 
 public:
@@ -37,19 +37,10 @@ public:
 	static shared_ptr<CModel> Create();
 
 	double Density(double radius, double height);
-	void DrawDisk(double r_in, double r_out);
-	void DrawSide(double radius);
 
 	virtual string GetID() { return "disk_pascucci2004"; };
 
 	double Opacity(double radius, double height, double wavelength);
-
-	void Render(GLuint framebuffer_object, int width, int height);
-
-	double Transparency(double radius, double height, double wavelength);
-
-	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
-
 };
 
 #endif /* CDISK_PASCUCCI2004_H_ */

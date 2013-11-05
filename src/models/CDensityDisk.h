@@ -40,14 +40,10 @@ public:
 	CDensityDisk(int n_additional_params);
 	virtual ~CDensityDisk();
 
-	//static shared_ptr<CModel> Create();
-
 	virtual double Density(double radius, double height) = 0;
 
 	void DrawDisk(double r_in, double r_out);
 	void DrawSide(double radius);
-
-	//virtual string GetID() { return "disk_pascucci2004"; };
 
 	virtual double Opacity(double radius, double height, double wavelength) = 0;
 
