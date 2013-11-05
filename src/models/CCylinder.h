@@ -56,7 +56,7 @@ protected:
 
 public:
 	CCylinder();
-	CCylinder(int additional_params);
+	CCylinder(int n_additional_params);
 	virtual ~CCylinder();
 
 	static shared_ptr<CModel> Create();
