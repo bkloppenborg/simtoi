@@ -1,17 +1,17 @@
 /*
- * CDisk_Pascucci2004.cpp
+ * CDisk_Andrews2009.cpp
  *
- *  Created on: Dec 28, 2012
- *      Author: bkloppen
+ *  Created on: Nov. 5, 2013
+ *      Author: bkloppenborg
  */
 
-#include "CDisk_Pascucci2004.h"
+#include "CDisk_Andrews2009.h"
 #include "CShaderFactory.h"
 
-CDisk_Pascucci2004::CDisk_Pascucci2004()
+CDisk_Andrews2009::CDisk_Andrews2009()
 : 	CDensityDisk(6)
 {
-	mName = "Flared Disk (Pascucci 2004)";
+	mName = "Flared Disk (Andrews 2009)";
 
 	// First four parameters are inherited from CDensityDisk:
 	// r_in
@@ -43,7 +43,7 @@ CDisk_Pascucci2004::CDisk_Pascucci2004()
 	SetMax(mBaseParams + 8, 10);
 	SetMin(mBaseParams + 8, 0.1);
 
-	mParamNames.push_back("alpha (radial power)");
+	mParamNames.push_back("gamma (radial power)");
 	SetParam(mBaseParams + 9, 1);
 	SetFree(mBaseParams + 9, true);
 	SetMax(mBaseParams + 9, 10);
@@ -60,14 +60,14 @@ CDisk_Pascucci2004::CDisk_Pascucci2004()
 	mShader = shaders.CreateShader("default");
 }
 
-CDisk_Pascucci2004::~CDisk_Pascucci2004()
+CDisk_Andrews2009::~CDisk_Andrews2009()
 {
 	// TODO Auto-generated destructor stub
 }
 
-shared_ptr<CModel> CDisk_Pascucci2004::Create()
+shared_ptr<CModel> CDisk_Andrews2009::Create()
 {
-	return shared_ptr<CModel>(new CDisk_Pascucci2004());
+	return shared_ptr<CModel>(new CDisk_Andrews2009());
 }
 
 /// Computes the optical depth following the density convention in Pascucci 2004
@@ -77,23 +77,25 @@ shared_ptr<CModel> CDisk_Pascucci2004::Create()
 ///  \rho(r,z) = \rho_0 \left( \frac{r}{r_0}\right )^{-\alpha} \exp{\left[-\frac{1}{2} \left( \frac{z}{h_0 (r/r_0)^{\beta}} \right)^{2} \right ]}
 /// and this is thrown in an exponential function exp(kappa * rho(r,z)) to yield
 /// the optical depth.
-double CDisk_Pascucci2004::Density(double radius, double height)
+double CDisk_Andrews2009::Density(double radius, double height)
 {
 	// Look up constants
 	const double rho0  = mParams[mBaseParams + 5];
 	const double r0 = mParams[mBaseParams + 7];
 	const double h0 = mParams[mBaseParams + 8];
-	const double alpha = mParams[mBaseParams + 9];
+	const double gamma = mParams[mBaseParams + 9];
 	const double beta = mParams[mBaseParams + 10];
 
-	double midplane_density = rho0 * pow(radius / r0, -alpha);
-	double height_scaling = -0.5 * pow(height / (h0 * pow(radius / r0, beta)), 2);
+	double radius_ratio = radius / r0;
+	double midplane_density = rho0 * pow(radius_ratio, -gamma);
+	double height_scaling = -0.5 * pow(height / (h0 * pow(radius_ratio, beta)), 2);
+	double radial_taper = -1 * pow(radius_ratio, 2 - gamma);
 
 	// compute the optical depth:
-	return rho0 * pow(radius / r0, -alpha) * exp(height_scaling);
+	return rho0 * pow(radius_ratio, -gamma) * exp(height_scaling) * exp(radial_taper);
 }
 
-double CDisk_Pascucci2004::Opacity(double radius, double height, double wavelength)
+double CDisk_Andrews2009::Opacity(double radius, double height, double wavelength)
 {
 	// look up and return the (constant) opacity
 	double kappa = mParams[mBaseParams + 6];
