@@ -78,7 +78,7 @@ void CModel::Color()
 	glColor4d(mParams[3], 0.0, 0.0, 1.0);
 }
 
-/// \brief Static functionw which creates a lookup table of sine and cosine values
+/// \brief Static function which creates a lookup table of sine and cosine values
 /// 	used in drawing things in polar coordinates.
 ///
 /// Code taken from
