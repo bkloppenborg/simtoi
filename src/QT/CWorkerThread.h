@@ -154,6 +154,7 @@ public:
 protected:
     void ClearQueue();
 public:
+    void CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture, int n_layers);
     void CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture);
     void CreateGLMultisampleRenderBuffer(unsigned int width, unsigned int height, unsigned int samples,
     		GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth);

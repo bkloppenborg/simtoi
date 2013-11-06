@@ -135,10 +135,25 @@ void CWorkerThread::CheckOpenGLError(string function_name)
     }
 }
 
+/// Create an OpenGL framebuffer and storage buffers matching the default OpenGL image
 void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture)
 {
+	CreateGLBuffer(FBO, FBO_texture, FBO_depth, FBO_storage, FBO_storage_texture, mImageDepth);
+}
+
+/// Create an OpenGL framebuffer and storage buffer matching the default OpenGL image but with a user-defined
+/// number of layers up to GL_MAX_FRAMEBUFFER_LAYERS.
+void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture, int n_layers)
+{
+	// enforce
+	GLint max_layers = 0;
+	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
+
+	if(n_layers > max_layers)
+		n_layers = max_layers;
+
 	CreateGLMultisampleRenderBuffer(mImageWidth, mImageHeight, mImageSamples, FBO, FBO_texture, FBO_depth);
-	CreateGLStorageBuffer(mImageWidth, mImageHeight, mImageDepth, FBO_storage, FBO_storage_texture);
+	CreateGLStorageBuffer(mImageWidth, mImageHeight, n_layers, FBO_storage, FBO_storage_texture);
 }
 
 void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned int height, unsigned int samples,
