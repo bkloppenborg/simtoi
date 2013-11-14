@@ -72,12 +72,6 @@ CModel::~CModel()
 
 }
 
-/// \brief Sets the color for the vertex based upon the model color.
-void CModel::Color()
-{
-	glColor4d(mParams[3], 0.0, 0.0, 1.0);
-}
-
 /// \brief Static function which creates a lookup table of sine and cosine values
 /// 	used in drawing things in polar coordinates.
 ///
@@ -259,19 +253,12 @@ int CModel::GetTotalFreeParameters()
 			this->GetNShaderFreeParameters();
 }
 
-/// \brief Runs OpenGL calls to rotate the model according to the inclination
-/// 	position angle, and rotation angle (rotational phase).
+/// \brief Constructs the rotation matrix according to the set parameters.
 ///
-/// This function runs the necessary OpenGL calls to rotate the model according
-/// to the inclination, position angle, and rotation angle specified in the model.
-/// If the position model is DYNAMIC (i.e. an orbit), the position angle of the model
-/// is specified relative to the orbital plane.
-void CModel::Rotate()
+/// Note, if the position model is DYNAMIC (i.e. an orbit) the position angle
+/// of the model is specified relative to the orbital plane.
+glm::mat4 CModel::Rotate()
 {
-	// Rotations are implemented in the standard way, namely
-	//  R_x(gamma) * R_y(beta) * R_z(alpha)
-	// where gamma = pitch, beta = roll, alpha = yaw.
-
 	double Omega = mParams[0];
 	double inc = mParams[1];
 	double omega = mParams[2];
@@ -287,10 +274,10 @@ void CModel::Rotate()
 		inc += mPosition->GetParam(1) - 90;
 	}
 
-	glRotatef(Omega, 0, 0, 1); // position angle about z-axis
-	glRotatef(inc  , 1, 0, 0); // inclination about x-axis
-	glRotatef(omega, 0, 1, 0); // omega about y-axis
-	CWorkerThread::CheckOpenGLError("CModel::Rotate()");
+	glm::mat4 temp = glm::rotate(mat4(), float(Omega), vec3(0.0f, 0.0f, 1.0f));
+	temp = glm::rotate(temp, float(inc), vec3(1.0, 0.0, 0.0));
+	temp = glm::rotate(temp, float(omega), vec3(0.0, 1.0, 0.0));
+	return temp;
 }
 
 /// \brief Restores a model from SIMTOI's JSON save file.
@@ -331,15 +318,6 @@ void CModel::Restore(Json::Value input)
 	auto shader = shaders.CreateShader(shader_id);
 	shader->Restore(input["shader_data"]);
 	SetShader(shader);
-}
-
-/// \brief Sets up the matrix mode for rendering models.
-void CModel::SetupMatrix()
-{
-    // Keep the matrix in standard OpenGL coordinates, namely
-	// (x,y,z) = (right, up, towards)
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
 /// \brief Serializes a model object into a JSON object.
@@ -435,15 +413,13 @@ void CModel::SetShader(CShaderPtr shader)
 	mShader = shader;
 }
 
-/// \brief Translates the model to the (x,y,z) position specified by the position object.
-void CModel::Translate()
+/// \brief Constructs the translation matrix from the position model.
+glm::mat4 CModel::Translate()
 {
 	double x, y, z;
 	mPosition->GetXYZ(x, y, z);
 
-	// Call the translation routines.  Use the double-precision call.
-	glTranslatef(x, y, z);
-	CWorkerThread::CheckOpenGLError("CModel::Translate()");
+	return glm::translate(mat4(), vec3(x, y, z));
 }
 
 /// \brief Use the shader on the model

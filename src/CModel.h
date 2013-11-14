@@ -50,6 +50,11 @@
 #include <cstdio>
 #include <cassert>
 #include <memory>
+// OpenGL Math Library code.
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+using namespace glm;
 
 using namespace std;
 
@@ -90,9 +95,8 @@ protected:
 	double mScale;
 
 protected:
-	void Color();
-	void Rotate();
-	void Translate();
+	glm::mat4 Rotate();
+	glm::mat4 Translate();
 
 public:
 	static void CircleTable( double * sint, double * cost, const int n );
