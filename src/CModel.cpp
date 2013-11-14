@@ -421,18 +421,3 @@ glm::mat4 CModel::Translate()
 
 	return glm::translate(mat4(), vec3(x, y, z));
 }
-
-/// \brief Use the shader on the model
-///
-/// Calls the shader, passing the minimum/maximum XYZ positions
-/// of the verticies in the model.
-///
-/// \param min_xyz The minimum (x,y,z) values in the model.
-/// \param max_xyz The maximum (x,y,z) values in the model.
-void CModel::UseShader(double min_xyz[3], double max_xyz[3])
-{
-	if(mShader != NULL)
-		mShader->UseShader(min_xyz, max_xyz);
-
-	CWorkerThread::CheckOpenGLError("CModel::UseShader()");
-}

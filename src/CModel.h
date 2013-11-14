@@ -123,7 +123,7 @@ public:
 	CShaderPtr GetShader(void);
 	int GetTotalFreeParameters();
 
-	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
+	virtual void Render(GLuint framebuffer_object, const glm::mat4 & view) = 0;
 public:
 	void Restore(Json::Value input);
 
@@ -137,9 +137,6 @@ public:
 	void SetTime(double time);
 protected:
 	void SetupMatrix();
-
-protected:
-	void UseShader(double min_xyz[3], double max_xyz[3]);
 
 
 };

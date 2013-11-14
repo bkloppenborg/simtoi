@@ -192,6 +192,15 @@ void CShader::CompileShader(GLuint shader)
     }
 }
 
+/// Returns a reference to the shader program, loading it into memory if necessary.
+GLuint CShader::GetProgram()
+{
+	if(!mShaderLoaded)
+		Init();
+
+	return mProgram;
+}
+
 // Loads the shader from the source file and creates a binary for the current selected context.
 void CShader::Init()
 {
@@ -205,8 +214,10 @@ void CShader::Init()
     string source_v, source_f;
 	const GLchar * tmp_source_v;
 	const GLchar * tmp_source_f;
-    source_v = ReadFile(mShader_dir + '/' + mBase_name + ".vert", "Could not read " + mShader_dir + '/' + mBase_name + ".vert file!");
-    source_f = ReadFile(mShader_dir + '/' + mBase_name + ".frag", "Could not read " + mShader_dir + '/' + mBase_name + ".frag file!");
+    source_v = ReadFile(mShader_dir + '/' + mBase_name + "_vert.glsl",
+    		"Could not read " + mShader_dir + '/' + mBase_name + "_vert.glsl file!");
+    source_f = ReadFile(mShader_dir + '/' + mBase_name + "_frag.glsl",
+    		"Could not read " + mShader_dir + '/' + mBase_name + "_vert.glsl file!");
 	tmp_source_v = (const GLchar *) source_v.c_str();
 	tmp_source_f = (const GLchar *) source_f.c_str();
 
@@ -260,53 +271,10 @@ void CShader::LinkProgram(GLuint program)
     glGetProgramiv(mProgram, GL_LINK_STATUS, &tmp);
     if(tmp == GL_FALSE)
     {
-    	char * infolog = (char*) malloc(501);
+    	char infolog[501];
     	int length;
     	printf("Could not build mProgram!");
     	glGetProgramInfoLog(mProgram, 500, &length, infolog);
     	printf("%s\n", infolog);
     }
-}
-
-void CShader::UseShader(double min_xyz[3], double max_xyz[3])
-{
-	UseShader(min_xyz, max_xyz, mParams, mNParams);
-}
-
-void CShader::UseShader(double min_xyz[3], double max_xyz[3], double * params, unsigned int in_params)
-{
-	if(!mShaderLoaded)
-		Init();
-
-	//if(imNParams != this->mNParams)
-	// throw exception
-
-	// Tell OpenGL to use the mProgram
-	glUseProgram(mProgram);
-	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUseProgram");
-
-	// Init temporary storage and copy the XYZ min/max values into the corresponding array.
-	GLfloat min_tmp[3];
-	GLfloat max_tmp[3];
-
-	// Note: the downcast from double to GLfloat is intentional... GLSL doesn't do doubles.
-	for(int i = 0; i < 3; i++)
-	{
-		min_tmp[i] = GLfloat(min_xyz[i]);
-		max_tmp[i] = GLfloat(max_xyz[i]);
-	}
-
-	// Send the values off to the shader:
-	glUniform3fv(mMinXYZ_location, 1, min_tmp);
-	glUniform3fv(mMaxXYZ_location, 1, max_tmp);
-	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUniform3fv");
-
-	// Set the shader-specific parameters.  Notice again the intentional downcast.
-	GLfloat tmp;
-	for(int i = 0; (i < mNParams && i < in_params); i++)
-	{
-		tmp = GLfloat(params[i]);
-		glUniform1fv(mParam_locations[i], 1, &tmp);
-	}
-	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUniform1fv");
 }

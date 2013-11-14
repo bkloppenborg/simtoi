@@ -390,6 +390,9 @@ void CWorkerThread::run()
 	glEnable (GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	// Enable for wireframe-only model
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE );
+
 	// Initalize the window
 	glViewport(0, 0, mImageWidth, mImageHeight);
 
@@ -423,49 +426,49 @@ void CWorkerThread::run()
 		op = GetNextOperation();
 		switch(op)
 		{
-//		case ANIMATE:
-//			mModelList->SetTime(mModelList->GetTime() + mTempDouble);
-//			Enqueue(RENDER);
-//			Enqueue(ANIMATE);
-//			break;
-//
-//		case ANIMATE_STOP:
-//			ClearQueue();
-//			break;
-//
-//		case BOOTSTRAP_NEXT:
-//			mTaskList->BootstrapNext(mTempUint);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case EXPORT:
-//			// Instruct the worker to export data
-//			mTaskList->Export(mTempString);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case GET_CHI:
-//			// uses mTempArray
-//			mTaskList->GetChi(mTempArray, mTempArraySize);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case GET_UNCERTAINTIES:
-//			// uses mTempArray
-//			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case OPEN_DATA:
-//			// Instruct the task list to open the file.
-//			mTaskList->OpenData(mTempString);
-//			mWorkerSemaphore.release(1);
-//
-//		case RENDER:
-//			mModelList->Render(mFBO, mImageWidth, mImageHeight);
-//			BlitToScreen(mFBO);
-//			break;
-//
+		case ANIMATE:
+			mModelList->SetTime(mModelList->GetTime() + mTempDouble);
+			Enqueue(RENDER);
+			Enqueue(ANIMATE);
+			break;
+
+		case ANIMATE_STOP:
+			ClearQueue();
+			break;
+
+		case BOOTSTRAP_NEXT:
+			mTaskList->BootstrapNext(mTempUint);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case EXPORT:
+			// Instruct the worker to export data
+			mTaskList->Export(mTempString);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case GET_CHI:
+			// uses mTempArray
+			mTaskList->GetChi(mTempArray, mTempArraySize);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case GET_UNCERTAINTIES:
+			// uses mTempArray
+			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case OPEN_DATA:
+			// Instruct the task list to open the file.
+			mTaskList->OpenData(mTempString);
+			mWorkerSemaphore.release(1);
+
+		case RENDER:
+			mModelList->Render(mFBO, mView);
+			BlitToScreen(mFBO);
+			break;
+
 		default:
 		case STOP:
 			ClearQueue();

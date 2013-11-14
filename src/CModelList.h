@@ -40,6 +40,7 @@
 #include <GL/glu.h>
 #include <memory>
 #include <vector>
+#include <glm/glm.hpp>
 using namespace std;
 
 #include "CPosition.h"
@@ -74,7 +75,7 @@ public:
 
 	static vector<string> GetTypes(void);
 
-	void Render(GLuint fbo, int width, int height);
+	void Render(GLuint fbo, const glm::mat4 & view);
 	void Restore(Json::Value input);
 
 	Json::Value Serialize();

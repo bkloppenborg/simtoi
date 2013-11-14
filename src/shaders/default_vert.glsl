@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -23,11 +23,19 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+in vec3 position;
+//in vec3 normal;
+//in vec2 color;
 
-// Default (do nothing) fragement shader.
-in vec4 color;
+uniform mat4 model;
+uniform mat4 view;
+//uniform mat4 proj;
 
-void main(void)
+void main() 
 {
-    gl_FragColor = color;
+//   Color = color
+//    gl_Position = proj * view * model * vec4(position, 1.0)
+    gl_Position = view * model * vec4(position, 1.0);
+//    gl_Position = vec4(position, 1.0);
 }

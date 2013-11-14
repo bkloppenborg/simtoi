@@ -75,14 +75,11 @@ public:
 	void CompileShader(GLuint shader);
 
 	string GetID() { return mShaderID; };
+	GLuint GetProgram();
 
 	void Init();
 
 	void LinkProgram(GLuint program);
-
-	void UseShader(double min_xyz[3], double max_xyz[3]);
-	void UseShader(double min_xyz[3], double max_xyz[3], double * params, unsigned int in_params);
-
 };
 
 #endif /* CGLSHADER_H_ */

@@ -153,7 +153,7 @@ vector<string> CModelList::GetTypes(void)
 }
 
 // Render the image to the specified OpenGL framebuffer object.
-void CModelList::Render(GLuint fbo, int width, int height)
+void CModelList::Render(GLuint fbo, const mat4 & view)
 {
 	// We render the models in order by depth (i.e. z-direction).
 	// To do this, we do a shallow copy of the model vector, then sort by z.
@@ -168,7 +168,7 @@ void CModelList::Render(GLuint fbo, int width, int height)
     // Now call render on all of the models:
     for(auto model : models)
     {
-    	model->Render(fbo, width, height);
+    	model->Render(fbo, view);
     }
 
     // Bind back to the default framebuffer and let OpenGL finish:

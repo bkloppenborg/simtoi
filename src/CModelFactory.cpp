@@ -34,7 +34,7 @@
 #include <stdexcept>
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
-//#include "models/CSphere.h"
+#include "models/CSphere.h"
 //#include "models/CCylinder.h"
 //#include "models/CDisk_A.h"
 //#include "models/CDisk_B.h"
@@ -46,7 +46,7 @@
 /// \brief Private constructor. Call `Instance()` instead.
 CModelFactory::CModelFactory()
 {
-//	Register("sphere", &CSphere::Create);
+	Register("sphere", &CSphere::Create);
 //	Register("cylinder", &CCylinder::Create);
 //	Register("disk_a", &CDisk_A::Create);
 //	Register("disk_b", &CDisk_B::Create);
