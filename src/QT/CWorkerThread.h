@@ -53,6 +53,7 @@
 #include "json/json.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <glm/glm.hpp>
 
 using namespace std;
 
@@ -105,6 +106,7 @@ protected:
     double mImageScale;
     unsigned int mImageWidth;
     unsigned int mImageSamples;
+    glm::mat4 mView;
 
     // Off-screen framebuffer (this matches the buffer created by CreateGLBuffer)
     // All rendering from the UI happens in these buffers. Results are blitted to screen.
@@ -176,6 +178,7 @@ public:
     unsigned int GetImageWidth() { return mImageWidth; };
     double GetImageScale() { return mImageScale; };
     COpenCLPtr GetOpenCL() { return mOpenCL; };
+    glm::mat4 GetView() { return mView; };
 
     void OpenData(string filename);
 

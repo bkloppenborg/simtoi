@@ -27,6 +27,9 @@
 #include "CWorkerThread.h"
 #include <QMutexLocker>
 #include <stdexcept>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
@@ -368,28 +371,33 @@ void CWorkerThread::run()
     // claim the OpenGL context:
     mGLWidget->makeCurrent();
 
+    // Setup the OpenGL context
+    // Set the clear color to black:
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-	// Set to flat (non-interpolated) shading:
-	glShadeModel(GL_SMOOTH);
+	// Dithering is a fractional pixel filling technique that allows you to
+	// combine some colors to create the effect of other colors. The non-full
+	// fill fraction of pixels could negativly impact the interferometric
+	// quantities we wish to simulate. So, disable dithering.
 	glDisable(GL_DITHER);
-	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
-
-	// Enable alpha blending:
+	// Enable multi-sample anti-aliasing to improve the effective resolution
+	// of the model area.
+	glEnable(GL_MULTISAMPLE);
+	// Set the shading model to smooth, interpolated shading by default:
+	glShadeModel(GL_SMOOTH);
+	// Enable depth testing to permit vertex culling
+	glEnable(GL_DEPTH_TEST);
+	// Enable alpha blending
 	glEnable (GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Enable multisample anti-aliasing.
-	glEnable(GL_MULTISAMPLE);
+	// Initalize the window
+	glViewport(0, 0, mImageWidth, mImageHeight);
 
-	// Resize the screen, then cascade to a render and a blit.
-    glViewport(0, 0, mImageWidth, mImageHeight);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    double half_width = mImageWidth * mImageScale / 2;
-    double half_height = mImageHeight * mImageScale / 2;
-    double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
-	glOrtho(-half_width, half_width, -half_height, half_height, -depth, depth);
-    glMatrixMode(GL_MODELVIEW);
+	// Setup the view:
+	double half_width = mImageWidth * mImageScale / 2;
+	double half_height = mImageHeight * mImageScale / 2;
+	double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
+	mView = glm::ortho(-half_width, half_width, -half_height, half_height, -depth, depth);
 
 	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
@@ -415,49 +423,49 @@ void CWorkerThread::run()
 		op = GetNextOperation();
 		switch(op)
 		{
-		case ANIMATE:
-			mModelList->SetTime(mModelList->GetTime() + mTempDouble);
-			Enqueue(RENDER);
-			Enqueue(ANIMATE);
-			break;
-
-		case ANIMATE_STOP:
-			ClearQueue();
-			break;
-
-		case BOOTSTRAP_NEXT:
-			mTaskList->BootstrapNext(mTempUint);
-			mWorkerSemaphore.release(1);
-			break;
-
-		case EXPORT:
-			// Instruct the worker to export data
-			mTaskList->Export(mTempString);
-			mWorkerSemaphore.release(1);
-			break;
-
-		case GET_CHI:
-			// uses mTempArray
-			mTaskList->GetChi(mTempArray, mTempArraySize);
-			mWorkerSemaphore.release(1);
-			break;
-
-		case GET_UNCERTAINTIES:
-			// uses mTempArray
-			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
-			mWorkerSemaphore.release(1);
-			break;
-
-		case OPEN_DATA:
-			// Instruct the task list to open the file.
-			mTaskList->OpenData(mTempString);
-			mWorkerSemaphore.release(1);
-
-		case RENDER:
-			mModelList->Render(mFBO, mImageWidth, mImageHeight);
-			BlitToScreen(mFBO);
-			break;
-
+//		case ANIMATE:
+//			mModelList->SetTime(mModelList->GetTime() + mTempDouble);
+//			Enqueue(RENDER);
+//			Enqueue(ANIMATE);
+//			break;
+//
+//		case ANIMATE_STOP:
+//			ClearQueue();
+//			break;
+//
+//		case BOOTSTRAP_NEXT:
+//			mTaskList->BootstrapNext(mTempUint);
+//			mWorkerSemaphore.release(1);
+//			break;
+//
+//		case EXPORT:
+//			// Instruct the worker to export data
+//			mTaskList->Export(mTempString);
+//			mWorkerSemaphore.release(1);
+//			break;
+//
+//		case GET_CHI:
+//			// uses mTempArray
+//			mTaskList->GetChi(mTempArray, mTempArraySize);
+//			mWorkerSemaphore.release(1);
+//			break;
+//
+//		case GET_UNCERTAINTIES:
+//			// uses mTempArray
+//			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
+//			mWorkerSemaphore.release(1);
+//			break;
+//
+//		case OPEN_DATA:
+//			// Instruct the task list to open the file.
+//			mTaskList->OpenData(mTempString);
+//			mWorkerSemaphore.release(1);
+//
+//		case RENDER:
+//			mModelList->Render(mFBO, mImageWidth, mImageHeight);
+//			BlitToScreen(mFBO);
+//			break;
+//
 		default:
 		case STOP:
 			ClearQueue();
