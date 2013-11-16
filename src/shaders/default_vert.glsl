@@ -26,14 +26,25 @@
  
 in vec3 position;
 in vec3 normal;
+in vec2 vert_color;
 
 uniform mat4 model;
 uniform mat4 view;
+uniform vec2 uni_color = vec2(1.0, 1.0);// init to reasonable default
+
+uniform bool color_from_uniform = true;
 
 out vec3 Normal;
+out vec2 Color;
 
 void main() 
 {
+	// The color can be either from a VBO or from a uniform, let the user decide.
+	if(color_from_uniform)
+		Color = uni_color;
+	else
+		Color = vert_color;
+	
 	Normal = normal;
     gl_Position = view * model * vec4(position, 1.0);
 }

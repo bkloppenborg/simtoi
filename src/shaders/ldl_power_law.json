@@ -1,7 +1,7 @@
 // SIMTOI shader configuration file in JSON format.
 
 {
-    "filename" : "ldl_power_law",
+    "fragment_shader" : "ldl_power_law_frag.glsl",
     "human_name" : "LDL - Power Law",
 	"param_0":
 	{
@@ -10,5 +10,6 @@
         "max" : 1,
         "default" : 0.5
 	},
-	"shader_id" : "ldl_power_law"
+	"shader_id" : "ldl_power_law",
+    "vertex_shader" : "default_vert.glsl"
 }

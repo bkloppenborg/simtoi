@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -25,16 +25,18 @@
  */
  
 // Power law limb darkening implemented according to Hestroffer (1997)
-// Implemented using alpha blending.
-varying out vec3 normal;
-varying out vec4 color;
+// Implemented by decreasing the flux (color.x) of the vertex.
 
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+in vec3 Normal;
+in vec2 Color;
+uniform float alpha;
+
+out vec4 out_color;
 
 void main(void)
 {
-    normal = gl_NormalMatrix * gl_Normal;
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
+    float intensity = pow(mu, alpha);
+
+    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
 }

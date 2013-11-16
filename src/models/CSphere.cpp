@@ -201,7 +201,9 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
+	mShader->UseShader();
+	GLint uniColorFlag = glGetUniformLocation(shader_program, "color_from_uniform");
+	glUniform1i(uniColorFlag, true);
 
 	// bind back to the VAO
 	glBindVertexArray(mVAO);
@@ -216,7 +218,7 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	model = Translate() * Rotate() * model;
     glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
 
-    GLint uniColor = glGetUniformLocation(shader_program, "color");
+    GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
     glUniform2fv(uniColor, 1, glm::value_ptr(color));
 
 	// render
