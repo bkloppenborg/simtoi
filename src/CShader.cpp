@@ -46,7 +46,8 @@ CShader::CShader(const CShader & other)
 {
 	mShaderID = other.mShaderID;
 	mShader_dir = other.mShader_dir;
-	mBase_name = other.mBase_name;
+	mVertShaderFileName = other.mVertShaderFileName;
+	mFragShaderFilename = other.mFragShaderFilename;
 	mNParams = other.mNParams;
 	mParam_locations = new GLuint[mNParams];
 	mShaderLoaded = false;
@@ -139,16 +140,19 @@ CShader::CShader(string json_config_file)
 	// Shaders and configuration files must be in the same directory.
 	size_t folder_end = json_config_file.find_last_of("/\\");
 	mShader_dir = json_config_file.substr(0,folder_end+1);
-	mBase_name = input["filename"].asString();
-
+	mVertShaderFileName = input["vertex_shader"].asString();
+	mFragShaderFilename = input["fragment_shader"].asString();
 }
 
-CShader::CShader(string shader_id, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax)
-	: CParameters(n_parameters)
+CShader::CShader(string shader_id, string shader_dir, string vertex_shader_filename, string fragment_shader_filename,
+		string friendly_name, int n_parameters,
+		vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax)
+	: CParameters(0)
 {
 	mShaderID = shader_id;
 	mShader_dir = shader_dir;
-	mBase_name = base_filename;
+	mVertShaderFileName = vertex_shader_filename;
+	mFragShaderFilename = fragment_shader_filename;
 	mParam_locations = new GLuint[mNParams];
 	mShaderLoaded = false;
 	mProgram = 0;
@@ -214,10 +218,10 @@ void CShader::Init()
     string source_v, source_f;
 	const GLchar * tmp_source_v;
 	const GLchar * tmp_source_f;
-    source_v = ReadFile(mShader_dir + '/' + mBase_name + "_vert.glsl",
-    		"Could not read " + mShader_dir + '/' + mBase_name + "_vert.glsl file!");
-    source_f = ReadFile(mShader_dir + '/' + mBase_name + "_frag.glsl",
-    		"Could not read " + mShader_dir + '/' + mBase_name + "_vert.glsl file!");
+    source_v = ReadFile(mShader_dir + '/' + mVertShaderFileName,
+    		"Could not read " + mShader_dir + '/' + mVertShaderFileName + " file!");
+    source_f = ReadFile(mShader_dir + '/' + mFragShaderFilename,
+    		"Could not read " + mShader_dir + '/' + mFragShaderFilename + " file!");
 	tmp_source_v = (const GLchar *) source_v.c_str();
 	tmp_source_f = (const GLchar *) source_f.c_str();
 
@@ -230,7 +234,7 @@ void CShader::Init()
 
     mShader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
     if(!bool(glIsShader(mShader_vertex)))
-    	CWorkerThread::CheckOpenGLError("Could not create fragement shader shader.");
+    	CWorkerThread::CheckOpenGLError("Could not create fragment shader.");
 
     glAttachShader(mProgram, mShader_vertex);
     glAttachShader(mProgram, mShader_fragment);
@@ -245,12 +249,6 @@ void CShader::Init()
     LinkProgram(mProgram);
 
     CWorkerThread::CheckOpenGLError("Could not link shader mProgram.");
-
-    // Now look up the locations of the parameters, start with the min/max value locations:
-    mMinXYZ_location = glGetUniformLocation(mProgram, "min_xyz");
-	CWorkerThread::CheckOpenGLError("Could find variable 'min_xyz' in shader source.");
-    mMaxXYZ_location = glGetUniformLocation(mProgram, "max_xyz");
-	CWorkerThread::CheckOpenGLError("Could find variable 'max_xyz' in shader source.");
 
     // Now the shader-specific parameters:
     for(int i = 0; i < mNParams; i++)

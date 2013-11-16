@@ -1,7 +1,8 @@
 // Model save file from SIMTOI in JSON format.
 
 {
-    "filename" : "default",
+    "fragment_shader" : "default_frag.glsl",
     "human_name" : "Default (None)",
-	"shader_id" : "default"
+	"shader_id" : "default",
+	"vertex_shader" : "default_vert.glsl"
 }
