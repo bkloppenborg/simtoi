@@ -212,11 +212,15 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniView = glGetUniformLocation(shader_program, "view");
 	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
-	// Apply scale, rotation, and translation operations:
+	// Apply scale, rotation, and translation operations to the vertices
     GLint uniModel = glGetUniformLocation(shader_program, "model");
 	mat4 model = glm::scale(mat4(), vec3(radius, radius, radius));
 	model = Translate() * Rotate() * model;
     glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+
+	// Inform the shader about the rotation, so the normals can be corrected.
+    GLint uniRotate = glGetUniformLocation(shader_program, "rotation");
+    glUniformMatrix4fv(uniRotate, 1, GL_FALSE, glm::value_ptr(Rotate()));
 
     GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
     glUniform2fv(uniColor, 1, glm::value_ptr(color));

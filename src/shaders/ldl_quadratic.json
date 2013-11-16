@@ -1,7 +1,7 @@
 // SIMTOI shader configuration file in JSON format.
 
 {
-    "filename" : "ldl_quadratic",
+    "fragment_shader" : "ldl_quadratic_frag.glsl",
     "human_name" : "LDL - Quadratic",
 	"param_0":
 	{
@@ -17,6 +17,7 @@
         "max" : 1,
         "default" : 0.1
 	},
-	"shader_id" : "ldl_quadratic"
+	"shader_id" : "ldl_quadratic",
+    "vertex_shader" : "default_vert.glsl"
 }
 

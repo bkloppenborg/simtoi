@@ -1,7 +1,7 @@
 // SIMTOI shader configuration file in JSON format.
 
 {
-    "filename" : "ldl_fields2003",
+    "fragment_shader" : "ldl_fields2003_frag.glsl",
     "human_name" : "LDL - Fields 2003",
 	"param_0":
 	{
@@ -17,5 +17,6 @@
         "max" : 1,
         "default" : 0.5
     },
-	"shader_id" : "ldl_fields2003"
+	"shader_id" : "ldl_fields2003",
+    "vertex_shader" : "default_vert.glsl"
 }

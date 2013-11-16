@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -24,21 +24,23 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Square root limb darkening
+// Quadratic limb darkening
 // Implemented by decreasing the flux (color.x) of the vertex.
-in vec3 normal;
-in vec4 color;
+in vec3 Normal;
+in vec2 Color;
 uniform float a1;
 uniform float a2;
 
+out vec4 out_color;
+
 void main(void)
 {
-    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
+    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
     
     // Simple quadratic limb darkening:
     float intensity = 1;
 	intensity -= a1 * (1 - mu);
-	intensity -= a2 * (1 - sqrt(mu));
+	intensity -= a2 * pow( (1 - mu), 2.0);
 
-    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
+    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
 }

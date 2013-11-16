@@ -28,6 +28,7 @@ in vec3 position;
 in vec3 normal;
 in vec2 vert_color;
 
+uniform mat4 rotation;
 uniform mat4 model;
 uniform mat4 view;
 uniform vec2 uni_color = vec2(1.0, 1.0);// init to reasonable default
@@ -45,6 +46,9 @@ void main()
 	else
 		Color = vert_color;
 	
-	Normal = normal;
+	// Rotate the normal vectors to match the orientation of the model
+	Normal =  (rotation * vec4(normal, 0.0)).xyz;
+
+	// Compute the positions of the vertices.
     gl_Position = view * model * vec4(position, 1.0);
 }
