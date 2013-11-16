@@ -263,21 +263,41 @@ glm::mat4 CModel::Rotate()
 	double inc = mParams[1];
 	double omega = mParams[2];
 
-	// TODO: At the moment I'm not sure if +90 or -90 is correct here.
-	// so we might have models displaying tilted slightly the wrong direction.
 	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
 	{
-		// position angle
-		Omega += mPosition->GetParam(0) - 90;
+		double orbit_Omega = mPosition->GetParam(0);
+		double orbit_inc = mPosition->GetParam(1);
+		double orbit_omega = mPosition->GetParam(2);
 
-		// the inclination
-		inc += mPosition->GetParam(1) - 90;
+		Omega += orbit_Omega;
+		inc += orbit_inc;
+		omega += orbit_omega;
 	}
 
-	glm::mat4 temp = glm::rotate(mat4(), float(Omega), vec3(0.0f, 0.0f, 1.0f));
-	temp = glm::rotate(temp, float(inc), vec3(1.0, 0.0, 0.0));
-	temp = glm::rotate(temp, float(omega), vec3(0.0, 1.0, 0.0));
-	return temp;
+	glm::mat4 A = glm::rotate(mat4(), float(Omega), vec3(0.0, 0.0, 1.0));
+	glm::mat4 B = glm::rotate(mat4(), float(inc), vec3(1.0, 0.0, 0.0));
+	glm::mat4 C = glm::rotate(mat4(), float(omega), vec3(0.0, 0.0, 1.0));
+	return A * B * C;
+
+
+//	// TODO: At the moment I'm not sure if +90 or -90 is correct here.
+//	// so we might have models displaying tilted slightly the wrong direction.
+//	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
+//	{
+//		// position angle
+//		Omega += mPosition->GetParam(0) - 90;
+//
+//		// the inclination
+//		inc += mPosition->GetParam(1) - 90;
+//	}
+//
+//
+//
+//	glm::mat4 temp = mat4();
+//	temp = glm::rotate(temp, float(omega), vec3(0.0, 0.0, 1.0));
+//	temp = glm::rotate(temp, float(inc), vec3(1.0, 0.0, 0.0));
+//	temp = glm::rotate(temp, float(Omega), vec3(0.0, 1.0, 0.0));
+//	return temp;
 }
 
 /// \brief Restores a model from SIMTOI's JSON save file.
