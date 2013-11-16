@@ -24,7 +24,7 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-in vec2 Color;
+in vec3 Normal;
 
 out vec4 out_color;
 void main()

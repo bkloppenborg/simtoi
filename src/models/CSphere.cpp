@@ -76,7 +76,9 @@ shared_ptr<CModel> CSphere::Create()
 
 /// Generates a sphere by dividing it into subdivisions in latitude and longitude.
 /// Render with GL_TRIANGLES.
-void CSphere::GenerateSphere_LatLon(vector<vec3> & vertices, vector<unsigned int> & elements, unsigned int latitude_subdivisions, unsigned int longitude_subdivisions)
+///
+/// vbo_data contains the verticies and normals stored as {x,y,z,n_x,n_y,n_z}_i
+void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int> & elements, unsigned int latitude_subdivisions, unsigned int longitude_subdivisions)
 {
 	// Generate a lookup table of sine/cosine values
 	// Iterate theta from zero to PI (hence + 1 on the subdivisions)
@@ -107,7 +109,11 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vertices, vector<unsigned int
 			x = sin_theta[i] * cos_phi[j];
 			y = sin_theta[i] * sin_phi[j];
 			z = cos_theta[i];
-			vertices.push_back(vec3(x, y, z));
+			// The first three elements are the verticies
+			vbo_data.push_back(vec3(x, y, z));
+			// The second three elements are the normals. Because we draw a
+			// unit sphere these are the same.
+//			vbo_data.push_back(vec3(x, y, z));
 		}
 	}
 
@@ -131,11 +137,11 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vertices, vector<unsigned int
 void CSphere::Init()
 {
 	// Generate the verticies and elements
-	vector<vec3> vertices;
+	vector<vec3> vbo_data;
 	vector<unsigned int> elements;
 	unsigned int latitude_subdivisions = 20;
 	unsigned int longitude_subdivisions = 20;
-	GenerateSphere_LatLon(vertices, elements, latitude_subdivisions, longitude_subdivisions);
+	GenerateSphere_LatLon(vbo_data, elements, latitude_subdivisions, longitude_subdivisions);
 
 	mNumElements = elements.size();
 
@@ -148,20 +154,30 @@ void CSphere::Init()
 	// Generate and bind to the VBO. Upload the verticies.
 	glGenBuffers(1, &mVBO); // Generate 1 buffer
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), &vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vbo_data.size() * sizeof(vec3), &vbo_data[0], GL_STATIC_DRAW);
 	// Generate and bind to the EBO. Upload the elements.
 	glGenBuffers(1, &mEBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
 	// Next we need to define the storage format for this object for the shader.
-	// First get the shader, then look up the location of the variables, activate
-	// them and define how they can look up this information in the VBO.
+	// First get the shader and activate it
 	GLuint shader_program = mShader->GetProgram();
 	glUseProgram(shader_program);
+	// Now start defining the storage for the VBO.
+	// The 'vbo_data' variable stores the data as [x,y,z,n_x,n_y,n_z]_i, ...
+	// where {x,y,z} are the vertices and {n_x,n_y,n_z} are the normals
+	// First define the positions:
 	GLint posAttrib = glGetAttribLocation(shader_program, "position");
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
+	// Now define the normals, if they are used
+	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
+	if(normAttrib > -1)
+	{
+		glEnableVertexAttribArray(normAttrib);
+		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
+	}
 
 	// Check that things loaded correctly.
 	CWorkerThread::CheckOpenGLError("CModelSphere.Init()");

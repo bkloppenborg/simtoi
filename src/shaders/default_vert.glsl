@@ -25,15 +25,18 @@
  */
  
 in vec3 position;
-//in vec3 normal;
+in vec3 normal;
 //in vec2 color;
 
 uniform mat4 model;
 uniform mat4 view;
 //uniform mat4 proj;
 
+out vec3 Normal;
+
 void main() 
 {
+    Normal = normal;
 //   Color = color
 //    gl_Position = proj * view * model * vec4(position, 1.0)
     gl_Position = view * model * vec4(position, 1.0);

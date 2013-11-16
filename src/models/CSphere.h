@@ -56,7 +56,7 @@ public:
 	virtual string GetID() { return "sphere"; };
 	double GetMaxHeight();
 
-	static void GenerateSphere_LatLon(vector<vec3> & vertices, vector<unsigned int> & elements,
+	static void GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int> & elements,
 			unsigned int latitude_subdivisions, unsigned int longitude_subdivisions);
 
 	void Init();
