@@ -26,9 +26,11 @@
 
 in vec3 Normal;
 
+uniform vec2 color;
+
 out vec4 out_color;
 void main()
 {
-    out_color = vec4(1.0, 0.0, 0.0, 1.0);
+    out_color = vec4(color.x, 0.0, 0.0, color.y);
 }
  

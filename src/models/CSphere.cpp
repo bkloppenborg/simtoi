@@ -111,9 +111,6 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 			z = cos_theta[i];
 			// The first three elements are the verticies
 			vbo_data.push_back(vec3(x, y, z));
-			// The second three elements are the normals. Because we draw a
-			// unit sphere these are the same.
-//			vbo_data.push_back(vec3(x, y, z));
 		}
 	}
 
@@ -197,6 +194,8 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	// Rename a few variables for convenience:
 	double radius = float(mParams[mBaseParams + 1] / 2);
 
+	vec2 color = vec2(mParams[3], 1.0);
+
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
@@ -216,6 +215,9 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	mat4 model = glm::scale(mat4(), vec3(radius, radius, radius));
 	model = Translate() * Rotate() * model;
     glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+
+    GLint uniColor = glGetUniformLocation(shader_program, "color");
+    glUniform2fv(uniColor, 1, glm::value_ptr(color));
 
 	// render
 	glDrawElements(GL_TRIANGLE_STRIP, mNumElements, GL_UNSIGNED_INT, 0);
