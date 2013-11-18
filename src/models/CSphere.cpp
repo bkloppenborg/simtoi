@@ -162,9 +162,8 @@ void CSphere::Init()
 	GLuint shader_program = mShader->GetProgram();
 	glUseProgram(shader_program);
 	// Now start defining the storage for the VBO.
-	// The 'vbo_data' variable stores the data as [x,y,z,n_x,n_y,n_z]_i, ...
-	// where {x,y,z} are the vertices and {n_x,n_y,n_z} are the normals
-	// First define the positions:
+	// The 'vbo_data' variable stores a unit sphere so the vertex data can
+	// be used as normals.
 	GLint posAttrib = glGetAttribLocation(shader_program, "position");
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
@@ -184,6 +183,9 @@ void CSphere::Init()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	// Indicate the model is ready to use.
+	mModelReady = true;
 }
 
 void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
