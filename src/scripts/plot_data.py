@@ -26,7 +26,7 @@ def plot_photometry(data_file, model_file, overplot_file=None, autosave=False,
     
     # Create a split plot. The top will have a plot of only the data
     # the bottom plot will contain residuals
-    fig, (top, bottom) = plt.subplots(2, 1, sharex='date', sharey=False, figsize=figsize)
+    fig, (top, bottom) = plt.subplots(2, 1, sharex=True, sharey=False, figsize=figsize)
     
     # Create the top plot. First plot the real data
     top.errorbar(data['date'], data['mag'], yerr=data['mag_err'], fmt='+', label="Data")
@@ -71,7 +71,7 @@ def v2_plot(data_file, model_file, autosave=False, saveformat='svg', title=None,
     assert(len(data) == len(model))
     
     # create the figure
-    fig, (top, bottom) = plt.subplots(2, 1, sharex='uv_mag', sharey=False, figsize=figsize)
+    fig, (top, bottom) = plt.subplots(2, 1, sharex=True, sharey=False, figsize=figsize)
     
     legend_data, legend_model = plot_v2(data, model, top)
     legend_residuals, legend_lb, legend_ub = plot_v2_residuals(data, model, bottom)
