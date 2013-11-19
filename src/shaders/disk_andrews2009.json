@@ -1,0 +1,51 @@
+// SIMTOI shader configuration file in JSON format.
+
+{
+    "fragment_shader" : "disk_andrews2009_frag.glsl",
+    "human_name" : "Andrews 2009 Disk",
+    "param_0":
+    {
+        "name" : "rho0",
+        "min" : 0.1,
+        "max" : 100,
+        "default" : 1
+    },
+    "param_1":
+    {
+        "name" : "kappa",
+        "min" : 0.1,
+        "max" : 10,
+        "default" : 1
+    },
+    "param_2":
+    {
+        "name" : "r0",
+        "min" : 0.1,
+        "max" : 6,
+        "default" : 1
+    },
+    "param_3":
+    {
+        "name" : "h0",
+        "min" : 0.1,
+        "max" : 10,
+        "default" : 1
+    },
+    "param_4":
+    {
+        "name" : "gamma",
+        "min" : 0.1,
+        "max" : 10,
+        "default" : 1
+    },
+    "param_5":
+    {
+        "name" : "beta",
+        "min" : 0.1,
+        "max" : 10,
+        "default" : 1
+    },
+	"shader_id" : "disk_andrews2009",
+    "vertex_shader" : "default_vert.glsl"
+}
+
