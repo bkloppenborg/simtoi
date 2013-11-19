@@ -44,21 +44,12 @@ public:
 	CDensityDisk(int n_additional_params);
 	virtual ~CDensityDisk();
 
-//	virtual double Density(double radius, double height) = 0;
-
-//	void DrawDisk(double r_in, double r_out);
-//	void DrawSide(double radius);
-
 	static void GenreateCylinderRim(vector<vec3> & vertices, vector<unsigned int> & elements,
 			unsigned int z_divisions, unsigned int phi_divisions);
 
 	void Init();
 
-//	virtual double Opacity(double radius, double height, double wavelength) = 0;
-
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
-
-//	virtual double Transparency(double radius, double height, double wavelength);
 
 	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
 
