@@ -30,26 +30,35 @@
 
 class CDensityDisk: public CModel
 {
-protected:
-	int mSlices;
-	int mStacks;
-	double * mSinT;
-	double * mCosT;
+	protected:
+
+	unsigned int mNumElements;
+
+	GLuint mVAO;
+	GLuint mVBO;
+	GLuint mEBO;
+
+	bool mModelReady;
 
 public:
 	CDensityDisk(int n_additional_params);
 	virtual ~CDensityDisk();
 
-	virtual double Density(double radius, double height) = 0;
+//	virtual double Density(double radius, double height) = 0;
 
-	void DrawDisk(double r_in, double r_out);
-	void DrawSide(double radius);
+//	void DrawDisk(double r_in, double r_out);
+//	void DrawSide(double radius);
 
-	virtual double Opacity(double radius, double height, double wavelength) = 0;
+	static void GenreateCylinderRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+			unsigned int z_divisions, unsigned int phi_divisions);
 
-	void Render(GLuint framebuffer_object, int width, int height);
+	void Init();
 
-	virtual double Transparency(double radius, double height, double wavelength);
+//	virtual double Opacity(double radius, double height, double wavelength) = 0;
+
+	void Render(GLuint framebuffer_object, const glm::mat4 & view);
+
+//	virtual double Transparency(double radius, double height, double wavelength);
 
 	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
 

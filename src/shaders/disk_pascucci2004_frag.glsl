@@ -24,34 +24,37 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-in vec3 position;
-in vec3 normal;
-in vec2 vert_color;
+// Square root limb darkening
+// Implemented by decreasing the flux (color.x) of the vertex.
+in vec3 Normal;
+in vec2 Color;
+in vec3 ModelPosition;
 
-uniform mat4 rotation;
-uniform mat4 scale;
-uniform mat4 translation;
-uniform mat4 view;
-uniform vec2 uni_color = vec2(1.0, 1.0);// init to reasonable default
+uniform float rho0;
+uniform float kappa;
+uniform float r0;
+uniform float h0;
+uniform float alpha;
+uniform float beta;
 
-uniform bool color_from_uniform = true;
+out vec4 out_color;
 
-out vec3 Normal;
-out vec2 Color;
-out vec3 ModelPosition;
-
-void main() 
+void main(void)
 {
-	// The color can be either from a VBO or from a uniform, let the user decide.
-	if(color_from_uniform)
-		Color = uni_color;
-	else
-		Color = vert_color;
-	
-	// Rotate the normal vectors to match the orientation of the model
-	Normal =  (rotation * vec4(normal, 0.0)).xyz;
+    // Compute the radius and height of this fragment
+    float radius = sqrt(ModelPosition.x * ModelPosition.x + ModelPosition.y * ModelPosition.y);
+    float height = ModelPosition.z;
 
-	// Compute the positions of the vertices.
-	ModelPosition = (scale * vec4(position, 1.0)).xyz;
-    gl_Position = view * translation * rotation * scale * vec4(position, 1.0);
+    // Compute the density:
+    float midplane_density = rho0 * pow(radius / r0, -alpha);
+    float height_scaling = -0.5 * pow(height / (h0 * pow(radius / r0, beta)), 2);
+    float rho = rho0 * pow(radius / r0, -alpha) * exp(height_scaling);
+ 
+    // Compute the opacity:
+    // Nothing to do - assume opacity is constant w.r.t. wavelength.
+    
+    // Compute the transparency
+    float transparency = 1 - exp(-1 * kappa * rho);
+    
+    out_color = vec4(Color.x, 0.0, 0.0, Color.y * transparency);
 }
