@@ -6,6 +6,7 @@
 
 #include "CDensityDisk.h"
 #include "CShaderFactory.h"
+#include "CCylinder.h"
 
 CDensityDisk::CDensityDisk(int n_additional_params)
 : 	CModel(n_additional_params + 4)
@@ -74,52 +75,6 @@ CDensityDisk::~CDensityDisk()
 //	glEnd();
 //}
 
-/// Draws a unit cylindrical wall in the z-direction from (z = -0.5 ... 0.5, at r = 1)
-void CDensityDisk::GenreateCylinderRim(vector<vec3> & vertices, vector<unsigned int> & elements,
-		unsigned int z_divisions, unsigned int phi_divisions)
-{
-	double dz = 1.0 / z_divisions;
-
-	double sin_phi[phi_divisions];
-	double cos_phi[phi_divisions];
-	double dphi = 2 * M_PI / phi_divisions;
-	for(unsigned int i = 0; i < phi_divisions; i++)
-	{
-		sin_phi[i] = sin(dphi * i);
-		cos_phi[i] = cos(dphi * i);
-	}
-
-	// generate the vertices
-	double x, y;
-	for(double z = -0.5; z <= 0.5; z += dz)
-	{
-		for(unsigned int phi = 0; phi < phi_divisions; phi++)
-		{
-			x = cos_phi[phi];
-			y = sin_phi[phi];
-			vertices.push_back(vec3(x, y, z)); // vertex position
-			vertices.push_back(vec3(x, y, 0)); // normal vector
-		}
-	}
-
-	// now generate the indices
-	// Now assign the elements. Go in the same direction as the vertices were
-	// generated above, namely in rows by latitude.
-	for(unsigned int z = 0; z < z_divisions; z++)
-	{
-		for(unsigned int phi = 0; phi < phi_divisions; phi++)
-		{
-			elements.push_back(z * phi_divisions + phi);
-			elements.push_back((z + 1) * phi_divisions + phi);
-		}
-
-		// To complete a z-row, link back to the first two vertices
-		// in the row.
-		elements.push_back(z * phi_divisions);
-		elements.push_back((z + 1) * phi_divisions);
-	}
-}
-
 void CDensityDisk::Init()
 {
 	// Generate the verticies and elements
@@ -127,7 +82,7 @@ void CDensityDisk::Init()
 	vector<unsigned int> elements;
 	unsigned int z_divisions = 20;
 	unsigned int phi_divisions = 50;
-	GenreateCylinderRim(vbo_data, elements, z_divisions, phi_divisions);
+	CCylinder::GenreateRim(vbo_data, elements, z_divisions, phi_divisions);
 
 	mNumElements = elements.size();
 
