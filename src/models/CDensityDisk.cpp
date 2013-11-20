@@ -82,9 +82,17 @@ void CDensityDisk::Init()
 	vector<unsigned int> elements;
 	unsigned int z_divisions = 20;
 	unsigned int phi_divisions = 50;
-	CCylinder::GenreateRim(vbo_data, elements, z_divisions, phi_divisions);
+	unsigned int r_divisions = 20;
 
-	mNumElements = elements.size();
+	mRimStart = 0;
+	CCylinder::GenreateRim(vbo_data, elements, z_divisions, phi_divisions);
+	mRimSize = elements.size();
+	// Calculate the offset in vertex indexes for the GenerateMidplane function
+	// to generate correct element indices.
+	unsigned int vertex_offset = vbo_data.size() / 2;
+	mMidplaneStart = mRimSize;
+	CCylinder::GenerateMidplane(vbo_data, elements, vertex_offset, r_divisions, phi_divisions);
+	mMidplaneSize = elements.size() - mRimSize;
 
 	// Create a new Vertex Array Object, Vertex Buffer Object, and Element Buffer
 	// object to store the model's information.
@@ -193,8 +201,11 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		scale = h_scale * r_scale;
 
 		glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
-		glDrawElements(GL_TRIANGLE_STRIP, mNumElements, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLE_STRIP, mRimSize, GL_UNSIGNED_INT, 0);
 	}
+
+	// Draw the midplane
+	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
 	glEnable(GL_DEPTH_TEST);
 

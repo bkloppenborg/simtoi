@@ -32,7 +32,10 @@ class CDensityDisk: public CModel
 {
 	protected:
 
-	unsigned int mNumElements;
+	unsigned int mRimStart;
+	unsigned int mRimSize;
+	unsigned int mMidplaneStart;
+	unsigned int mMidplaneSize;
 
 	GLuint mVAO;
 	GLuint mVBO;
