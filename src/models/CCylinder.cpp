@@ -35,6 +35,8 @@
 CCylinder::CCylinder()
 	: CModel(2)
 {
+	mName = "Cylinder";
+
 	mParamNames.push_back("Diameter");
 	SetParam(mBaseParams + 1, 3.0);
 	SetFree(mBaseParams + 1, true);
