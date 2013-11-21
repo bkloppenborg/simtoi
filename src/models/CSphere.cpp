@@ -136,8 +136,8 @@ void CSphere::Init()
 	// Generate the verticies and elements
 	vector<vec3> vbo_data;
 	vector<unsigned int> elements;
-	unsigned int latitude_subdivisions = 20;
-	unsigned int longitude_subdivisions = 20;
+	unsigned int latitude_subdivisions = 50;
+	unsigned int longitude_subdivisions = 50;
 	GenerateSphere_LatLon(vbo_data, elements, latitude_subdivisions, longitude_subdivisions);
 
 	mNumElements = elements.size();
