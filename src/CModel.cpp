@@ -309,7 +309,7 @@ void CModel::Restore(Json::Value input)
 
 	auto position = positions.CreatePosition(position_id);
 	position->Restore(input["position_data"]);
-	SetPositionModel(position);
+	CModel::SetPositionModel(position);
 
 	// Find the shader
 	string shader_id = input["shader_id"].asString();
@@ -318,7 +318,7 @@ void CModel::Restore(Json::Value input)
 
 	auto shader = shaders.CreateShader(shader_id);
 	shader->Restore(input["shader_data"]);
-	SetShader(shader);
+	CModel::SetShader(shader);
 }
 
 /// \brief Serializes a model object into a JSON object.
