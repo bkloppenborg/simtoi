@@ -318,6 +318,14 @@ WorkerOperations CWorkerThread::GetNextOperation(void)
 	return tmp;
 }
 
+double CWorkerThread::GetTime()
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	return mModelList->GetTime();
+}
+
 void CWorkerThread::GetUncertainties(double * uncertainties, unsigned int size)
 {
 	// Get exclusive access to the worker
@@ -387,11 +395,11 @@ void CWorkerThread::run()
 	// Enable depth testing to permit vertex culling
 	glEnable(GL_DEPTH_TEST);
 	// Enable alpha blending
-	glEnable (GL_BLEND);
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Enable for wireframe-only model
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE );
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE );
 
 	// Initalize the window
 	glViewport(0, 0, mImageWidth, mImageHeight);
@@ -426,15 +434,6 @@ void CWorkerThread::run()
 		op = GetNextOperation();
 		switch(op)
 		{
-		case ANIMATE:
-			mModelList->SetTime(mModelList->GetTime() + mTempDouble);
-			Enqueue(RENDER);
-			Enqueue(ANIMATE);
-			break;
-
-		case ANIMATE_STOP:
-			ClearQueue();
-			break;
 
 		case BOOTSTRAP_NEXT:
 			mTaskList->BootstrapNext(mTempUint);
@@ -467,6 +466,10 @@ void CWorkerThread::run()
 		case RENDER:
 			mModelList->Render(mFBO, mView);
 			BlitToScreen(mFBO);
+			break;
+
+		case SET_TIME:
+			mModelList->SetTime(mTempDouble);
 			break;
 
 		default:
@@ -504,6 +507,17 @@ void CWorkerThread::SetSize(unsigned int width, unsigned int height)
 	mImageHeight = height;
 }
 
+void CWorkerThread::SetTime(double time)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mTempDouble = time;
+	Enqueue(SET_TIME);
+	Enqueue(RENDER);
+}
+
+
 Json::Value CWorkerThread::Serialize()
 {
 	// Get exclusive access to the worker
@@ -512,19 +526,6 @@ Json::Value CWorkerThread::Serialize()
 	Json::Value temp = mModelList->Serialize();
 
 	return temp;
-}
-
-void CWorkerThread::startAnimation(double timestep)
-{
-	QMutexLocker lock(&mWorkerMutex);
-	mTempDouble = timestep;
-	Enqueue(ANIMATE);
-}
-
-void CWorkerThread::stopAnimation()
-{
-	QMutexLocker lock(&mWorkerMutex);
-	Enqueue(ANIMATE_STOP);
 }
 
 void CWorkerThread::stop()

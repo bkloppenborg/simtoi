@@ -130,42 +130,6 @@ QMdiSubWindow * gui_main::AddGLArea(CGLWidget * gl_widget)
 	return sw;
 }
 
-void gui_main::Animation_StartStop()
-{
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-//
-//	if(mAnimating)
-//	{
-//		widget->EnqueueOperation(GLT_AnimateStop);
-//		mAnimating = false;
-//		this->btnStartStop->setText("Start");
-//	}
-//	else
-//	{
-//		widget->SetTimestep(this->spinTimeStep->value());
-//		widget->EnqueueOperation(GLT_Animate);
-//		mAnimating = true;
-//		this->btnStartStop->setText("Stop");
-//	}
-}
-
-void gui_main::Animation_Reset()
-{
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-
-//	widget->SetTime(this->spinTimeStart->value());
-//	widget->EnqueueOperation(GLT_RenderModels);
-
-}
-
 /// Checks to see which buttons can be enabled/disabled.
 void gui_main::ButtonCheck()
 {
@@ -175,27 +139,14 @@ void gui_main::ButtonCheck()
 	this->btnEditModel->setEnabled(false);
 	this->btnDeleteModel->setEnabled(false);
 	this->btnRemoveData->setEnabled(false);
-	this->btnStartStop->setEnabled(true);
-	this->btnReset->setEnabled(false);
 	this->btnMinimizerStartStop->setEnabled(true);
-	this->btnSavePhotometry->setEnabled(false);
-	this->btnSaveFITS->setEnabled(false);
-	this->btnSetTime->setEnabled(false);
 
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-    // Animation / data export area
-	this->btnStartStop->setEnabled(true);
-	this->btnReset->setEnabled(true);
-	this->btnSavePhotometry->setEnabled(true);
-	this->btnSaveFITS->setEnabled(true);
-	this->btnSetTime->setEnabled(true);
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
 
 	// Buttons for add/delete data
 	this->btnAddData->setEnabled(true);
-	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
 	if(widget->GetOpenFileModel()->rowCount() > 0)
 		this->btnRemoveData->setEnabled(true);
 
@@ -253,7 +204,7 @@ void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, 
 	Open(model_files);
 
 	// Get a pointer to the active model area.
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
+    QMdiSubWindow * sw = GetCurrentSubwindow();
     if(!sw)
     	return;
 
@@ -261,6 +212,21 @@ void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, 
 	AddData(data_files, sw);
 	MinimizerRun(minimizer, sw);
 	mAutoClose = close_simtoi;
+}
+
+QMdiSubWindow * gui_main::GetCurrentSubwindow()
+{
+    return this->mdiArea->activeSubWindow();
+}
+
+CGLWidget * gui_main::GetCurrentGLWidget()
+{
+    QMdiSubWindow * sw = GetCurrentSubwindow();
+    if(!sw)
+    	return NULL;
+
+	// We have a valid subwindow, so cast it into a CGLWidget
+	return dynamic_cast<CGLWidget*>(sw->widget());
 }
 
 /// Runs initialization routines for the main this->
@@ -470,11 +436,10 @@ void gui_main::on_btnAddData_clicked(void)
 
 void gui_main::on_btnAddModel_clicked(void)
 {
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
 
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
     int id = 0;
     int n_features;
 
@@ -503,13 +468,10 @@ void gui_main::on_btnEditModel_clicked()
 void gui_main::on_btnMinimizerStartStop_clicked()
 {
 	/// TODO: Handle thread-execution exceptions that might be thrown.
-
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	// We have a valid subwindow, so cast it into a CGLWidget
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+	QMdiSubWindow * sw = GetCurrentSubwindow();
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
 
 	// If the minimizer is running, stop it.
 	if(widget->GetMinimizerRunning())
@@ -523,14 +485,56 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 	ButtonCheck();
 }
 
+void gui_main::on_btnPlayPause_clicked()
+{
+
+}
+
+void gui_main::render_at_time(double time)
+{
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
+
+	widget->SetTime(time);
+	widget->Render();
+}
+
+void gui_main::on_btnStepBackward_clicked()
+{
+	double time = doubleSpinBoxJD->value();
+	double dt = doubleSpinBoxRate->value();
+	doubleSpinBoxJD->setValue(time - dt);
+}
+
+void gui_main::on_btnStepBackward2_clicked()
+{
+	double time = doubleSpinBoxJD->value();
+	double dt = doubleSpinBoxRate->value();
+	doubleSpinBoxJD->setValue(time - 10 * dt);
+}
+
+void gui_main::on_btnStepForward_clicked()
+{
+	double time = doubleSpinBoxJD->value();
+	double dt = doubleSpinBoxRate->value();
+	doubleSpinBoxJD->setValue(time + dt);
+}
+
+void gui_main::on_btnStepForward2_clicked()
+{
+	double time = doubleSpinBoxJD->value();
+	double dt = doubleSpinBoxRate->value();
+	doubleSpinBoxJD->setValue(time + 10 * dt);
+}
+
 void gui_main::on_mdiArea_subWindowActivated()
 {
 	ButtonCheck();
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
 
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
 
 	// Configure the open file widget:
 	this->treeOpenFiles->setHeaderHidden(false);
@@ -559,13 +563,9 @@ void gui_main::on_btnNewModelArea_clicked()
 /// Removes the current selected data set.
 void gui_main::on_btnRemoveData_clicked()
 {
-	// Ensure there is a selected widget, if not immediately return.
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-    // Get access to the current widget, and QStandardItemModel list
-    CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
 
     // Get the selected indicies:
     QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedIndexes();
@@ -581,42 +581,7 @@ void gui_main::on_btnRemoveData_clicked()
     }
 }
 
-
-void gui_main::render()
+void gui_main::on_doubleSpinBoxJD_valueChanged(double jd)
 {
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-	CGLWidget *widget = dynamic_cast<CGLWidget*>(sw->widget());
-    if(widget)
-    {
-//    	widget->EnqueueOperation(GLT_RenderModels);
-    }
+	render_at_time(jd);
 }
-
-/// Sets the time from the current selected datafile.
-void gui_main::SetTime(void)
-{
-    QMdiSubWindow * sw = this->mdiArea->activeSubWindow();
-    if(!sw)
-    	return;
-
-    // Get access to the current widget, and QStandardItemModel list
-    CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
-
-    // Get the selected indicies:
-    QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedIndexes();
-    QStandardItemModel * model = widget->GetOpenFileModel();
-
-    // Ensure there is data present before continuing.
-    if(list.size() == 0)
-    	return;
-
-    QList<QModelIndex>::iterator it = list.begin();
-    int id = (*it).row();
-//    double t = widget->GetDataAveJD(id);
-//    widget->SetTime(t);
-//    widget->EnqueueOperation(GLT_RenderModels);
-}
-

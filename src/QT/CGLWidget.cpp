@@ -177,6 +177,11 @@ bool CGLWidget::GetMinimizerRunning()
 	return mMinimizer->isRunning();
 }
 
+double CGLWidget::GetTime()
+{
+	return mWorker->GetTime();
+}
+
 void CGLWidget::on_mTreeModel_parameterUpdated()
 {
 	mWorker->Render();
@@ -276,6 +281,11 @@ void CGLWidget::RebuildTree()
 	}
 }
 
+void CGLWidget::Render()
+{
+	mWorker->Render();
+}
+
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
 	// do nothing, the area cannot be resized once created
@@ -320,6 +330,11 @@ void CGLWidget::SetSaveDirectory(string directory_path)
 void CGLWidget::SetSize(unsigned int width, unsigned int height)
 {
 	mWorker->SetSize(width, height);
+}
+
+void CGLWidget::SetTime(double time)
+{
+	mWorker->SetTime(time);
 }
 
 void CGLWidget::startRendering()

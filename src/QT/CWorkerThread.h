@@ -69,14 +69,13 @@ typedef shared_ptr<COpenCL> COpenCLPtr;
 
 enum WorkerOperations
 {
-	ANIMATE,
-	ANIMATE_STOP,
 	BOOTSTRAP_NEXT,
 	EXPORT,
 	GET_CHI,
 	GET_UNCERTAINTIES,
 	OPEN_DATA,
 	RENDER,
+	SET_TIME,
 	STOP
 };
 
@@ -147,6 +146,7 @@ public:
 public:
     void AddModel(CModelPtr model);
     void AllocateBuffer();
+
 public:
     void BlitToBuffer(GLuint in_buffer, GLuint out_buffer);
     void BlitToScreen(GLuint FBO);
@@ -165,6 +165,7 @@ public:
 public:
     void ExportResults(QString save_folder);
 
+    double GetTime();
     void GetChi(double * chi, unsigned int size);
     unsigned int GetDataSize();
     QStringList GetFileFilters();
@@ -189,9 +190,8 @@ public:
 
     void SetScale(double scale);
     void SetSize(unsigned int width, unsigned int height);
+    void SetTime(double time);
     Json::Value Serialize();
-    void startAnimation(double timestep);
-    void stopAnimation();
     void stop();
 protected:
     void SwapBuffers();

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>621</height>
+    <width>892</width>
+    <height>805</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -158,7 +158,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -181,118 +181,165 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Start</string>
+         <widget class="QSlider" name="sliderAnimation">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+          <property name="invertedControls">
+           <bool>false</bool>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::NoTicks</enum>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Step</string>
+         <widget class="QDoubleSpinBox" name="doubleSpinBoxJD">
+          <property name="decimals">
+           <number>4</number>
+          </property>
+          <property name="maximum">
+           <double>2760000.000000000000000</double>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Duration</string>
+           <string>JD</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QDoubleSpinBox" name="spinTimeStart">
-          <property name="maximum">
-           <double>3000000.000000000000000</double>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
-          <property name="singleStep">
-           <double>100.000000000000000</double>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
-          <property name="value">
-           <double>0.000000000000000</double>
-          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QPushButton" name="btnStepBackward2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&lt;&lt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnStepBackward">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&lt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnPlayPause">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>P</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnStepForward">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnStepForward2">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&gt;&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QDoubleSpinBox" name="spinTimeStep">
-          <property name="minimum">
-           <double>-1000.000000000000000</double>
+         <widget class="QDoubleSpinBox" name="doubleSpinBoxRate">
+          <property name="decimals">
+           <number>4</number>
           </property>
           <property name="maximum">
            <double>1000.000000000000000</double>
           </property>
-          <property name="value">
-           <double>1.000000000000000</double>
-          </property>
          </widget>
         </item>
         <item row="1" column="2">
-         <widget class="QDoubleSpinBox" name="spinTimeDuration">
-          <property name="maximum">
-           <double>100000.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>100.000000000000000</double>
-          </property>
-          <property name="value">
-           <double>100.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="btnStartStop">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-            <horstretch>85</horstretch>
-            <verstretch>27</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="btnReset">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Reset</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="btnSaveFITS">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Save FITS</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="btnSetTime">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Set Time</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="btnSavePhotometry">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Save Flux</string>
+           <string>Rate</string>
           </property>
          </widget>
         </item>
@@ -345,7 +392,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>892</width>
      <height>25</height>
     </rect>
    </property>

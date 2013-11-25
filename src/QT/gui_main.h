@@ -72,6 +72,9 @@ protected:
 public:
     void CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, bool close_simtoi);
 
+    QMdiSubWindow * GetCurrentSubwindow();
+    CGLWidget * GetCurrentGLWidget();
+
 protected:
     void MinimizerRun(string MinimizerID, QMdiSubWindow * sw);
     void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
@@ -83,15 +86,16 @@ protected:
     void Init();
 
 public:
+    void render_at_time(double time);
+
+public:
     void SetOutputDir(string folder_name);
 
 private slots:
-    void Animation_StartStop();
-    void Animation_Reset();
-    void render();
-    void SetTime();
-
     void minimizerFinished();
+
+    void on_doubleSpinBoxJD_valueChanged(double jd);
+
     void on_actionExport_triggered();
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
@@ -103,6 +107,12 @@ private slots:
     void on_btnMinimizerStartStop_clicked();
     void on_btnNewModelArea_clicked();
     void on_mdiArea_subWindowActivated();
+
+    void on_btnPlayPause_clicked();
+    void on_btnStepBackward_clicked();
+    void on_btnStepBackward2_clicked();
+    void on_btnStepForward_clicked();
+    void on_btnStepForward2_clicked();
 
 };
 

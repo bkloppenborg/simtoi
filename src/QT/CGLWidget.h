@@ -80,6 +80,7 @@ public:
     QStringList GetFileFilters();
     string GetMinimizerID();
     bool GetMinimizerRunning();
+    double GetTime();
 
     QStandardItemModel * GetOpenFileModel() { return &mOpenFileModel; };
     CTreeModel * GetTreeModel() { return &mTreeModel; };
@@ -97,14 +98,16 @@ public:
 
 protected:
     void RebuildTree();
-
 public:
+    void Render();
+
     void Save(string filename);
     void SetScale(double scale);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetMinimizer(CMinimizerPtr minimizer);
     void SetSaveDirectory(string directory_path);
     void SetSize(unsigned int width, unsigned int height);
+    void SetTime(double time);
     void startMinimizer();
     void startRendering();
     void stopMinimizer();
