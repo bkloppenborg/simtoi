@@ -33,6 +33,7 @@
 #include "CMultiNest.h"
 #include <limits>
 #include <cmath>
+#include <stdexcept>
 
 #include "CWorkerThread.h"
 #include "CModelList.h"
@@ -152,7 +153,17 @@ void CMultiNest::ResultFromSummaryFile(string multinest_root)
 	double best_logZ = -numeric_limits<double>::max();
 	double logZ = 0;
 
-	vector<string> lines = ReadFile(multinest_root + "summary.txt", "", "Could not read multinestsummary.txt file.");
+	vector<string> lines;
+
+	try
+	{
+		lines = ReadFile(multinest_root + "summary.txt", "", "Could not read multinestsummary.txt file.");
+	}
+	catch(runtime_error e)
+	{
+		cout << e.what() << endl;
+		cout << "Best-fit parameters and exported values will be invalid." << endl;
+	}
 
 	for(auto line : lines)
 	{
