@@ -494,14 +494,14 @@ void gui_main::on_btnPlayPause_clicked()
 	if(widget->IsAnimating())
 	{
 		widget->StopAnimation();
-		btnPlayPause->SetText("P");
+		btnPlayPause->setText("P");
 	}
 	else
 	{
 		double time = doubleSpinBoxJD->value();
 		double step = doubleSpinBoxRate->value();
 		widget->StartAnimation(time, step);
-		btnPlayPause->SetText("||");
+		btnPlayPause->setText("||");
 	}
 
 }

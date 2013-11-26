@@ -91,6 +91,8 @@ public:
     unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
     string GetSaveFolder() { return mSaveDirectory; };
 
+    bool IsAnimating();
+
 protected:
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);

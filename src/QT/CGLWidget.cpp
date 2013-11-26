@@ -182,6 +182,11 @@ double CGLWidget::GetTime()
 	return mWorker->GetTime();
 }
 
+bool CGLWidget::IsAnimating()
+{
+	return false;
+}
+
 void CGLWidget::on_mTreeModel_parameterUpdated()
 {
 	mWorker->Render();
@@ -337,12 +342,12 @@ void CGLWidget::SetTime(double time)
 	mWorker->SetTime(time);
 }
 
-void StartAnimation(double start_time, double time_step)
+void CGLWidget::StartAnimation(double start_time, double time_step)
 {
 
 }
 
-void StopAnimation()
+void CGLWidget::StopAnimation()
 {
 
 }

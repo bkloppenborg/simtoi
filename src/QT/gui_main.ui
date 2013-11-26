@@ -268,6 +268,9 @@
            </item>
            <item>
             <widget class="QPushButton" name="btnPlayPause">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="minimumSize">
               <size>
                <width>30</width>
