@@ -92,20 +92,21 @@ void CBenchmark::run()
 
 	int start = GetMilliCount();
 
-	for(int i = 0; i < n_iterations && mRun; i++)
+	int iterations;
+	for(iterations = 0; iterations < n_iterations && mRun; iterations++)
 	{
 		mWorkerThread->GetChi(&mChis[0], mChis.size());
 		chi2r = ComputeChi2r(mChis, mNParams);
 
-		if(i % 100 == 0)
-			printf("Iteration %i Chi2r: %f\n", i, chi2r);
+		if(iterations % 100 == 0)
+			printf("Iteration %i Chi2r: %f\n", iterations, chi2r);
 	}
 
 	// Calculate the time, print out a nice message.
 	time = double(GetMilliSpan(start)) / 1000;
 	cout << "Benchmark Test completed!" << endl;
-	cout << "Completed " << n_iterations << " iterations in " << time << " seconds." << endl;
-	cout << "Throughput: " << n_iterations/time << " iterations/second." << endl;
+	cout << "Completed " << iterations << " iterations in " << time << " seconds." << endl;
+	cout << "Throughput: " << iterations/time << " iterations/second." << endl;
 
 	mIsRunning = false;
 }
