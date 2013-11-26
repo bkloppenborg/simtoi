@@ -57,9 +57,8 @@ protected:
 	GLuint mShader_vertex;
 	GLuint mShader_fragment;
 	GLuint * mParam_locations;
-	GLuint mMinXYZ_location;
-	GLuint mMaxXYZ_location;
-	string mBase_name;
+	string mVertShaderFileName;
+	string mFragShaderFilename;
 	string mShader_dir;
 
 	string mShaderID;
@@ -69,20 +68,22 @@ protected:
 public:
 	CShader(const CShader & other);
 	CShader(string json_config_file);
-	CShader(string shader_id, string shader_dir, string base_filename, string friendly_name, int n_parameters, vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax);
+	CShader(string shader_id, string shader_dir, string vertex_shader_filename, string fragment_shader_filename,
+			string friendly_name, int n_parameters,
+			vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax);
 	virtual ~CShader();
 
 	void CompileShader(GLuint shader);
 
 	string GetID() { return mShaderID; };
+	GLuint GetProgram();
 
 	void Init();
 
 	void LinkProgram(GLuint program);
 
-	void UseShader(double min_xyz[3], double max_xyz[3]);
-	void UseShader(double min_xyz[3], double max_xyz[3], double * params, unsigned int in_params);
-
+	void UseShader();
+	void UseShader(double * params, unsigned int in_params);
 };
 
 #endif /* CGLSHADER_H_ */

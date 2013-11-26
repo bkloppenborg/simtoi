@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -26,19 +26,35 @@
  
 // Square root limb darkening
 // Implemented by decreasing the flux (color.x) of the vertex.
-in vec3 normal;
-in vec4 color;
-uniform float a1;
-uniform float a2;
+in vec3 Normal;
+in vec2 Color;
+in vec3 ModelPosition;
+
+uniform float rho0;
+uniform float kappa;
+uniform float r0;
+uniform float h0;
+uniform float alpha;
+uniform float beta;
+
+out vec4 out_color;
 
 void main(void)
 {
-    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
-    
-    // Simple quadratic limb darkening:
-    float intensity = 1;
-	intensity -= a1 * (1 - mu);
-	intensity -= a2 * (1 - sqrt(mu));
+    // Compute the radius and height of this fragment
+    float radius = sqrt(ModelPosition.x * ModelPosition.x + ModelPosition.y * ModelPosition.y);
+    float height = ModelPosition.z;
 
-    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
+    // Compute the density:
+    float midplane_density = rho0 * pow(radius / r0, -alpha);
+    float height_scaling = -0.5 * pow(height / (h0 * pow(radius / r0, beta)), 2);
+    float rho = rho0 * pow(radius / r0, -alpha) * exp(height_scaling);
+ 
+    // Compute the opacity:
+    // Nothing to do - assume opacity is constant w.r.t. wavelength.
+    
+    // Compute the transparency
+    float transparency = 1 - exp(-1 * kappa * rho);
+    
+    out_color = vec4(Color.x, 0.0, 0.0, Color.y * transparency);
 }

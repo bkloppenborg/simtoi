@@ -53,11 +53,8 @@ add_subdirectory(src)
 file(GLOB KERNELS ${CMAKE_SOURCE_DIR}/lib/liboi/src/kernels/*.cl)
 file(COPY ${KERNELS} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/kernels/)
 
-file(GLOB SHADERS_FRAG ${CMAKE_SOURCE_DIR}/src/shaders/*.frag)
+file(GLOB SHADERS_FRAG ${CMAKE_SOURCE_DIR}/src/shaders/*.glsl)
 file(COPY ${SHADERS_FRAG} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/shaders/)
-
-file(GLOB SHADERS_VERT ${CMAKE_SOURCE_DIR}/src/shaders/*.vert)
-file(COPY ${SHADERS_VERT} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/shaders/)
 
 file(GLOB SHADERS_CONFIG ${CMAKE_SOURCE_DIR}/src/shaders/*.json)
 file(COPY ${SHADERS_CONFIG} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/shaders/)

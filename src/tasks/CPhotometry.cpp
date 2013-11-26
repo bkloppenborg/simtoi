@@ -40,10 +40,10 @@ extern string EXE_FOLDER;
 CPhotometry::CPhotometry(CWorkerThread * WorkerThread)
 	: CTask(WorkerThread)
 {
-    mFBO = 0;
+	mFBO = 0;
 	mFBO_texture = 0;
 	mFBO_depth = 0;
-    mFBO_storage = 0;
+	mFBO_storage = 0;
 	mFBO_storage_texture = 0;
 
 	mLibOI = NULL;
@@ -292,19 +292,19 @@ double CPhotometry::SimulatePhotometry(CModelListPtr model_list, double jd)
 	double sim_flux = 0;
 
 	// Set the time, render the model
-//	model_list->SetTime(jd);
-	model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+	model_list->SetTime(jd);
+	model_list->Render(mFBO, mWorkerThread->GetView());
 
 	// Blit to the storage buffer (for liboi to use the image)
-//	mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+	mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
 	// Blit to the screen (to show the user, not required, but nice.
-//	mWorkerThread->BlitToScreen(mFBO);
-//
-//	// Compute the flux:
-//	mLibOI->CopyImageToBuffer(0);
-//
-//	// Get the simulated flux, convert it to a simulated magnitude using
-//	// -2.5 * log(counts)
-//	sim_flux = mLibOI->TotalFlux(true);
+	mWorkerThread->BlitToScreen(mFBO);
+
+	// Compute the flux:
+	mLibOI->CopyImageToBuffer(0);
+
+	// Get the simulated flux, convert it to a simulated magnitude using
+	// -2.5 * log(counts)
+	sim_flux = mLibOI->TotalFlux(true);
 	return -2.5 * log10(sim_flux);
 }

@@ -22,11 +22,7 @@ public:
 
 	static shared_ptr<CModel> Create();
 
-	double Density(double radius, double height);
-
 	virtual string GetID() { return "disk_andrews2009"; };
-
-	double Opacity(double radius, double height, double wavelength);
 };
 
 #endif /* CDISK_ANDREWS2009_H_ */

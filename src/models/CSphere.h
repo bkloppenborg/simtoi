@@ -38,7 +38,14 @@
 class CSphere: public CModel
 {
 protected:
-	int mSlices;
+
+	unsigned int mNumElements;
+
+	GLuint mVAO;
+	GLuint mVBO;
+	GLuint mEBO;
+
+	bool mModelReady;
 
 public:
 	CSphere();
@@ -49,7 +56,12 @@ public:
 	virtual string GetID() { return "sphere"; };
 	double GetMaxHeight();
 
-	void Render(GLuint framebuffer_object, int width, int height);
+	static void GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int> & elements,
+			unsigned int latitude_subdivisions, unsigned int longitude_subdivisions);
+
+	void Init();
+
+	void Render(GLuint framebuffer_object, const glm::mat4 & view);
 };
 
 #endif /* CSPHERE_H_ */

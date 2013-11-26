@@ -36,11 +36,7 @@ public:
 
 	static shared_ptr<CModel> Create();
 
-	double Density(double radius, double height);
-
 	virtual string GetID() { return "disk_pascucci2004"; };
-
-	double Opacity(double radius, double height, double wavelength);
 };
 
 #endif /* CDISK_PASCUCCI2004_H_ */

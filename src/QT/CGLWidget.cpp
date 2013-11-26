@@ -177,6 +177,11 @@ bool CGLWidget::GetMinimizerRunning()
 	return mMinimizer->isRunning();
 }
 
+double CGLWidget::GetTime()
+{
+	return mWorker->GetTime();
+}
+
 void CGLWidget::on_mTreeModel_parameterUpdated()
 {
 	mWorker->Render();
@@ -276,6 +281,11 @@ void CGLWidget::RebuildTree()
 	}
 }
 
+void CGLWidget::Render()
+{
+	mWorker->Render();
+}
+
 void CGLWidget::resizeEvent(QResizeEvent *evt)
 {
 	// do nothing, the area cannot be resized once created
@@ -322,15 +332,19 @@ void CGLWidget::SetSize(unsigned int width, unsigned int height)
 	mWorker->SetSize(width, height);
 }
 
-void CGLWidget::startRendering()
+void CGLWidget::SetTime(double time)
 {
-	// Tell the thread to start.
-    mWorker->start();
+	mWorker->SetTime(time);
 }
 
-void CGLWidget::stopRendering()
+void StartAnimation(double start_time, double time_step)
 {
-    mWorker->stop();
+
+}
+
+void StopAnimation()
+{
+
 }
 
 void CGLWidget::startMinimizer()
@@ -349,5 +363,16 @@ void CGLWidget::stopMinimizer()
 
 	// Stop the thread. If it was running, join it.
 	mMinimizer->stop();
+}
+
+void CGLWidget::startRendering()
+{
+	// Tell the thread to start.
+    mWorker->start();
+}
+
+void CGLWidget::stopRendering()
+{
+    mWorker->stop();
 }
 

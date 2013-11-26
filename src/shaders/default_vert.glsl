@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -24,17 +24,34 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Logarithmic root limb darkening
-// Implemented using alpha blending.
-varying out vec3 normal;
-varying out vec4 color;
+in vec3 position;
+in vec3 normal;
+in vec2 vert_color;
 
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+uniform mat4 rotation;
+uniform mat4 scale;
+uniform mat4 translation;
+uniform mat4 view;
+uniform vec2 uni_color = vec2(1.0, 1.0);// init to reasonable default
 
-void main(void)
+uniform bool color_from_uniform = true;
+
+out vec3 Normal;
+out vec2 Color;
+out vec3 ModelPosition;
+
+void main() 
 {
-    normal = gl_NormalMatrix * gl_Normal;
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	// The color can be either from a VBO or from a uniform, let the user decide.
+	if(color_from_uniform)
+		Color = uni_color;
+	else
+		Color = vert_color;
+	
+	// Rotate the normal vectors to match the orientation of the model
+	Normal =  (rotation * vec4(normal, 0.0)).xyz;
+
+	// Compute the positions of the vertices.
+	ModelPosition = (scale * vec4(position, 1.0)).xyz;
+    gl_Position = view * translation * rotation * scale * vec4(position, 1.0);
 }

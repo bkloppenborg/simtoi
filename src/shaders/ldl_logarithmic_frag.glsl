@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -26,19 +26,19 @@
  
 // Logarithmic root limb darkening
 // Implemented by decreasing the flux (color.x) of the vertex.
-in vec3 normal;
-in vec4 color;
+in vec3 Normal;
+in vec2 Color;
 uniform float a1;
 uniform float a2;
 
 void main(void)
 {
-    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
+    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
     
     // Simple logarithmic limb darkening:
     float intensity = 1;
 	intensity -= a1 * (1 - mu);
 	intensity -= a2 * mu * log(mu);
 
-    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
+    gl_FragColor = vec4(intensity * Color.x, 0, 0, Color.y);
 }

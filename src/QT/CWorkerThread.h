@@ -53,6 +53,7 @@
 #include "json/json.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <glm/glm.hpp>
 
 using namespace std;
 
@@ -68,14 +69,13 @@ typedef shared_ptr<COpenCL> COpenCLPtr;
 
 enum WorkerOperations
 {
-	ANIMATE,
-	ANIMATE_STOP,
 	BOOTSTRAP_NEXT,
 	EXPORT,
 	GET_CHI,
 	GET_UNCERTAINTIES,
 	OPEN_DATA,
 	RENDER,
+	SET_TIME,
 	STOP
 };
 
@@ -105,6 +105,7 @@ protected:
     double mImageScale;
     unsigned int mImageWidth;
     unsigned int mImageSamples;
+    glm::mat4 mView;
 
     // Off-screen framebuffer (this matches the buffer created by CreateGLBuffer)
     // All rendering from the UI happens in these buffers. Results are blitted to screen.
@@ -145,6 +146,7 @@ public:
 public:
     void AddModel(CModelPtr model);
     void AllocateBuffer();
+
 public:
     void BlitToBuffer(GLuint in_buffer, GLuint out_buffer);
     void BlitToScreen(GLuint FBO);
@@ -164,6 +166,7 @@ public:
 public:
     void ExportResults(QString save_folder);
 
+    double GetTime();
     void GetChi(double * chi, unsigned int size);
     unsigned int GetDataSize();
     QStringList GetFileFilters();
@@ -177,6 +180,7 @@ public:
     unsigned int GetImageWidth() { return mImageWidth; };
     double GetImageScale() { return mImageScale; };
     COpenCLPtr GetOpenCL() { return mOpenCL; };
+    glm::mat4 GetView() { return mView; };
 
     void OpenData(string filename);
 
@@ -187,9 +191,8 @@ public:
 
     void SetScale(double scale);
     void SetSize(unsigned int width, unsigned int height);
+    void SetTime(double time);
     Json::Value Serialize();
-    void startAnimation(double timestep);
-    void stopAnimation();
     void stop();
 protected:
     void SwapBuffers();

@@ -27,6 +27,9 @@
 #include "CWorkerThread.h"
 #include <QMutexLocker>
 #include <stdexcept>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
@@ -318,6 +321,14 @@ WorkerOperations CWorkerThread::GetNextOperation(void)
 	return tmp;
 }
 
+double CWorkerThread::GetTime()
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	return mModelList->GetTime();
+}
+
 void CWorkerThread::GetUncertainties(double * uncertainties, unsigned int size)
 {
 	// Get exclusive access to the worker
@@ -371,28 +382,36 @@ void CWorkerThread::run()
     // claim the OpenGL context:
     mGLWidget->makeCurrent();
 
+    // Setup the OpenGL context
+    // Set the clear color to black:
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-	// Set to flat (non-interpolated) shading:
-	glShadeModel(GL_SMOOTH);
+	// Dithering is a fractional pixel filling technique that allows you to
+	// combine some colors to create the effect of other colors. The non-full
+	// fill fraction of pixels could negativly impact the interferometric
+	// quantities we wish to simulate. So, disable dithering.
 	glDisable(GL_DITHER);
-	glEnable(GL_DEPTH_TEST);    // enable the Z-buffer depth testing
-
-	// Enable alpha blending:
-	glEnable (GL_BLEND);
+	// Enable multi-sample anti-aliasing to improve the effective resolution
+	// of the model area.
+	glEnable(GL_MULTISAMPLE);
+	// Set the shading model to smooth, interpolated shading by default:
+	glShadeModel(GL_SMOOTH);
+	// Enable depth testing to permit vertex culling
+	glEnable(GL_DEPTH_TEST);
+	// Enable alpha blending
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Enable multisample anti-aliasing.
-	glEnable(GL_MULTISAMPLE);
+	// Enable for wireframe-only model
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE );
 
-	// Resize the screen, then cascade to a render and a blit.
-    glViewport(0, 0, mImageWidth, mImageHeight);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    double half_width = mImageWidth * mImageScale / 2;
-    double half_height = mImageHeight * mImageScale / 2;
-    double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
-	glOrtho(-half_width, half_width, -half_height, half_height, -depth, depth);
-    glMatrixMode(GL_MODELVIEW);
+	// Initalize the window
+	glViewport(0, 0, mImageWidth, mImageHeight);
+
+	// Setup the view:
+	double half_width = mImageWidth * mImageScale / 2;
+	double half_height = mImageHeight * mImageScale / 2;
+	double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
+	mView = glm::ortho(-half_width, half_width, -half_height, half_height, -depth, depth);
 
 	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
 
@@ -418,15 +437,6 @@ void CWorkerThread::run()
 		op = GetNextOperation();
 		switch(op)
 		{
-		case ANIMATE:
-			mModelList->SetTime(mModelList->GetTime() + mTempDouble);
-			Enqueue(RENDER);
-			Enqueue(ANIMATE);
-			break;
-
-		case ANIMATE_STOP:
-			ClearQueue();
-			break;
 
 		case BOOTSTRAP_NEXT:
 			mTaskList->BootstrapNext(mTempUint);
@@ -457,8 +467,12 @@ void CWorkerThread::run()
 			mWorkerSemaphore.release(1);
 
 		case RENDER:
-			mModelList->Render(mFBO, mImageWidth, mImageHeight);
+			mModelList->Render(mFBO, mView);
 			BlitToScreen(mFBO);
+			break;
+
+		case SET_TIME:
+			mModelList->SetTime(mTempDouble);
 			break;
 
 		default:
@@ -496,6 +510,17 @@ void CWorkerThread::SetSize(unsigned int width, unsigned int height)
 	mImageHeight = height;
 }
 
+void CWorkerThread::SetTime(double time)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mTempDouble = time;
+	Enqueue(SET_TIME);
+	Enqueue(RENDER);
+}
+
+
 Json::Value CWorkerThread::Serialize()
 {
 	// Get exclusive access to the worker
@@ -504,19 +529,6 @@ Json::Value CWorkerThread::Serialize()
 	Json::Value temp = mModelList->Serialize();
 
 	return temp;
-}
-
-void CWorkerThread::startAnimation(double timestep)
-{
-	QMutexLocker lock(&mWorkerMutex);
-	mTempDouble = timestep;
-	Enqueue(ANIMATE);
-}
-
-void CWorkerThread::stopAnimation()
-{
-	QMutexLocker lock(&mWorkerMutex);
-	Enqueue(ANIMATE_STOP);
 }
 
 void CWorkerThread::stop()

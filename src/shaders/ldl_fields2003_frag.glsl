@@ -1,6 +1,6 @@
-#version 120
+#version 150 core
 /* 
- * Copyright (c) 2012 Brian Kloppenborg
+ * Copyright (c) 2013 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -23,11 +23,22 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+// A flux-conserving square-root limb darkening law based on Fields (2003)
+// Implemented by decreasing the flux (color.x) of the vertex.
+in vec3 Normal;
+in vec2 Color;
+uniform float A;
+uniform float B;
 
-// Default (do nothing) fragement shader.
-in vec4 color;
+out vec4 out_color;
 
 void main(void)
 {
-    gl_FragColor = color;
+    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
+    float intensity = 1;
+    intensity -= A * (1 - 1.5*mu);
+    intensity -= B * (1 - 2.5*sqrt(mu));
+
+    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
 }

@@ -50,6 +50,11 @@
 #include <cstdio>
 #include <cassert>
 #include <memory>
+// OpenGL Math Library code.
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+using namespace glm;
 
 using namespace std;
 
@@ -90,9 +95,8 @@ protected:
 	double mScale;
 
 protected:
-	void Color();
-	void Rotate();
-	void Translate();
+	glm::mat4 Rotate();
+	glm::mat4 Translate();
 
 public:
 	static void CircleTable( double * sint, double * cost, const int n );
@@ -119,7 +123,7 @@ public:
 	CShaderPtr GetShader(void);
 	int GetTotalFreeParameters();
 
-	virtual void Render(GLuint framebuffer_object, int width, int height) = 0;
+	virtual void Render(GLuint framebuffer_object, const glm::mat4 & view) = 0;
 public:
 	void Restore(Json::Value input);
 
@@ -133,9 +137,6 @@ public:
 	void SetTime(double time);
 protected:
 	void SetupMatrix();
-
-protected:
-	void UseShader(double min_xyz[3], double max_xyz[3]);
 
 
 };

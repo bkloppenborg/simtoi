@@ -157,7 +157,7 @@ void COI::Export(string folder_name)
 
 		// Set the current JD, render the model.
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
-		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+		model_list->Render(mFBO, mWorkerThread->GetView());
 		// Blit to the storage buffer (for liboi to use the image)
 		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
 		mWorkerThread->BlitToScreen(mFBO);
@@ -187,7 +187,7 @@ void COI::GetChi(double * chis, unsigned int size)
 	{
 		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
-		model_list->Render(mFBO, mWorkerThread->GetImageWidth(), mWorkerThread->GetImageHeight());
+		model_list->Render(mFBO, mWorkerThread->GetView());
 
 		// Blit to the storage buffer (for liboi to use the image)
 		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);

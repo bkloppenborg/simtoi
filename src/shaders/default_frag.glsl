@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -23,15 +23,13 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-// Default (do nothing) shader.
-varying out vec4 color;
 
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+in vec3 Normal;
+in vec2 Color;
 
-void main() 
-{ 
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+out vec4 out_color;
+void main()
+{
+    out_color = vec4(Color.x, 0.0, 0.0, Color.y);
 }
+ 

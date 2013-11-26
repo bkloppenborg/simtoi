@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -24,17 +24,21 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Four-parameter limb darkening implemented according to Claret (2003)
-// Implemented using alpha blending.
-varying out vec3 normal;
-varying out vec4 color;
-
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+// Square root limb darkening
+// Implemented by decreasing the flux (color.x) of the vertex.
+in vec3 Normal;
+in vec4 Color;
+uniform float a1;
+uniform float a2;
 
 void main(void)
 {
-    normal = gl_NormalMatrix * gl_Normal;
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
+    
+    // Simple quadratic limb darkening:
+    float intensity = 1;
+	intensity -= a1 * (1 - mu);
+	intensity -= a2 * (1 - sqrt(mu));
+
+    gl_FragColor = vec4(intensity * Color.x, 0, 0, Color.y);
 }

@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -24,25 +24,19 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Four-parameter limb darkening implemented according to Claret (2003)
+// Power law limb darkening implemented according to Hestroffer (1997)
 // Implemented by decreasing the flux (color.x) of the vertex.
-in vec3 normal;
-in vec4 color;
-uniform float a1;
-uniform float a2;
-uniform float a3; 
-uniform float a4;
+
+in vec3 Normal;
+in vec2 Color;
+uniform float alpha;
+
+out vec4 out_color;
 
 void main(void)
 {
-    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
-    
-    // now compute the Claret 2003 limb darkening law.
-    float intensity = 1;
-	intensity -= a1 * (1 - pow(mu, 0.5));
-	intensity -= a2 * (1 - mu);
-	intensity -= a3 * (1 - pow(mu, 1.5));
-	intensity -= a4 * (1 - pow(mu, 2));
+    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
+    float intensity = pow(mu, alpha);
 
-    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
+    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
 }

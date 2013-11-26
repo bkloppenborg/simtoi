@@ -47,36 +47,44 @@
 class CCylinder : public CModel
 {
 protected:
-	static int mDiskParams;
-	int mSlices;
-	int mStacks;
-	double * mSinT;
-	double * mCosT;
-	double mZeroThreshold;
+
+	unsigned int mRimStart;
+	unsigned int mRimSize;
+	unsigned int mMidplaneStart;
+	unsigned int mMidplaneSize;
+
+	GLuint mVAO;
+	GLuint mVBO;
+	GLuint mEBO;
+
+	bool mModelReady;
 
 public:
 	CCylinder();
-	CCylinder(int n_additional_params);
 	virtual ~CCylinder();
 
 	static shared_ptr<CModel> Create();
 
-	virtual void Draw();
-	virtual void DrawDisk(double radius, double at_y);
-	virtual void DrawDisk(double r_in, double r_out, double at_y);
-	virtual void DrawSides(double radius, double height);
+	static void GenerateMidplane(vector<vec3> & vertices, vector<unsigned int> & elements,
+			unsigned int r_divisions, unsigned int phi_divisions);
+
+	static void GenerateMidplane(vector<vec3> & vertices, vector<unsigned int> & elements,
+			unsigned int element_offset,
+			unsigned int r_divisions, unsigned int phi_divisions);
+
+	/// Draws a unit cylindrical wall in the z-direction from (z = -0.5 ... 0.5, at r = 1)
+	static void GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+			unsigned int vertex_offset,
+			unsigned int z_divisions, unsigned int phi_divisions);
+
+	static void GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+			unsigned int z_divisions, unsigned int phi_divisions);
 
 	virtual string GetID() { return "cylinder"; };
-	virtual double GetRadius(double half_height, double h, double dh, double rim_radius);
 
-	void InitMembers();
+	void Init();
 
-	virtual double MidplaneColor(double radius) { return 1; };
-	virtual double MidplaneTransparency(double radius) { return 1; };
-
-	void Render(GLuint framebuffer_object, int width, int height);
-
-	virtual double Transparency(double half_height, double at_z) { return 1; };
+	void Render(GLuint framebuffer_object, const glm::mat4 & view);
 };
 
 #endif /* CMODELDISK_GAUSS_H_ */

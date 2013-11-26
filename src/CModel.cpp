@@ -72,12 +72,6 @@ CModel::~CModel()
 
 }
 
-/// \brief Sets the color for the vertex based upon the model color.
-void CModel::Color()
-{
-	glColor4d(mParams[3], 0.0, 0.0, 1.0);
-}
-
 /// \brief Static function which creates a lookup table of sine and cosine values
 /// 	used in drawing things in polar coordinates.
 ///
@@ -259,38 +253,32 @@ int CModel::GetTotalFreeParameters()
 			this->GetNShaderFreeParameters();
 }
 
-/// \brief Runs OpenGL calls to rotate the model according to the inclination
-/// 	position angle, and rotation angle (rotational phase).
+/// \brief Constructs the rotation matrix according to the set parameters.
 ///
-/// This function runs the necessary OpenGL calls to rotate the model according
-/// to the inclination, position angle, and rotation angle specified in the model.
-/// If the position model is DYNAMIC (i.e. an orbit), the position angle of the model
-/// is specified relative to the orbital plane.
-void CModel::Rotate()
+/// Note, if the position model is DYNAMIC (i.e. an orbit) the position angle
+/// of the model is specified relative to the orbital plane.
+glm::mat4 CModel::Rotate()
 {
-	// Rotations are implemented in the standard way, namely
-	//  R_x(gamma) * R_y(beta) * R_z(alpha)
-	// where gamma = pitch, beta = roll, alpha = yaw.
-
 	double Omega = mParams[0];
 	double inc = mParams[1];
 	double omega = mParams[2];
 
-	// TODO: At the moment I'm not sure if +90 or -90 is correct here.
-	// so we might have models displaying tilted slightly the wrong direction.
+	// If we have a dynamic position, simply add the angles
 	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
 	{
-		// position angle
-		Omega += mPosition->GetParam(0) - 90;
+		double orbit_Omega = mPosition->GetParam(0);
+		double orbit_inc = mPosition->GetParam(1);
+		double orbit_omega = mPosition->GetParam(2);
 
-		// the inclination
-		inc += mPosition->GetParam(1) - 90;
+		Omega += orbit_Omega;
+		inc += orbit_inc;
+		omega += orbit_omega;
 	}
 
-	glRotatef(Omega, 0, 0, 1); // position angle about z-axis
-	glRotatef(inc  , 1, 0, 0); // inclination about x-axis
-	glRotatef(omega, 0, 1, 0); // omega about y-axis
-	CWorkerThread::CheckOpenGLError("CModel::Rotate()");
+	glm::mat4 A = glm::rotate(mat4(), float(Omega), vec3(0.0, 0.0, 1.0));
+	glm::mat4 B = glm::rotate(mat4(), float(inc), vec3(1.0, 0.0, 0.0));
+	glm::mat4 C = glm::rotate(mat4(), float(omega), vec3(0.0, 0.0, 1.0));
+	return A * B * C;
 }
 
 /// \brief Restores a model from SIMTOI's JSON save file.
@@ -321,7 +309,7 @@ void CModel::Restore(Json::Value input)
 
 	auto position = positions.CreatePosition(position_id);
 	position->Restore(input["position_data"]);
-	SetPositionModel(position);
+	CModel::SetPositionModel(position);
 
 	// Find the shader
 	string shader_id = input["shader_id"].asString();
@@ -330,16 +318,7 @@ void CModel::Restore(Json::Value input)
 
 	auto shader = shaders.CreateShader(shader_id);
 	shader->Restore(input["shader_data"]);
-	SetShader(shader);
-}
-
-/// \brief Sets up the matrix mode for rendering models.
-void CModel::SetupMatrix()
-{
-    // Keep the matrix in standard OpenGL coordinates, namely
-	// (x,y,z) = (right, up, towards)
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	CModel::SetShader(shader);
 }
 
 /// \brief Serializes a model object into a JSON object.
@@ -435,28 +414,11 @@ void CModel::SetShader(CShaderPtr shader)
 	mShader = shader;
 }
 
-/// \brief Translates the model to the (x,y,z) position specified by the position object.
-void CModel::Translate()
+/// \brief Constructs the translation matrix from the position model.
+glm::mat4 CModel::Translate()
 {
 	double x, y, z;
 	mPosition->GetXYZ(x, y, z);
 
-	// Call the translation routines.  Use the double-precision call.
-	glTranslatef(x, y, z);
-	CWorkerThread::CheckOpenGLError("CModel::Translate()");
-}
-
-/// \brief Use the shader on the model
-///
-/// Calls the shader, passing the minimum/maximum XYZ positions
-/// of the verticies in the model.
-///
-/// \param min_xyz The minimum (x,y,z) values in the model.
-/// \param max_xyz The maximum (x,y,z) values in the model.
-void CModel::UseShader(double min_xyz[3], double max_xyz[3])
-{
-	if(mShader != NULL)
-		mShader->UseShader(min_xyz, max_xyz);
-
-	CWorkerThread::CheckOpenGLError("CModel::UseShader()");
+	return glm::translate(mat4(), vec3(x, y, z));
 }

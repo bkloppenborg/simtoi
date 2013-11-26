@@ -32,136 +32,11 @@
 
 #include "CCylinder.h"
 
-int CCylinder::mDiskParams = 2;
-
 CCylinder::CCylinder()
-	: CModel(mDiskParams)
+	: CModel(2)
 {
-	InitMembers();
-}
-
-CCylinder::CCylinder(int additional_params)
-	: CModel(mDiskParams + additional_params)
-{
-	InitMembers();
-}
-
-CCylinder::~CCylinder()
-{
-	delete[] mSinT;
-	delete[] mCosT;
-}
-
-shared_ptr<CModel> CCylinder::Create()
-{
-	return shared_ptr<CModel>(new CCylinder());
-}
-
-/// Baseclass routine, draws a cylinder with a top and bottom.
-void CCylinder::Draw()
-{
-	// Rename a few variables for convenience:
-	const double radius = mParams[mBaseParams + 1] / 2;	// diameter / 2
-	const double total_height = mParams[mBaseParams + 2];
-	const double half_height = total_height/2;
-
-	// Draw the top, sides, and bottom
-	DrawDisk(0, radius, half_height);
-	DrawSides(radius, total_height);
-	DrawDisk(0, radius, -half_height);
-}
-
-void CCylinder::DrawDisk(double radius, double at_y)
-{
-	DrawDisk(0, radius, at_y);
-}
-
-/// Draws a flat (planar) disk
-void CCylinder::DrawDisk(double r_in, double r_out, double at_y)
-{
-    double color = mParams[3];
-    glBegin(GL_QUAD_STRIP);
-
-		if(at_y < 0)
-			glNormal3d( 0.0, -1.0, 0.0);
-		else
-			glNormal3d(0.0, 1.0, 0.0);
-
-		for(int j = 0; j <= mSlices; j++ )
-		{
-			glColor4d(color, 0.0, 0.0, MidplaneTransparency(r_in));
-			glVertex3d(mCosT[ j ] * r_in,  at_y, mSinT[ j ] * r_in);
-			glVertex3d(mCosT[ j ] * r_out, at_y, mSinT[ j ] * r_out);
-		}
-
-	glEnd();
-}
-
-/// Draws the sides of the disk (cylinder)
-void CCylinder::DrawSides(double radius, double total_height)
-{
-	double transparency = 0;
-    double y0 = 0;
-    double y1 = 0;
-    double yStep = 0;
-    double r0 = 0;
-    double r1 = 0;
-    double half_height = total_height / 2;
-
-    double color = mParams[3];
-
-    // Divide the z direction into mStacks equal steps
-    // Stop when we get to mScale in height.
-    yStep = total_height / mStacks;
-
-	y0 = -half_height;
-	y1 = y0 + yStep;
-
-	while(y0 < half_height)
-	{
-		glColor4d(color, 0.0, 0.0, MidplaneTransparency(radius) * Transparency(half_height, y0));
-		r0 = GetRadius(half_height, y0, yStep, radius);
-		r1 = GetRadius(half_height, y1, yStep, radius);
-
-		// Draw the top half
-		glBegin( GL_QUAD_STRIP );
-		for(int j = 0; j <= mSlices; j++ )
-		{
-			glNormal3d( mCosT[ j ],      0.0, mSinT[ j ]       );
-			glVertex3d( mCosT[ j ] * r0,  y0, mSinT[ j ] * r0  );
-			glVertex3d( mCosT[ j ] * r1,  y1, mSinT[ j ] * r1  );
-		}
-		glEnd( );
-
-		y0 = y1;
-		y1 += yStep;
-	}
-}
-
-/// Returns the radius as a function of height for the outer edge of the disk
-/// Specify r0 to indicate the radius of the outer rim.
-double CCylinder::GetRadius(double half_height, double h, double dh, double rim_radius)
-{
-	return rim_radius;
-}
-
-void CCylinder::InitMembers()
-{
-	// CModel(3) because we have three additional parameters for this model
-	// Remember, mParams[0] = yaw, mParams[1] = pitch, mParams[2] = roll.
-	// and mParams[3] = color
-
-	mSlices = 50;	// seems like a good number.
-	mStacks = 100;
-	mSinT = new double[mSlices + 1];
-	mCosT = new double[mSlices + 1];
-	CircleTable(mSinT, mCosT, mSlices);
-
 	mName = "Cylinder";
 
-	mZeroThreshold = 1E-4;	// The zero point for flux
-
-	// Set the radius and diameter to something useful:
 	mParamNames.push_back("Diameter");
 	SetParam(mBaseParams + 1, 3.0);
 	SetFree(mBaseParams + 1, true);
@@ -173,42 +48,258 @@ void CCylinder::InitMembers()
 	SetFree(mBaseParams + 2, true);
 	SetMax(mBaseParams + 2, 2.0);
 	SetMin(mBaseParams + 2, 0.1);
+
+	mMidplaneStart = 0;
+	mMidplaneSize = 0;
+	mRimStart = 0;
+	mRimSize = 0;
 }
 
-void CCylinder::Render(GLuint framebuffer_object, int width, int height)
+CCylinder::~CCylinder()
 {
-	// NOTE: When rendering assume that the framebuffer has already been cleared.
+
+}
+
+shared_ptr<CModel> CCylinder::Create()
+{
+	return shared_ptr<CModel>(new CCylinder());
+}
+
+void CCylinder::GenerateMidplane(vector<vec3> & vertices, vector<unsigned int> & elements,
+		unsigned int r_divisions, unsigned int phi_divisions)
+{
+	unsigned int element_offset = 0;
+	GenerateMidplane(vertices, elements, element_offset, r_divisions, phi_divisions);
+}
+
+void CCylinder::GenerateMidplane(vector<vec3> & vertices, vector<unsigned int> & elements,
+		unsigned int vertex_offset,
+		unsigned int r_divisions, unsigned int phi_divisions)
+{
+	double sin_phi[phi_divisions];
+	double cos_phi[phi_divisions];
+	double dphi = 2 * M_PI / phi_divisions;
+	for(unsigned int i = 0; i < phi_divisions; i++)
+	{
+		sin_phi[i] = sin(dphi * i);
+		cos_phi[i] = cos(dphi * i);
+	}
+
+	// Generate the top vertices
+	double dr = 1.0 / r_divisions;
+	double x, y;
+	for(double r = 1; r > 0; r -= dr)
+	{
+		for(unsigned int phi = 0; phi < phi_divisions; phi++)
+		{
+			x = cos_phi[phi] * r;
+			y = sin_phi[phi] * r;
+			vertices.push_back(vec3(x, y, 0)); // vertex position
+			vertices.push_back(vec3(0, 0, 1)); // normal vector
+		}
+	}
+
+	// now generate the indices
+	// Now assign the elements. Go in the same direction as the vertices were
+	// generated above, namely in rows by latitude.
+	for(unsigned int r = 0; r < r_divisions; r++)
+	{
+		for(unsigned int phi = 0; phi < phi_divisions; phi++)
+		{
+			elements.push_back(r * phi_divisions + phi + vertex_offset);
+			elements.push_back((r + 1) * phi_divisions + phi + vertex_offset);
+		}
+
+		// To complete a z-row, link back to the first two vertices
+		// in the row.
+		elements.push_back(r * phi_divisions + vertex_offset);
+		elements.push_back((r + 1) * phi_divisions + vertex_offset);
+	}
+}
+
+void CCylinder::GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+		unsigned int z_divisions, unsigned int phi_divisions)
+{
+	unsigned int element_offset = 0;
+	GenreateRim(vertices, elements, element_offset, z_divisions, phi_divisions);
+}
+
+/// Draws a unit cylindrical wall in the z-direction from (z = -0.5 ... 0.5, at r = 1)
+void CCylinder::GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+		unsigned int element_offset,
+		unsigned int z_divisions, unsigned int phi_divisions)
+{
+	double dz = 1.0 / z_divisions;
+
+	double sin_phi[phi_divisions];
+	double cos_phi[phi_divisions];
+	double dphi = 2 * M_PI / phi_divisions;
+	for(unsigned int i = 0; i < phi_divisions; i++)
+	{
+		sin_phi[i] = sin(dphi * i);
+		cos_phi[i] = cos(dphi * i);
+	}
+
+	// generate the vertices
+	double x, y;
+	for(double z = -0.5; z <= 0.5; z += dz)
+	{
+		for(unsigned int phi = 0; phi < phi_divisions; phi++)
+		{
+			x = cos_phi[phi];
+			y = sin_phi[phi];
+			vertices.push_back(vec3(x, y, z)); // vertex position
+			vertices.push_back(vec3(x, y, 0)); // normal vector
+		}
+	}
+
+	// now generate the indices
+	// Now assign the elements. Go in the same direction as the vertices were
+	// generated above, namely in rows by latitude.
+	for(unsigned int z = 0; z < z_divisions; z++)
+	{
+		for(unsigned int phi = 0; phi < phi_divisions; phi++)
+		{
+			elements.push_back(z * phi_divisions + phi + element_offset);
+			elements.push_back((z + 1) * phi_divisions + phi + element_offset);
+		}
+
+		// To complete a z-row, link back to the first two vertices
+		// in the row.
+		elements.push_back(z * phi_divisions + element_offset);
+		elements.push_back((z + 1) * phi_divisions + element_offset);
+	}
+}
+
+void CCylinder::Init()
+{
+	// Generate the verticies and elements
+	vector<vec3> vbo_data;
+	vector<unsigned int> elements;
+	unsigned int z_divisions = 20;
+	unsigned int phi_divisions = 50;
+	unsigned int r_divisions = 20;
+
+	mRimStart = 0;
+	CCylinder::GenreateRim(vbo_data, elements, z_divisions, phi_divisions);
+	mRimSize = elements.size();
+	// Calculate the offset in vertex indexes for the GenerateMidplane function
+	// to generate correct element indices.
+	unsigned int vertex_offset = vbo_data.size() / 2;
+	mMidplaneStart = mRimSize;
+	GenerateMidplane(vbo_data, elements, vertex_offset, r_divisions, phi_divisions);
+	mMidplaneSize = elements.size() - mRimSize;
+
+	// Create a new Vertex Array Object, Vertex Buffer Object, and Element Buffer
+	// object to store the model's information.
+	//
+	// First generate the VAO, this stores all buffer information related to this object
+	glGenVertexArrays(1, &mVAO);
+	glBindVertexArray(mVAO);
+	// Generate and bind to the VBO. Upload the verticies.
+	glGenBuffers(1, &mVBO); // Generate 1 buffer
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glBufferData(GL_ARRAY_BUFFER, vbo_data.size() * sizeof(vec3), &vbo_data[0], GL_STATIC_DRAW);
+	// Generate and bind to the EBO. Upload the elements.
+	glGenBuffers(1, &mEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
+
+	// Next we need to define the storage format for this object for the shader.
+	// First get the shader and activate it
+	GLuint shader_program = mShader->GetProgram();
+	glUseProgram(shader_program);
+	// Now start defining the storage for the VBO.
+	// The 'vbo_data' variable stores a unit cylindrical shell (i.e. r = 1,
+	// h = -0.5 ... 0.5).
+	GLint posAttrib = glGetAttribLocation(shader_program, "position");
+	glEnableVertexAttribArray(posAttrib);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 0);
+	// Now define the normals, if they are used
+	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
+	if(normAttrib > -1)
+	{
+		glEnableVertexAttribArray(normAttrib);
+		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+	}
+
+	// Check that things loaded correctly.
+	CWorkerThread::CheckOpenGLError("CDensityDisk.Init()");
+
+	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
+	// modified by subsequent calls.
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	// Indicate the model is ready to use.
+	mModelReady = true;
+}
+
+void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
+{
+	if(!mModelReady)
+		Init();
+
+	// Look up the parameters:
+	const double diameter = mParams[mBaseParams + 1];
+	const double radius = diameter / 2;
+	const double height  = mParams[mBaseParams + 2];
+
+	vec2 color = vec2(mParams[3], 1.0);
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
-	// Rename a few variables for convenience:
-	const double radius = mParams[mBaseParams + 1] / 2;	// diameter / 2
-	const double total_height = mParams[mBaseParams + 2];
-	const double half_height = total_height/2;
+	// Activate the shader
+	GLuint shader_program = mShader->GetProgram();
+	mShader->UseShader();
+	GLint uniColorFlag = glGetUniformLocation(shader_program, "color_from_uniform");
+	glUniform1i(uniColorFlag, true);
 
-	double min_xyz[3] = {0, 0, 0};
-	double max_xyz[3] = {radius, radius, half_height};
+	// bind back to the VAO
+	glBindVertexArray(mVAO);
 
+	// Define the color
+    GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
+    glUniform2fv(uniColor, 1, glm::value_ptr(color));
+
+	// Define the view:
+	GLint uniView = glGetUniformLocation(shader_program, "view");
+	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+
+	GLint uniTranslation = glGetUniformLocation(shader_program, "translation");
+	glUniformMatrix4fv(uniTranslation, 1, GL_FALSE, glm::value_ptr(Translate()));
+
+	GLint uniRotation = glGetUniformLocation(shader_program, "rotation");
+	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
+
+	GLint uniScale = glGetUniformLocation(shader_program, "scale");
+    glm::mat4 r_scale = glm::scale(mat4(), glm::vec3(radius, radius, 1.0));
+    glm::mat4 h_scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, height));
+    glm::mat4 scale = r_scale * h_scale;
+	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+
+	// Render
 	glDisable(GL_DEPTH_TEST);
 
-	glPushMatrix();
-		SetupMatrix();
-		Color();
-		UseShader(min_xyz, max_xyz);
+	// Draw the cylindrical wall.
+	glDrawElements(GL_TRIANGLE_STRIP, mRimSize, GL_UNSIGNED_INT, 0);
 
-		// Call base-class rotation and translation functions.
-		// NOTE: OpenGL applies these operations in a stack-like buffer so they are reversed
-		// compared to conventional application.
-		Translate();
-		Rotate();
+	// Draw the top
+	mat4 z_offset;
+	z_offset = glm::translate(mat4(), vec3(0, 0, 0.5));
+	scale = r_scale * h_scale * z_offset;
+	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
-		Draw();
-
-	glPopMatrix();
+	// Draw the bottom
+	z_offset = glm::translate(mat4(), vec3(0, 0, -0.5));
+	scale = r_scale * h_scale * z_offset;
+	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
 	glEnable(GL_DEPTH_TEST);
-
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

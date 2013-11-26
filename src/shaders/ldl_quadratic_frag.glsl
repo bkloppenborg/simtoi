@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -25,16 +25,22 @@
  */
  
 // Quadratic limb darkening
-// Implemented using alpha blending.
-varying out vec3 normal;
-varying out vec4 color;
+// Implemented by decreasing the flux (color.x) of the vertex.
+in vec3 Normal;
+in vec2 Color;
+uniform float a1;
+uniform float a2;
 
-uniform vec3 min_xyz;
-uniform vec3 max_xyz;
+out vec4 out_color;
 
 void main(void)
 {
-    normal = gl_NormalMatrix * gl_Normal;
-    color = gl_Color;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
+    
+    // Simple quadratic limb darkening:
+    float intensity = 1;
+	intensity -= a1 * (1 - mu);
+	intensity -= a2 * pow( (1 - mu), 2.0);
+
+    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
 }

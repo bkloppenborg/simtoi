@@ -54,6 +54,9 @@ protected:
     // Worker thread
     shared_ptr<CWorkerThread> mWorker;
 
+    // Animation thread
+    QThread mAnimationThread;
+
     // Minimizer
     CMinimizerPtr mMinimizer;
     QStandardItemModel mOpenFileModel;
@@ -80,6 +83,7 @@ public:
     QStringList GetFileFilters();
     string GetMinimizerID();
     bool GetMinimizerRunning();
+    double GetTime();
 
     QStandardItemModel * GetOpenFileModel() { return &mOpenFileModel; };
     CTreeModel * GetTreeModel() { return &mTreeModel; };
@@ -97,18 +101,23 @@ public:
 
 protected:
     void RebuildTree();
-
 public:
+    void Render();
+
     void Save(string filename);
     void SetScale(double scale);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
     void SetMinimizer(CMinimizerPtr minimizer);
     void SetSaveDirectory(string directory_path);
     void SetSize(unsigned int width, unsigned int height);
+    void SetTime(double time);
     void startMinimizer();
     void startRendering();
     void stopMinimizer();
     void stopRendering();
+
+    void StartAnimation(double start_time, double time_step);
+    void StopAnimation();
 
 private slots:
 

@@ -1,4 +1,4 @@
-#version 120
+#version 150 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -24,16 +24,36 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// Power law limb darkening implemented according to Hestroffer (1997)
+// Square root limb darkening
 // Implemented by decreasing the flux (color.x) of the vertex.
-in vec3 normal;
-in vec4 color;
-uniform float alpha;
+in vec3 Normal;
+in vec2 Color;
+in vec3 ModelPosition;
+
+uniform float rho0;
+uniform float kappa;
+uniform float r0;
+uniform float h0;
+uniform float gamma;
+uniform float beta;
+
+out vec4 out_color;
 
 void main(void)
 {
-    float mu = abs(dot(normal, vec3(0.0, 0.0, 1.0)));
-    float intensity = pow(mu, alpha);
+    // Compute the radius and height of this fragment
+    float radius = sqrt(ModelPosition.x * ModelPosition.x + ModelPosition.y * ModelPosition.y);
+    float height = ModelPosition.z;
 
-    gl_FragColor = vec4(intensity * color.x, 0, 0, color.w);
+    // Compute the density
+    float radius_ratio = radius / r0;
+    float midplane_density = rho0 * pow(radius_ratio, -gamma);
+    float height_scaling = -0.5 * pow(height / (h0 * pow(radius_ratio, beta)), 2);
+    float radial_taper = -1 * pow(radius_ratio, 2 - gamma);
+    float rho = rho0 * pow(radius_ratio, -gamma) * exp(height_scaling) * exp(radial_taper);
+
+    // Compute the transparency
+    float transparency = 1 - exp(-1 * kappa * rho);
+    
+    out_color = vec4(Color.x, 0.0, 0.0, Color.y * transparency);
 }
