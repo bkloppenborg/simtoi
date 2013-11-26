@@ -337,15 +337,14 @@ void CGLWidget::SetTime(double time)
 	mWorker->SetTime(time);
 }
 
-void CGLWidget::startRendering()
+void StartAnimation(double start_time, double time_step)
 {
-	// Tell the thread to start.
-    mWorker->start();
+
 }
 
-void CGLWidget::stopRendering()
+void StopAnimation()
 {
-    mWorker->stop();
+
 }
 
 void CGLWidget::startMinimizer()
@@ -364,5 +363,16 @@ void CGLWidget::stopMinimizer()
 
 	// Stop the thread. If it was running, join it.
 	mMinimizer->stop();
+}
+
+void CGLWidget::startRendering()
+{
+	// Tell the thread to start.
+    mWorker->start();
+}
+
+void CGLWidget::stopRendering()
+{
+    mWorker->stop();
 }
 

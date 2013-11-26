@@ -487,6 +487,22 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 
 void gui_main::on_btnPlayPause_clicked()
 {
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
+
+	if(widget->IsAnimating())
+	{
+		widget->StopAnimation();
+		btnPlayPause->SetText("P");
+	}
+	else
+	{
+		double time = doubleSpinBoxJD->value();
+		double step = doubleSpinBoxRate->value();
+		widget->StartAnimation(time, step);
+		btnPlayPause->SetText("||");
+	}
 
 }
 

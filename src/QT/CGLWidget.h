@@ -54,6 +54,9 @@ protected:
     // Worker thread
     shared_ptr<CWorkerThread> mWorker;
 
+    // Animation thread
+    QThread mAnimationThread;
+
     // Minimizer
     CMinimizerPtr mMinimizer;
     QStandardItemModel mOpenFileModel;
@@ -112,6 +115,9 @@ public:
     void startRendering();
     void stopMinimizer();
     void stopRendering();
+
+    void StartAnimation(double start_time, double time_step);
+    void StopAnimation();
 
 private slots:
 
