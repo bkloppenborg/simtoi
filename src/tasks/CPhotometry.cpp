@@ -80,7 +80,9 @@ void CPhotometry::Export(string folder_name)
 {
 	InitBuffers();
 
-	ofstream outfile;
+	ofstream real_data;
+	ofstream sim_data;
+	ofstream summary;
 
 	bool first_point = true;
 	double sim_flux = 1;
@@ -88,36 +90,75 @@ void CPhotometry::Export(string folder_name)
 	double t0_delta_mag = 0;
 	CModelListPtr model_list = mWorkerThread->GetModelList();
 
+	// Open the statistics file in append mode:
+	summary.open(folder_name + "summary.txt", ios::app | ios_base::in | ios_base::out);
+	summary.precision(8);
+
 	// Iterate through the data, copying the mag_err into the uncertainties buffer
 	for(auto data_file: mData)
 	{
+		// Create some local storage for the chi elements we compute below.
+		vector<double> chi_values;
+
+		// Open the real data file:
+		real_data.open(folder_name + data_file->base_filename + ".phot");
+		real_data.width(15);
+		real_data.precision(8);
+
+		real_data << "# Input photometric data file as parsed by SIMTOI.." << endl;
+		real_data << "# CSV format: JD, mag, mag_error " << endl;
+
+		// Open the synthetic data file:
 		first_point = true;
-		// The save file should follow the following format:
-		outfile.open(folder_name + data_file->base_filename + "_model.phot");
-		outfile.width(15);
-		outfile.precision(8);
+		sim_data.open(folder_name + data_file->base_filename + "_model.phot");
+		sim_data.width(15);
+		sim_data.precision(8);
+		// Provide some information about the format
+		sim_data << "# Simulated photometry from SIMTOI" << endl;
+		sim_data << "# The data is normalized to the first data point in the real data." << endl;
+		sim_data << "# CSV format: JD, mag " << endl;
 
-		outfile << "# Simulated photometry from SIMTOI" << endl;
-
+		// Iterate over the data points in this data file:
 		for(auto data_point: data_file->data)
 		{
-			sim_mag = SimulatePhotometry(model_list, data_point->jd);
+			// Write out to the real data file:
+			real_data << data_point->jd << "," << data_point->mag << "," << data_point->mag_err << endl;
 
+			// Simulate the photometry
+			sim_mag = SimulatePhotometry(model_list, data_point->jd);
 			// Cache the t = 0 magnitude.
 			if(first_point)
 			{
 				t0_delta_mag = sim_mag - data_point->mag;
 				first_point = false;
 			}
-
 			// Add the zero-point offset:
 			sim_mag -= (t0_delta_mag);
+			// Write out oto the simulated file
+			sim_data << data_point->jd << "," << sim_mag << endl;
 
-			outfile << data_point->jd << "," << sim_mag << endl;
+			// Append the chi (residual / error) for this data point:
+			chi_values.push_back((sim_mag - data_point->mag) / data_point->mag_err);
 		}
+		// Close the file.
+		real_data.close();
+		sim_data.close();
 
-		outfile.close();
+		// Lastly write out some useful information to the summary file.
+		// Here we compute the reduced chi2 for this data set:
+		double chi2r = 0;
+		for(auto chi: chi_values)
+		{
+			chi2r += chi * chi;
+		}
+		chi2r /= chi_values.size();
+
+		// Write out the chi2r for this file:
+		summary << data_file->base_filename << ".phot," << mDataDescription << "," << chi2r << endl;
 	}
+
+	// Close the statistics file.
+	summary.close();
 }
 
 void CPhotometry::GetChi(double * chi, unsigned int size)

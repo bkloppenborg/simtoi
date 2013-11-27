@@ -9,6 +9,7 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <fstream>
 
 #include "CTask.h"
 #include "CTaskFactory.h"
@@ -39,6 +40,14 @@ void CTaskList::BootstrapNext(unsigned int maxBootstrapFailures)
 
 void CTaskList::Export(string export_folder)
 {
+	// Each task can optionally write information to a summary file. Be sure
+	// we clear it out (in case the folder is being reused).
+	ofstream summary;
+	summary.open(export_folder + "summary.txt", ios::trunc | ios::in | ios::out);
+	summary << "# SIMTOI export summary file." << endl;
+	summary << "# Each line contains the data file, type of data, and reduced chi2 for the data file in CSV format." << endl;
+	summary.close();
+
 	for(auto task: mTasks)
 		task->Export(export_folder);
 }
