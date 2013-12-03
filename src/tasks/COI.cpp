@@ -34,6 +34,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdexcept>
+#include <fstream>
 #include "oi_tools.hpp"
 // TODO: Figure out how to pull in additional calibrator models
 #include "CUniformDisk.h"
@@ -147,6 +148,16 @@ void COI::Export(string folder_name)
 	CModelListPtr model_list = mWorkerThread->GetModelList();
 	string filename = "";
 
+	// Open the summary/statistics file in append mode:
+	ofstream summary;
+	summary.open(folder_name + "summary.txt", ios::app | ios_base::in | ios_base::out);
+	summary.precision(8);
+	// Allocate a buffer in which the data may be stored.
+	unsigned int max_data = mLibOI->GetMaxDataSize();
+	vector<float> temp_chi(max_data);
+	unsigned int n_vis = 0, n_vis2 = 0, n_t3 = 0, start = 0, n_data_size = 0;
+	double total_chi2 = 0, vis_real_chi2 = 0, vis_imag_chi2 = 0, vis2_chi2 = 0, t3_real_chi2 = 0, t3_imag_chi2 = 0;
+
 	unsigned int n_data_sets = mLibOI->GetNDataSets();
 	for(int data_set = 0; data_set < n_data_sets; data_set++)
 	{
@@ -169,6 +180,43 @@ void COI::Export(string folder_name)
 		// Now generate and save the simulated data:
 		mLibOI->ImageToData(data_set);
 		mLibOI->ExportData(data_set, folder_name + filename);
+
+		// Generate the chi2
+//		n_vis = mLibOI->GetNVis(data_set);
+		n_vis = 0;
+		n_vis2 = mLibOI->GetNV2(data_set);
+		n_t3 = mLibOI->GetNT3(data_set);
+		n_data_size = mLibOI->GetNDataAllocated(data_set);
+		mLibOI->ImageToChi(data_set, &temp_chi[0], n_data_size);
+		// Compute the chi-squared for each element.
+		for(unsigned int i = 0; i < n_data_size; i++)
+			temp_chi[i] *= temp_chi[i];
+
+		// LibOI packages the interferometric data like this:
+		//  [vis_real, vis_imag, vis2, t3_real, t3_imag]
+		// where each type of data is of size:
+		//  [n_vis, n_vis, n_vis2, n_t3, n_t3]
+		start = 0;
+		total_chi2 = sum(temp_chi, 0, n_data_size) / n_data_size;
+		vis_real_chi2 = sum(temp_chi, start, n_vis) / n_vis;
+		start += n_vis;
+		vis_imag_chi2 = sum(temp_chi, start, n_vis) / n_vis;
+		start += n_vis;
+		vis2_chi2 = sum(temp_chi, start, n_vis2) / n_vis2;
+		start += n_vis2;
+		t3_real_chi2 = sum(temp_chi, start, n_t3) / n_t3;
+		start += n_t3;
+		t3_imag_chi2 = sum(temp_chi, start, n_t3) / n_t3;
+
+		// Write out the results to the summary file
+		summary << filename << ".oifits," << mDataDescription << ",";
+		summary << total_chi2 << "," << n_data_size << ",";
+		summary << vis_real_chi2 << "," << n_vis << ",";
+		summary << vis_imag_chi2 << "," << n_vis << ",";
+		summary << vis2_chi2 << "," << n_vis2 << ",";
+		summary << t3_real_chi2 << "," << n_t3 << ",";
+		summary << t3_imag_chi2 << "," << n_t3;
+		summary << endl;
 	}
 }
 
@@ -288,4 +336,15 @@ void COI::InitCL()
 void COI::OpenData(string filename)
 {
 	mLibOI->LoadData(filename);
+}
+
+double COI::sum(vector<float> & values, unsigned int start, unsigned int end)
+{
+	double temp = 0;
+	for(unsigned int i = start; i < start + end; i++)
+	{
+		temp += values[i];
+	}
+
+	return temp;
 }

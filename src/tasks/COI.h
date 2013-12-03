@@ -76,6 +76,8 @@ public:
 	virtual void InitCL();
 
 	void OpenData(string filename);
+
+	double sum(vector<float> & values, unsigned int start, unsigned int end);
 };
 
 #endif /* COI_H_ */
