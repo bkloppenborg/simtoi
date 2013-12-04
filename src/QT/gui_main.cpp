@@ -121,7 +121,6 @@ QMdiSubWindow * gui_main::AddGLArea(CGLWidget * gl_widget)
 
     // Connect signals/slots
 	// Now connect signals and slots
-	connect(gl_widget->GetTreeModel(), SIGNAL(parameterUpdated(void)), this, SLOT(render(void)));
 	connect(gl_widget, SIGNAL(minimizerFinished(void)), this, SLOT(minimizerFinished(void)));
 
 	// If the load data button isn't enabled, turn it on
