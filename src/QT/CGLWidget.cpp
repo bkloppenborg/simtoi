@@ -33,9 +33,9 @@ using namespace std;
 
 
 #include "CTreeModel.h"
-
+#include "CAnimator.h"
 #include "CMinimizerThread.h"
-
+#include "CAnimator.h"
 #include "CModel.h"
 #include "CModelList.h"
 #include "CTreeModel.h"
@@ -53,6 +53,13 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
     // Immediately initialize the worker thread. This will claim the OPenGL context.
 	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
 
+	// Create the animation thread:
+	mAnimator.reset(new CAnimator(this));
+	mAnimator->moveToThread(&mAnimationThread);
+	connect(this, SIGNAL(startAnimation(double, double)), mAnimator.get(), SLOT(start_animation(double, double)));
+//	connect(this, SIGNAL(stopAnimation(void)), mAnimator.get(), SLOT(stop_animation(void)));
+	mAnimationThread.start();
+
 	QStringList labels = QStringList();
 	labels << "File" << "Mean JD";
 	mOpenFileModel.clear();
@@ -68,6 +75,10 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 CGLWidget::~CGLWidget()
 {
 	// Stop any running threads
+	StopAnimation();
+	mAnimationThread.quit();
+	mAnimationThread.wait();
+
 	stopMinimizer();
 	stopRendering();
 }
@@ -184,7 +195,7 @@ double CGLWidget::GetTime()
 
 bool CGLWidget::IsAnimating()
 {
-	return false;
+	return mAnimator->IsRunning();
 }
 
 void CGLWidget::on_mTreeModel_parameterUpdated()
@@ -344,18 +355,21 @@ void CGLWidget::SetTime(double time)
 
 void CGLWidget::StartAnimation(double start_time, double time_step)
 {
-
+	emit(startAnimation(start_time, time_step));
 }
 
 void CGLWidget::StopAnimation()
 {
-
+	mAnimator->mRun = false;
 }
 
 void CGLWidget::startMinimizer()
 {
 	if(!mMinimizer)
 		return;
+
+	// Stop the animation, if it is running
+	StopAnimation();
 
 	mMinimizer->start();
 	connect(mMinimizer.get(), SIGNAL(finished()), this, SLOT(on_minimizer_finished(void)));

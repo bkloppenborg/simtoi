@@ -37,6 +37,7 @@
 
 #include "liboi.hpp"
 #include "CModelList.h"
+#include "CAnimator.h"
 #include "CMinimizerThread.h"
 #include "CWorkerThread.h"
 #include "CTreeModel.h"
@@ -53,9 +54,9 @@ protected:
 
     // Worker thread
     shared_ptr<CWorkerThread> mWorker;
-
     // Animation thread
     QThread mAnimationThread;
+    shared_ptr<CAnimator> mAnimator;
 
     // Minimizer
     CMinimizerPtr mMinimizer;
@@ -129,6 +130,9 @@ private slots:
 
 signals:
 	void minimizerFinished();
+	void startAnimation(double start_time, double timestep);
+	void stopAnimation(void);
+
 
 };
 
