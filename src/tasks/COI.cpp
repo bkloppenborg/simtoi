@@ -187,6 +187,9 @@ void COI::Export(string folder_name)
 		n_vis2 = mLibOI->GetNV2(data_set);
 		n_t3 = mLibOI->GetNT3(data_set);
 		n_data_size = mLibOI->GetNDataAllocated(data_set);
+		// Clear out the chi buffer:
+		for(unsigned int i = 0; i < max_data; i++)
+			temp_chi[i] = 0;
 		mLibOI->ImageToChi(data_set, &temp_chi[0], n_data_size);
 		// Compute the chi-squared for each element.
 		for(unsigned int i = 0; i < n_data_size; i++)
