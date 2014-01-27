@@ -393,8 +393,6 @@ void CWorkerThread::run()
 	// Enable multi-sample anti-aliasing to improve the effective resolution
 	// of the model area.
 	glEnable(GL_MULTISAMPLE);
-	// Set the shading model to smooth, interpolated shading by default:
-	glShadeModel(GL_SMOOTH);
 	// Enable depth testing to permit vertex culling
 	glEnable(GL_DEPTH_TEST);
 	// Enable alpha blending
