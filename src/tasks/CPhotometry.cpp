@@ -346,6 +346,6 @@ double CPhotometry::SimulatePhotometry(CModelListPtr model_list, double jd)
 
 	// Get the simulated flux, convert it to a simulated magnitude using
 	// -2.5 * log(counts)
-	sim_flux = mLibOI->TotalFlux(true);
+	sim_flux = mLibOI->TotalFlux();
 	return -2.5 * log10(sim_flux);
 }
