@@ -376,11 +376,16 @@ void CWorkerThread::Restore(Json::Value input)
 void CWorkerThread::run()
 {
 	// ########
-	// OpenGL initialization
+	// CL/GL context initialization
 	// ########
-
-    // claim the OpenGL context:
+	// Immediately claim the OpenCL context
     mGLWidget->makeCurrent();
+    // Create an OpenCL context
+	mOpenCL = COpenCLPtr(new COpenCL(CL_DEVICE_TYPE_GPU));
+
+	// ########
+	// OpenGL display initialization
+	// ########
 
     // Setup the OpenGL context
     // Set the clear color to black:
@@ -421,14 +426,13 @@ void CWorkerThread::run()
 	mTaskList->InitGL();
 
 	// ########
-	// OpenCL initialization (must occur after OpenGL init)
+	// Remaining OpenCL initialization (context done above)
 	// ########
-	mOpenCL = COpenCLPtr(new COpenCL(CL_DEVICE_TYPE_GPU));
-
-	// Lastly, have the workers initialize any OpenCL objects they need
 	mTaskList->InitCL();
 
-	// Everything is initialized, lets run.
+	// ########
+	// Main thread.
+	// ########
 	WorkerOperations op;
 	while(mRun)
 	{
