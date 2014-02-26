@@ -264,8 +264,14 @@ void CPhotometry::InitBuffers()
 void CPhotometry::InitGL()
 {
 	// Determine the maximum number of layers in the OpenGL 3D buffer:
-	GLint max_layers = 0;
-	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
+	GLint max_gl_layers = 0;
+	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_gl_layers);
+	unsigned int max_gl_depth = max_gl_layers;
+
+	// TODO: Look this up from the Open CL context.
+	unsigned int max_cl_depth = 256;
+
+	unsigned int max_layers = min(max_gl_depth, max_cl_depth);
 
 	// Init framebuffers
 	mWorkerThread->CreateGLBuffer(mFBO, mFBO_texture, mFBO_depth, mFBO_storage, mFBO_storage_texture, max_layers);
