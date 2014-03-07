@@ -155,11 +155,8 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 	if(n_layers > max_layers)
 		n_layers = max_layers;
 
-	CheckOpenGLError("A");
 	CreateGLMultisampleRenderBuffer(mImageWidth, mImageHeight, mImageSamples, FBO, FBO_texture, FBO_depth);
-	CheckOpenGLError("B");
 	CreateGLStorageBuffer(mImageWidth, mImageHeight, n_layers, FBO_storage, FBO_storage_texture);
-	CheckOpenGLError("C");
 }
 
 void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned int height, unsigned int samples,
@@ -198,11 +195,9 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 {
 	glGenFramebuffers(1, &FBO_storage);
 	glBindFramebuffer(GL_FRAMEBUFFER, FBO_storage);
-	CheckOpenGLError("aa");
 
 	glGenTextures(1, &FBO_storage_texture);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, FBO_storage_texture);
-	CheckOpenGLError("ab");
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -210,9 +205,7 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	CheckOpenGLError("ay");
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R32F, width, height, depth, 0, GL_RED, GL_FLOAT, NULL);
-	CheckOpenGLError("az");
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
 
@@ -228,7 +221,7 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
     }
 
     // All done, bind back to the default framebuffer
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
