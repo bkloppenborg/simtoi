@@ -43,7 +43,7 @@ void main(void)
 {
     // Compute the radius and height of this fragment
     float radius = sqrt(ModelPosition.x * ModelPosition.x + ModelPosition.y * ModelPosition.y);
-    float height = ModelPosition.z;
+    float height = abs(ModelPosition.z);
 
     // Compute the density
     float radius_ratio = radius / r0;
