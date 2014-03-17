@@ -1,0 +1,518 @@
+/*
+ * CRocheBinary.cpp
+ *
+ *  Created on: Feb 28, 2014
+ *      Author: fbaron
+ *      Description: basic stellar shape based on Roche equations, with gravity darkening
+ *      Note:   most of the code is not optimized at the moment...
+ * 
+ */
+
+#include "CRocheBinary.h"
+
+
+RocheBinary::RocheBinary()
+: CModel(10)
+{
+	GLuint mVAO = 0;
+	GLuint mVBO = 0;
+	GLuint mEBO = 0;
+
+	mParamNames.push_back("Wavelength (um)");
+	SetParam(mBaseParams + 1,  1.4);
+	SetFree(mBaseParams + 1, false);
+	SetMax(mBaseParams + 1, 5);
+	SetMin(mBaseParams + 1, 0.1);
+
+	mParamNames.push_back("Parallax (mas)");
+	SetParam(mBaseParams + 2, 28.8);
+	SetFree(mBaseParams + 2, false);
+	SetMax(mBaseParams + 2, 0.1);
+	SetMin(mBaseParams + 2, 50);
+
+	mParamNames.push_back("Orbital Period (d)");
+	SetParam(mBaseParams + 3, 2.87);
+	SetFree(mBaseParams + 3, false);
+	SetMax(mBaseParams + 3, 0.1);
+	SetMin(mBaseParams + 3, 50);
+
+	mParamNames.push_back("Rotation Period (d)");
+	SetParam(mBaseParams + 4, 2.87);
+	SetFree(mBaseParams + 4, false);
+	SetMax(mBaseParams + 4, 0.1);
+	SetMin(mBaseParams + 4, 50);
+
+	mParamNames.push_back("Healpix Resolution (mas)");
+	SetParam(mBaseParams + 5, 0.05);
+	SetFree(mBaseParams + 5, false);
+	SetMax(mBaseParams + 5, 0.01);
+	SetMin(mBaseParams + 5, 5.0);
+
+	mParamNames.push_back("Mass 1 (MSolar)");
+	SetParam(mBaseParams + 6, 0.75);
+	SetFree(mBaseParams + 6, false);
+	SetMax(mBaseParams + 6, 0.1);
+	SetMin(mBaseParams + 6, 50.0);
+
+	mParamNames.push_back("Mass 2 (MSolar)");
+	SetParam(mBaseParams + 7, 3.2);
+	SetFree(mBaseParams + 7, false);
+	SetMax(mBaseParams + 7, 0.1);
+	SetMin(mBaseParams + 7, 50.0);
+
+	mParamNames.push_back("Polar Temperature (K)");
+	SetParam(mBaseParams + 8, 3700);
+	SetFree(mBaseParams + 8, false);
+	SetMax(mBaseParams + 8, 1500);
+	SetMin(mBaseParams + 8, 25000.0);
+
+	mParamNames.push_back("Polar Radius (RSolar)");
+	SetParam(mBaseParams + 9, 3.25);
+	SetFree(mBaseParams + 9, false);
+	SetMax(mBaseParams + 9, 1.0);
+	SetMin(mBaseParams + 9, 1000);
+
+	mParamNames.push_back("Gravity Darkening");
+	SetParam(mBaseParams + 10, 0.2);
+	SetFree(mBaseParams + 10, false);
+	SetMax(mBaseParams + 10, 0.01);
+	SetMin(mBaseParams + 10, 1.0);
+
+//	// Fundamental properties of the star
+//	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
+//	parallax = 28.8; // distance from the sun, in pc
+//	orbital_period = 2.87; // days
+//	rotation_period = orbital_period; // days, using synchronous rotation, but can work asynchronously
+//	desired_resolution =.05; // mas
+//	mass1 = 0.75; // mass of the Roche-lobed star
+//	mass2 = 3.2 ; // mass of the other star in the binary
+//	teff_pole = 3700. ; // temperature of the Roche-lobed star
+//	radius_pole = 3.25; //  rsun
+//	gravity_darkening = 0.2;
+
+		
+	// Derived values
+	separation_rsun = pow(( pow( orbital_period / 365.24, 2) * (mass1 + mass2) ), 1./3.) * AU / rsun; // TBD: replace this semimajor axis by the instantaneous separation
+	cout << "Estimated semimajor axis: "<< separation_rsun << " Rsun \n";
+	massratio = mass2 / (mass1 + mass2) ;
+	omega_rot= 2.0 * PI / (rotation_period * 3600. * 24.) ; // in Hz
+		
+	// Setup Healpix and geometry
+	npix_estimate = 4.*PI * pow( radius_pole * rsun / (parallax * AU) * 1000. / desired_resolution, 2.0);
+	nside_estimate = sqrt(npix_estimate/12.0);
+	nside = pow(2, ceil( log(nside_estimate) / log(2.0) ) );
+	npix = nside2npix(nside);
+	cout << "Nside: " << nside << "\tNpix: " << npix <<"\n";
+	
+	// Volume-equivalent Roche lobe radius from Eggleton
+	double q = mass1/mass2; 
+	double rl_rsun = separation_rsun * 0.49*pow(q, 2./3.)/( 0.6*pow(q, 2./3.) + log(1.+pow(q, 1./3.)));
+	cout << "Rl (rsun): " << rl_rsun << "\n";
+	
+	ipix = new long[npix];
+	theta_center = new double[npix];
+	phi_center = new double[npix];
+	radii_center = new double[npix];
+		
+	theta_corners = new double[4 * npix];	
+	phi_corners = new double[ 4 * npix];	
+	radii_corners = new double[ 4 * npix];
+
+	// Setup image/texture
+	long imsize = 12 * nside * nside;
+	image = new float[imsize]; 
+	gravity= new double[npix];
+	temperature= new double[npix];
+	
+	// Setup spots
+	
+	nspots = 0;
+	/*
+	spot_theta = new double[nspots];
+	spot_phi = new double[nspots];
+	spot_thetasize = new double[nspots];
+	spot_phisize = new double[nspots];
+	spot_temperature = new double[nspots];
+	
+	spot_theta[0] = 45./180.*PI ;
+	spot_phi[0] = 45./180.*PI ;
+	spot_thetasize[0] = 15./180.*PI ;
+	spot_phisize[0] = 10./180.*PI ;
+	spot_temperature[0] = 7000.;
+	*/
+}
+
+RocheBinary::~RocheBinary()
+{
+	glDeleteBuffers(1, &mEBO);
+	glDeleteBuffers(1, &mVBO);
+	glDeleteVertexArrays(1, &mVAO);
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+	glDeleteTextures(1,&mTextureID);
+	
+	delete[] ipix;
+	
+	delete[] theta_center;
+	delete[] phi_center;
+	delete[] radii_center;
+	
+	delete[] theta_corners;
+	delete[] phi_corners;
+	delete[] radii_corners;
+	
+	delete[] image; 
+	delete[] gravity;
+	delete[] temperature;
+	
+	
+}
+
+void RocheBinary::triaxial_gravity(double * gravity, const double radius, const double theta, const double phi)
+{ 
+	  double x1, x2, x3, y, z, radius1, radius2, radius1_pow3, radius2_pow3, l, mu;
+	  double gx, gy, gz;
+
+	  x1 = radius * cos(phi) * sin(theta);
+	  x2 = separation_rsun - x1;
+	  y = radius * sin(phi) * sin(theta);
+	  z = radius * cos(theta);
+	  radius2 = sqrt( x2*x2 + y*y + z*z);
+	  radius1_pow3 = radius * radius * radius;
+	  radius2_pow3 = radius2 * radius2 * radius2;
+
+	  // gx, gy, gz are the coordinates of the gravity vector
+	  gx = gmr2 * mass1 * x1 / radius1_pow3  - gmr2 * mass2 * x2 / radius2_pow3 - omega_rot * omega_rot * rsun * ( x1 - separation_rsun * massratio );
+	  gy = gmr2 * mass1 * y  / radius1_pow3  + gmr2 * mass2 * y  / radius2_pow3 - omega_rot * omega_rot * rsun * y;
+	  gz = gmr2 * mass1 * z  / radius1_pow3  + gmr2 * mass2 * z  / radius2_pow3;
+
+	  *gravity = sqrt( gx*gx+gy*gy+gz*gz);
+}
+
+void RocheBinary::surface_gravity(double* gravity, const double* radii, const double* theta, const double* phi, const unsigned int vsize)
+{
+	for(unsigned int i=0; i < vsize; i++)
+		triaxial_gravity(&gravity[i], radii[i],  theta[i], phi[i] );
+}
+
+void RocheBinary::surface_temperature(double* temperature, const double* gravity, const double gravity_pole, const unsigned int vsize ) 
+{
+	 for(unsigned int i = 0; i < vsize; i++)
+		temperature[i] = teff_pole * pow(gravity[i] / gravity_pole, gravity_darkening);
+}
+
+void RocheBinary::triaxial_pot(double* pot, double* dpot, const double radius, const double theta, const double phi)
+{
+	  // TBD this is using Pringle 1985, or for a more recent ref Regos 2005 (http://adsabs.harvard.edu/abs/2005MNRAS.358..544R )
+	  // This is only valid for circular + synchronous rotation, so this will be replaced by Sepinsky 2007
+	  // theta in radians: co-latitude -- vector
+	  // phi in radians: phi phi=0 points toward companion -- vector
+	  // vsize = vector size
+	  double x1, x2, x3, y, z, radius1, radius2, l, mu;
+	  radius1 = fabs(radius);
+	  l = cos(phi) * sin(theta);
+	  mu = sin(phi) * sin(theta);
+	  x1 = radius1 * l;
+	  x2 = x1 - separation_rsun ;
+	  x3 = x1 -  separation_rsun * massratio   ;
+	  y = radius1 * mu;
+	  z = radius1 * cos(theta);
+	  radius2 = sqrt(x2*x2+y*y+z*z);
+	  *pot  = -gmr  * ( mass1 / radius1 + mass2 /radius2 ) - 0.5 * omega_rot * omega_rot * rsun * rsun * ( x3*x3  + y * y );
+	  *dpot =  gmr2 * ( mass1 / (radius1*radius1) + mass2 / (radius2 * radius2 * radius2) * ( radius1 - separation_rsun * l ) )  - omega_rot * omega_rot * rsun * ( radius1 * l * l - l * separation_rsun * massratio + radius1 * mu * mu);
+}
+
+
+void RocheBinary::surface_radii(double* radii, const double *theta, const double *phi, const unsigned int vsize)
+{
+  // in this function we compute the roche radius based on masses/ distance / orbital_period, for each (theta, phi)
+  const double epsilon = 1;  
+  register int i;
+  double pot_surface, pot, dpot;
+  double newton_step;
+
+  triaxial_pot(&pot_surface, &dpot, radius_pole, 0.0, 0.0); // potential at the equator
+
+  for(i =0;i<vsize;i++) 
+    radii[i] = 1.22 * radius_pole; // initial guess for the radius
+
+  unsigned short converged[vsize]; // tracks the convergence for each radius
+  for(i=0;i<vsize;i++)
+    converged[i] = 0;      
+  unsigned int all_converged = 0;
+  //unsigned int counter =0;
+
+  while(all_converged < vsize-1)
+    {
+      all_converged = 0;
+
+      for(i=0;i<vsize;i++)
+	{
+	  if(converged[i] == 0) // we compute only up to the precision for each element, then we skip
+	    // not sure if this is faster than vectorizing...
+	    {
+	      
+	      triaxial_pot(&pot, &dpot, radii[i], theta[i], phi[i]);	     
+	      newton_step = (pot - pot_surface ) / (rsun * dpot);  // newton step
+	      radii[i] = radii[i] - newton_step;
+	      if( fabs(newton_step) < epsilon)
+		{
+		  converged[i] = 1;
+		  all_converged +=1;
+		}
+	//      counter++;
+	    }
+	}
+    
+     cout << "Convergence " << all_converged << "\n";
+    }
+}
+
+void RocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
+{
+	// Rename a few variables for convenience:
+	double radius = 50;
+	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
+
+	vec2 color = vec2(1.0, 1.0);
+			
+	// Bind to the framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
+
+	// Activate the shader
+	glUseProgram(mShaderProgram);
+	
+	//GLint uniColorFlag = glGetUniformLocation(mShaderProgram, "color_from_uniform");
+	//glUniform1i(uniColorFlag, true);
+
+	// bind back to the VAO
+	glBindVertexArray(mVAO);
+
+	// Define the view:
+	GLint uniView = glGetUniformLocation(mShaderProgram, "view");
+	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+
+	GLint uniTranslation = glGetUniformLocation(mShaderProgram, "translation");
+	glUniformMatrix4fv(uniTranslation, 1, GL_FALSE, glm::value_ptr(Translate()));
+
+	GLint uniRotation = glGetUniformLocation(mShaderProgram, "rotation");
+	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
+
+	GLint uniScale = glGetUniformLocation(mShaderProgram, "scale");
+	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+
+	//GLint uniColor = glGetUniformLocation(mShaderProgram, "uni_color");
+	//glUniform2fv(uniColor, 1, glm::value_ptr(color));
+	  
+	// render
+	glDrawElements(GL_TRIANGLES ,  mElements.size(), GL_UNSIGNED_INT, 0);
+	
+	// unbind from the Vertex Array Object, Vertex Buffer Object, and Element buffer object.
+	glBindVertexArray(0);
+
+	// Return to the default framebuffer before leaving.
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void RocheBinary::surface_flux() // Converts temperatures to image brightness
+{
+	// We basically use Plank's law to derive the temperature dependency
+	//
+	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
+	// h*c/k = 0.0143877696 m K
+	double maxim = 0;
+	for(unsigned int i = 0; i < npix; i++)
+	{
+		image[i]=1./(exp( 0.0143877696 / (lambda*temperature[i])) - 1.);
+
+		if(image[i] > maxim)
+			maxim = image[i];
+	}
+
+	// Normalize image by its max for opengl display
+	for(int i=0;i<npix;i++)
+		image[i] /= maxim;
+}
+
+void RocheBinary::GenerateRoche(vector<vec3> & vbo_data, vector<unsigned int> & elements)
+{
+	register int i,j,k;
+	double vec[npix][3];
+	double vertex[npix][4][3];
+	double vec_temp[3], vertex_temp[12];
+
+	//
+	// Compute geometry of the spherical Healpix surface
+	//
+
+	// First get the angles, central vector, and 4 vertices of each Healpix pixel
+	for(i=0;i<npix;i++)
+	{
+		  ipix[i] = i;
+		  pix2ang_nest(nside, i, &theta_center[i], &phi_center[i]);
+		 // cout << "theta: " << theta_center[i] << " phi:" << phi_center[i] << "\n";
+		  pix2vec_nest(nside, i, &vec_temp[0], &vertex_temp[0]);
+		  for(j=0;j<3;j++)
+			  vec[i][j] = vec_temp[j];
+
+		  for(k=0;k<4;k++) // four corners of the surface element
+		  {
+			  for(j=0;j<3;j++) // three spatial coordinates
+				  vertex[i][k][j] = vertex_temp[j+3*k];
+
+			  // Compute the angles for each vertices
+			  vec2ang(vertex[i][k], &theta_corners[i*4+k], &phi_corners[i*4+k]);
+		  }
+	}
+
+	//
+	// Compute geometry of the Roche spheroid
+
+	// Compute the surface radii for each vertices using the angles and Roche potential equations
+	surface_radii(radii_corners, theta_corners, phi_corners, 4*npix);
+	surface_radii( radii_center,  theta_center, phi_center,    npix);
+
+	// Compute the gravity darkening (based on the center of the Healpix pixel)
+	surface_gravity(gravity, radii_center, theta_center, phi_center, npix);
+	double gravity_pole = 1;
+	triaxial_gravity(&gravity_pole, radius_pole, 0.0, 0.0);
+	surface_temperature(temperature, gravity, gravity_pole, npix);
+
+
+	double dtheta;
+	double dphi;
+	// Add simple spots (TBD: overlap)
+	for(j=0;j<nspots;j++)
+	{
+		for(i = 0; i < npix; i++)
+		{
+			// test for spot presence
+			// cout <<  abs( theta_center[i] - spot_theta[j] ) << "\t" << spot_thetasize[j] << "\n";
+			dtheta =  ( theta_center[i] - spot_theta[j] ) / spot_thetasize[j];
+			dphi = ( phi_center[i] - spot_phi[j] ) / spot_phisize[j] ;
+			if ( dtheta*dtheta + dphi*dphi <= 1.  )
+			{
+				temperature[i] = spot_temperature[i];
+			}
+		}
+	}
+
+	// Convert temperature into fluxes
+	surface_flux();
+
+
+	// Modify the vertices
+	for ( i = 0; i < npix; i++)
+	{
+		for ( j = 0; j < 4; j++)
+		{
+			for (k=0;k<3; k++)
+			{
+				vertex[i][j][k] *= radii_corners[i*4+j] ;
+			}
+		}
+	}
+
+	for(i=0;i<npix;i++)
+	{
+		for ( j = 0; j < 4; j++)
+		{
+			vbo_data.push_back(vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
+			vbo_data.push_back(vec3( i % (12*nside) ,  i/(12*nside), 0 ) );
+			vbo_data.push_back(vec3(cos(phi_center[i]) * sin(theta_center[i]), sin(phi_center[i]) * sin(theta_center[i]), cos(theta_center[i])));
+		}
+	}
+	
+	// for each Healpix pixel (= quad), "elements" contains the two triangle vertices that form this quad
+	// both quads and triangles are defined counterclockwise 0-1-2-3 becomes 0-1-3 + 3-1-2
+	// these indexes are given by i * N + M
+	// a new quad is defined every N vec3 in the vbo
+	// M = N/4 * [0, 1, 3, 3, 1, 2]
+	for(i=0;i<npix;i++)
+	{
+		elements.push_back(i * 12 + 0);
+		elements.push_back(i * 12 + 3);
+		elements.push_back(i * 12 + 9);
+		elements.push_back(i * 12 + 9);
+		elements.push_back(i * 12 + 3);
+		elements.push_back(i * 12 + 6);
+	}
+
+  
+}
+
+void RocheBinary::setup()
+{
+	// Generate the verticies and elements
+	GenerateRoche(mVBOData, mElements);
+	// Create a new Vertex Array Object, Vertex Buffer Object, and Element Buffer
+	// object to store the model's information.
+	//
+	// First generate the VAO, this stores all buffer information related to this object
+	glGenVertexArrays(1, &mVAO);
+	glBindVertexArray(mVAO);
+	// Generate and bind to the VBO. Upload the verticies.
+	glGenBuffers(1, &mVBO); // Generate 1 buffer
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glBufferData(GL_ARRAY_BUFFER, mVBOData.size() * sizeof(vec3), &mVBOData[0], GL_STATIC_DRAW);
+	// Generate and bind to the EBO. Upload the elements.
+	glGenBuffers(1, &mEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mElements.size() * sizeof(unsigned int), &mElements[0], GL_STATIC_DRAW);
+
+
+	// Next we need to define the storage format for this object for the shader.
+	// First get the shader and activate it
+	LoadVBOShaders();
+	glUseProgram(mShaderProgram);
+			
+	// Now start defining the storage for the VBO.
+	// The 'vbo_data' variable stores a unit sphere so the vertex data can
+	// be used as normals.
+	GLint posAttrib = glGetAttribLocation(mShaderProgram, "position");
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid *) 0);
+	glEnableVertexAttribArray(posAttrib);
+	
+	GLint texAttrib = glGetAttribLocation(mShaderProgram, "in_tex_coord");
+	
+	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid *)(3*sizeof(float)));
+	glEnableVertexAttribArray(texAttrib);
+	
+	// Now define the normals, if they are used
+	GLint normAttrib = glGetAttribLocation(mShaderProgram, "normal");
+	if(normAttrib > -1)
+	{
+	  cout << "NORMALS \n";
+	  glEnableVertexAttribArray(normAttrib);
+	  glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid*) (6 * sizeof(float)));
+	}
+		
+	//GLint ExtensionCount;
+	//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ExtensionCount);
+	//cout << "Maximum allocable texture size: " << ExtensionCount << endl;
+		
+	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
+	// modified by subsequent calls.
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	// Load image as a texture
+	glGenTextures(1, &mTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, 12*nside, nside, 0, GL_RED, GL_FLOAT, image);
+	glGenerateMipmap(GL_TEXTURE_RECTANGLE);  //Generate mipmaps -- shouldnt do anything for GL_TEXTURE_RECTANGLE
+	glTexParameteri(GL_TEXTURE_RECTANGLE,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	//glGetError();
+	
+	// Set sampler
+	GLuint TextureSamp  = glGetUniformLocation(mShaderProgram,"TexSampler");
+	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
+
+	//glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+}
+
