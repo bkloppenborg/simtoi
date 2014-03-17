@@ -9,86 +9,90 @@
  */
 
 #include "CRocheBinary.h"
+#include "CShaderFactory.h"
 
-
-RocheBinary::RocheBinary()
-: CModel(10)
+CRocheBinary::CRocheBinary()
+: CModel(0)
 {
-	GLuint mVAO = 0;
-	GLuint mVBO = 0;
-	GLuint mEBO = 0;
+	mVAO = 0;
+	mVBO = 0;
+	mEBO = 0;
 
-	mParamNames.push_back("Wavelength (um)");
-	SetParam(mBaseParams + 1,  1.4);
-	SetFree(mBaseParams + 1, false);
-	SetMax(mBaseParams + 1, 5);
-	SetMin(mBaseParams + 1, 0.1);
+	// This model ALWAYS uses the Andrews 2009 disk shader.
+	auto shaders = CShaderFactory::Instance();
+	mShader = shaders.CreateShader("texture_2d");
 
-	mParamNames.push_back("Parallax (mas)");
-	SetParam(mBaseParams + 2, 28.8);
-	SetFree(mBaseParams + 2, false);
-	SetMax(mBaseParams + 2, 0.1);
-	SetMin(mBaseParams + 2, 50);
-
-	mParamNames.push_back("Orbital Period (d)");
-	SetParam(mBaseParams + 3, 2.87);
-	SetFree(mBaseParams + 3, false);
-	SetMax(mBaseParams + 3, 0.1);
-	SetMin(mBaseParams + 3, 50);
-
-	mParamNames.push_back("Rotation Period (d)");
-	SetParam(mBaseParams + 4, 2.87);
-	SetFree(mBaseParams + 4, false);
-	SetMax(mBaseParams + 4, 0.1);
-	SetMin(mBaseParams + 4, 50);
-
-	mParamNames.push_back("Healpix Resolution (mas)");
-	SetParam(mBaseParams + 5, 0.05);
-	SetFree(mBaseParams + 5, false);
-	SetMax(mBaseParams + 5, 0.01);
-	SetMin(mBaseParams + 5, 5.0);
-
-	mParamNames.push_back("Mass 1 (MSolar)");
-	SetParam(mBaseParams + 6, 0.75);
-	SetFree(mBaseParams + 6, false);
-	SetMax(mBaseParams + 6, 0.1);
-	SetMin(mBaseParams + 6, 50.0);
-
-	mParamNames.push_back("Mass 2 (MSolar)");
-	SetParam(mBaseParams + 7, 3.2);
-	SetFree(mBaseParams + 7, false);
-	SetMax(mBaseParams + 7, 0.1);
-	SetMin(mBaseParams + 7, 50.0);
-
-	mParamNames.push_back("Polar Temperature (K)");
-	SetParam(mBaseParams + 8, 3700);
-	SetFree(mBaseParams + 8, false);
-	SetMax(mBaseParams + 8, 1500);
-	SetMin(mBaseParams + 8, 25000.0);
-
-	mParamNames.push_back("Polar Radius (RSolar)");
-	SetParam(mBaseParams + 9, 3.25);
-	SetFree(mBaseParams + 9, false);
-	SetMax(mBaseParams + 9, 1.0);
-	SetMin(mBaseParams + 9, 1000);
-
-	mParamNames.push_back("Gravity Darkening");
-	SetParam(mBaseParams + 10, 0.2);
-	SetFree(mBaseParams + 10, false);
-	SetMax(mBaseParams + 10, 0.01);
-	SetMin(mBaseParams + 10, 1.0);
+//	mParamNames.push_back("Wavelength (um)");
+//	SetParam(mBaseParams + 1,  1.4);
+//	SetFree(mBaseParams + 1, false);
+//	SetMax(mBaseParams + 1, 5);
+//	SetMin(mBaseParams + 1, 0.1);
+//
+//	mParamNames.push_back("Parallax (mas)");
+//	SetParam(mBaseParams + 2, 28.8);
+//	SetFree(mBaseParams + 2, false);
+//	SetMax(mBaseParams + 2, 0.1);
+//	SetMin(mBaseParams + 2, 50);
+//
+//	mParamNames.push_back("Orbital Period (d)");
+//	SetParam(mBaseParams + 3, 2.87);
+//	SetFree(mBaseParams + 3, false);
+//	SetMax(mBaseParams + 3, 0.1);
+//	SetMin(mBaseParams + 3, 50);
+//
+//	mParamNames.push_back("Rotation Period (d)");
+//	SetParam(mBaseParams + 4, 2.87);
+//	SetFree(mBaseParams + 4, false);
+//	SetMax(mBaseParams + 4, 0.1);
+//	SetMin(mBaseParams + 4, 50);
+//
+//	mParamNames.push_back("Healpix Resolution (mas)");
+//	SetParam(mBaseParams + 5, 0.05);
+//	SetFree(mBaseParams + 5, false);
+//	SetMax(mBaseParams + 5, 0.01);
+//	SetMin(mBaseParams + 5, 5.0);
+//
+//	mParamNames.push_back("Mass 1 (MSolar)");
+//	SetParam(mBaseParams + 6, 0.75);
+//	SetFree(mBaseParams + 6, false);
+//	SetMax(mBaseParams + 6, 0.1);
+//	SetMin(mBaseParams + 6, 50.0);
+//
+//	mParamNames.push_back("Mass 2 (MSolar)");
+//	SetParam(mBaseParams + 7, 3.2);
+//	SetFree(mBaseParams + 7, false);
+//	SetMax(mBaseParams + 7, 0.1);
+//	SetMin(mBaseParams + 7, 50.0);
+//
+//	mParamNames.push_back("Polar Temperature (K)");
+//	SetParam(mBaseParams + 8, 3700);
+//	SetFree(mBaseParams + 8, false);
+//	SetMax(mBaseParams + 8, 1500);
+//	SetMin(mBaseParams + 8, 25000.0);
+//
+//	mParamNames.push_back("Polar Radius (RSolar)");
+//	SetParam(mBaseParams + 9, 3.25);
+//	SetFree(mBaseParams + 9, false);
+//	SetMax(mBaseParams + 9, 1.0);
+//	SetMin(mBaseParams + 9, 1000);
+//
+//	mParamNames.push_back("Gravity Darkening");
+//	SetParam(mBaseParams + 10, 0.2);
+//	SetFree(mBaseParams + 10, false);
+//	SetMax(mBaseParams + 10, 0.01);
+//	SetMin(mBaseParams + 10, 1.0);
 
 //	// Fundamental properties of the star
-//	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
-//	parallax = 28.8; // distance from the sun, in pc
-//	orbital_period = 2.87; // days
-//	rotation_period = orbital_period; // days, using synchronous rotation, but can work asynchronously
-//	desired_resolution =.05; // mas
-//	mass1 = 0.75; // mass of the Roche-lobed star
-//	mass2 = 3.2 ; // mass of the other star in the binary
-//	teff_pole = 3700. ; // temperature of the Roche-lobed star
-//	radius_pole = 3.25; //  rsun
-//	gravity_darkening = 0.2;
+	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
+	parallax = 28.8; // distance from the sun, in pc
+	orbital_period = 2.87; // days
+	rotation_period = orbital_period; // days, using synchronous rotation, but can work asynchronously
+	desired_resolution =.05; // mas
+	mass1 = 0.75; // mass of the Roche-lobed star
+	mass2 = 3.2 ; // mass of the other star in the binary
+	teff_pole = 3700. ; // temperature of the Roche-lobed star
+	radius_pole = 3.25; //  rsun
+	gravity_darkening = 0.2;
 
 		
 	// Derived values
@@ -142,7 +146,7 @@ RocheBinary::RocheBinary()
 	*/
 }
 
-RocheBinary::~RocheBinary()
+CRocheBinary::~CRocheBinary()
 {
 	glDeleteBuffers(1, &mEBO);
 	glDeleteBuffers(1, &mVBO);
@@ -167,7 +171,12 @@ RocheBinary::~RocheBinary()
 	
 }
 
-void RocheBinary::triaxial_gravity(double * gravity, const double radius, const double theta, const double phi)
+shared_ptr<CModel> CRocheBinary::Create()
+{
+	return shared_ptr<CModel>(new CRocheBinary());
+}
+
+void CRocheBinary::triaxial_gravity(double * gravity, const double radius, const double theta, const double phi)
 { 
 	  double x1, x2, x3, y, z, radius1, radius2, radius1_pow3, radius2_pow3, l, mu;
 	  double gx, gy, gz;
@@ -188,19 +197,19 @@ void RocheBinary::triaxial_gravity(double * gravity, const double radius, const 
 	  *gravity = sqrt( gx*gx+gy*gy+gz*gz);
 }
 
-void RocheBinary::surface_gravity(double* gravity, const double* radii, const double* theta, const double* phi, const unsigned int vsize)
+void CRocheBinary::surface_gravity(double* gravity, const double* radii, const double* theta, const double* phi, const unsigned int vsize)
 {
 	for(unsigned int i=0; i < vsize; i++)
 		triaxial_gravity(&gravity[i], radii[i],  theta[i], phi[i] );
 }
 
-void RocheBinary::surface_temperature(double* temperature, const double* gravity, const double gravity_pole, const unsigned int vsize ) 
+void CRocheBinary::surface_temperature(double* temperature, const double* gravity, const double gravity_pole, const unsigned int vsize ) 
 {
 	 for(unsigned int i = 0; i < vsize; i++)
 		temperature[i] = teff_pole * pow(gravity[i] / gravity_pole, gravity_darkening);
 }
 
-void RocheBinary::triaxial_pot(double* pot, double* dpot, const double radius, const double theta, const double phi)
+void CRocheBinary::triaxial_pot(double* pot, double* dpot, const double radius, const double theta, const double phi)
 {
 	  // TBD this is using Pringle 1985, or for a more recent ref Regos 2005 (http://adsabs.harvard.edu/abs/2005MNRAS.358..544R )
 	  // This is only valid for circular + synchronous rotation, so this will be replaced by Sepinsky 2007
@@ -222,56 +231,58 @@ void RocheBinary::triaxial_pot(double* pot, double* dpot, const double radius, c
 }
 
 
-void RocheBinary::surface_radii(double* radii, const double *theta, const double *phi, const unsigned int vsize)
+void CRocheBinary::surface_radii(double* radii, const double *theta, const double *phi, const unsigned int vsize)
 {
-  // in this function we compute the roche radius based on masses/ distance / orbital_period, for each (theta, phi)
-  const double epsilon = 1;  
-  register int i;
-  double pot_surface, pot, dpot;
-  double newton_step;
+	// in this function we compute the roche radius based on masses/ distance / orbital_period, for each (theta, phi)
+	const double epsilon = 1;
+	register int i;
+	double pot_surface, pot, dpot;
+	double newton_step;
 
-  triaxial_pot(&pot_surface, &dpot, radius_pole, 0.0, 0.0); // potential at the equator
+	triaxial_pot(&pot_surface, &dpot, radius_pole, 0.0, 0.0); // potential at the equator
 
-  for(i =0;i<vsize;i++) 
-    radii[i] = 1.22 * radius_pole; // initial guess for the radius
+	for(i =0;i<vsize;i++)
+	radii[i] = 1.22 * radius_pole; // initial guess for the radius
 
-  unsigned short converged[vsize]; // tracks the convergence for each radius
-  for(i=0;i<vsize;i++)
-    converged[i] = 0;      
-  unsigned int all_converged = 0;
-  //unsigned int counter =0;
+	unsigned short converged[vsize]; // tracks the convergence for each radius
+	for(i=0;i<vsize;i++)
+	converged[i] = 0;
+	unsigned int all_converged = 0;
+	//unsigned int counter =0;
 
-  while(all_converged < vsize-1)
-    {
-      all_converged = 0;
-
-      for(i=0;i<vsize;i++)
+	while(all_converged < vsize-1)
 	{
-	  if(converged[i] == 0) // we compute only up to the precision for each element, then we skip
-	    // not sure if this is faster than vectorizing...
-	    {
-	      
-	      triaxial_pot(&pot, &dpot, radii[i], theta[i], phi[i]);	     
-	      newton_step = (pot - pot_surface ) / (rsun * dpot);  // newton step
-	      radii[i] = radii[i] - newton_step;
-	      if( fabs(newton_step) < epsilon)
+		all_converged = 0;
+
+		for(i=0;i<vsize;i++)
 		{
-		  converged[i] = 1;
-		  all_converged +=1;
+			if(converged[i] == 0) // we compute only up to the precision for each element, then we skip
+			// not sure if this is faster than vectorizing...
+			{
+				triaxial_pot(&pot, &dpot, radii[i], theta[i], phi[i]);
+				newton_step = (pot - pot_surface ) / (rsun * dpot);  // newton step
+				radii[i] = radii[i] - newton_step;
+				if( fabs(newton_step) < epsilon)
+				{
+				converged[i] = 1;
+				all_converged +=1;
+			}
+		//      counter++;
 		}
-	//      counter++;
-	    }
 	}
-    
-     cout << "Convergence " << all_converged << "\n";
-    }
+
+	cout << "Convergence " << all_converged << "\n";
+	}
 }
 
-void RocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
+void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 {
+	if(!mModelReady)
+		Init();
+
 	// Rename a few variables for convenience:
-	double radius = 50;
-	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
+	double radial_scale = 50;
+	mat4 scale = glm::scale(mat4(), glm::vec3(radial_scale, radial_scale, radial_scale));
 
 	vec2 color = vec2(1.0, 1.0);
 			
@@ -279,7 +290,8 @@ void RocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	// Activate the shader
-	glUseProgram(mShaderProgram);
+	GLuint shader_program = mShader->GetProgram();
+	glUseProgram(shader_program);
 	
 	//GLint uniColorFlag = glGetUniformLocation(mShaderProgram, "color_from_uniform");
 	//glUniform1i(uniColorFlag, true);
@@ -288,20 +300,17 @@ void RocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glBindVertexArray(mVAO);
 
 	// Define the view:
-	GLint uniView = glGetUniformLocation(mShaderProgram, "view");
+	GLint uniView = glGetUniformLocation(shader_program, "view");
 	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 
-	GLint uniTranslation = glGetUniformLocation(mShaderProgram, "translation");
+	GLint uniTranslation = glGetUniformLocation(shader_program, "translation");
 	glUniformMatrix4fv(uniTranslation, 1, GL_FALSE, glm::value_ptr(Translate()));
 
-	GLint uniRotation = glGetUniformLocation(mShaderProgram, "rotation");
+	GLint uniRotation = glGetUniformLocation(shader_program, "rotation");
 	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
 
-	GLint uniScale = glGetUniformLocation(mShaderProgram, "scale");
+	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
-
-	//GLint uniColor = glGetUniformLocation(mShaderProgram, "uni_color");
-	//glUniform2fv(uniColor, 1, glm::value_ptr(color));
 	  
 	// render
 	glDrawElements(GL_TRIANGLES ,  mElements.size(), GL_UNSIGNED_INT, 0);
@@ -314,7 +323,7 @@ void RocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 }
 
 
-void RocheBinary::surface_flux() // Converts temperatures to image brightness
+void CRocheBinary::surface_flux() // Converts temperatures to image brightness
 {
 	// We basically use Plank's law to derive the temperature dependency
 	//
@@ -334,7 +343,7 @@ void RocheBinary::surface_flux() // Converts temperatures to image brightness
 		image[i] /= maxim;
 }
 
-void RocheBinary::GenerateRoche(vector<vec3> & vbo_data, vector<unsigned int> & elements)
+void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data, vector<unsigned int> & elements)
 {
 	register int i,j,k;
 	double vec[npix][3];
@@ -441,7 +450,7 @@ void RocheBinary::GenerateRoche(vector<vec3> & vbo_data, vector<unsigned int> & 
   
 }
 
-void RocheBinary::setup()
+void CRocheBinary::Init()
 {
 	// Generate the verticies and elements
 	GenerateRoche(mVBOData, mElements);
@@ -460,32 +469,38 @@ void RocheBinary::setup()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mElements.size() * sizeof(unsigned int), &mElements[0], GL_STATIC_DRAW);
 
+	CWorkerThread::CheckOpenGLError("A");
+
 
 	// Next we need to define the storage format for this object for the shader.
 	// First get the shader and activate it
-	LoadVBOShaders();
-	glUseProgram(mShaderProgram);
+	GLuint shader_program = mShader->GetProgram();
+	glUseProgram(shader_program);
 			
 	// Now start defining the storage for the VBO.
 	// The 'vbo_data' variable stores a unit sphere so the vertex data can
 	// be used as normals.
-	GLint posAttrib = glGetAttribLocation(mShaderProgram, "position");
+	GLint posAttrib = glGetAttribLocation(shader_program, "position");
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid *) 0);
 	glEnableVertexAttribArray(posAttrib);
 	
-	GLint texAttrib = glGetAttribLocation(mShaderProgram, "in_tex_coord");
-	
+	CWorkerThread::CheckOpenGLError("Aa");
+
+	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
 	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid *)(3*sizeof(float)));
 	glEnableVertexAttribArray(texAttrib);
 	
+	CWorkerThread::CheckOpenGLError("Ab");
+
 	// Now define the normals, if they are used
-	GLint normAttrib = glGetAttribLocation(mShaderProgram, "normal");
+	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
 	if(normAttrib > -1)
 	{
-	  cout << "NORMALS \n";
 	  glEnableVertexAttribArray(normAttrib);
 	  glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid*) (6 * sizeof(float)));
 	}
+
+	CWorkerThread::CheckOpenGLError("B");
 		
 	//GLint ExtensionCount;
 	//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ExtensionCount);
@@ -507,12 +522,22 @@ void RocheBinary::setup()
 	glTexParameteri(GL_TEXTURE_RECTANGLE,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	//glGetError();
 	
 	// Set sampler
-	GLuint TextureSamp  = glGetUniformLocation(mShaderProgram,"TexSampler");
+	GLuint TextureSamp  = glGetUniformLocation(shader_program,"TexSampler");
 	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
 
+	// Check that things loaded correctly.
+	CWorkerThread::CheckOpenGLError("C");
+
 	//glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+
+	// Indicate the model is ready to use.
+	mModelReady = true;
 }
 
+/// Overrides the default CModel::SetShader function.
+void CRocheBinary::SetShader(CShaderPtr shader)
+{
+	// This mode does not accept different shaders, do nothing here.
+}

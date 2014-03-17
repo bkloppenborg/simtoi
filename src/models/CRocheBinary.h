@@ -12,10 +12,10 @@
 #include "chealpix.h"
 
 
-class RocheBinary: public CModel {
+class CRocheBinary: public CModel {
 public:
-	RocheBinary();
-	virtual ~RocheBinary();
+	CRocheBinary();
+	virtual ~CRocheBinary();
 
 protected:
 	GLuint mVAO;
@@ -26,12 +26,20 @@ protected:
 	vector<unsigned int> mElements;
 
 	GLuint mTextureID; // texture id	
+
+	bool mModelReady;
 	
 public:
 	void normalize_vert(double * vec);
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
-	void setup();
+	void Init();
+
+	static shared_ptr<CModel> Create();
+
+	virtual string GetID() { return "roche_binary"; };
 	
+	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
+
 	
 private: 
 	// Constants
@@ -44,17 +52,17 @@ private:
 	const double gmr2 = gmr / rsun;
 	
 	// Main parameters
-//	double lambda; // wavelength of observation, used to convert temperatures to fluxes, in meters
-//	double parallax; // distance from the sun, in pc
-//	double orbital_period; // days, orbital period of the star
-//	double rotation_period; // days, rotation period of the star
-//	double radius_pole; //  rsun, polar radius of the star
-//	double desired_resolution; // mas, Healpix resolution
-//	double gravity_darkening;
-//
-//	double mass1 ; // mass of the Roche-lobed star
-//	double mass2 ; // mass of the other star in the binary
-//	double teff_pole; // temperature of the Roche-lobed star
+	double lambda; // wavelength of observation, used to convert temperatures to fluxes, in meters
+	double parallax; // distance from the sun, in pc
+	double orbital_period; // days, orbital period of the star
+	double rotation_period; // days, rotation period of the star
+	double radius_pole; //  rsun, polar radius of the star
+	double desired_resolution; // mas, Healpix resolution
+	double gravity_darkening;
+
+	double mass1 ; // mass of the Roche-lobed star
+	double mass2 ; // mass of the other star in the binary
+	double teff_pole; // temperature of the Roche-lobed star
 	
 	double massratio ;
 	double omega_rot ; // orbital period in Hz	
