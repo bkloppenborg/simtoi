@@ -12,7 +12,7 @@
 #include "CShaderFactory.h"
 
 CRocheBinary::CRocheBinary()
-: CModel(0)
+: CModel(1)
 {
 	mVAO = 0;
 	mVBO = 0;
@@ -81,6 +81,12 @@ CRocheBinary::CRocheBinary()
 //	SetFree(mBaseParams + 10, false);
 //	SetMax(mBaseParams + 10, 0.01);
 //	SetMin(mBaseParams + 10, 1.0);
+
+	mParamNames.push_back("Scale (temp)");
+	SetParam(mBaseParams + 1, 0.2);
+	SetFree(mBaseParams + 1, false);
+	SetMax(mBaseParams + 1, 10.0);
+	SetMin(mBaseParams + 1, 0.01);
 
 //	// Fundamental properties of the star
 	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
@@ -281,7 +287,7 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		Init();
 
 	// Rename a few variables for convenience:
-	double radial_scale = 1;
+	double radial_scale = mParams[mBaseParams + 1];
 	mat4 scale = glm::scale(mat4(), glm::vec3(radial_scale, radial_scale, radial_scale));
 
 	vec2 color = vec2(1.0, 1.0);
@@ -386,7 +392,6 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data, vector<unsigned int> &
 	double gravity_pole = 1;
 	triaxial_gravity(&gravity_pole, radius_pole, 0.0, 0.0);
 	surface_temperature(temperature, gravity, gravity_pole, npix);
-
 
 	double dtheta;
 	double dphi;
