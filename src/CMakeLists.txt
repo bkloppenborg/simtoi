@@ -20,7 +20,7 @@ add_subdirectory(scripts)
 # Assemble all of the source to build simtoi.
 #file(GLOB SOURCE *.cpp models/*.cpp positions/*.cpp minimizers/*.cpp tasks/*.cpp)
 file(GLOB SOURCE *.cpp models/CSphere.* models/CDensityDisk.* models/CDisk_Pascucci2004.* 
-models/CDisk_Andrews2009.* models/CCylinder.*
+models/CDisk_Andrews2009.* models/CCylinder.* models/CRocheBinary.*
 positions/*.cpp minimizers/*.cpp tasks/*.cpp)
 
 # Levmar requires a linear algebra package, but it doesn't export a
@@ -44,4 +44,4 @@ endif(MULTINEST_FOUND)
 add_executable(simtoi ${SOURCE})
 
 SET_TARGET_PROPERTIES(simtoi PROPERTIES LINKER_LANGUAGE Fortran)
-target_link_libraries(simtoi QT_files jsoncpp levmar oi_static textio_static ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${LAPACK_LIBRARIES} ${OPTIONAL_LIBS})
+target_link_libraries(simtoi QT_files jsoncpp levmar oi_static textio_static chealpix ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${LAPACK_LIBRARIES} ${OPTIONAL_LIBS})
