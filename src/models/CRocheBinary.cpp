@@ -281,7 +281,7 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		Init();
 
 	// Rename a few variables for convenience:
-	double radial_scale = 50;
+	double radial_scale = 1;
 	mat4 scale = glm::scale(mat4(), glm::vec3(radial_scale, radial_scale, radial_scale));
 
 	vec2 color = vec2(1.0, 1.0);
@@ -446,8 +446,6 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data, vector<unsigned int> &
 		elements.push_back(i * 12 + 3);
 		elements.push_back(i * 12 + 6);
 	}
-
-  
 }
 
 void CRocheBinary::Init()
@@ -469,9 +467,6 @@ void CRocheBinary::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mElements.size() * sizeof(unsigned int), &mElements[0], GL_STATIC_DRAW);
 
-	CWorkerThread::CheckOpenGLError("A");
-
-
 	// Next we need to define the storage format for this object for the shader.
 	// First get the shader and activate it
 	GLuint shader_program = mShader->GetProgram();
@@ -483,14 +478,10 @@ void CRocheBinary::Init()
 	GLint posAttrib = glGetAttribLocation(shader_program, "position");
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid *) 0);
 	glEnableVertexAttribArray(posAttrib);
-	
-	CWorkerThread::CheckOpenGLError("Aa");
 
 	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
 	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid *)(3*sizeof(float)));
 	glEnableVertexAttribArray(texAttrib);
-	
-	CWorkerThread::CheckOpenGLError("Ab");
 
 	// Now define the normals, if they are used
 	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
@@ -500,7 +491,7 @@ void CRocheBinary::Init()
 	  glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (GLvoid*) (6 * sizeof(float)));
 	}
 
-	CWorkerThread::CheckOpenGLError("B");
+	CWorkerThread::CheckOpenGLError("A");
 		
 	//GLint ExtensionCount;
 	//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ExtensionCount);
@@ -516,10 +507,11 @@ void CRocheBinary::Init()
 	// Load image as a texture
 	glGenTextures(1, &mTextureID);
 	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+
 	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, 12*nside, nside, 0, GL_RED, GL_FLOAT, image);
-	glGenerateMipmap(GL_TEXTURE_RECTANGLE);  //Generate mipmaps -- shouldnt do anything for GL_TEXTURE_RECTANGLE
-	glTexParameteri(GL_TEXTURE_RECTANGLE,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_RECTANGLE,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	
@@ -528,7 +520,7 @@ void CRocheBinary::Init()
 	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
 
 	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("C");
+	CWorkerThread::CheckOpenGLError("CRocheBinary.Init()");
 
 	//glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
