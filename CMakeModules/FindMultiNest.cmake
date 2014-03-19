@@ -69,7 +69,7 @@ FIND_PATH(_MULTINEST_INCLUDE_DIRS
     
 FIND_PATH(MULTINEST_MODULE_DIRS
     NAMES nested.mod
-    HINTS ${MULTINEST_ROOT_DIR}/modules
+    HINTS /usr/local/modules ${MULTINEST_ROOT_DIR}/modules
     DOC "MULTINEST Fortran module directory")
 
 # Now find the library:
