@@ -85,10 +85,12 @@ void CCylinder::GenerateMidplane(vector<vec3> & vertices, vector<unsigned int> &
 		cos_phi[i] = cos(dphi * i);
 	}
 
-	// Generate the top vertices
+	// Generate the vertices and normals
 	double dr = 1.0 / r_divisions;
 	double x, y;
-	for(double r = 1; r > 0; r -= dr)
+	// Note, we exceed the outer radius here to ensure the outer-rim is
+	// drawn. This avoids some floating point issues.
+	for(double r = 0; r < 1 + dr; r += dr)
 	{
 		for(unsigned int phi = 0; phi < phi_divisions; phi++)
 		{

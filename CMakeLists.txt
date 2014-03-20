@@ -46,6 +46,11 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/lib/liboi EXCLUDE_FROM_ALL)
 include_directories(${PROJECT_SOURCE_DIR}/lib/liboi/src)
 include_directories(${LIBOI_INCLUDE_DIRS})
 
+# healpix
+add_subdirectory(${PROJECT_SOURCE_DIR}/lib/chealpix EXCLUDE_FROM_ALL)
+include_directories(${PROJECT_SOURCE_DIR}/lib/chealpix)
+include_directories(${CHEALPIX_INCLUDE_DIRS})
+
 # Build the main directory, always
 add_subdirectory(src)
 
