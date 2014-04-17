@@ -1,4 +1,5 @@
-#version 150 core
+#version 330 core
+
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -25,11 +26,13 @@
  */
 
 in vec3 Normal;
-in vec2 Color;
+in vec2 Tex_Coords;
 
 out vec4 out_color;
+
+uniform sampler2DRect TexSampler;
+
 void main()
 {
-    out_color = vec4(Color.x, 0.0, 0.0, Color.y);
-}
- 
+    out_color = vec4(texture(TexSampler, Tex_Coords).r, 0.0, 0.0, texture(TexSampler, Tex_Coords).a);
+};
