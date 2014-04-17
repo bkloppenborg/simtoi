@@ -39,8 +39,7 @@ public:
 	virtual string GetID()
 	{
 		return "roche_binary";
-	}
-	;
+	};
 
 	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
 

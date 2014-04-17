@@ -542,8 +542,6 @@ void CRocheBinary::Init()
 	// Check that things loaded correctly.
 	CWorkerThread::CheckOpenGLError("CRocheBinary.Init()");
 
-	//glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-
 	// Indicate the model is ready to use.
 	mModelReady = true;
 }
