@@ -351,24 +351,21 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void CRocheBinary::surface_flux() // Converts temperatures to image brightness
+void CRocheBinary::surface_flux(float * pixels, double * temperatures, unsigned int size,
+		double wavelength, double max_temperature) // Converts temperatures to image brightness
 {
 	// We basically use Plank's law to derive the temperature dependency
 	//
 	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
 	// h*c/k = 0.0143877696 m K
-	double maxim = 0;
-	for (unsigned int i = 0; i < npix; i++)
+	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	for (unsigned int i = 0; i < size; i++)
 	{
-		image[i] = 1. / (exp(0.0143877696 / (lambda * temperature[i])) - 1.);
+		pixels[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
 
-		if (image[i] > maxim)
-			maxim = image[i];
+		pixels[i] /= max_flux;
 	}
 
-	// Normalize image by its max for opengl display
-	for (int i = 0; i < npix; i++)
-		image[i] /= maxim;
 }
 
 void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
@@ -417,8 +414,16 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	triaxial_gravity(gravity_pole, radius_pole, 0.0, 0.0);
 	surface_temperature(temperature, gravity, gravity_pole, npix);
 
+	double max_temperature = 0;
+	for(unsigned int i = 0; i < npix; i++)
+	{
+		if(temperature[i] > max_temperature)
+			max_temperature = temperature[i];
+	}
+
 	double dtheta;
 	double dphi;
+
 	// Add simple spots (TBD: overlap)
 	for (j = 0; j < nspots; j++)
 	{
@@ -436,7 +441,7 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperature into fluxes
-	surface_flux();
+	surface_flux(image, temperature, npix, lambda, max_temperature);
 
 	// Modify the vertices
 	for (i = 0; i < npix; i++)

@@ -108,7 +108,8 @@ private:
 			const double* theta, const double* phi, const unsigned int vsize);
 	void surface_temperature(double* temperature, const double* gravity,
 			const double gravity_pole, const unsigned int vsize);
-	void surface_flux();
+	void surface_flux(float * pixels, double * temperatures, unsigned int size,
+			double wavelength, double max_temperature);
 public:
 	void GenerateRoche(vector<vec3> & vbo_data,
 			vector<unsigned int> & elements);
