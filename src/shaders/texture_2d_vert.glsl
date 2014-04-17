@@ -28,10 +28,12 @@
 in vec3 position;
 in vec3 normal;
 in vec3 tex_coords;
+
 uniform mat4 rotation;
 uniform mat4 scale;
 uniform mat4 translation;
 uniform mat4 view;
+
 out vec3 ModelPosition;
 out vec3 Normal;
 out vec2 Tex_Coords;

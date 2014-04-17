@@ -27,7 +27,9 @@
 
 in vec3 Normal;
 in vec2 Tex_Coords;
+
 out vec4 out_color;
+
 uniform sampler2DRect TexSampler;
 
 void main()

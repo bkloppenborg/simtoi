@@ -425,7 +425,7 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	for(i = 0; i < npix; i++)
 		image[i].a = 1.0;
 
-	// Modify the vertices
+	// Convert the unit-radius verticies to the Roche surface radii.
 	for (i = 0; i < npix; i++)
 	{
 		for (j = 0; j < 4; j++)
@@ -437,13 +437,17 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 		}
 	}
 
+	// load data into the VBO.
 	for (i = 0; i < npix; i++)
 	{
 		for (j = 0; j < 4; j++)
 		{
+			// set the verticies
 			vbo_data.push_back(
 					vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
+			// set the texture coordinates
 			vbo_data.push_back(vec3(i % (12 * nside), i / (12 * nside), 0));
+			// set the surface normals
 			vbo_data.push_back(
 					vec3(cos(phi_center[i]) * sin(theta_center[i]),
 							sin(phi_center[i]) * sin(theta_center[i]),

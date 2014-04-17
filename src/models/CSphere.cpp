@@ -111,7 +111,10 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 		cos_phi[i] = cos(dphi * i);
 	}
 
-	// Generate the vertex positions.
+	// Generate the VBO. It will be populated as follows:
+	// [x0, y0, z0], [xN, yN, zN],
+	// because we store a unit sphere, the vertex positions are the same
+	// as the normals.
 	double x, y, z;
 	for(int i = 0; i < latitude_subdivisions + 1; i++)
 	{
@@ -122,23 +125,32 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 			z = cos_theta[i];
 			// The first three elements are the verticies
 			vbo_data.push_back(vec3(x, y, z));
+			// define the texture coordinate location
+			vbo_data.push_back(vec3(1.0, 0, 0));
 		}
 	}
 
 	// Now assign the elements. Go in the same direction as the vertices were
 	// generated above, namely in rows by latitude.
+	unsigned int top = 0, bottom = 0;
 	for(int lat = 0; lat < latitude_subdivisions; lat++)
 	{
 		for(int lon = 0; lon < longitude_subdivisions; lon++)
 		{
-			elements.push_back(lat * longitude_subdivisions + lon);
-			elements.push_back((lat + 1) * longitude_subdivisions + lon);
+			// compute the index of the top and bottom vertices
+			bottom = lat * longitude_subdivisions + lon;
+			top = (lat + 1) * longitude_subdivisions + lon;
+			elements.push_back(2*bottom);
+			elements.push_back(2*top);
 		}
 
 		// To complete a latitude row, link back to the first two vertices
 		// in the row.
-		elements.push_back(lat * longitude_subdivisions);
-		elements.push_back((lat + 1) * longitude_subdivisions);
+		bottom = lat * longitude_subdivisions;
+		top = (lat + 1) * longitude_subdivisions;
+
+		elements.push_back(2*bottom);
+		elements.push_back(2*top);
 	}
 }
 
@@ -174,26 +186,29 @@ void CSphere::Init()
 	glUseProgram(shader_program);
 
 	// Now start defining the storage for the VBO.
-	// The 'vbo_data' variable stores a unit sphere so the vertex data can
-	// be used as normals.
+	// As discussed in GenerateSphere_LatLon the VBO data is packed as thus:
+	//
+	// Positions are the first three elements
 	GLint posAttrib = glGetAttribLocation(shader_program, "position");
 	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
 			(GLvoid *) 0);
 	glEnableVertexAttribArray(posAttrib);
-
-	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
-	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-			(GLvoid *) (3 * sizeof(float)));
-	glEnableVertexAttribArray(texAttrib);
-
-	// Now define the normals, if they are used
+	// because we draw a unit sphere, the vertex positions are the same as
+	// normals
 	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
 	if (normAttrib > -1)
 	{
 		glEnableVertexAttribArray(normAttrib);
 		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
-				3 * sizeof(float), (GLvoid*) (6 * sizeof(float)));
+				3 * sizeof(float), (GLvoid *) 0);
 	}
+	// texture coordinates are packed right after the vertex coordinates.
+	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
+	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			(GLvoid *) (3 * sizeof(float)));
+
+	glEnableVertexAttribArray(texAttrib);
+
 
 	// Check that things loaded correctly.
 	CWorkerThread::CheckOpenGLError("CModelSphere.Init(), vbo setup");
@@ -237,7 +252,7 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Rename a few variables for convenience:
 	double radius = float(mParams[mBaseParams + 1] / 2);
-	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, 1.0));
+	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
 	// Set the color.
 	mTexture[0].r = mParams[3];
