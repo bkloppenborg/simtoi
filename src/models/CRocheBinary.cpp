@@ -18,10 +18,6 @@ CRocheBinary::CRocheBinary() :
 	mVBO = 0;
 	mEBO = 0;
 
-	// This model ALWAYS uses the Andrews 2009 disk shader.
-	auto shaders = CShaderFactory::Instance();
-	mShader = shaders.CreateShader("texture_2d");
-
 //	mParamNames.push_back("Wavelength (um)");
 //	SetParam(mBaseParams + 1,  1.4);
 //	SetFree(mBaseParams + 1, false);
@@ -555,10 +551,4 @@ void CRocheBinary::Init()
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
-}
-
-/// Overrides the default CModel::SetShader function.
-void CRocheBinary::SetShader(CShaderPtr shader)
-{
-	// This mode does not accept different shaders, do nothing here.
 }

@@ -41,8 +41,6 @@ public:
 		return "roche_binary";
 	};
 
-	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
-
 private:
 	// Constants
 	const double AU = 1.496e11; // meters

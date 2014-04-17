@@ -65,9 +65,9 @@ CSphere::CSphere()
 
 	mModelReady = false;
 
-	// temporary, set the default shader to texture_2d
-	auto shaders = CShaderFactory::Instance();
-	mShader = shaders.CreateShader("texture_2d");
+//	// temporary, set the default shader to texture_2d
+//	auto shaders = CShaderFactory::Instance();
+//	mShader = shaders.CreateShader("default");
 }
 
 CSphere::~CSphere()

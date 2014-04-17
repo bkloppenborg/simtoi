@@ -64,11 +64,6 @@ public:
 	void Init();
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
-
-	virtual void SetShader(CShaderPtr shader)
-	{
-
-	}
 };
 
 #endif /* CSPHERE_H_ */
