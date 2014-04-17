@@ -414,7 +414,7 @@ void CModel::SetShader(CShaderPtr shader)
 	mShader = shader;
 }
 
-/// Computes the flux for pixels given the input temperatuers following Planck's
+/// Computes the flux for pixels given the input temperatures following Planck's
 /// law.
 /// @param temperatures An array of temperatures of in Kelvin
 /// @param fluxes Array into which computed fluxes will be stored
@@ -435,6 +435,32 @@ void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & flux
 		fluxes[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
 
 		fluxes[i] /= max_flux;
+	}
+
+}
+
+/// Computes the flux for pixels given the input temperatures following Planck's
+/// law.
+/// @param temperatures An array of temperatures of in Kelvin
+/// @param pixels A vector of RGBA pixels into which the computes fluxes will be stored
+/// @param wavelength The wavelength of observation
+/// @param max_temperature The maximum temperature of all models (used for normalization)
+void CModel::TemperatureToFlux(vector<double> temperatures, vector<vec4> & fluxes,
+		double wavelength, double max_temperature)
+{
+	// The pixel and temperature buffers must be of the same size.
+	assert(fluxes.size() == temperatures.size());
+
+	// Planck's law:
+	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
+	// h*c/k = 0.0143877696 m K
+	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	for (unsigned int i = 0; i < temperatures.size(); i++)
+	{
+		// fill in the Red component.
+		fluxes[i].r = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+
+		fluxes[i].r /= max_flux;
 	}
 
 }

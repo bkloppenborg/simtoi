@@ -417,6 +417,9 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 
 	// Convert temperature into fluxes
 	TemperatureToFlux(temperature, image, lambda, max_temperature);
+	// set alpha channel values, the object is entirely opaque.
+	for(i = 0; i < npix; i++)
+		image[i].a = 1.0;
 
 	// Modify the vertices
 	for (i = 0; i < npix; i++)
@@ -524,7 +527,7 @@ void CRocheBinary::Init()
 	glGenTextures(1, &mTextureID);
 	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
 
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, 12*nside, nside, 0, GL_RED,
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 12*nside, nside, 0, GL_RGBA,
 			GL_FLOAT, &image[0]);
 
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

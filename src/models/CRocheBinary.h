@@ -80,7 +80,7 @@ private:
 	double* theta_center;
 	double* phi_center;
 	double* radii_center;
-	vector<float> image;
+	vector<vec4> image;	// RGBA float pixel values.
 	vector<double> gravity; // gravity intensity (not gravity vector)
 	vector<double> temperature; // temperature
 	// quantities related to the precise geometrical corners 

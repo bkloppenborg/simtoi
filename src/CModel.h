@@ -141,6 +141,8 @@ protected:
 public:
 	static void TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
 			double wavelength, double max_temperature);
+	static void TemperatureToFlux(vector<double> temperatures, vector<vec4> & pixels,
+			double wavelength, double max_temperature);
 
 };
 

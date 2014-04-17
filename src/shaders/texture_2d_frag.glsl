@@ -32,5 +32,5 @@ uniform sampler2DRect TexSampler;
 
 void main()
 {
-    out_color = vec4(texture(TexSampler, Tex_Coords).r, 0.0, 0.0, 1.0);
+    out_color = vec4(texture(TexSampler, Tex_Coords).r, 0.0, 0.0, texture(TexSampler, Tex_Coords).a);
 };
