@@ -95,10 +95,10 @@ private:
 	double* spot_phisize;
 	
 	//void normalize_vert(double * vec);
-	void triaxial_pot(double* pot, double* dpot, const double radius,  const double theta, const double phi);
-	void triaxial_gravity(double* gravity, const double radius, const double theta, const double phi);
+	void triaxial_pot(double & pot, double & dpot, const double radius,  const double theta, const double phi);
+	void triaxial_gravity(double & gravity, const double radius, const double theta, const double phi);
 	void surface_radii(double* radii, const double *theta, const double *phi, const unsigned int vsize);	
-	void surface_gravity(double* gravity, const double* radii, const double* theta, const double* phi, const unsigned int vsize);
+	void surface_gravity(double * gravity, const double* radii, const double* theta, const double* phi, const unsigned int vsize);
 	void surface_temperature(double* temperature, const double* gravity, const double gravity_pole, const unsigned int vsize ) ;
 	void surface_flux();
 public:

@@ -182,7 +182,7 @@ shared_ptr<CModel> CRocheBinary::Create()
 	return shared_ptr<CModel>(new CRocheBinary());
 }
 
-void CRocheBinary::triaxial_gravity(double * gravity, const double radius, const double theta, const double phi)
+void CRocheBinary::triaxial_gravity(double & gravity, const double radius, const double theta, const double phi)
 { 
 	  double x1, x2, x3, y, z, radius1, radius2, radius1_pow3, radius2_pow3, l, mu;
 	  double gx, gy, gz;
@@ -200,22 +200,22 @@ void CRocheBinary::triaxial_gravity(double * gravity, const double radius, const
 	  gy = gmr2 * mass1 * y  / radius1_pow3  + gmr2 * mass2 * y  / radius2_pow3 - omega_rot * omega_rot * rsun * y;
 	  gz = gmr2 * mass1 * z  / radius1_pow3  + gmr2 * mass2 * z  / radius2_pow3;
 
-	  *gravity = sqrt( gx*gx+gy*gy+gz*gz);
+	  gravity = sqrt( gx*gx+gy*gy+gz*gz);
 }
 
-void CRocheBinary::surface_gravity(double* gravity, const double* radii, const double* theta, const double* phi, const unsigned int vsize)
+void CRocheBinary::surface_gravity(double * gravity, const double * radii, const double * theta, const double * phi, const unsigned int vsize)
 {
 	for(unsigned int i=0; i < vsize; i++)
-		triaxial_gravity(&gravity[i], radii[i],  theta[i], phi[i] );
+		triaxial_gravity(gravity[i], radii[i],  theta[i], phi[i] );
 }
 
-void CRocheBinary::surface_temperature(double* temperature, const double* gravity, const double gravity_pole, const unsigned int vsize ) 
+void CRocheBinary::surface_temperature(double * temperature, const double * gravity, const double gravity_pole, const unsigned int vsize )
 {
 	 for(unsigned int i = 0; i < vsize; i++)
 		temperature[i] = teff_pole * pow(gravity[i] / gravity_pole, gravity_darkening);
 }
 
-void CRocheBinary::triaxial_pot(double* pot, double* dpot, const double radius, const double theta, const double phi)
+void CRocheBinary::triaxial_pot(double & pot, double & dpot, const double radius, const double theta, const double phi)
 {
 	  // TBD this is using Pringle 1985, or for a more recent ref Regos 2005 (http://adsabs.harvard.edu/abs/2005MNRAS.358..544R )
 	  // This is only valid for circular + synchronous rotation, so this will be replaced by Sepinsky 2007
@@ -232,12 +232,12 @@ void CRocheBinary::triaxial_pot(double* pot, double* dpot, const double radius, 
 	  y = radius1 * mu;
 	  z = radius1 * cos(theta);
 	  radius2 = sqrt(x2*x2+y*y+z*z);
-	  *pot  = -gmr  * ( mass1 / radius1 + mass2 /radius2 ) - 0.5 * omega_rot * omega_rot * rsun * rsun * ( x3*x3  + y * y );
-	  *dpot =  gmr2 * ( mass1 / (radius1*radius1) + mass2 / (radius2 * radius2 * radius2) * ( radius1 - separation_rsun * l ) )  - omega_rot * omega_rot * rsun * ( radius1 * l * l - l * separation_rsun * massratio + radius1 * mu * mu);
+	  pot  = -gmr  * ( mass1 / radius1 + mass2 /radius2 ) - 0.5 * omega_rot * omega_rot * rsun * rsun * ( x3*x3  + y * y );
+	  dpot =  gmr2 * ( mass1 / (radius1*radius1) + mass2 / (radius2 * radius2 * radius2) * ( radius1 - separation_rsun * l ) )  - omega_rot * omega_rot * rsun * ( radius1 * l * l - l * separation_rsun * massratio + radius1 * mu * mu);
 }
 
 
-void CRocheBinary::surface_radii(double* radii, const double *theta, const double *phi, const unsigned int vsize)
+void CRocheBinary::surface_radii(double * radii, const double * theta, const double * phi, const unsigned int vsize)
 {
 	// in this function we compute the roche radius based on masses/ distance / orbital_period, for each (theta, phi)
 	const double epsilon = 1;
@@ -245,14 +245,15 @@ void CRocheBinary::surface_radii(double* radii, const double *theta, const doubl
 	double pot_surface, pot, dpot;
 	double newton_step;
 
-	triaxial_pot(&pot_surface, &dpot, radius_pole, 0.0, 0.0); // potential at the equator
+	triaxial_pot(pot_surface, dpot, radius_pole, 0.0, 0.0); // potential at the equator
 
 	for(i =0;i<vsize;i++)
-	radii[i] = 1.22 * radius_pole; // initial guess for the radius
+		radii[i] = 1.22 * radius_pole; // initial guess for the radius
 
 	unsigned short converged[vsize]; // tracks the convergence for each radius
 	for(i=0;i<vsize;i++)
-	converged[i] = 0;
+		converged[i] = 0;
+
 	unsigned int all_converged = 0;
 	//unsigned int counter =0;
 
@@ -265,7 +266,7 @@ void CRocheBinary::surface_radii(double* radii, const double *theta, const doubl
 			if(converged[i] == 0) // we compute only up to the precision for each element, then we skip
 			// not sure if this is faster than vectorizing...
 			{
-				triaxial_pot(&pot, &dpot, radii[i], theta[i], phi[i]);
+				triaxial_pot(pot, dpot, radii[i], theta[i], phi[i]);
 				newton_step = (pot - pot_surface ) / (rsun * dpot);  // newton step
 				radii[i] = radii[i] - newton_step;
 				if( fabs(newton_step) < epsilon)
@@ -390,7 +391,7 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data, vector<unsigned int> &
 	// Compute the gravity darkening (based on the center of the Healpix pixel)
 	surface_gravity(gravity, radii_center, theta_center, phi_center, npix);
 	double gravity_pole = 1;
-	triaxial_gravity(&gravity_pole, radius_pole, 0.0, 0.0);
+	triaxial_gravity(gravity_pole, radius_pole, 0.0, 0.0);
 	surface_temperature(temperature, gravity, gravity_pole, npix);
 
 	double dtheta;
