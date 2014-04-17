@@ -1,4 +1,4 @@
-#version 150 core
+#version 330 core
 /* 
  * Copyright (c) 2013 Brian Kloppenborg
  *
@@ -26,10 +26,13 @@
  
 // A flux-conserving square-root limb darkening law based on Fields (2003)
 // Implemented by decreasing the flux (color.x) of the vertex.
+
 in vec3 Normal;
-in vec2 Color;
+in vec2 Tex_Coords;
+
 uniform float A;
 uniform float B;
+uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
 
@@ -40,5 +43,6 @@ void main(void)
     intensity -= A * (1 - 1.5*mu);
     intensity -= B * (1 - 2.5*sqrt(mu));
 
-    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
+    vec4 Color = texture(TexSampler, Tex_Coords);
+    out_color = vec4(intensity * Color.x, 0, 0, Color.a);
 }
