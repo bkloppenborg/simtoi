@@ -134,9 +134,10 @@ CRocheBinary::CRocheBinary() :
 
 	// Setup image/texture
 	long imsize = 12 * nside * nside;
-	image = new float[imsize];
-	gravity = new double[npix];
-	temperature = new double[npix];
+	image.resize(imsize);
+
+	gravity.resize(npix);
+	temperature.resize(npix);
 
 	// Setup spots
 
@@ -173,11 +174,6 @@ CRocheBinary::~CRocheBinary()
 	delete[] theta_corners;
 	delete[] phi_corners;
 	delete[] radii_corners;
-
-	delete[] image;
-	delete[] gravity;
-	delete[] temperature;
-
 }
 
 shared_ptr<CModel> CRocheBinary::Create()
@@ -358,14 +354,17 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 /// @param size The length of the pixels and temperatures arrays
 /// @param wavelength The wavelength of observation
 /// @param max_temperature The maximum temperature of all models (used for normalization)
-void CRocheBinary::surface_flux(float * pixels, double * temperatures, unsigned int size,
+void CRocheBinary::surface_flux(vector<float> & pixels, vector<double> temperatures,
 		double wavelength, double max_temperature) // Converts temperatures to image brightness
 {
+	// The pixel and temperature buffers must be of the same size.
+	assert(pixels.size() == temperatures.size());
+
 	// Planck's law:
 	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
 	// h*c/k = 0.0143877696 m K
 	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
-	for (unsigned int i = 0; i < size; i++)
+	for (unsigned int i = 0; i < temperatures.size(); i++)
 	{
 		pixels[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
 
@@ -374,6 +373,7 @@ void CRocheBinary::surface_flux(float * pixels, double * temperatures, unsigned 
 
 }
 
+/// Computes the geometry of the spherical Healpix surface
 void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
 {
@@ -381,10 +381,6 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	double vec[npix][3];
 	double vertex[npix][4][3];
 	double vec_temp[3], vertex_temp[12];
-
-	//
-	// Compute geometry of the spherical Healpix surface
-	//
 
 	// First get the angles, central vector, and 4 vertices of each Healpix pixel
 	for (i = 0; i < npix; i++)
@@ -415,10 +411,10 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	surface_radii(radii_center, theta_center, phi_center, npix);
 
 	// Compute the gravity darkening (based on the center of the Healpix pixel)
-	surface_gravity(gravity, radii_center, theta_center, phi_center, npix);
+	surface_gravity(&gravity[0], radii_center, theta_center, phi_center, npix);
 	double gravity_pole = 1;
 	triaxial_gravity(gravity_pole, radius_pole, 0.0, 0.0);
-	surface_temperature(temperature, gravity, gravity_pole, npix);
+	surface_temperature(&temperature[0], &gravity[0], gravity_pole, npix);
 
 	double max_temperature = 0;
 	for(unsigned int i = 0; i < npix; i++)
@@ -447,7 +443,7 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperature into fluxes
-	surface_flux(image, temperature, npix, lambda, max_temperature);
+	surface_flux(image, temperature, lambda, max_temperature);
 
 	// Modify the vertices
 	for (i = 0; i < npix; i++)
@@ -557,8 +553,8 @@ void CRocheBinary::Init()
 	glGenTextures(1, &mTextureID);
 	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
 
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, 12 * nside, nside, 0, GL_RED,
-			GL_FLOAT, image);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGB, 12*nside, nside, 0, GL_RED,
+			GL_FLOAT, &image[0]);
 
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
