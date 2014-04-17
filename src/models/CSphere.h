@@ -44,6 +44,8 @@ protected:
 	GLuint mVAO;
 	GLuint mVBO;
 	GLuint mEBO;
+	GLuint mTextureID; // texture id
+	vector<vec4> mTexture;
 
 	bool mModelReady;
 
@@ -62,6 +64,11 @@ public:
 	void Init();
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
+
+	virtual void SetShader(CShaderPtr shader)
+	{
+
+	}
 };
 
 #endif /* CSPHERE_H_ */

@@ -38,6 +38,8 @@
 #include <cmath>
 #include <float.h>
 
+#include "CShaderFactory.h"
+
 using namespace std;
 
 CSphere::CSphere()
@@ -59,7 +61,13 @@ CSphere::CSphere()
 
 	mNumElements = 0;
 
+	mTexture.resize(1);	// single element texture.
+
 	mModelReady = false;
+
+	// temporary, set the default shader to texture_2d
+	auto shaders = CShaderFactory::Instance();
+	mShader = shaders.CreateShader("texture_2d");
 }
 
 CSphere::~CSphere()
@@ -67,6 +75,9 @@ CSphere::~CSphere()
 	glDeleteBuffers(1, &mEBO);
 	glDeleteBuffers(1, &mVBO);
 	glDeleteVertexArrays(1, &mVAO);
+
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+	glDeleteTextures(1, &mTextureID);
 }
 
 shared_ptr<CModel> CSphere::Create()
@@ -161,28 +172,59 @@ void CSphere::Init()
 	// First get the shader and activate it
 	GLuint shader_program = mShader->GetProgram();
 	glUseProgram(shader_program);
+
 	// Now start defining the storage for the VBO.
 	// The 'vbo_data' variable stores a unit sphere so the vertex data can
 	// be used as normals.
 	GLint posAttrib = glGetAttribLocation(shader_program, "position");
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			(GLvoid *) 0);
 	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
+
+	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
+	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			(GLvoid *) (3 * sizeof(float)));
+	glEnableVertexAttribArray(texAttrib);
+
 	// Now define the normals, if they are used
 	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	if(normAttrib > -1)
+	if (normAttrib > -1)
 	{
 		glEnableVertexAttribArray(normAttrib);
-		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
+		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
+				3 * sizeof(float), (GLvoid*) (6 * sizeof(float)));
 	}
 
 	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CModelSphere.Init()");
+	CWorkerThread::CheckOpenGLError("CModelSphere.Init(), vbo setup");
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	// Load image as a texture
+	glGenTextures(1, &mTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mTexture[0]);
+
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	// Set sampler
+	GLuint TextureSamp = glGetUniformLocation(shader_program, "TexSampler");
+	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
+
+	// unbind from the texture
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+
+	CWorkerThread::CheckOpenGLError("CModelSphere.Init(), texture setup");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
@@ -197,7 +239,9 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	double radius = float(mParams[mBaseParams + 1] / 2);
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, 1.0));
 
-	vec2 color = vec2(mParams[3], 1.0);
+	// Set the color.
+	mTexture[0].r = mParams[3];
+	mTexture[0].a = 1.0;
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -205,8 +249,6 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
 	mShader->UseShader();
-	GLint uniColorFlag = glGetUniformLocation(shader_program, "color_from_uniform");
-	glUniform1i(uniColorFlag, true);
 
 	// bind back to the VAO
 	glBindVertexArray(mVAO);
@@ -224,11 +266,17 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
-    GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
-    glUniform2fv(uniColor, 1, glm::value_ptr(color));
+	// bind to this object's texture
+	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+	// upload the image
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mTexture[0]);
 
 	// render
 	glDrawElements(GL_TRIANGLE_STRIP, mNumElements, GL_UNSIGNED_INT, 0);
+
+	// Unbind
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 	// unbind from the Vertex Array Object, Vertex Buffer Object, and Element buffer object.
 	glBindVertexArray(0);
