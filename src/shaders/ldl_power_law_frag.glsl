@@ -1,4 +1,4 @@
-#version 150 core
+#version 330 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
