@@ -32,6 +32,7 @@
 
 #include "CLevmar.h"
 #include <cmath>
+#include <limits>
 
 #include "levmar.h"
 #include "CWorkerThread.h"
@@ -62,7 +63,8 @@ void CLevmar::ErrorFunc(double * params, double * output, int nParams, int nOutp
 	// See if we have been requested to exit.  If so, give levmar an invalid result
 	if(!minimizer->mRun)
 	{
-		output[0] = 1.0/0;	// Intentional, generate NAN to cause levmar to terminate.
+		// Intentional, generate NAN to cause levmar to terminate.
+		output[0] = std::numeric_limits<double>::quiet_NaN();
 		return;
 	}
 
