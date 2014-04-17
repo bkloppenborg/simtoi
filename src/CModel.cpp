@@ -414,6 +414,31 @@ void CModel::SetShader(CShaderPtr shader)
 	mShader = shader;
 }
 
+/// Computes the flux for pixels given the input temperatuers following Planck's
+/// law.
+/// @param temperatures An array of temperatures of in Kelvin
+/// @param fluxes Array into which computed fluxes will be stored
+/// @param wavelength The wavelength of observation
+/// @param max_temperature The maximum temperature of all models (used for normalization)
+void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
+		double wavelength, double max_temperature)
+{
+	// The pixel and temperature buffers must be of the same size.
+	assert(fluxes.size() == temperatures.size());
+
+	// Planck's law:
+	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
+	// h*c/k = 0.0143877696 m K
+	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	for (unsigned int i = 0; i < temperatures.size(); i++)
+	{
+		fluxes[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+
+		fluxes[i] /= max_flux;
+	}
+
+}
+
 /// \brief Constructs the translation matrix from the position model.
 glm::mat4 CModel::Translate()
 {

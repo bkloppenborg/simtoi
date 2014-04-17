@@ -347,32 +347,6 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-/// Computes the flux for pixels given the input temperatuers following Planck's
-/// law.
-/// @param pixels An array of pixels of length size
-/// @param temperatures An array of temperatures of length size in Kelvin
-/// @param size The length of the pixels and temperatures arrays
-/// @param wavelength The wavelength of observation
-/// @param max_temperature The maximum temperature of all models (used for normalization)
-void CRocheBinary::surface_flux(vector<float> & pixels, vector<double> temperatures,
-		double wavelength, double max_temperature) // Converts temperatures to image brightness
-{
-	// The pixel and temperature buffers must be of the same size.
-	assert(pixels.size() == temperatures.size());
-
-	// Planck's law:
-	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
-	// h*c/k = 0.0143877696 m K
-	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
-	for (unsigned int i = 0; i < temperatures.size(); i++)
-	{
-		pixels[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
-
-		pixels[i] /= max_flux;
-	}
-
-}
-
 /// Computes the geometry of the spherical Healpix surface
 void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
@@ -443,7 +417,7 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperature into fluxes
-	surface_flux(image, temperature, lambda, max_temperature);
+	TemperatureToFlux(temperature, image, lambda, max_temperature);
 
 	// Modify the vertices
 	for (i = 0; i < npix; i++)

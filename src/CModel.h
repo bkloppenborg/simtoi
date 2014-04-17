@@ -138,6 +138,9 @@ public:
 protected:
 	void SetupMatrix();
 
+public:
+	static void TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
+			double wavelength, double max_temperature);
 
 };
 
