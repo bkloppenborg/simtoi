@@ -336,8 +336,12 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
+	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+
 	// render
 	glDrawElements(GL_TRIANGLES, mElements.size(), GL_UNSIGNED_INT, 0);
+
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 	// unbind from the Vertex Array Object, Vertex Buffer Object, and Element buffer object.
 	glBindVertexArray(0);
@@ -538,6 +542,9 @@ void CRocheBinary::Init()
 	// Set sampler
 	GLuint TextureSamp = glGetUniformLocation(shader_program, "TexSampler");
 	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
+
+	// Return to the default texture.
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 	// Check that things loaded correctly.
 	CWorkerThread::CheckOpenGLError("CRocheBinary.Init()");
