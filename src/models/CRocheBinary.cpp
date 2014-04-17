@@ -109,8 +109,7 @@ CRocheBinary::CRocheBinary() :
 
 	// Setup Healpix and geometry
 	npix_estimate = 4. * PI
-			* pow(
-					radius_pole * rsun / (parallax * AU) * 1000.
+			* pow(radius_pole * rsun / (parallax * AU) * 1000.
 							/ desired_resolution, 2.0);
 	nside_estimate = sqrt(npix_estimate / 12.0);
 	nside = pow(2, ceil(log(nside_estimate) / log(2.0)));
@@ -509,8 +508,6 @@ void CRocheBinary::Init()
 		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
 				3 * sizeof(float), (GLvoid*) (6 * sizeof(float)));
 	}
-
-	CWorkerThread::CheckOpenGLError("A");
 
 	//GLint ExtensionCount;
 	//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ExtensionCount);
