@@ -303,17 +303,12 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	mat4 scale = glm::scale(mat4(),
 			glm::vec3(radial_scale, radial_scale, radial_scale));
 
-	vec2 color = vec2(1.0, 1.0);
-
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
 	mShader->UseShader();
-
-	//GLint uniColorFlag = glGetUniformLocation(mShaderProgram, "color_from_uniform");
-	//glUniform1i(uniColorFlag, true);
 
 	// bind back to the VAO
 	glBindVertexArray(mVAO);
