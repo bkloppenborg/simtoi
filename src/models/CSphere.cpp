@@ -64,10 +64,6 @@ CSphere::CSphere()
 	mTexture.resize(1);	// single element texture.
 
 	mModelReady = false;
-
-//	// temporary, set the default shader to texture_2d
-//	auto shaders = CShaderFactory::Instance();
-//	mShader = shaders.CreateShader("default");
 }
 
 CSphere::~CSphere()
@@ -122,10 +118,14 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 			z = cos_theta[i];
 			// The first three elements are the verticies
 			vbo_data.push_back(vec3(x, y, z));
+			// normals:
+			vbo_data.push_back(vec3(x, y, z));
 			// define the texture coordinate location
 			vbo_data.push_back(vec3(1.0, 0, 0));
 		}
 	}
+	// The number of vec3s that define a vertex
+	unsigned int n_vec3_per_vertex = 3;
 
 	// Now assign the elements. Go in the same direction as the vertices were
 	// generated above, namely in rows by latitude.
@@ -137,8 +137,8 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 			// compute the index of the top and bottom vertices
 			bottom = lat * longitude_subdivisions + lon;
 			top = (lat + 1) * longitude_subdivisions + lon;
-			elements.push_back(2*bottom);
-			elements.push_back(2*top);
+			elements.push_back(n_vec3_per_vertex * bottom);
+			elements.push_back(n_vec3_per_vertex * top);
 		}
 
 		// To complete a latitude row, link back to the first two vertices
@@ -146,8 +146,8 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 		bottom = lat * longitude_subdivisions;
 		top = (lat + 1) * longitude_subdivisions;
 
-		elements.push_back(2*bottom);
-		elements.push_back(2*top);
+		elements.push_back(n_vec3_per_vertex * bottom);
+		elements.push_back(n_vec3_per_vertex * top);
 	}
 }
 
