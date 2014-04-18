@@ -51,6 +51,7 @@ CModel::CModel(int n_params)
 
 	// Shader storage location, boolean if it is loaded:
 	mShader = CShaderPtr();
+	mTextureID = 0;
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
 	mParamNames.push_back("Pos. Angle");
@@ -69,7 +70,12 @@ CModel::CModel(int n_params)
 
 CModel::~CModel()
 {
-
+	// Delete the texture if one was allocated.
+	if(mTextureID)
+	{
+		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+		glDeleteTextures(1, &mTextureID);
+	}
 }
 
 /// \brief Static function which creates a lookup table of sine and cosine values

@@ -75,9 +75,6 @@ CSphere::~CSphere()
 	glDeleteBuffers(1, &mEBO);
 	glDeleteBuffers(1, &mVBO);
 	glDeleteVertexArrays(1, &mVAO);
-
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-	glDeleteTextures(1, &mTextureID);
 }
 
 shared_ptr<CModel> CSphere::Create()
@@ -206,9 +203,7 @@ void CSphere::Init()
 	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
 	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
 			(GLvoid *) (3 * sizeof(float)));
-
 	glEnableVertexAttribArray(texAttrib);
-
 
 	// Check that things loaded correctly.
 	CWorkerThread::CheckOpenGLError("CModelSphere.Init(), vbo setup");

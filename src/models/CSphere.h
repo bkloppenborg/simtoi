@@ -44,8 +44,6 @@ protected:
 	GLuint mVAO;
 	GLuint mVBO;
 	GLuint mEBO;
-	GLuint mTextureID; // texture id
-	vector<vec4> mTexture;
 
 	bool mModelReady;
 

@@ -94,6 +94,9 @@ protected:
 	CShaderPtr mShader;	///< A shared pointer to the shader object.
 	double mScale;
 
+	GLuint mTextureID; // texture id
+	vector<vec4> mTexture;
+
 protected:
 	glm::mat4 Rotate();
 	glm::mat4 Translate();
