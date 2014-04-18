@@ -129,7 +129,7 @@ CRocheBinary::CRocheBinary() :
 
 	// Setup image/texture
 	long imsize = 12 * nside * nside;
-	image.resize(imsize);
+	mTexture.resize(imsize);
 
 	gravity.resize(npix);
 	temperature.resize(npix);
@@ -416,10 +416,10 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperature into fluxes
-	TemperatureToFlux(temperature, image, lambda, max_temperature);
+	TemperatureToFlux(temperature, mTexture, lambda, max_temperature);
 	// set alpha channel values, the object is entirely opaque.
 	for(i = 0; i < npix; i++)
-		image[i].a = 1.0;
+		mTexture[i].a = 1.0;
 
 	// Convert the unit-radius verticies to the Roche surface radii.
 	for (i = 0; i < npix; i++)
@@ -441,13 +441,14 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 			// set the verticies
 			vbo_data.push_back(
 					vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
-			// set the texture coordinates
-			vbo_data.push_back(vec3(i % (12 * nside), i / (12 * nside), 0));
 			// set the surface normals
 			vbo_data.push_back(
 					vec3(cos(phi_center[i]) * sin(theta_center[i]),
 							sin(phi_center[i]) * sin(theta_center[i]),
 							cos(theta_center[i])));
+
+			// set the texture coordinates
+			vbo_data.push_back(vec3(i % (12 * nside), i / (12 * nside), 0));
 		}
 	}
 
@@ -489,32 +490,7 @@ void CRocheBinary::Init()
 			mElements.size() * sizeof(unsigned int), &mElements[0],
 			GL_STATIC_DRAW);
 
-	// Next we need to define the storage format for this object for the shader.
-	// First get the shader and activate it
-	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
-
-	// Now start defining the storage for the VBO.
-	// The 'vbo_data' variable stores a unit sphere so the vertex data can
-	// be used as normals.
-	GLint posAttrib = glGetAttribLocation(shader_program, "position");
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-			(GLvoid *) 0);
-	glEnableVertexAttribArray(posAttrib);
-
-	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
-	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-			(GLvoid *) (3 * sizeof(float)));
-	glEnableVertexAttribArray(texAttrib);
-
-	// Now define the normals, if they are used
-	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	if (normAttrib > -1)
-	{
-		glEnableVertexAttribArray(normAttrib);
-		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
-				3 * sizeof(float), (GLvoid*) (6 * sizeof(float)));
-	}
+	InitShaderVariables();
 
 	//GLint ExtensionCount;
 	//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ExtensionCount);
@@ -532,7 +508,7 @@ void CRocheBinary::Init()
 	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
 
 	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 12*nside, nside, 0, GL_RGBA,
-			GL_FLOAT, &image[0]);
+			GL_FLOAT, &mTexture[0]);
 
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -540,6 +516,7 @@ void CRocheBinary::Init()
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	// Set sampler
+	GLuint shader_program = mShader->GetProgram();
 	GLuint TextureSamp = glGetUniformLocation(shader_program, "TexSampler");
 	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
 
