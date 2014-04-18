@@ -126,6 +126,11 @@ public:
 	CShaderPtr GetShader(void);
 	int GetTotalFreeParameters();
 
+protected:
+	virtual void InitTexture();
+	virtual void InitShaderVariables();
+
+public:
 	virtual void Render(GLuint framebuffer_object, const glm::mat4 & view) = 0;
 public:
 	void Restore(Json::Value input);

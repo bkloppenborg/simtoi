@@ -177,36 +177,10 @@ void CSphere::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
-	// Next we need to define the storage format for this object for the shader.
-	// First get the shader and activate it
-	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
-
-	// Now start defining the storage for the VBO.
-	// As discussed in GenerateSphere_LatLon the VBO data is packed as thus:
-	//
-	// Positions are the first three elements
-	GLint posAttrib = glGetAttribLocation(shader_program, "position");
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-			(GLvoid *) 0);
-	glEnableVertexAttribArray(posAttrib);
-	// because we draw a unit sphere, the vertex positions are the same as
-	// normals
-	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	if (normAttrib > -1)
-	{
-		glEnableVertexAttribArray(normAttrib);
-		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
-				3 * sizeof(float), (GLvoid *) 0);
-	}
-	// texture coordinates are packed right after the vertex coordinates.
-	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
-	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-			(GLvoid *) (3 * sizeof(float)));
-	glEnableVertexAttribArray(texAttrib);
-
-	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CModelSphere.Init(), vbo setup");
+	// Initialize the shader variables and texture following the default packing
+	// scheme.
+	InitShaderVariables();
+	InitTexture();
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.
@@ -214,27 +188,7 @@ void CSphere::Init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	glActiveTexture(GL_TEXTURE0);
-	// Load image as a texture
-	glGenTextures(1, &mTextureID);
-	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
-
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
-			GL_FLOAT, &mTexture[0]);
-
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	// Set sampler
-	GLuint TextureSamp = glGetUniformLocation(shader_program, "TexSampler");
-	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
-
-	// unbind from the texture
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-
-	CWorkerThread::CheckOpenGLError("CModelSphere.Init(), texture setup");
+	CWorkerThread::CheckOpenGLError("CModelSphere.Init()");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;

@@ -43,6 +43,9 @@ CDensityDisk::CDensityDisk(int n_additional_params)
 	// specific later.
 	auto shaders = CShaderFactory::Instance();
 	mShader = shaders.CreateShader("default");
+
+	// Resize the texture, 1 element is sufficient.
+	mTexture.resize(1);
 }
 
 CDensityDisk::~CDensityDisk()
@@ -50,30 +53,7 @@ CDensityDisk::~CDensityDisk()
 
 }
 
-///// Draws a flat (planar) ring between r_in and r_out.
-//void CDensityDisk::DrawDisk(double r_in, double r_out)
-//{
-//	// lookup constants
-//	double color = mParams[3];
-//
-//	// Compute the transparency at the inner/out radii
-//	const double trans_in = Transparency(r_in, 0, 0);
-//	const double trans_out = Transparency(r_out, 0, 0);
-//
-//	glBegin(GL_QUAD_STRIP);
-//
-//	glNormal3d(0.0, 1.0, 0.0);
-//
-//	for(int j = 0; j <= mSlices; j++ )
-//	{
-//		glColor4d(color, 0.0, 0.0, trans_in);
-//		glVertex3d(mCosT[ j ] * r_in,  0, mSinT[ j ] * r_in);
-//		glColor4d(color, 0.0, 0.0, trans_out);
-//		glVertex3d(mCosT[ j ] * r_out, 0, mSinT[ j ] * r_out);
-//	}
-//
-//	glEnd();
-//}
+
 
 void CDensityDisk::Init()
 {
@@ -109,32 +89,18 @@ void CDensityDisk::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
-	// Next we need to define the storage format for this object for the shader.
-	// First get the shader and activate it
-	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
-	// Now start defining the storage for the VBO.
-	// The 'vbo_data' variable stores a unit cylindrical shell (i.e. r = 1,
-	// h = -0.5 ... 0.5).
-	GLint posAttrib = glGetAttribLocation(shader_program, "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 0);
-	// Now define the normals, if they are used
-	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	if(normAttrib > -1)
-	{
-		glEnableVertexAttribArray(normAttrib);
-		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
-	}
-
-	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CDensityDisk.Init()");
+	// Initialize the shader variables and texture following the default packing
+	// scheme.
+	InitShaderVariables();
+	InitTexture();
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	CWorkerThread::CheckOpenGLError("CModelSphere.Init()");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;

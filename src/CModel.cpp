@@ -259,6 +259,80 @@ int CModel::GetTotalFreeParameters()
 			this->GetNShaderFreeParameters();
 }
 
+/// Initalizes the shader variables `position`, `normal`, and `tex_coords`
+/// following the default packing scheme of:
+///		[vec3(x,y,z), vec3(n_x, n_y, n_z), (t_x, t_y, t_z)]
+/// where (x,y,z) is the position, (n_x, n_y, n_z) are the normals and
+/// (t_x, t_y, t_z) are the texture coordinates.
+/// All values are assumed to be floating point values.
+void CModel::InitShaderVariables()
+{
+	// Next we need to define the storage format for this object for the shader.
+	// First get the shader and activate it
+	GLuint shader_program = mShader->GetProgram();
+	glUseProgram(shader_program);
+
+	// Define the storage format for the VBO. Each vertex is defined by
+	// three vec3s that are packed as follows:
+	// [vec3(x,y,z), vec3(n_x, n_y, n_z), (t_x, t_y, t_z)]
+	// First we define the position attribute:
+	GLint posAttrib = glGetAttribLocation(shader_program, "position");
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			(GLvoid *) 0);
+	glEnableVertexAttribArray(posAttrib);
+	// Setup the normals. Their offset is (3 * sizeof(float)) from the start
+	// of the current index
+	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
+	glEnableVertexAttribArray(normAttrib);
+	glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
+			3 * sizeof(float), (GLvoid *) (3 * sizeof(float)));
+
+	// Setup the texture coordinate lookup variables. Their offset
+	// is (6 * sizeof(float)) from the start of the current index
+	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
+	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			(GLvoid *) (6 * sizeof(float)));
+	glEnableVertexAttribArray(texAttrib);
+
+	// Setup the texture sampler. Have it use texture sampler Unit 0.
+	GLuint TextureSamp = glGetUniformLocation(shader_program, "TexSampler");
+	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
+
+	// Check that things loaded correctly.
+	CWorkerThread::CheckOpenGLError("CModel.InitShaderVariables()");
+}
+
+/// Initializes the texture by setting properties and uploading a default
+/// (smooth gradient) texture to the texture buffer.
+void CModel::InitTexture()
+{
+	glActiveTexture(GL_TEXTURE0);
+
+	// Create a new texture of type GL_TEXTURE_RECTANGLE and bind to it.
+	glGenTextures(1, &mTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+
+	// Load a default (smooth graident) texture into the texture buffer
+	for(unsigned int i = 0; i < mTexture.size(); i++)
+	{
+		mTexture[i].x = float(i) / mTexture.size();
+		mTexture[i].a = 1.0;
+	}
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mTexture[0]);
+
+	// Set wrapping and lookup filters
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	// All done. Unbind.
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+
+	CWorkerThread::CheckOpenGLError("CModel.InitTexture(), texture setup");
+}
+
 /// \brief Constructs the rotation matrix according to the set parameters.
 ///
 /// Note, if the position model is DYNAMIC (i.e. an orbit) the position angle
