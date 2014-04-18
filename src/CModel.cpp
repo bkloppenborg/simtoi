@@ -315,7 +315,7 @@ void CModel::InitTexture()
 	// Load a default (smooth graident) texture into the texture buffer
 	for(unsigned int i = 0; i < mTexture.size(); i++)
 	{
-		mTexture[i].x = float(i) / mTexture.size();
+		mTexture[i].r = float(i) / mTexture.size();
 		mTexture[i].a = 1.0;
 	}
 	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
