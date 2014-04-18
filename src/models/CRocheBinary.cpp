@@ -310,7 +310,7 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
+	mShader->UseShader();
 
 	//GLint uniColorFlag = glGetUniformLocation(mShaderProgram, "color_from_uniform");
 	//glUniform1i(uniColorFlag, true);
