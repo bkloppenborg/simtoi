@@ -58,5 +58,5 @@ void main(void)
     float transparency = 1 - exp(-1 * kappa * rho);
     
     vec4 Color = texture(TexSampler, Tex_Coords);
-    out_color = vec4(Color.x, 0.0, 0.0, Color.a * transparency);
+    out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
 }
