@@ -206,7 +206,7 @@ void CCylinder::Init()
 	mRimSize = elements.size();
 	// Calculate the offset in vertex indexes for the GenerateMidplane function
 	// to generate correct element indices.
-	unsigned int vertex_offset = vbo_data.size() / 2;
+	unsigned int vertex_offset = vbo_data.size();
 	mMidplaneStart = mRimSize;
 	GenerateMidplane(vbo_data, elements, vertex_offset, r_divisions, phi_divisions);
 	mMidplaneSize = elements.size() - mRimSize;
