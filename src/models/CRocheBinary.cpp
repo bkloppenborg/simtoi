@@ -129,7 +129,7 @@ CRocheBinary::CRocheBinary() :
 
 	// Setup image/texture
 	long imsize = 12 * nside * nside;
-	mTexture.resize(imsize);
+	mFluxTexture.resize(imsize);
 
 	gravity.resize(npix);
 	g_x.resize(npix);
@@ -419,10 +419,10 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperature into fluxes
-	TemperatureToFlux(temperature, mTexture, lambda, max_temperature);
+	TemperatureToFlux(temperature, mFluxTexture, lambda, max_temperature);
 	// set alpha channel values, the object is entirely opaque.
 	for(i = 0; i < npix; i++)
-		mTexture[i].a = 1.0;
+		mFluxTexture[i].a = 1.0;
 
 	// Convert the unit-radius verticies to the Roche surface radii.
 	for (i = 0; i < npix; i++)
@@ -508,7 +508,7 @@ void CRocheBinary::Init()
 	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
 
 	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 12*nside, nside, 0, GL_RGBA,
-			GL_FLOAT, &mTexture[0]);
+			GL_FLOAT, &mFluxTexture[0]);
 
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

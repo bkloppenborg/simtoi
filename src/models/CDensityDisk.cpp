@@ -45,7 +45,7 @@ CDensityDisk::CDensityDisk(int n_additional_params)
 	mShader = shaders.CreateShader("default");
 
 	// Resize the texture, 1 element is sufficient.
-	mTexture.resize(1);
+	mFluxTexture.resize(1);
 }
 
 CDensityDisk::~CDensityDisk()
@@ -118,8 +118,8 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	int n_rings  = ceil(mParams[mBaseParams + 4]);
 
 	// Set the color
-	mTexture[0].r = mParams[3];
-	mTexture[0].a = 1.0;
+	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -145,10 +145,10 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 
 	// bind to this object's texture
-	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
 	// upload the image
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
-			GL_FLOAT, &mTexture[0]);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
 
 	glDisable(GL_DEPTH_TEST);
 

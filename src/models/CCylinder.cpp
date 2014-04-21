@@ -55,7 +55,7 @@ CCylinder::CCylinder()
 	mRimSize = 0;
 
 	// Resize the texture. Single pixel is all that is required.
-	mTexture.resize(1);
+	mFluxTexture.resize(1);
 }
 
 CCylinder::~CCylinder()
@@ -251,8 +251,8 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	const double radius = diameter / 2;
 	const double height  = mParams[mBaseParams + 2];
 
-	mTexture[0].x = mParams[3];
-	mTexture[0].a = 1.0;
+	mFluxTexture[0].x = mParams[3];
+	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -281,9 +281,9 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
 	// bind to this object's texture, upload the image.
-	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
-			GL_FLOAT, &mTexture[0]);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
 
 	// Render
 	glDisable(GL_DEPTH_TEST);

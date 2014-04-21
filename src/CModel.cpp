@@ -51,7 +51,7 @@ CModel::CModel(int n_params)
 
 	// Shader storage location, boolean if it is loaded:
 	mShader = CShaderPtr();
-	mTextureID = 0;
+	mFluxTextureID = 0;
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
 	mParamNames.push_back("Pos. Angle");
@@ -71,10 +71,10 @@ CModel::CModel(int n_params)
 CModel::~CModel()
 {
 	// Delete the texture if one was allocated.
-	if(mTextureID)
+	if(mFluxTextureID)
 	{
 		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-		glDeleteTextures(1, &mTextureID);
+		glDeleteTextures(1, &mFluxTextureID);
 	}
 }
 
@@ -309,17 +309,17 @@ void CModel::InitTexture()
 	glActiveTexture(GL_TEXTURE0);
 
 	// Create a new texture of type GL_TEXTURE_RECTANGLE and bind to it.
-	glGenTextures(1, &mTextureID);
-	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+	glGenTextures(1, &mFluxTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
 
 	// Load a default (smooth graident) texture into the texture buffer
-	for(unsigned int i = 0; i < mTexture.size(); i++)
+	for(unsigned int i = 0; i < mFluxTexture.size(); i++)
 	{
-		mTexture[i].r = float(i) / mTexture.size();
-		mTexture[i].a = 1.0;
+		mFluxTexture[i].r = float(i) / mFluxTexture.size();
+		mFluxTexture[i].a = 1.0;
 	}
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
-			GL_FLOAT, &mTexture[0]);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
 
 	// Set wrapping and lookup filters
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

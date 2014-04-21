@@ -61,7 +61,7 @@ CSphere::CSphere()
 
 	mNumElements = 0;
 
-	mTexture.resize(1);	// single element texture.
+	mFluxTexture.resize(1);	// single element texture.
 
 	mModelReady = false;
 }
@@ -204,8 +204,8 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
 	// Set the color.
-	mTexture[0].r = mParams[3];
-	mTexture[0].a = 1.0;
+	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -231,10 +231,10 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
 	// bind to this object's texture
-	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
 	// upload the image
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mTexture.size(), 1, 0, GL_RGBA,
-			GL_FLOAT, &mTexture[0]);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
 
 	// render
 	glDrawElements(GL_TRIANGLE_STRIP, mNumElements, GL_UNSIGNED_INT, 0);
