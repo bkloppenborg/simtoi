@@ -437,7 +437,6 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	}
 
 	// load data into the VBO.
-	vec3 normal;
 	for (i = 0; i < npix; i++)
 	{
 		for (j = 0; j < 4; j++)
@@ -447,7 +446,6 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 					vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
 			// set the surface normals, remember to normalize!
 			vbo_data.push_back( glm::normalize( vec3(g_x[i], g_y[i], g_z[i]) ) );
-
 
 			// set the texture coordinates
 			vbo_data.push_back(vec3(i % (12 * nside), i / (12 * nside), 0));
