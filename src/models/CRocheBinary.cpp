@@ -132,6 +132,9 @@ CRocheBinary::CRocheBinary() :
 	mTexture.resize(imsize);
 
 	gravity.resize(npix);
+	g_x.resize(npix);
+	g_y.resize(npix);
+	g_z.resize(npix);
 	temperature.resize(npix);
 
 	// Setup spots
@@ -176,12 +179,14 @@ shared_ptr<CModel> CRocheBinary::Create()
 	return shared_ptr < CModel > (new CRocheBinary());
 }
 
-void CRocheBinary::triaxial_gravity(double & gravity, const double radius,
-		const double theta, const double phi)
+/// Computes the tangential components and magnitude of gravity at the
+/// specified (r, theta, phi) coordinates.
+void CRocheBinary::triaxial_gravity(const double radius,
+		const double theta, const double phi,
+		double & g_x, double & g_y, double & g_z, double & g_mag)
 {
 	double x1, x2, x3, y, z, radius1, radius2, radius1_pow3, radius2_pow3, l,
 			mu;
-	double gx, gy, gz;
 
 	x1 = radius * cos(phi) * sin(theta);
 	x2 = separation_rsun - x1;
@@ -192,20 +197,21 @@ void CRocheBinary::triaxial_gravity(double & gravity, const double radius,
 	radius2_pow3 = radius2 * radius2 * radius2;
 
 	// gx, gy, gz are the coordinates of the gravity vector
-	gx = gmr2 * mass1 * x1 / radius1_pow3 - gmr2 * mass2 * x2 / radius2_pow3
+	g_x = gmr2 * mass1 * x1 / radius1_pow3 - gmr2 * mass2 * x2 / radius2_pow3
 			- omega_rot * omega_rot * rsun * (x1 - separation_rsun * massratio);
-	gy = gmr2 * mass1 * y / radius1_pow3 + gmr2 * mass2 * y / radius2_pow3
+	g_y = gmr2 * mass1 * y / radius1_pow3 + gmr2 * mass2 * y / radius2_pow3
 			- omega_rot * omega_rot * rsun * y;
-	gz = gmr2 * mass1 * z / radius1_pow3 + gmr2 * mass2 * z / radius2_pow3;
+	g_z = gmr2 * mass1 * z / radius1_pow3 + gmr2 * mass2 * z / radius2_pow3;
 
-	gravity = sqrt(gx * gx + gy * gy + gz * gz);
+	g_mag = sqrt(g_x * g_x + g_y * g_y + g_z * g_z);
 }
 
-void CRocheBinary::surface_gravity(double * gravity, const double * radii,
-		const double * theta, const double * phi, const unsigned int vsize)
+void CRocheBinary::surface_gravity(const double * radii, const double * theta, const double * phi,
+		double * g_x, double * g_y, double * g_z, double * g_mag,
+		const unsigned int vsize)
 {
 	for (unsigned int i = 0; i < vsize; i++)
-		triaxial_gravity(gravity[i], radii[i], theta[i], phi[i]);
+		triaxial_gravity(radii[i], theta[i], phi[i], g_x[i], g_y[i], g_z[i], gravity[i]);
 }
 
 void CRocheBinary::surface_temperature(double * temperature,
@@ -379,9 +385,11 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	surface_radii(radii_center, theta_center, phi_center, npix);
 
 	// Compute the gravity darkening (based on the center of the Healpix pixel)
-	surface_gravity(&gravity[0], radii_center, theta_center, phi_center, npix);
+	surface_gravity(radii_center, theta_center, phi_center,
+			&g_x[0], &g_y[0], &g_z[0], &gravity[0], npix);
 	double gravity_pole = 1;
-	triaxial_gravity(gravity_pole, radius_pole, 0.0, 0.0);
+	double g_pole_x, g_pole_y, g_pole_z;
+	triaxial_gravity(radius_pole, 0.0, 0.0, g_pole_x, g_pole_y, g_pole_z, gravity_pole);
 	surface_temperature(&temperature[0], &gravity[0], gravity_pole, npix);
 
 	double max_temperature = 0;
@@ -429,18 +437,17 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	}
 
 	// load data into the VBO.
+	vec3 normal;
 	for (i = 0; i < npix; i++)
 	{
 		for (j = 0; j < 4; j++)
 		{
-			// set the verticies
+			// set the vertices
 			vbo_data.push_back(
 					vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
-			// set the surface normals
-			vbo_data.push_back(
-					vec3(cos(phi_center[i]) * sin(theta_center[i]),
-							sin(phi_center[i]) * sin(theta_center[i]),
-							cos(theta_center[i])));
+			// set the surface normals, remember to normalize!
+			vbo_data.push_back( glm::normalize( vec3(g_x[i], g_y[i], g_z[i]) ) );
+
 
 			// set the texture coordinates
 			vbo_data.push_back(vec3(i % (12 * nside), i / (12 * nside), 0));

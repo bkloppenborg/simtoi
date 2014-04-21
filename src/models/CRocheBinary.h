@@ -80,6 +80,9 @@ private:
 	double* radii_center;
 
 	vector<double> gravity; // gravity intensity (not gravity vector)
+	vector<double> g_x;
+	vector<double> g_y;
+	vector<double> g_z;
 	vector<double> temperature; // temperature
 	// quantities related to the precise geometrical corners 
 	double* theta_corners;
@@ -97,12 +100,14 @@ private:
 	//void normalize_vert(double * vec);
 	void triaxial_pot(double & pot, double & dpot, const double radius,
 			const double theta, const double phi);
-	void triaxial_gravity(double & gravity, const double radius,
-			const double theta, const double phi);
+	void triaxial_gravity(const double radius,
+			const double theta, const double phi,
+			double & g_x, double & g_y, double & g_z, double & g_mag);
 	void surface_radii(double* radii, const double *theta, const double *phi,
 			const unsigned int vsize);
-	void surface_gravity(double * gravity, const double* radii,
-			const double* theta, const double* phi, const unsigned int vsize);
+	void surface_gravity(const double * radii, const double * theta, const double * phi,
+			double * g_x, double * g_y, double * g_z, double * g_mag,
+			const unsigned int vsize);
 	void surface_temperature(double* temperature, const double* gravity,
 			const double gravity_pole, const unsigned int vsize);
 public:
