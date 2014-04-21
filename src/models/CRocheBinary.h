@@ -72,31 +72,31 @@ private:
 	long nside;
 	long npix;
 
-	long* ipix;
+	// Quantities related to the pixel centroid and corners:
 	vector<double> pixel_theta;
 	vector<double> pixel_phi;
 	vector<double> pixel_radii;
+	vector<double> pixel_temperature; // temperature
+	vector<vec3>   pixel_xyz;
 
-	// quantities related to the precise geometrical corners
 	vector<double> corner_theta;
 	vector<double> corner_phi;
 	vector<double> corner_radii;
-
+	vector<vec3>   corner_xyz;
 
 	vector<double> gravity; // gravity intensity (not gravity vector)
 	vector<double> g_x;
 	vector<double> g_y;
 	vector<double> g_z;
-	vector<double> temperature; // temperature
 
 
 	// Spots (should be a class, really)
-	int nspots; // number of spots
-	double* spot_temperature;
-	double* spot_theta;
-	double* spot_phi;
-	double* spot_thetasize;
-	double* spot_phisize;
+//	int nspots; // number of spots
+//	double* spot_temperature;
+//	double* spot_theta;
+//	double* spot_phi;
+//	double* spot_thetasize;
+//	double* spot_phisize;
 
 	//void normalize_vert(double * vec);
 	void triaxial_pot(double & pot, double & dpot, const double radius,

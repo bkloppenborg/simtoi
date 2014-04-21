@@ -118,7 +118,7 @@ CRocheBinary::CRocheBinary() :
 			/ (0.6 * pow(q, 2. / 3.) + log(1. + pow(q, 1. / 3.)));
 	cout << "Rl (rsun): " << rl_rsun << "\n";
 
-	ipix = new long[npix];
+//	ipix = new long[npix];
 	pixel_theta.resize(npix);
 	pixel_phi.resize(npix);
 	pixel_radii.resize(npix);
@@ -135,11 +135,11 @@ CRocheBinary::CRocheBinary() :
 	g_x.resize(npix);
 	g_y.resize(npix);
 	g_z.resize(npix);
-	temperature.resize(npix);
+	pixel_temperature.resize(npix);
 
 	// Setup spots
 
-	nspots = 0;
+//	nspots = 0;
 	/*
 	 spot_theta = new double[nspots];
 	 spot_phi = new double[nspots];
@@ -160,8 +160,6 @@ CRocheBinary::~CRocheBinary()
 	glDeleteBuffers(1, &mEBO);
 	glDeleteBuffers(1, &mVBO);
 	glDeleteVertexArrays(1, &mVAO);
-
-	delete[] ipix;
 }
 
 shared_ptr<CModel> CRocheBinary::Create()
@@ -349,7 +347,6 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	// First get the angles, central vector, and 4 vertices of each Healpix pixel
 	for (i = 0; i < npix; i++)
 	{
-		ipix[i] = i;
 		pix2ang_nest(nside, i, &pixel_theta[i], &pixel_phi[i]);
 		// cout << "theta: " << theta_center[i] << " phi:" << phi_center[i] << "\n";
 		pix2vec_nest(nside, i, &vec_temp[0], &vertex_temp[0]);
@@ -380,36 +377,36 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	double gravity_pole = 1;
 	double g_pole_x, g_pole_y, g_pole_z;
 	triaxial_gravity(radius_pole, 0.0, 0.0, g_pole_x, g_pole_y, g_pole_z, gravity_pole);
-	surface_temperature(&temperature[0], &gravity[0], gravity_pole, npix);
+	surface_temperature(&pixel_temperature[0], &gravity[0], gravity_pole, npix);
 
 	double max_temperature = 0;
 	for(unsigned int i = 0; i < npix; i++)
 	{
-		if(temperature[i] > max_temperature)
-			max_temperature = temperature[i];
+		if(pixel_temperature[i] > max_temperature)
+			max_temperature = pixel_temperature[i];
 	}
 
 	double dtheta;
 	double dphi;
 
 	// Add simple spots (TBD: overlap)
-	for (j = 0; j < nspots; j++)
-	{
-		for (i = 0; i < npix; i++)
-		{
-			// test for spot presence
-			// cout <<  abs( theta_center[i] - spot_theta[j] ) << "\t" << spot_thetasize[j] << "\n";
-			dtheta = (pixel_theta[i] - spot_theta[j]) / spot_thetasize[j];
-			dphi = (pixel_phi[i] - spot_phi[j]) / spot_phisize[j];
-			if (dtheta * dtheta + dphi * dphi <= 1.)
-			{
-				temperature[i] = spot_temperature[i];
-			}
-		}
-	}
+//	for (j = 0; j < nspots; j++)
+//	{
+//		for (i = 0; i < npix; i++)
+//		{
+//			// test for spot presence
+//			// cout <<  abs( theta_center[i] - spot_theta[j] ) << "\t" << spot_thetasize[j] << "\n";
+//			dtheta = (pixel_theta[i] - spot_theta[j]) / spot_thetasize[j];
+//			dphi = (pixel_phi[i] - spot_phi[j]) / spot_phisize[j];
+//			if (dtheta * dtheta + dphi * dphi <= 1.)
+//			{
+//				temperature[i] = spot_temperature[i];
+//			}
+//		}
+//	}
 
 	// Convert temperature into fluxes
-	TemperatureToFlux(temperature, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
 	// set alpha channel values, the object is entirely opaque.
 	for(i = 0; i < npix; i++)
 		mFluxTexture[i].a = 1.0;
