@@ -160,8 +160,6 @@ CRocheBinary::~CRocheBinary()
 	glDeleteBuffers(1, &mEBO);
 	glDeleteBuffers(1, &mVBO);
 	glDeleteVertexArrays(1, &mVAO);
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-	glDeleteTextures(1, &mTextureID);
 
 	delete[] ipix;
 
@@ -333,7 +331,7 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
-	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
 
 	// render
 	glDrawElements(GL_TRIANGLES, mElements.size(), GL_UNSIGNED_INT, 0);
@@ -504,8 +502,8 @@ void CRocheBinary::Init()
 
 	glActiveTexture(GL_TEXTURE0);
 	// Load image as a texture
-	glGenTextures(1, &mTextureID);
-	glBindTexture(GL_TEXTURE_RECTANGLE, mTextureID);
+	glGenTextures(1, &mFluxTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
 
 	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 12*nside, nside, 0, GL_RGBA,
 			GL_FLOAT, &mFluxTexture[0]);

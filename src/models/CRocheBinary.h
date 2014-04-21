@@ -25,12 +25,9 @@ protected:
 	vector<vec3> mVBOData;
 	vector<unsigned int> mElements;
 
-	GLuint mTextureID; // texture id	
-
 	bool mModelReady;
 
 public:
-	void normalize_vert(double * vec);
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
 	void Init();
 
