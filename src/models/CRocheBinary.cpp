@@ -335,34 +335,59 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+/// Creates a Healpix sphere by computing the pixel and coordinate vector
+/// locations and (phi, theta) values.
+void CRocheBinary::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides)
+{
+	// Resize the input vectors to match the image.
+	mFluxTexture.resize(n_pixels);
+	pixel_xyz.resize(n_pixels);
+	pixel_phi.resize(n_pixels);
+	pixel_theta.resize(n_pixels);
+//	pixel_temperatures.resize(n_pixels);
+
+	corner_xyz.resize(4 * n_pixels);	// four corners per Healpix pixel
+	corner_theta.resize(4 * n_pixels);	// four corners per Healpix pixel
+	corner_phi.resize(4 * n_pixels);	// four corners per Healpix pixel
+
+	// Temporary double vectors to interface with Healpix's routines:
+	vector<double> t_pixel_xyz(3);
+	vector<double> t_corner_xyz(12);
+
+	// Iterate over each pixel in the Healpix image
+	for(unsigned int i = 0; i < n_pixels; i++)
+	{
+		// Init the flux texture to something useful.
+		mFluxTexture[i].r = float(i) / n_pixels;
+		mFluxTexture[i].a = 1.0;
+
+		// Compute the vertex locations for the center and (four) corners
+		// of the pixels.
+		pix2vec_nest(n_sides, i, &t_pixel_xyz[0], &t_corner_xyz[0]);
+
+		// Copy the pixel location from the temporary buffer into the storage buffer.
+		pixel_xyz[i] = vec3(t_pixel_xyz[0], t_pixel_xyz[1], t_pixel_xyz[2]);
+
+		// Compute the (theta, phi) values for the center of each pixel
+		pix2ang_nest(n_sides, i, &pixel_theta[i], &pixel_phi[i]);
+
+		// Compute the (theta, phi) values for each of the (four) corners
+		for(unsigned int j = 0; j < 4; j++)
+		{
+			vec2ang(&t_corner_xyz[3*j], &corner_theta[4*i + j], &corner_phi[4*i + j]);
+			// Copy the corner location into the storage buffer
+			corner_xyz[4*i + j] = vec3(t_corner_xyz[3*j + 0], t_corner_xyz[3*j + 1], t_corner_xyz[3*j + 2]);
+		}
+	}
+}
+
 /// Computes the geometry of the spherical Healpix surface
 void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
 {
 	register int i, j, k;
-	double vec[npix][3];
-	double vertex[npix][4][3];
-	double vec_temp[3], vertex_temp[12];
 
-	// First get the angles, central vector, and 4 vertices of each Healpix pixel
-	for (i = 0; i < npix; i++)
-	{
-		pix2ang_nest(nside, i, &pixel_theta[i], &pixel_phi[i]);
-		// cout << "theta: " << theta_center[i] << " phi:" << phi_center[i] << "\n";
-		pix2vec_nest(nside, i, &vec_temp[0], &vertex_temp[0]);
-		for (j = 0; j < 3; j++)
-			vec[i][j] = vec_temp[j];
-
-		for (k = 0; k < 4; k++) // four corners of the surface element
-		{
-			for (j = 0; j < 3; j++) // three spatial coordinates
-				vertex[i][k][j] = vertex_temp[j + 3 * k];
-
-			// Compute the angles for each vertices
-			vec2ang(vertex[i][k], &corner_theta[i * 4 + k],
-					&corner_phi[i * 4 + k]);
-		}
-	}
+	GenerateHealpixSphere(npix, nside);
 
 	//
 	// Compute geometry of the Roche spheroid
@@ -408,29 +433,31 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	// Convert temperature into fluxes
 	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
 	// set alpha channel values, the object is entirely opaque.
-	for(i = 0; i < npix; i++)
-		mFluxTexture[i].a = 1.0;
+//	for(i = 0; i < npix; i++)
+//		mFluxTexture[i].a = 1.0;
 
-	// Convert the unit-radius verticies to the Roche surface radii.
-	for (i = 0; i < npix; i++)
-	{
-		for (j = 0; j < 4; j++)
-		{
-			for (k = 0; k < 3; k++)
-			{
-				vertex[i][j][k] *= corner_radii[i * 4 + j];
-			}
-		}
-	}
+//	// Convert the unit-radius verticies to the Roche surface radii.
+//	for (i = 0; i < npix; i++)
+//	{
+//		for (j = 0; j < 4; j++)
+//		{
+//			for (k = 0; k < 3; k++)
+//			{
+//				vertex[i][j][k] *= corner_radii[i * 4 + j];
+//			}
+//		}
+//	}
 
 	// load data into the VBO.
 	for (i = 0; i < npix; i++)
 	{
 		for (j = 0; j < 4; j++)
 		{
+			vbo_data.push_back(corner_xyz[4*i + j] * float(corner_radii[i * 4 + j]));
+
 			// set the vertices
-			vbo_data.push_back(
-					vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
+//			vbo_data.push_back(
+//					vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
 			// set the surface normals, remember to normalize!
 			vbo_data.push_back( glm::normalize( vec3(g_x[i], g_y[i], g_z[i]) ) );
 

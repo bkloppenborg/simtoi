@@ -115,6 +115,8 @@ public:
 	void GenerateRoche(vector<vec3> & vbo_data,
 			vector<unsigned int> & elements);
 
+	void GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides);
+
 };
 
 #endif /* CROCHEBINARY_H_ */
