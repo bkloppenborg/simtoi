@@ -119,13 +119,13 @@ CRocheBinary::CRocheBinary() :
 	cout << "Rl (rsun): " << rl_rsun << "\n";
 
 	ipix = new long[npix];
-	theta_center = new double[npix];
-	phi_center = new double[npix];
-	radii_center = new double[npix];
+	pixel_theta.resize(npix);
+	pixel_phi.resize(npix);
+	pixel_radii.resize(npix);
 
-	theta_corners = new double[4 * npix];
-	phi_corners = new double[4 * npix];
-	radii_corners = new double[4 * npix];
+	corner_theta.resize(4 * npix);
+	corner_phi.resize(4 * npix);
+	corner_radii.resize(4 * npix);
 
 	// Setup image/texture
 	long imsize = 12 * nside * nside;
@@ -162,14 +162,6 @@ CRocheBinary::~CRocheBinary()
 	glDeleteVertexArrays(1, &mVAO);
 
 	delete[] ipix;
-
-	delete[] theta_center;
-	delete[] phi_center;
-	delete[] radii_center;
-
-	delete[] theta_corners;
-	delete[] phi_corners;
-	delete[] radii_corners;
 }
 
 shared_ptr<CModel> CRocheBinary::Create()
@@ -358,7 +350,7 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	for (i = 0; i < npix; i++)
 	{
 		ipix[i] = i;
-		pix2ang_nest(nside, i, &theta_center[i], &phi_center[i]);
+		pix2ang_nest(nside, i, &pixel_theta[i], &pixel_phi[i]);
 		// cout << "theta: " << theta_center[i] << " phi:" << phi_center[i] << "\n";
 		pix2vec_nest(nside, i, &vec_temp[0], &vertex_temp[0]);
 		for (j = 0; j < 3; j++)
@@ -370,8 +362,8 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 				vertex[i][k][j] = vertex_temp[j + 3 * k];
 
 			// Compute the angles for each vertices
-			vec2ang(vertex[i][k], &theta_corners[i * 4 + k],
-					&phi_corners[i * 4 + k]);
+			vec2ang(vertex[i][k], &corner_theta[i * 4 + k],
+					&corner_phi[i * 4 + k]);
 		}
 	}
 
@@ -379,11 +371,11 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 	// Compute geometry of the Roche spheroid
 
 	// Compute the surface radii for each vertices using the angles and Roche potential equations
-	surface_radii(radii_corners, theta_corners, phi_corners, 4 * npix);
-	surface_radii(radii_center, theta_center, phi_center, npix);
+	surface_radii(&corner_radii[0], &corner_theta[0], &corner_phi[0], 4 * npix);
+	surface_radii(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0], npix);
 
 	// Compute the gravity darkening (based on the center of the Healpix pixel)
-	surface_gravity(radii_center, theta_center, phi_center,
+	surface_gravity(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0],
 			&g_x[0], &g_y[0], &g_z[0], &gravity[0], npix);
 	double gravity_pole = 1;
 	double g_pole_x, g_pole_y, g_pole_z;
@@ -407,8 +399,8 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 		{
 			// test for spot presence
 			// cout <<  abs( theta_center[i] - spot_theta[j] ) << "\t" << spot_thetasize[j] << "\n";
-			dtheta = (theta_center[i] - spot_theta[j]) / spot_thetasize[j];
-			dphi = (phi_center[i] - spot_phi[j]) / spot_phisize[j];
+			dtheta = (pixel_theta[i] - spot_theta[j]) / spot_thetasize[j];
+			dphi = (pixel_phi[i] - spot_phi[j]) / spot_phisize[j];
 			if (dtheta * dtheta + dphi * dphi <= 1.)
 			{
 				temperature[i] = spot_temperature[i];
@@ -429,7 +421,7 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 		{
 			for (k = 0; k < 3; k++)
 			{
-				vertex[i][j][k] *= radii_corners[i * 4 + j];
+				vertex[i][j][k] *= corner_radii[i * 4 + j];
 			}
 		}
 	}

@@ -28,6 +28,7 @@ protected:
 	bool mModelReady;
 
 public:
+
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
 	void Init();
 
@@ -72,19 +73,22 @@ private:
 	long npix;
 
 	long* ipix;
-	double* theta_center;
-	double* phi_center;
-	double* radii_center;
+	vector<double> pixel_theta;
+	vector<double> pixel_phi;
+	vector<double> pixel_radii;
+
+	// quantities related to the precise geometrical corners
+	vector<double> corner_theta;
+	vector<double> corner_phi;
+	vector<double> corner_radii;
+
 
 	vector<double> gravity; // gravity intensity (not gravity vector)
 	vector<double> g_x;
 	vector<double> g_y;
 	vector<double> g_z;
 	vector<double> temperature; // temperature
-	// quantities related to the precise geometrical corners 
-	double* theta_corners;
-	double* phi_corners;
-	double* radii_corners;
+
 
 	// Spots (should be a class, really)
 	int nspots; // number of spots
