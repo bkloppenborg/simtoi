@@ -8,9 +8,9 @@
 #ifndef CROCHEBINARY_H_
 #define CROCHEBINARY_H_
 
-#include "CRocheSpheroid.h"
+#include "CHealpixSpheroid.h"
 
-class CRocheBinary: public CRocheSpheroid
+class CRocheBinary: public CHealpixSphereoid
 {
 public:
 	CRocheBinary();

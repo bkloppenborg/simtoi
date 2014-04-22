@@ -5,9 +5,9 @@
  *      Author: bkloppenborg
  */
 
-#include "CRocheSpheroid.h"
+#include "CHealpixSpheroid.h"
 
-CRocheSpheroid::CRocheSpheroid(int n_params) :
+CHealpixSphereoid::CHealpixSphereoid(int n_params) :
 	CModel(n_params)
 {
 	mVAO = 0;
@@ -15,14 +15,14 @@ CRocheSpheroid::CRocheSpheroid(int n_params) :
 	mEBO = 0;
 }
 
-CRocheSpheroid::~CRocheSpheroid()
+CHealpixSphereoid::~CHealpixSphereoid()
 {
 	// TODO Auto-generated destructor stub
 }
 
 /// Creates a Healpix sphere by computing the pixel and coordinate vector
 /// locations and (phi, theta) values.
-void CRocheSpheroid::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides)
+void CHealpixSphereoid::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides)
 {
 	// Resize the input vectors to match the image.
 	mFluxTexture.resize(n_pixels);
@@ -67,7 +67,7 @@ void CRocheSpheroid::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n
 }
 
 /// Generates the element buffer indicies for a Healpix sphere
-void	CRocheSpheroid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector<unsigned int> & elements)
+void	CHealpixSphereoid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector<unsigned int> & elements)
 {
 	// Each Healpix pixel is composed of four verticies which are represented
 	// as vec3. Thus, the start of each Healpix vertex definition follows a
@@ -91,7 +91,7 @@ void	CRocheSpheroid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector<un
 }
 
 /// Creates the VBO from the corners, radii, and gravity buffers.
-void CRocheSpheroid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data)
+void CHealpixSphereoid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data)
 {
 	// Iterate over each Healpix pixel
 	for (unsigned int i = 0; i < n_pixels; i++)
@@ -113,7 +113,7 @@ void CRocheSpheroid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, vec
 }
 
 
-void CRocheSpheroid::Init()
+void CHealpixSphereoid::Init()
 {
 	// Generate the verticies and elements
 	GenerateModel(mVBOData, mElements);

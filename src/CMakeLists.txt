@@ -20,7 +20,8 @@ add_subdirectory(scripts)
 # Assemble all of the source to build simtoi.
 #file(GLOB SOURCE *.cpp models/*.cpp positions/*.cpp minimizers/*.cpp tasks/*.cpp)
 file(GLOB SOURCE *.cpp models/CSphere.* models/CDensityDisk.* models/CDisk_Pascucci2004.* 
-models/CDisk_Andrews2009.* models/CCylinder.* models/CRocheBinary.*
+models/CDisk_Andrews2009.* models/CCylinder.* 
+models/CHealpixSpheroid.* models/CRocheBinary.*
 positions/*.cpp minimizers/*.cpp tasks/*.cpp)
 
 # Levmar requires a linear algebra package, but it doesn't export a

@@ -11,7 +11,7 @@
 #include "chealpix.h"
 #include "CModel.h"
 
-class CRocheSpheroid : public CModel
+class CHealpixSphereoid : public CModel
 {
 protected:
 	GLuint mVAO;
@@ -42,8 +42,8 @@ protected:
 	vector<double> g_z;
 
 public:
-	CRocheSpheroid(int n_params);
-	virtual ~CRocheSpheroid();
+	CHealpixSphereoid(int n_params);
+	virtual ~CHealpixSphereoid();
 
 	void GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides);
 	void GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data);

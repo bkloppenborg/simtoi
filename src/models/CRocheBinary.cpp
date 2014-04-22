@@ -12,7 +12,7 @@
 #include "CShaderFactory.h"
 
 CRocheBinary::CRocheBinary() :
-	CRocheSpheroid(1)
+	CHealpixSphereoid(1)
 {
 
 
