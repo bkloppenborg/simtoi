@@ -12,11 +12,9 @@
 #include "CShaderFactory.h"
 
 CRocheBinary::CRocheBinary() :
-		CModel(1)
+	CRocheSpheroid(1)
 {
-	mVAO = 0;
-	mVBO = 0;
-	mEBO = 0;
+
 
 //	mParamNames.push_back("Wavelength (um)");
 //	SetParam(mBaseParams + 1,  1.4);
@@ -108,9 +106,9 @@ CRocheBinary::CRocheBinary() :
 			* pow(radius_pole * rsun / (parallax * AU) * 1000.
 							/ desired_resolution, 2.0);
 	nside_estimate = sqrt(npix_estimate / 12.0);
-	nside = pow(2, ceil(log(nside_estimate) / log(2.0)));
-	npix = nside2npix(nside);
-	cout << "Nside: " << nside << "\tNpix: " << npix << "\n";
+	n_sides = pow(2, ceil(log(nside_estimate) / log(2.0)));
+	npix = nside2npix(n_sides);
+	cout << "Nside: " << n_sides << "\tNpix: " << npix << "\n";
 
 	// Volume-equivalent Roche lobe radius from Eggleton
 	double q = mass1 / mass2;
@@ -128,7 +126,7 @@ CRocheBinary::CRocheBinary() :
 	corner_radii.resize(4 * npix);
 
 	// Setup image/texture
-	long imsize = 12 * nside * nside;
+	long imsize = 12 * n_sides * n_sides;
 	mFluxTexture.resize(imsize);
 
 	gravity.resize(npix);
@@ -335,59 +333,12 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-/// Creates a Healpix sphere by computing the pixel and coordinate vector
-/// locations and (phi, theta) values.
-void CRocheBinary::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides)
-{
-	// Resize the input vectors to match the image.
-	mFluxTexture.resize(n_pixels);
-	pixel_xyz.resize(n_pixels);
-	pixel_phi.resize(n_pixels);
-	pixel_theta.resize(n_pixels);
-//	pixel_temperatures.resize(n_pixels);
-
-	corner_xyz.resize(4 * n_pixels);	// four corners per Healpix pixel
-	corner_theta.resize(4 * n_pixels);	// four corners per Healpix pixel
-	corner_phi.resize(4 * n_pixels);	// four corners per Healpix pixel
-
-	// Temporary double vectors to interface with Healpix's routines:
-	vector<double> t_pixel_xyz(3);
-	vector<double> t_corner_xyz(12);
-
-	// Iterate over each pixel in the Healpix image
-	for(unsigned int i = 0; i < n_pixels; i++)
-	{
-		// Init the flux texture to something useful.
-		mFluxTexture[i].r = float(i) / n_pixels;
-		mFluxTexture[i].a = 1.0;
-
-		// Compute the vertex locations for the center and (four) corners
-		// of the pixels.
-		pix2vec_nest(n_sides, i, &t_pixel_xyz[0], &t_corner_xyz[0]);
-
-		// Copy the pixel location from the temporary buffer into the storage buffer.
-		pixel_xyz[i] = vec3(t_pixel_xyz[0], t_pixel_xyz[1], t_pixel_xyz[2]);
-
-		// Compute the (theta, phi) values for the center of each pixel
-		pix2ang_nest(n_sides, i, &pixel_theta[i], &pixel_phi[i]);
-
-		// Compute the (theta, phi) values for each of the (four) corners
-		for(unsigned int j = 0; j < 4; j++)
-		{
-			vec2ang(&t_corner_xyz[3*j], &corner_theta[4*i + j], &corner_phi[4*i + j]);
-			// Copy the corner location into the storage buffer
-			corner_xyz[4*i + j] = vec3(t_corner_xyz[3*j + 0], t_corner_xyz[3*j + 1], t_corner_xyz[3*j + 2]);
-		}
-	}
-}
-
 /// Computes the geometry of the spherical Healpix surface
-void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
+void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
 {
-	register int i, j, k;
-
-	GenerateHealpixSphere(npix, nside);
+	// Generate a unit Healpix sphere
+	GenerateHealpixSphere(npix, n_sides);
 
 	//
 	// Compute geometry of the Roche spheroid
@@ -411,10 +362,10 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 			max_temperature = pixel_temperature[i];
 	}
 
-	double dtheta;
-	double dphi;
-
-	// Add simple spots (TBD: overlap)
+//	double dtheta;
+//	double dphi;
+//
+//	 Add simple spots (TBD: overlap)
 //	for (j = 0; j < nspots; j++)
 //	{
 //		for (i = 0; i < npix; i++)
@@ -432,114 +383,9 @@ void CRocheBinary::GenerateRoche(vector<vec3> & vbo_data,
 
 	// Convert temperature into fluxes
 	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
-	// set alpha channel values, the object is entirely opaque.
-//	for(i = 0; i < npix; i++)
-//		mFluxTexture[i].a = 1.0;
 
-//	// Convert the unit-radius verticies to the Roche surface radii.
-//	for (i = 0; i < npix; i++)
-//	{
-//		for (j = 0; j < 4; j++)
-//		{
-//			for (k = 0; k < 3; k++)
-//			{
-//				vertex[i][j][k] *= corner_radii[i * 4 + j];
-//			}
-//		}
-//	}
+	GenerateVBO(npix, n_sides, vbo_data);
 
-	// load data into the VBO.
-	for (i = 0; i < npix; i++)
-	{
-		for (j = 0; j < 4; j++)
-		{
-			vbo_data.push_back(corner_xyz[4*i + j] * float(corner_radii[i * 4 + j]));
-
-			// set the vertices
-//			vbo_data.push_back(
-//					vec3(vertex[i][j][0], vertex[i][j][1], vertex[i][j][2]));
-			// set the surface normals, remember to normalize!
-			vbo_data.push_back( glm::normalize( vec3(g_x[i], g_y[i], g_z[i]) ) );
-
-			// set the texture coordinates
-			vbo_data.push_back(vec3(i % (12 * nside), i / (12 * nside), 0));
-		}
-	}
-
-	// for each Healpix pixel (= quad), "elements" contains the two triangle vertices that form this quad
-	// both quads and triangles are defined counterclockwise 0-1-2-3 becomes 0-1-3 + 3-1-2
-	// these indexes are given by i * N + M
-	// a new quad is defined every N vec3 in the vbo
-	// M = N/4 * [0, 1, 3, 3, 1, 2]
-	for (i = 0; i < npix; i++)
-	{
-		elements.push_back(i * 12 + 0);
-		elements.push_back(i * 12 + 3);
-		elements.push_back(i * 12 + 9);
-		elements.push_back(i * 12 + 9);
-		elements.push_back(i * 12 + 3);
-		elements.push_back(i * 12 + 6);
-	}
-}
-
-void CRocheBinary::Init()
-{
-	// Generate the verticies and elements
-	GenerateRoche(mVBOData, mElements);
-	// Create a new Vertex Array Object, Vertex Buffer Object, and Element Buffer
-	// object to store the model's information.
-	//
-	// First generate the VAO, this stores all buffer information related to this object
-	glGenVertexArrays(1, &mVAO);
-	glBindVertexArray(mVAO);
-	// Generate and bind to the VBO. Upload the verticies.
-	glGenBuffers(1, &mVBO); // Generate 1 buffer
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-	glBufferData(GL_ARRAY_BUFFER, mVBOData.size() * sizeof(vec3), &mVBOData[0],
-			GL_STATIC_DRAW);
-	// Generate and bind to the EBO. Upload the elements.
-	glGenBuffers(1, &mEBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			mElements.size() * sizeof(unsigned int), &mElements[0],
-			GL_STATIC_DRAW);
-
-	InitShaderVariables();
-
-	//GLint ExtensionCount;
-	//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ExtensionCount);
-	//cout << "Maximum allocable texture size: " << ExtensionCount << endl;
-
-	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
-	// modified by subsequent calls.
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	glActiveTexture(GL_TEXTURE0);
-	// Load image as a texture
-	glGenTextures(1, &mFluxTextureID);
-	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
-
-	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 12*nside, nside, 0, GL_RGBA,
-			GL_FLOAT, &mFluxTexture[0]);
-
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	// Set sampler
-	GLuint shader_program = mShader->GetProgram();
-	GLuint TextureSamp = glGetUniformLocation(shader_program, "TexSampler");
-	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
-
-	// Return to the default texture.
-	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-
-	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CRocheBinary.Init()");
-
-	// Indicate the model is ready to use.
-	mModelReady = true;
+	// Create the lookup indicies.
+	GenerateHealpixVBOIndicies(npix, elements);
 }

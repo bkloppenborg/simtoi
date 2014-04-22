@@ -8,29 +8,18 @@
 #ifndef CROCHEBINARY_H_
 #define CROCHEBINARY_H_
 
-#include "CModel.h"
-#include "chealpix.h"
+#include "CRocheSpheroid.h"
 
-class CRocheBinary: public CModel
+class CRocheBinary: public CRocheSpheroid
 {
 public:
 	CRocheBinary();
 	virtual ~CRocheBinary();
 
-protected:
-	GLuint mVAO;
-	GLuint mVBO;
-	GLuint mEBO;
-
-	vector<vec3> mVBOData;
-	vector<unsigned int> mElements;
-
-	bool mModelReady;
 
 public:
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
-	void Init();
 
 	static shared_ptr<CModel> Create();
 
@@ -69,25 +58,8 @@ private:
 
 	double npix_estimate;
 	double nside_estimate;
-	long nside;
+
 	long npix;
-
-	// Quantities related to the pixel centroid and corners:
-	vector<double> pixel_theta;
-	vector<double> pixel_phi;
-	vector<double> pixel_radii;
-	vector<double> pixel_temperature; // temperature
-	vector<vec3>   pixel_xyz;
-
-	vector<double> corner_theta;
-	vector<double> corner_phi;
-	vector<double> corner_radii;
-	vector<vec3>   corner_xyz;
-
-	vector<double> gravity; // gravity intensity (not gravity vector)
-	vector<double> g_x;
-	vector<double> g_y;
-	vector<double> g_z;
 
 
 	// Spots (should be a class, really)
@@ -112,10 +84,8 @@ private:
 	void surface_temperature(double* temperature, const double* gravity,
 			const double gravity_pole, const unsigned int vsize);
 public:
-	void GenerateRoche(vector<vec3> & vbo_data,
+	void GenerateModel(vector<vec3> & vbo_data,
 			vector<unsigned int> & elements);
-
-	void GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides);
 
 };
 
