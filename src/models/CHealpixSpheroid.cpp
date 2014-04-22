@@ -29,11 +29,13 @@ void CHealpixSphereoid::GenerateHealpixSphere(unsigned int n_pixels, unsigned in
 	pixel_xyz.resize(n_pixels);
 	pixel_phi.resize(n_pixels);
 	pixel_theta.resize(n_pixels);
+	pixel_radii.resize(n_pixels);
 //	pixel_temperatures.resize(n_pixels);
 
 	corner_xyz.resize(4 * n_pixels);	// four corners per Healpix pixel
 	corner_theta.resize(4 * n_pixels);	// four corners per Healpix pixel
 	corner_phi.resize(4 * n_pixels);	// four corners per Healpix pixel
+	corner_radii.resize(4 * n_pixels);	// four corners per Healpix pixel
 
 	// Temporary double vectors to interface with Healpix's routines:
 	vector<double> t_pixel_xyz(3);

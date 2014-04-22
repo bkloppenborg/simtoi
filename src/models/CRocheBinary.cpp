@@ -15,7 +15,6 @@ CRocheBinary::CRocheBinary() :
 	CHealpixSphereoid(1)
 {
 
-
 //	mParamNames.push_back("Wavelength (um)");
 //	SetParam(mBaseParams + 1,  1.4);
 //	SetFree(mBaseParams + 1, false);
@@ -116,18 +115,6 @@ CRocheBinary::CRocheBinary() :
 			/ (0.6 * pow(q, 2. / 3.) + log(1. + pow(q, 1. / 3.)));
 	cout << "Rl (rsun): " << rl_rsun << "\n";
 
-//	ipix = new long[npix];
-	pixel_theta.resize(npix);
-	pixel_phi.resize(npix);
-	pixel_radii.resize(npix);
-
-	corner_theta.resize(4 * npix);
-	corner_phi.resize(4 * npix);
-	corner_radii.resize(4 * npix);
-
-	// Setup image/texture
-	long imsize = 12 * n_sides * n_sides;
-	mFluxTexture.resize(imsize);
 
 	gravity.resize(npix);
 	g_x.resize(npix);
