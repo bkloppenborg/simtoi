@@ -347,7 +347,6 @@ void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 	double g_pole_x, g_pole_y, g_pole_z;
 	triaxial_gravity(radius_pole, 0.0, 0.0, g_pole_x, g_pole_y, g_pole_z, gravity_pole);
 
-
 	surface_temperature(&pixel_temperature[0], &gravity[0], gravity_pole, n_pixels);
 
 	double max_temperature = 0;
