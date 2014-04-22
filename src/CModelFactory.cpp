@@ -43,6 +43,7 @@
 #include "models/CDisk_Pascucci2004.h"
 #include "models/CDisk_Andrews2009.h"
 #include "models/CRocheBinary.h"
+#include "models/CRocheRotator.h"
 
 /// \brief Private constructor. Call `Instance()` instead.
 CModelFactory::CModelFactory()
@@ -56,6 +57,7 @@ CModelFactory::CModelFactory()
 	Register("disk_pascucci2004", &CDisk_Pascucci2004::Create);
 	Register("disk_andrews2009", &CDisk_Andrews2009::Create);
 	Register("roche_binary", &CRocheBinary::Create);
+	Register("roche_rotator", &CRocheRotator::Create);
 }
 
 CModelFactory::~CModelFactory() \
