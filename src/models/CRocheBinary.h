@@ -10,7 +10,7 @@
 
 #include "CHealpixSpheroid.h"
 
-class CRocheBinary: public CHealpixSphereoid
+class CRocheBinary: public CHealpixSpheroid
 {
 public:
 	CRocheBinary();
@@ -59,8 +59,6 @@ private:
 	double npix_estimate;
 	double nside_estimate;
 
-	long npix;
-
 
 	// Spots (should be a class, really)
 //	int nspots; // number of spots
@@ -76,7 +74,7 @@ private:
 	void triaxial_gravity(const double radius,
 			const double theta, const double phi,
 			double & g_x, double & g_y, double & g_z, double & g_mag);
-	void surface_radii(double* radii, const double *theta, const double *phi,
+	void ComputeRadii(double* radii, const double *theta, const double *phi,
 			const unsigned int vsize);
 	void surface_gravity(const double * radii, const double * theta, const double * phi,
 			double * g_x, double * g_y, double * g_z, double * g_mag,

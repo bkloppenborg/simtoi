@@ -11,7 +11,7 @@
 #include "chealpix.h"
 #include "CModel.h"
 
-class CHealpixSphereoid : public CModel
+class CHealpixSpheroid : public CModel
 {
 protected:
 	GLuint mVAO;
@@ -30,6 +30,7 @@ protected:
 	vector<double> pixel_temperature; // temperature
 	vector<vec3>   pixel_xyz;
 	unsigned int n_sides;
+	unsigned int n_pixels;
 
 	vector<double> corner_theta;
 	vector<double> corner_phi;
@@ -42,8 +43,8 @@ protected:
 	vector<double> g_z;
 
 public:
-	CHealpixSphereoid(int n_params);
-	virtual ~CHealpixSphereoid();
+	CHealpixSpheroid(int n_params);
+	virtual ~CHealpixSpheroid();
 
 	void GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides);
 	void GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data);

@@ -7,22 +7,25 @@
 
 #include "CHealpixSpheroid.h"
 
-CHealpixSphereoid::CHealpixSphereoid(int n_params) :
+CHealpixSpheroid::CHealpixSpheroid(int n_params) :
 	CModel(n_params)
 {
 	mVAO = 0;
 	mVBO = 0;
 	mEBO = 0;
+
+	n_sides = 4;
+	n_pixels = 0;
 }
 
-CHealpixSphereoid::~CHealpixSphereoid()
+CHealpixSpheroid::~CHealpixSpheroid()
 {
 	// TODO Auto-generated destructor stub
 }
 
 /// Creates a Healpix sphere by computing the pixel and coordinate vector
 /// locations and (phi, theta) values.
-void CHealpixSphereoid::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides)
+void CHealpixSpheroid::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides)
 {
 	// Resize the input vectors to match the image.
 	mFluxTexture.resize(n_pixels);
@@ -69,7 +72,7 @@ void CHealpixSphereoid::GenerateHealpixSphere(unsigned int n_pixels, unsigned in
 }
 
 /// Generates the element buffer indicies for a Healpix sphere
-void	CHealpixSphereoid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector<unsigned int> & elements)
+void	CHealpixSpheroid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector<unsigned int> & elements)
 {
 	// Each Healpix pixel is composed of four verticies which are represented
 	// as vec3. Thus, the start of each Healpix vertex definition follows a
@@ -93,7 +96,7 @@ void	CHealpixSphereoid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector
 }
 
 /// Creates the VBO from the corners, radii, and gravity buffers.
-void CHealpixSphereoid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data)
+void CHealpixSpheroid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data)
 {
 	// Iterate over each Healpix pixel
 	for (unsigned int i = 0; i < n_pixels; i++)
@@ -115,8 +118,20 @@ void CHealpixSphereoid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, 
 }
 
 
-void CHealpixSphereoid::Init()
+void CHealpixSpheroid::Init()
 {
+	// Empty the VBOs, just in case they contain some other data.
+	mVBOData.clear();
+	mElements.clear();
+
+	n_pixels = nside2npix(n_sides);
+
+	gravity.resize(n_pixels);
+	g_x.resize(n_pixels);
+	g_y.resize(n_pixels);
+	g_z.resize(n_pixels);
+	pixel_temperature.resize(n_pixels);
+
 	// Generate the verticies and elements
 	GenerateModel(mVBOData, mElements);
 	// Create a new Vertex Array Object, Vertex Buffer Object, and Element Buffer

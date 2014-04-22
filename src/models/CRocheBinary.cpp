@@ -12,7 +12,7 @@
 #include "CShaderFactory.h"
 
 CRocheBinary::CRocheBinary() :
-	CHealpixSphereoid(1)
+	CHealpixSpheroid(2)
 {
 
 //	mParamNames.push_back("Wavelength (um)");
@@ -81,6 +81,12 @@ CRocheBinary::CRocheBinary() :
 	SetMax(mBaseParams + 1, 10.0);
 	SetMin(mBaseParams + 1, 0.01);
 
+	mParamNames.push_back("n_side_power");
+	SetParam(mBaseParams + 2, 4);
+	SetFree(mBaseParams + 2, false);
+	SetMax(mBaseParams + 2, 10.0);
+	SetMin(mBaseParams + 2, 1);
+
 //	// Fundamental properties of the star
 	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 	parallax = 28.8; // distance from the sun, in pc
@@ -101,26 +107,19 @@ CRocheBinary::CRocheBinary() :
 	omega_rot = 2.0 * PI / (rotation_period * 3600. * 24.); // in Hz
 
 	// Setup Healpix and geometry
-	npix_estimate = 4. * PI
-			* pow(radius_pole * rsun / (parallax * AU) * 1000.
-							/ desired_resolution, 2.0);
-	nside_estimate = sqrt(npix_estimate / 12.0);
-	n_sides = pow(2, ceil(log(nside_estimate) / log(2.0)));
-	npix = nside2npix(n_sides);
-	cout << "Nside: " << n_sides << "\tNpix: " << npix << "\n";
+//	npix_estimate = 4. * PI
+//			* pow(radius_pole * rsun / (parallax * AU) * 1000.
+//							/ desired_resolution, 2.0);
+//	nside_estimate = sqrt(npix_estimate / 12.0);
+//	n_sides = pow(2, ceil(log(nside_estimate) / log(2.0)));
+//	npix = nside2npix(n_sides);
+//	cout << "Nside: " << n_sides << "\tNpix: " << npix << "\n";
 
 	// Volume-equivalent Roche lobe radius from Eggleton
 	double q = mass1 / mass2;
 	double rl_rsun = separation_rsun * 0.49 * pow(q, 2. / 3.)
 			/ (0.6 * pow(q, 2. / 3.) + log(1. + pow(q, 1. / 3.)));
 	cout << "Rl (rsun): " << rl_rsun << "\n";
-
-
-	gravity.resize(npix);
-	g_x.resize(npix);
-	g_y.resize(npix);
-	g_z.resize(npix);
-	pixel_temperature.resize(npix);
 
 	// Setup spots
 
@@ -225,7 +224,7 @@ void CRocheBinary::triaxial_pot(double & pot, double & dpot,
 							+ radius1 * mu * mu);
 }
 
-void CRocheBinary::surface_radii(double * radii, const double * theta,
+void CRocheBinary::ComputeRadii(double * radii, const double * theta,
 		const double * phi, const unsigned int vsize)
 {
 	// in this function we compute the roche radius based on masses/ distance / orbital_period, for each (theta, phi)
@@ -277,6 +276,13 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	if (!mModelReady)
 		Init();
 
+	unsigned int t_n_sides = floor(pow(2, mParams[mBaseParams + 2]));
+	if(t_n_sides != n_sides)
+	{
+		n_sides = t_n_sides;
+		Init();
+	}
+
 	// Rename a few variables for convenience:
 	double radial_scale = mParams[mBaseParams + 1];
 	mat4 scale = glm::scale(mat4(),
@@ -325,25 +331,27 @@ void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
 {
 	// Generate a unit Healpix sphere
-	GenerateHealpixSphere(npix, n_sides);
+	GenerateHealpixSphere(n_pixels, n_sides);
 
-	//
 	// Compute geometry of the Roche spheroid
 
 	// Compute the surface radii for each vertices using the angles and Roche potential equations
-	surface_radii(&corner_radii[0], &corner_theta[0], &corner_phi[0], 4 * npix);
-	surface_radii(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0], npix);
+	ComputeRadii(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0], n_pixels);
+	ComputeRadii(&corner_radii[0], &corner_theta[0], &corner_phi[0], 4 * n_pixels);
 
 	// Compute the gravity darkening (based on the center of the Healpix pixel)
 	surface_gravity(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0],
-			&g_x[0], &g_y[0], &g_z[0], &gravity[0], npix);
+			&g_x[0], &g_y[0], &g_z[0], &gravity[0], n_pixels);
+
 	double gravity_pole = 1;
 	double g_pole_x, g_pole_y, g_pole_z;
 	triaxial_gravity(radius_pole, 0.0, 0.0, g_pole_x, g_pole_y, g_pole_z, gravity_pole);
-	surface_temperature(&pixel_temperature[0], &gravity[0], gravity_pole, npix);
+
+
+	surface_temperature(&pixel_temperature[0], &gravity[0], gravity_pole, n_pixels);
 
 	double max_temperature = 0;
-	for(unsigned int i = 0; i < npix; i++)
+	for(unsigned int i = 0; i < n_pixels; i++)
 	{
 		if(pixel_temperature[i] > max_temperature)
 			max_temperature = pixel_temperature[i];
@@ -371,8 +379,8 @@ void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 	// Convert temperature into fluxes
 	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
 
-	GenerateVBO(npix, n_sides, vbo_data);
+	GenerateVBO(n_pixels, n_sides, vbo_data);
 
 	// Create the lookup indicies.
-	GenerateHealpixVBOIndicies(npix, elements);
+	GenerateHealpixVBOIndicies(n_pixels, elements);
 }
