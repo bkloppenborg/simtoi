@@ -283,9 +283,14 @@ void CModel::InitShaderVariables()
 	// Setup the normals. Their offset is (3 * sizeof(float)) from the start
 	// of the current index
 	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	glEnableVertexAttribArray(normAttrib);
-	glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
-			3 * sizeof(float), (GLvoid *) (3 * sizeof(float)));
+	// If the normal shader variable is not used, it can be optimized out
+	// verify that it is in use before setting any properties..
+	if(normAttrib > -1)
+	{
+		glEnableVertexAttribArray(normAttrib);
+		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
+				3 * sizeof(float), (GLvoid *) (3 * sizeof(float)));
+	}
 
 	// Setup the texture coordinate lookup variables. Their offset
 	// is (6 * sizeof(float)) from the start of the current index
