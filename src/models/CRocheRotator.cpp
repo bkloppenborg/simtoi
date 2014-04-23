@@ -11,7 +11,7 @@
 #include "CShaderFactory.h"
 
 CRocheRotator::CRocheRotator() :
-		CHealpixSpheroid(6)
+		CHealpixSpheroid(7)
 {
 	// Tesselation parameter for healpix, 4-6 is adequate for our uses.
 	mParamNames.push_back("n_side_power");
@@ -55,8 +55,17 @@ CRocheRotator::CRocheRotator() :
 	SetMax(mBaseParams + 6, 1.0);
 	SetMin(mBaseParams + 6, 0.01);
 
+	// Rotational period (units 1/day)
+	mParamNames.push_back("Omega_dot");
+	SetParam(mBaseParams + 7, 0.5);
+	SetFree(mBaseParams + 7, false);
+	SetMax(mBaseParams + 7, 1.0);
+	SetMin(mBaseParams + 7, 0.01);
+
 	// TODO: Remove this variable
 	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
+
+	mTime = 0;
 }
 
 CRocheRotator::~CRocheRotator()
@@ -260,4 +269,18 @@ void CRocheRotator::VonZeipelTemperatures(double T_eff_pole, double g_pole, doub
 {
 	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
 		pixel_temperature[i] = T_eff_pole * pow(gravity[i] / g_pole, beta);
+}
+
+void CRocheRotator::SetTime(double time)
+{
+	// Call the base class method (updates orbital parameters, etc.)
+	CModel::SetTime(time);
+
+	double dt = time - mTime;
+
+	const double Omega_dot = mParams[mBaseParams + 7];
+
+	mParams[2] = mParams[2] + dt * Omega_dot;
+
+	mTime = time;
 }

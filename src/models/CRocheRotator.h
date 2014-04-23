@@ -30,6 +30,7 @@ public:
 
 private:
 	double lambda;
+	double mTime;
 
 public:
 
@@ -55,6 +56,8 @@ public:
 			double & g_x, double & g_y, double & g_z, double & g_mag);
 
 	void VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta);
+
+	void SetTime(double time);
 
 };
 
