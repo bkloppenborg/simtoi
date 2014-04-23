@@ -142,7 +142,7 @@ public:
 
 	virtual void SetShader(string shader_id);
 	virtual void SetShader(CShaderPtr shader);
-	void SetTime(double time);
+	virtual void SetTime(double time);
 protected:
 	void SetupMatrix();
 
