@@ -156,13 +156,14 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 	ComputeGravity(g_pole, r_pole, omega_rot);
 	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
+	// Find the maximum temperature
 	double max_temperature = 0;
 	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
 	{
 		if(pixel_temperature[i] > max_temperature)
 			max_temperature = pixel_temperature[i];
 	}
-
+	// Convert temperatures to fluxes.
 	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);

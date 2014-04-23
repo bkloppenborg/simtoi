@@ -141,9 +141,7 @@ CRocheBinary::CRocheBinary() :
 
 CRocheBinary::~CRocheBinary()
 {
-	glDeleteBuffers(1, &mEBO);
-	glDeleteBuffers(1, &mVBO);
-	glDeleteVertexArrays(1, &mVAO);
+
 }
 
 shared_ptr<CModel> CRocheBinary::Create()
