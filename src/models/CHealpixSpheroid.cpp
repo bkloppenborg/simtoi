@@ -20,7 +20,9 @@ CHealpixSpheroid::CHealpixSpheroid(int n_params) :
 
 CHealpixSpheroid::~CHealpixSpheroid()
 {
-	// TODO Auto-generated destructor stub
+	if(mEBO) glDeleteBuffers(1, &mEBO);
+	if(mVBO) glDeleteBuffers(1, &mVBO);
+	if(mVAO) glDeleteVertexArrays(1, &mVAO);
 }
 
 /// Creates a Healpix sphere by computing the pixel and coordinate vector

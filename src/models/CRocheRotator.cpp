@@ -22,7 +22,7 @@ CRocheRotator::CRocheRotator() :
 
 	// gravity at the pole (= G M / (R_pole)^2 === m/s^2)
 	mParamNames.push_back("g_pole");
-	SetParam(mBaseParams + 2, 10);
+	SetParam(mBaseParams + 2, 1);
 	SetFree(mBaseParams + 2, false);
 	SetMax(mBaseParams + 2, 10000.0);
 	SetMin(mBaseParams + 2, 0.01);
@@ -41,12 +41,14 @@ CRocheRotator::CRocheRotator() :
 	SetMax(mBaseParams + 4, 1.0);
 	SetMin(mBaseParams + 4, 0.01);
 
+	// The effective temperature at the pole
 	mParamNames.push_back("T_eff_pole");
-	SetParam(mBaseParams + 5, 1);
+	SetParam(mBaseParams + 5, 5000);
 	SetFree(mBaseParams + 5, false);
-	SetMax(mBaseParams + 5, 1.0);
-	SetMin(mBaseParams + 5, 0.01);
+	SetMax(mBaseParams + 5, 2E3);
+	SetMin(mBaseParams + 5, 1E6);
 
+	// The von Zeipel gravity darkening coefficient.
 	mParamNames.push_back("von_zeipel_beta");
 	SetParam(mBaseParams + 6, 0.5);
 	SetFree(mBaseParams + 6, false);
@@ -59,9 +61,7 @@ CRocheRotator::CRocheRotator() :
 
 CRocheRotator::~CRocheRotator()
 {
-	glDeleteBuffers(1, &mEBO);
-	glDeleteBuffers(1, &mVBO);
-	glDeleteVertexArrays(1, &mVAO);
+
 }
 
 shared_ptr<CModel> CRocheRotator::Create()
