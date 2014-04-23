@@ -141,24 +141,22 @@ void CHealpixSpheroid::Init()
 	//
 	// First generate the VAO, this stores all buffer information related to this object
 	glGenVertexArrays(1, &mVAO);
+	glGenBuffers(1, &mVBO); // Generate 1 buffer
+	glGenBuffers(1, &mEBO);
+
 	glBindVertexArray(mVAO);
 	// Generate and bind to the VBO. Upload the verticies.
-	glGenBuffers(1, &mVBO); // Generate 1 buffer
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
 	glBufferData(GL_ARRAY_BUFFER, mVBOData.size() * sizeof(vec3), &mVBOData[0],
-			GL_STATIC_DRAW);
+			GL_DYNAMIC_DRAW);
+
 	// Generate and bind to the EBO. Upload the elements.
-	glGenBuffers(1, &mEBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 			mElements.size() * sizeof(unsigned int), &mElements[0],
-			GL_STATIC_DRAW);
+			GL_DYNAMIC_DRAW);
 
 	InitShaderVariables();
-
-	//GLint ExtensionCount;
-	//glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ExtensionCount);
-	//cout << "Maximum allocable texture size: " << ExtensionCount << endl;
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.

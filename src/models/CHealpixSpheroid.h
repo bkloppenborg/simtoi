@@ -54,6 +54,9 @@ public:
 
 	virtual void Render(GLuint framebuffer_object, const glm::mat4 & view) = 0;
 	virtual void Init();
+
+	void UploadVBO();
+	void UploadEBO();
 };
 
 #endif /* CROCHESPHEROID_H_ */

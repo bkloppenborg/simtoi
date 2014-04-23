@@ -11,7 +11,7 @@
 #include "CShaderFactory.h"
 
 CRocheRotator::CRocheRotator() :
-		CHealpixSpheroid(4)
+		CHealpixSpheroid(6)
 {
 	// Tesselation parameter for healpix, 4-6 is adequate for our uses.
 	mParamNames.push_back("n_side_power");
@@ -38,8 +38,23 @@ CRocheRotator::CRocheRotator() :
 	mParamNames.push_back("omega_rot");
 	SetParam(mBaseParams + 4, 0.5);
 	SetFree(mBaseParams + 4, false);
-	SetMax(mBaseParams + 4, 10.0);
-	SetMin(mBaseParams + 4, 1);
+	SetMax(mBaseParams + 4, 1.0);
+	SetMin(mBaseParams + 4, 0.01);
+
+	mParamNames.push_back("T_eff_pole");
+	SetParam(mBaseParams + 5, 1);
+	SetFree(mBaseParams + 5, false);
+	SetMax(mBaseParams + 5, 1.0);
+	SetMin(mBaseParams + 5, 0.01);
+
+	mParamNames.push_back("von_zeipel_beta");
+	SetParam(mBaseParams + 6, 0.5);
+	SetFree(mBaseParams + 6, false);
+	SetMax(mBaseParams + 6, 1.0);
+	SetMin(mBaseParams + 6, 0.01);
+
+	// TODO: Remove this variable
+	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 }
 
 CRocheRotator::~CRocheRotator()
@@ -58,7 +73,12 @@ shared_ptr<CModel> CRocheRotator::Create()
 /// Cranmer et. al 1995 (or equation 12 of Aufdenberg et al. 2006)
 double CRocheRotator::ComputeRadius(double polar_radius, double omega_rot, double theta)
 {
-	double omega_sin_theta = omega_rot * sin(theta);
+	double sin_theta = sin(theta);
+
+	if(abs(sin_theta) < 1E-3)	// ~ 0.1 degrees from the pole
+		return polar_radius;
+
+	double omega_sin_theta = omega_rot * sin_theta;
 
 	double radius = 3 * (polar_radius) / (omega_sin_theta) *
 			cos((M_PI + acos(omega_sin_theta)) / 3);
@@ -100,22 +120,18 @@ void CRocheRotator::ComputeGravity(double g_pole, double r_pole, double omega,
 	g_z = g_mag * cos_theta;
 }
 
-void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements)
+void CRocheRotator::ComputeRadii(double r_pole, double omega_rot)
 {
-	const double g_pole = mParams[mBaseParams + 2];
-	const double r_pole = mParams[mBaseParams + 3];
-	const double omega_rot = mParams[mBaseParams + 4];
-
-	// Generate a unit Healpix sphere
-	GenerateHealpixSphere(n_pixels, n_sides);
-
 	// Compute the radii for the pixels and corners:
 	for(unsigned int i = 0; i < pixel_radii.size(); i++)
 		pixel_radii[i] = ComputeRadius(r_pole, omega_rot, pixel_theta[i]);
 
 	for(unsigned int i = 0; i < corner_radii.size(); i++)
 		corner_radii[i] = ComputeRadius(r_pole, omega_rot, corner_theta[i]);
+}
 
+void CRocheRotator::ComputeGravity(double g_pole, double r_pole, double omega_rot)
+{
 	// Compute the gravity vector for each pixel:
 	for(unsigned int i = 0; i < gravity.size(); i++)
 	{
@@ -123,28 +139,32 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 					pixel_radii[i], pixel_theta[i], pixel_phi[i],
 					g_x[i], g_y[i], g_z[i], gravity[i]);
 	}
+}
 
-//	// Compute the gravity darkening (based on the center of the Healpix pixel)
-//	surface_gravity(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0],
-//			&g_x[0], &g_y[0], &g_z[0], &gravity[0], npix);
-//
-//	double gravity_pole = 1;
-//	double g_pole_x, g_pole_y, g_pole_z;
-//	triaxial_gravity(radius_pole, 0.0, 0.0, g_pole_x, g_pole_y, g_pole_z, gravity_pole);
-//
-//
-//	surface_temperature(&pixel_temperature[0], &gravity[0], gravity_pole, npix);
+void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements)
+{
+	const double g_pole = mParams[mBaseParams + 2];
+	const double r_pole = mParams[mBaseParams + 3];
+	const double omega_rot = mParams[mBaseParams + 4];
+	const double T_eff_pole = mParams[mBaseParams + 5];
+	const double von_zeipel_beta = mParams[mBaseParams + 6];
 
-//	double max_temperature = 0;
-//	for(unsigned int i = 0; i < npix; i++)
-//	{
-//		if(pixel_temperature[i] > max_temperature)
-//			max_temperature = pixel_temperature[i];
-//	}
-//
-//	// Convert temperature into fluxes
-//	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
-//
+	// Generate a unit Healpix sphere
+	GenerateHealpixSphere(n_pixels, n_sides);
+
+	ComputeRadii(r_pole, omega_rot);
+	ComputeGravity(g_pole, r_pole, omega_rot);
+	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
+
+	double max_temperature = 0;
+	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
+	{
+		if(pixel_temperature[i] > max_temperature)
+			max_temperature = pixel_temperature[i];
+	}
+
+	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
+
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 
 	// Create the lookup indicies.
@@ -167,6 +187,23 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	const double g_pole = mParams[mBaseParams + 2];
 	const double r_pole = mParams[mBaseParams + 3];
 	const double omega_rot = mParams[mBaseParams + 4];
+	const double T_eff_pole = mParams[mBaseParams + 5];
+	const double von_zeipel_beta = mParams[mBaseParams + 6];
+
+	ComputeRadii(r_pole, omega_rot);
+	ComputeGravity(g_pole, r_pole, omega_rot);
+	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
+
+	double max_temperature = 0;
+	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
+	{
+		if(pixel_temperature[i] > max_temperature)
+			max_temperature = pixel_temperature[i];
+	}
+
+	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
+
+	GenerateVBO(n_pixels, n_sides, mVBOData);
 
 	mat4 scale = glm::scale(mat4(), glm::vec3(1, 1, 1));
 
@@ -194,7 +231,15 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
+	// Bind to the texture, upload it.
 	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 12 * n_sides, n_sides, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
+
+	// Upload the VBO data:
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glBufferData(GL_ARRAY_BUFFER, mVBOData.size() * sizeof(vec3), &mVBOData[0],
+			GL_DYNAMIC_DRAW);
 
 	// render
 	glDrawElements(GL_TRIANGLES, mElements.size(), GL_UNSIGNED_INT, 0);
@@ -210,3 +255,8 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	CWorkerThread::CheckOpenGLError("CRocheRotator.Render()");
 }
 
+void CRocheRotator::VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta)
+{
+	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
+		pixel_temperature[i] = T_eff_pole * pow(gravity[i] / g_pole, beta);
+}

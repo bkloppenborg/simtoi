@@ -28,6 +28,9 @@ public:
 	CRocheRotator();
 	virtual ~CRocheRotator();
 
+private:
+	double lambda;
+
 public:
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
@@ -41,11 +44,17 @@ public:
 
 	void GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements);
 
+	void ComputeModel(double g_pole, double r_pole, double omega_rot);
+
+	void ComputeRadii(double r_pole, double omega_rot);
 	double ComputeRadius(double polar_radius, double omega_rot, double theta);
 
+	void ComputeGravity(double g_pole, double r_pole, double omega_rot);
 	void ComputeGravity(double g_pole, double r_pole, double omega,
 			double radius_at_theta, double theta, double phi,
 			double & g_x, double & g_y, double & g_z, double & g_mag);
+
+	void VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta);
 
 };
 
