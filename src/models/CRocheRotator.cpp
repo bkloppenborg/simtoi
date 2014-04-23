@@ -13,10 +13,6 @@
 CRocheRotator::CRocheRotator() :
 		CHealpixSpheroid(4)
 {
-	mVAO = 0;
-	mVBO = 0;
-	mEBO = 0;
-
 	// Tesselation parameter for healpix, 4-6 is adequate for our uses.
 	mParamNames.push_back("n_side_power");
 	SetParam(mBaseParams + 1, 4);
@@ -210,5 +206,7 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	CWorkerThread::CheckOpenGLError("CRocheRotator.Render()");
 }
 

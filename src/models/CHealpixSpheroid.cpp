@@ -74,6 +74,9 @@ void CHealpixSpheroid::GenerateHealpixSphere(unsigned int n_pixels, unsigned int
 /// Generates the element buffer indicies for a Healpix sphere
 void	CHealpixSpheroid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector<unsigned int> & elements)
 {
+	// Clear out the element buffer:
+	elements.clear();
+
 	// Each Healpix pixel is composed of four verticies which are represented
 	// as vec3. Thus, the start of each Healpix vertex definition follows a
 	// stride of 4 * 3 = 12 floating point numbers.
@@ -98,6 +101,9 @@ void	CHealpixSpheroid::GenerateHealpixVBOIndicies(unsigned int n_pixels, vector<
 /// Creates the VBO from the corners, radii, and gravity buffers.
 void CHealpixSpheroid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data)
 {
+	// Clear out the VBO buffer
+	vbo_data.clear();
+
 	// Iterate over each Healpix pixel
 	for (unsigned int i = 0; i < n_pixels; i++)
 	{
@@ -120,10 +126,6 @@ void CHealpixSpheroid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, v
 
 void CHealpixSpheroid::Init()
 {
-	// Empty the VBOs, just in case they contain some other data.
-	mVBOData.clear();
-	mElements.clear();
-
 	n_pixels = nside2npix(n_sides);
 
 	gravity.resize(n_pixels);

@@ -28,16 +28,6 @@ public:
 	CRocheRotator();
 	virtual ~CRocheRotator();
 
-protected:
-	GLuint mVAO;
-	GLuint mVBO;
-	GLuint mEBO;
-
-	vector<vec3> mVBOData;
-	vector<unsigned int> mElements;
-
-	bool mModelReady;
-
 public:
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);

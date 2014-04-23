@@ -16,7 +16,6 @@ public:
 	CRocheBinary();
 	virtual ~CRocheBinary();
 
-
 public:
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);
