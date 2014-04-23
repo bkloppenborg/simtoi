@@ -344,16 +344,16 @@ void CModel::InitTexture()
 /// of the model is specified relative to the orbital plane.
 glm::mat4 CModel::Rotate()
 {
-	double Omega = mParams[0];
-	double inc = mParams[1];
-	double omega = mParams[2];
+	double Omega = mParams[0] * M_PI / 180;
+	double inc = mParams[1] * M_PI / 180;
+	double omega = mParams[2] * M_PI / 180;
 
 	// If we have a dynamic position, simply add the angles
 	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
 	{
-		double orbit_Omega = mPosition->GetParam(0);
-		double orbit_inc = mPosition->GetParam(1);
-		double orbit_omega = mPosition->GetParam(2);
+		double orbit_Omega = mPosition->GetParam(0) * M_PI / 180;
+		double orbit_inc = mPosition->GetParam(1) * M_PI / 180;
+		double orbit_omega = mPosition->GetParam(2) * M_PI / 180;
 
 		Omega += orbit_Omega;
 		inc += orbit_inc;
@@ -361,7 +361,7 @@ glm::mat4 CModel::Rotate()
 	}
 
 	glm::mat4 A = glm::rotate(mat4(), float(Omega), vec3(0.0, 0.0, 1.0));
-	glm::mat4 B = glm::rotate(mat4(), float(inc), vec3(1.0, 0.0, 0.0));
+	glm::mat4 B = glm::rotate(mat4(), float(inc),   vec3(1.0, 0.0, 0.0));
 	glm::mat4 C = glm::rotate(mat4(), float(omega), vec3(0.0, 0.0, 1.0));
 	return A * B * C;
 }
