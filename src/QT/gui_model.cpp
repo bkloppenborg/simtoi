@@ -101,17 +101,15 @@ void gui_model::SetupUI()
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-	connect(ui.btnFeatureAdd, SIGNAL(clicked()), this, SLOT(add_feature()));
-	connect(ui.btnFeatureRemove, SIGNAL(clicked()), this, SLOT(remove_feature()));
 }
 
-void gui_model::add_feature()
+void gui_model::on_btnFeatureAdd_clicked()
 {
 	QString feature_id = ui.cboFeatures->currentText();
 	ui.listFeatures->addItem(feature_id);
 }
 
-void gui_model::remove_feature()
+void gui_model::on_btnFeatureRemove_clicked()
 {
 	qDeleteAll(ui.listFeatures->selectedItems());
 }

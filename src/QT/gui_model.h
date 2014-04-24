@@ -60,8 +60,8 @@ public:
     shared_ptr<CModel> GetModel();
 
 public slots:
-    void add_feature();
-	void remove_feature();
+    void on_btnFeatureAdd_clicked();
+	void on_btnFeatureRemove_clicked();
 
     void SetupUI();
 };
