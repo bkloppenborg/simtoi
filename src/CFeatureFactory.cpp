@@ -54,8 +54,6 @@ shared_ptr<CFeature> CFeatureFactory::CreateFeature(string FeatureID)
 	if(it != mFactory.end())
 		return it->second();
 
-	throw runtime_error("The feature with ID '" + FeatureID + "' not registered with CFeatureFactory");
-
 	return shared_ptr<CFeature>();
 }
 

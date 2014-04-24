@@ -36,7 +36,6 @@
 // Headers for OpenGL functions
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <memory>
 
 #include "CParameters.h"
 #include "CPosition.h"
@@ -73,6 +72,9 @@ typedef shared_ptr<CPosition> CPositionPtr;
 class CShader;
 typedef shared_ptr<CShader> CShaderPtr;
 
+class CFeature;
+typedef shared_ptr<CFeature> CFeaturePtr;
+
 /// \brief A base class for all models in SIMTOI
 ///
 /// This class serves as a basis from which all models in SIMTOI are derived.
@@ -97,6 +99,8 @@ protected:
 
 	GLuint mFluxTextureID; // texture id
 	vector<vec4> mFluxTexture;
+
+	vector<CFeaturePtr> mFeatures;
 
 protected:
 	glm::mat4 Rotate();
@@ -123,6 +127,7 @@ public:
 	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();
 	int GetNShaderFreeParameters();
+	int GetNFeatureFreeParameters();
 	CPositionPtr GetPosition(void);
 	CShaderPtr GetShader(void);
 	int GetTotalFreeParameters();

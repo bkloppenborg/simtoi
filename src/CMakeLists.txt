@@ -22,7 +22,7 @@ add_subdirectory(scripts)
 file(GLOB SOURCE *.cpp models/CSphere.* models/CDensityDisk.* models/CDisk_Pascucci2004.* 
 models/CDisk_Andrews2009.* models/CCylinder.* 
 models/CHealpixSpheroid.* models/CRocheBinary.* models/CRocheRotator.*
-positions/*.cpp minimizers/*.cpp tasks/*.cpp)
+positions/*.cpp minimizers/*.cpp tasks/*.cpp features/*.cpp)
 
 # Levmar requires a linear algebra package, but it doesn't export a
 # LEVMAR_LIBRARIES. SIMTOI instructions say install Lapack, so we'll always

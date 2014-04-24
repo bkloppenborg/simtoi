@@ -38,11 +38,15 @@
  *  three values in mParameters.
  */
 
+#include <sstream>
+
 #include "CModel.h"
 // Header files for position objects.
 #include "CPosition.h"
 #include "CPositionFactory.h"
 #include "CShaderFactory.h"
+#include "CFeature.h"
+#include "CFeatureFactory.h"
 
 CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
@@ -109,6 +113,17 @@ string CModel::GetID()
 	return "model_base_invalid";
 }
 
+/// \brief Returns the number of free parameters used by all features
+int CModel::GetNFeatureFreeParameters()
+{
+	unsigned int n_free = 0;
+
+	for(auto feature: mFeatures)
+		n_free += feature->GetNFreeParams();
+
+	return 0;
+}
+
 /// \brief Returns the number of free parameters in the model
 int CModel::GetNModelFreeParameters()
 {
@@ -124,7 +139,7 @@ int CModel::GetNPositionFreeParameters()
 	return 0;
 }
 
-/// \brief Retursn the number of free parameters used in the shader
+/// \brief Returns the number of free parameters used in the shader
 int CModel::GetNShaderFreeParameters()
 {
 	if(mShader != NULL)
@@ -166,6 +181,12 @@ void CModel::GetAllParameters(double * params, int n_params)
 		mShader->GetParams(params + n, n_params - n);
 		n += mShader->GetNParams();
 	}
+
+	for(auto feature: mFeatures)
+	{
+		feature->GetParams(params + n, n_params - n);
+		n += feature->GetNParams();
+	}
 }
 
 /// \brief Get a vector containing the minimum/maximum values for all free parameters.
@@ -183,6 +204,12 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 	if(mShader != NULL)
 	{
 		tmp2 = mShader->GetFreeMinMaxes();
+		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	}
+
+	for(auto feature: mFeatures)
+	{
+		tmp2 = feature->GetFreeMinMaxes();
 		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	}
 
@@ -213,6 +240,12 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 		mShader->GetFreeParams(params + n, n_params - n, scale_params);
 		n += mShader->GetNFreeParams();
 	}
+
+	for(auto feature: mFeatures)
+	{
+		feature->GetFreeParams(params + n, n_params - n, scale_params);
+		n += feature->GetNFreeParams();
+	}
 }
 
 
@@ -228,6 +261,12 @@ vector<string> CModel::GetFreeParameterNames()
 	if(mShader != NULL)
 	{
 		tmp2 = mShader->GetFreeParamNames();
+		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	}
+
+	for(auto feature: mFeatures)
+	{
+		tmp2 = feature->GetFreeParamNames();
 		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	}
 
@@ -248,6 +287,12 @@ void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 		mShader->GetFreeParamSteps(steps + n, size - n);
 		n += mShader->GetNFreeParams();
 	}
+
+	for(auto feature: mFeatures)
+	{
+		feature->GetFreeParamSteps(steps + n, size - n);
+		n += feature->GetNFreeParams();
+	}
 }
 
 /// \brief Gets the total number of free parameters in the model.
@@ -256,7 +301,8 @@ int CModel::GetTotalFreeParameters()
 	// Sum up the free parameters from the model, position, and features
 	return this->GetNModelFreeParameters() +
 			this->GetNPositionFreeParameters() +
-			this->GetNShaderFreeParameters();
+			this->GetNShaderFreeParameters() +
+			this->GetNFeatureFreeParameters();
 }
 
 /// Initalizes the shader variables `position`, `normal`, and `tex_coords`
@@ -386,6 +432,7 @@ void CModel::Restore(Json::Value input)
 
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
+	auto features = CFeatureFactory::Instance();
 
 	// Look up the name of the position model, if none is specified use "xy" by default.
 	string position_id = input["position_id"].asString();
@@ -404,6 +451,46 @@ void CModel::Restore(Json::Value input)
 	auto shader = shaders.CreateShader(shader_id);
 	shader->Restore(input["shader_data"]);
 	CModel::SetShader(shader);
+
+	// Lastly restore features:
+	unsigned int i = 0;
+	string feature_id;
+	stringstream temp;
+	while(true)
+	{
+		// Attempt to restore the shader, if this fails it's ok.
+		try
+		{
+			// Look up the ID
+			temp.clear();
+			temp << "feature_id_" << i;
+			feature_id = input[temp.str()].asString();
+
+			// If there was no string found, quit searching.
+			if(feature_id.size() == 0)
+				break;
+
+			// Find the feature
+			auto feature = features.CreateFeature(feature_id);
+			// See if the feature was found, if not print out an error
+			if(feature == nullptr)
+			{
+				throw runtime_error("The feature with ID '" + feature_id + "' not registered with CFeatureFactory");
+				break;
+			}
+
+			temp.clear();
+			temp << "feature_data_" << i;;
+			feature->Restore(input[temp.str()]);
+
+			// increment the feature counter
+			i++;
+		}
+		catch(...)
+		{
+			break;
+		}
+	}
 }
 
 /// \brief Serializes a model object into a JSON object.
@@ -426,6 +513,23 @@ Json::Value CModel::Serialize()
 
 	output["shader_id"] = mShader->GetID();
 	output["shader_data"] = mShader->Serialize();
+
+	stringstream temp;
+
+	// Serialize each feature ID as
+	//  "feature_id_#" -> feature_id
+	//  "feature_data_#" -> seralized data for the feature
+	for(unsigned int i = 0; i < mFeatures.size(); i++)
+	{
+		auto feature = mFeatures[i];
+
+		temp.clear();
+		temp << "feature_id_" << i;
+		output[temp.str()] = feature->GetID();
+		temp.clear();
+		temp << "feature_data_" << i;;
+		output[temp.str()] = feature->Serialize();
+	}
 
 	return output;
 }
@@ -454,8 +558,13 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 		mShader->SetFreeParams(in_params + n, n_params - n, scale_params);
 		n += mShader->GetNFreeParams();
 	}
-	// Lastly the features
-	//features->SetParams(in_params + n, n_params - n);
+
+	for(auto feature: mFeatures)
+	{
+		feature->SetFreeParams(in_params + n, n_params - n, scale_params);
+		n += feature->GetNFreeParams();
+	}
+
 }
 
 /// \brief Assigns the position object from a position id
