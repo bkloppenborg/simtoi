@@ -10,6 +10,8 @@
 CUniformSpot::CUniformSpot():
 	CFeature(3)
 {
+	mName = "Uniform Spot";
+
 	mParamNames.push_back("theta");
 	SetParam(0, 3.0);
 	SetFree(0, true);
