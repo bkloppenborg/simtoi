@@ -123,6 +123,11 @@ string CModel::GetID()
 	return "model_base_invalid";
 }
 
+const vector<CFeaturePtr> & CModel::GetFeatures() const
+{
+	return mFeatures;
+};
+
 /// \brief Returns the number of free parameters used by all features
 int CModel::GetNFeatureFreeParameters()
 {

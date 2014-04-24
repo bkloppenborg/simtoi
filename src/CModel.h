@@ -132,6 +132,9 @@ public:
 	int GetNFeatureFreeParameters();
 	CPositionPtr GetPosition(void);
 	CShaderPtr GetShader(void);
+
+	const vector<CFeaturePtr> & GetFeatures() const;;
+
 	int GetTotalFreeParameters();
 
 protected:

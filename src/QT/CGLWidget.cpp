@@ -40,6 +40,7 @@ using namespace std;
 #include "CModelList.h"
 #include "CTreeModel.h"
 #include "CParameterItem.h"
+#include "CFeature.h"
 
 extern string EXE_FOLDER;
 
@@ -294,6 +295,15 @@ void CGLWidget::RebuildTree()
 		item = items[0];
 		item_parent->appendRow(items);
 		LoadParameters(item, shader);
+
+		auto features = model->GetFeatures();
+		for(auto feature: features)
+		{
+			items = LoadParametersHeader(QString("Feature"), feature.get());
+			item = items[0];
+			item_parent->appendRow(items);
+			LoadParameters(item, feature.get());
+		}
 	}
 }
 
