@@ -276,11 +276,13 @@ void CRocheRotator::SetTime(double time)
 	// Call the base class method (updates orbital parameters, etc.)
 	CModel::SetTime(time);
 
-	double dt = time - mTime;
-
+	// Get the rotation rate:
 	const double Omega_dot = mParams[mBaseParams + 7];
 
+	// Compute the change in rotational angle
+	double dt = time - mTime;
 	mParams[2] = mParams[2] + dt * Omega_dot;
 
+	// Update the current time.
 	mTime = time;
 }
