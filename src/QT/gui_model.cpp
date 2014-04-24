@@ -29,6 +29,7 @@
 #include "CModelFactory.h"
 #include "CPositionFactory.h"
 #include "CShaderFactory.h"
+#include "CFeatureFactory.h"
 
 gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
@@ -82,10 +83,12 @@ void gui_model::SetupUI()
 	auto models = CModelFactory::Instance();
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
+	auto features = CFeatureFactory::Instance();
 
-	gui_common::SetupComboOptions(ui.cboModels, models.GetModelList());
-	gui_common::SetupComboOptions(ui.cboPositions, positions.GetPositionList());
-	gui_common::SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
+	gui_common::SetupOptions(ui.cboModels, models.GetModelList());
+	gui_common::SetupOptions(ui.cboPositions, positions.GetPositionList());
+	gui_common::SetupOptions(ui.cboShaders, shaders.GetShaderList());
+	gui_common::SetupOptions(ui.listFeatures, features.GetFeatureList());
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

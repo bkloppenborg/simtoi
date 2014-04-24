@@ -38,6 +38,7 @@
 #include <QComboBox>
 #include <QString>
 #include <vector>
+#include <QListWidget>
 
 using namespace std;
 
@@ -47,14 +48,25 @@ public:
 	gui_common();
 	virtual ~gui_common();
 
-	static void SetupComboOptions(QComboBox * combo_box, vector<string> values)
+	static void SetupOptions(QComboBox * widget, vector<string> values)
 	{
 		QString tmp_str = "";
 
 		for(unsigned int i = 0; i < values.size(); i++)
 		{
 			tmp_str = QString::fromStdString(values[i]);
-			combo_box->addItem(tmp_str);
+			widget->addItem(tmp_str);
+		}
+	}
+
+	static void SetupOptions(QListWidget * widget, vector<string> values)
+	{
+		QString tmp_str = "";
+
+		for(unsigned int i = 0; i < values.size(); i++)
+		{
+			tmp_str = QString::fromStdString(values[i]);
+			widget->addItem(tmp_str);
 		}
 	}
 };
