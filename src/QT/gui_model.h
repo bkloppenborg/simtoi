@@ -59,6 +59,10 @@ public:
 
     shared_ptr<CModel> GetModel();
 
+public slots:
+    void add_feature();
+	void remove_feature();
+
     void SetupUI();
 };
 

@@ -17,7 +17,7 @@ public:
 	CUniformSpot();
 	virtual ~CUniformSpot();
 
-	static string GetID() { return "uniform_spot"; };
+	string GetID() { return "uniform_spot"; };
 
 	static shared_ptr<CFeature> Create()
 	{

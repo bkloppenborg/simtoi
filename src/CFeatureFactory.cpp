@@ -38,7 +38,7 @@
 
 CFeatureFactory::CFeatureFactory()
 {
-	Register(CUniformSpot::GetID(), &CUniformSpot::Create);
+	Register("uniform_spot", &CUniformSpot::Create);
 }
 
 CFeatureFactory::~CFeatureFactory() \

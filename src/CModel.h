@@ -123,6 +123,8 @@ public:
 	CModel(int n_params);
 	virtual ~CModel();
 
+	void AddFeature(string feature_id);
+
 	virtual string GetID();
 	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();

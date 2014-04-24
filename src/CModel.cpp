@@ -82,6 +82,16 @@ CModel::~CModel()
 	}
 }
 
+/// \breif Adds the feature with feature_id to the current model.
+void CModel::AddFeature(string feature_id)
+{
+	auto features = CFeatureFactory::Instance();
+	auto feature = features.CreateFeature(feature_id);
+
+	if(feature != nullptr)
+		mFeatures.push_back(feature);
+}
+
 /// \brief Static function which creates a lookup table of sine and cosine values
 /// 	used in drawing things in polar coordinates.
 ///
@@ -463,7 +473,8 @@ void CModel::Restore(Json::Value input)
 		{
 			// Look up the ID
 			temp.clear();
-			temp << "feature_id_" << i;
+			temp.str(std::string());
+			temp << "feature_" << i << "_id";
 			feature_id = input[temp.str()].asString();
 
 			// If there was no string found, quit searching.
@@ -480,8 +491,12 @@ void CModel::Restore(Json::Value input)
 			}
 
 			temp.clear();
-			temp << "feature_data_" << i;;
+			temp.str(std::string());
+			temp << "feature_" << i << "_data";
 			feature->Restore(input[temp.str()]);
+
+			// The feature is restored, add it to the list.
+			mFeatures.push_back(feature);
 
 			// increment the feature counter
 			i++;
@@ -524,10 +539,12 @@ Json::Value CModel::Serialize()
 		auto feature = mFeatures[i];
 
 		temp.clear();
-		temp << "feature_id_" << i;
+		temp.str(std::string());
+		temp << "feature_" << i << "_id";
 		output[temp.str()] = feature->GetID();
 		temp.clear();
-		temp << "feature_data_" << i;;
+		temp.str(std::string());
+		temp << "feature_" << i << "_data";
 		output[temp.str()] = feature->Serialize();
 	}
 

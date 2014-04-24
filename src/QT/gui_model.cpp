@@ -72,6 +72,15 @@ shared_ptr<CModel> gui_model::GetModel(void)
 	string shader_id = ui.cboShaders->currentText().toStdString();
 	model->SetShader(shader_id);
 
+	QListWidgetItem * item;
+	string feature_id;
+	for ( int i = 0 ; i < ui.listFeatures->count() ; ++i )
+	{
+		item = ui.listFeatures->item(i);
+		feature_id = item->data(Qt::DisplayRole).toString().toStdString();
+		model->AddFeature(feature_id);
+	}
+
 	return model;
 }
 
@@ -88,8 +97,21 @@ void gui_model::SetupUI()
 	gui_common::SetupOptions(ui.cboModels, models.GetModelList());
 	gui_common::SetupOptions(ui.cboPositions, positions.GetPositionList());
 	gui_common::SetupOptions(ui.cboShaders, shaders.GetShaderList());
-	gui_common::SetupOptions(ui.listFeatures, features.GetFeatureList());
+	gui_common::SetupOptions(ui.cboFeatures, features.GetFeatureList());
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+	connect(ui.btnFeatureAdd, SIGNAL(clicked()), this, SLOT(add_feature()));
+	connect(ui.btnFeatureRemove, SIGNAL(clicked()), this, SLOT(remove_feature()));
+}
+
+void gui_model::add_feature()
+{
+	QString feature_id = ui.cboFeatures->currentText();
+	ui.listFeatures->addItem(feature_id);
+}
+
+void gui_model::remove_feature()
+{
+	qDeleteAll(ui.listFeatures->selectedItems());
 }

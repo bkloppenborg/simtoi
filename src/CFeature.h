@@ -18,7 +18,7 @@ public:
 	CFeature(int n_params);
 	virtual ~CFeature();
 
-	static string GetID() { return "invalid_feature"; };
+	virtual string GetID() { return "invalid_feature"; };
 };
 
 #endif /* CFEATURE_H_ */
