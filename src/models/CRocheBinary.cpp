@@ -345,13 +345,13 @@ void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 	double g_pole_x, g_pole_y, g_pole_z;
 	triaxial_gravity(radius_pole, 0.0, 0.0, g_pole_x, g_pole_y, g_pole_z, gravity_pole);
 
-	surface_temperature(&pixel_temperature[0], &gravity[0], gravity_pole, n_pixels);
+	surface_temperature(&mPixelTemperatures[0], &gravity[0], gravity_pole, n_pixels);
 
 	double max_temperature = 0;
 	for(unsigned int i = 0; i < n_pixels; i++)
 	{
-		if(pixel_temperature[i] > max_temperature)
-			max_temperature = pixel_temperature[i];
+		if(mPixelTemperatures[i] > max_temperature)
+			max_temperature = mPixelTemperatures[i];
 	}
 
 //	double dtheta;
@@ -374,7 +374,7 @@ void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 //	}
 
 	// Convert temperature into fluxes
-	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 

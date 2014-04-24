@@ -12,6 +12,8 @@
 
 #include "CParameters.h"
 
+class CModel;
+
 class CFeature: public CParameters
 {
 public:
@@ -19,6 +21,8 @@ public:
 	virtual ~CFeature();
 
 	virtual string GetID() { return "invalid_feature"; };
+
+	virtual void apply(CModel * model) = 0;
 };
 
 #endif /* CFEATURE_H_ */

@@ -25,6 +25,31 @@ CHealpixSpheroid::~CHealpixSpheroid()
 	if(mVAO) glDeleteVertexArrays(1, &mVAO);
 }
 
+/// Finds pixels on the surface
+void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
+			double d_radius, double d_theta, double d_phi,
+			vector<unsigned int> &pixels_ids)
+{
+	//
+	double rad_squared = d_theta * d_theta + d_phi * d_phi;
+
+	double t_d_theta, t_d_phi;
+	double t_rad_squared;
+
+	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
+	{
+		t_d_theta = pixel_theta[i] - theta;
+		t_d_phi = pixel_phi[i] - phi;
+
+		t_rad_squared = t_d_theta * t_d_theta + t_d_phi * t_d_phi;
+
+		if(t_rad_squared <= rad_squared)
+			pixels_ids.push_back(i);
+	}
+
+}
+
+
 /// Creates a Healpix sphere by computing the pixel and coordinate vector
 /// locations and (phi, theta) values.
 void CHealpixSpheroid::GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides)
@@ -134,7 +159,7 @@ void CHealpixSpheroid::Init()
 	g_x.resize(n_pixels);
 	g_y.resize(n_pixels);
 	g_z.resize(n_pixels);
-	pixel_temperature.resize(n_pixels);
+	mPixelTemperatures.resize(n_pixels);
 
 	// Generate the verticies and elements
 	GenerateModel(mVBOData, mElements);

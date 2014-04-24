@@ -23,6 +23,8 @@ public:
 	{
 		return shared_ptr<CFeature>(new CUniformSpot());
 	}
+
+	void apply(CModel * model);
 };
 
 #endif /* CUNIFORMSPOT_H_ */

@@ -98,6 +98,7 @@ protected:
 	double mScale;
 
 	GLuint mFluxTextureID; // texture id
+	vector<double> mPixelTemperatures;
 	vector<vec4> mFluxTexture;
 
 	vector<CFeaturePtr> mFeatures;
@@ -108,6 +109,10 @@ protected:
 
 public:
 	static void CircleTable( double * sint, double * cost, const int n );
+
+	virtual void FindPixels(double s0, double s1, double s2,
+			double ds0, double ds1, double ds2,
+			vector<unsigned int> &pixels_ids);
 
 	void GetAllParameters(double * params, int n_params);
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
@@ -130,6 +135,7 @@ public:
 	int GetNPositionFreeParameters();
 	int GetNShaderFreeParameters();
 	int GetNFeatureFreeParameters();
+	vector<double> & GetPixelTemperatures();
 	CPositionPtr GetPosition(void);
 	CShaderPtr GetShader(void);
 

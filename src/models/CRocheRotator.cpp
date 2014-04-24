@@ -9,10 +9,13 @@
 
 #include "CRocheRotator.h"
 #include "CShaderFactory.h"
+#include "CFeature.h"
 
 CRocheRotator::CRocheRotator() :
 		CHealpixSpheroid(7)
 {
+	mName = "Roche Rotator";
+
 	// Tesselation parameter for healpix, 4-6 is adequate for our uses.
 	mParamNames.push_back("n_side_power");
 	SetParam(mBaseParams + 1, 4);
@@ -45,8 +48,8 @@ CRocheRotator::CRocheRotator() :
 	mParamNames.push_back("T_eff_pole");
 	SetParam(mBaseParams + 5, 5000);
 	SetFree(mBaseParams + 5, false);
-	SetMax(mBaseParams + 5, 2E3);
-	SetMin(mBaseParams + 5, 1E6);
+	SetMax(mBaseParams + 5, 1E6);
+	SetMin(mBaseParams + 5, 2E3);
 
 	// The von Zeipel gravity darkening coefficient.
 	mParamNames.push_back("von_zeipel_beta");
@@ -165,15 +168,18 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 	ComputeGravity(g_pole, r_pole, omega_rot);
 	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
+	for(auto feature: mFeatures)
+		feature->apply(this);
+
 	// Find the maximum temperature
 	double max_temperature = 0;
-	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
+	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
 	{
-		if(pixel_temperature[i] > max_temperature)
-			max_temperature = pixel_temperature[i];
+		if(mPixelTemperatures[i] > max_temperature)
+			max_temperature = mPixelTemperatures[i];
 	}
 	// Convert temperatures to fluxes.
-	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 
@@ -204,14 +210,17 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	ComputeGravity(g_pole, r_pole, omega_rot);
 	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
+	for(auto feature: mFeatures)
+		feature->apply(this);
+
 	double max_temperature = 0;
-	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
+	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
 	{
-		if(pixel_temperature[i] > max_temperature)
-			max_temperature = pixel_temperature[i];
+		if(mPixelTemperatures[i] > max_temperature)
+			max_temperature = mPixelTemperatures[i];
 	}
 
-	TemperatureToFlux(pixel_temperature, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, mVBOData);
 
@@ -267,8 +276,8 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 void CRocheRotator::VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta)
 {
-	for(unsigned int i = 0; i < pixel_temperature.size(); i++)
-		pixel_temperature[i] = T_eff_pole * pow(gravity[i] / g_pole, beta);
+	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
+		mPixelTemperatures[i] = T_eff_pole * pow(gravity[i] / g_pole, beta);
 }
 
 void CRocheRotator::SetTime(double time)

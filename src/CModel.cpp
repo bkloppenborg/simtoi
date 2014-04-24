@@ -92,6 +92,18 @@ void CModel::AddFeature(string feature_id)
 		mFeatures.push_back(feature);
 }
 
+/// \breif Function for finding the IDs of pixels within the bounds
+/// (s0, s1, s2) +/- (ds0, ds1, ds2)
+/// where (s0, s1, s2) are the generalized coordinates in the model's
+/// coordinate system.
+void CModel::FindPixels(double s0, double s1, double s2,
+		double ds0, double ds1, double ds2,
+		vector<unsigned int> &pixels_ids)
+{
+	// base class function cannot match pixels. Do nothing here.
+}
+
+
 /// \brief Static function which creates a lookup table of sine and cosine values
 /// 	used in drawing things in polar coordinates.
 ///
@@ -136,7 +148,7 @@ int CModel::GetNFeatureFreeParameters()
 	for(auto feature: mFeatures)
 		n_free += feature->GetNFreeParams();
 
-	return 0;
+	return n_free;
 }
 
 /// \brief Returns the number of free parameters in the model
@@ -161,6 +173,12 @@ int CModel::GetNShaderFreeParameters()
 		return mShader->GetNFreeParams();
 
 	return 0;
+}
+
+/// \brief Get a reference to the pixel temperatures
+vector<double> & CModel::GetPixelTemperatures()
+{
+	return mPixelTemperatures;
 }
 
 /// \brief Get a copy of the position object. Note, this could be NULL.

@@ -27,7 +27,6 @@ protected:
 	vector<double> pixel_theta;
 	vector<double> pixel_phi;
 	vector<double> pixel_radii;
-	vector<double> pixel_temperature; // temperature
 	vector<vec3>   pixel_xyz;
 	unsigned int n_sides;
 	unsigned int n_pixels;
@@ -45,6 +44,10 @@ protected:
 public:
 	CHealpixSpheroid(int n_params);
 	virtual ~CHealpixSpheroid();
+
+	void FindPixels(double s0, double s1, double s2,
+			double ds0, double ds1, double ds2,
+			vector<unsigned int> &pixels_ids);
 
 	void GenerateHealpixSphere(unsigned int n_pixels, unsigned int n_sides);
 	void GenerateVBO(unsigned int n_pixels, unsigned int n_side, vector<vec3> & vbo_data);
