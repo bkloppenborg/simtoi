@@ -30,20 +30,22 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 			double d_radius, double d_theta, double d_phi,
 			vector<unsigned int> &pixels_ids)
 {
-	//
-	double rad_squared = d_theta * d_theta + d_phi * d_phi;
+	// Look up the (x,y,z) position of the target (r, theta, phi) center.
+	long target_pixel = 0;
+	ang2pix_nest(n_sides, theta, phi, &target_pixel);
+	vec3 target_xyz = pixel_xyz[target_pixel];
 
-	double t_d_theta, t_d_phi;
-	double t_rad_squared;
+	// Compute the maximum allowable distance
+	double target_radius = sqrt(d_theta * d_theta + d_phi * d_phi);
+	cout << "Target radius: " << target_radius << endl;
+
+	vec3 t_pix_xyz;
 
 	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
 	{
-		t_d_theta = pixel_theta[i] - theta;
-		t_d_phi = pixel_phi[i] - phi;
+		double distance = length(target_xyz - pixel_xyz[i]);
 
-		t_rad_squared = t_d_theta * t_d_theta + t_d_phi * t_d_phi;
-
-		if(t_rad_squared <= rad_squared)
+		if(distance <= target_radius)
 			pixels_ids.push_back(i);
 	}
 
