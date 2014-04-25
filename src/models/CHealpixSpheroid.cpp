@@ -25,7 +25,8 @@ CHealpixSpheroid::~CHealpixSpheroid()
 	if(mVAO) glDeleteVertexArrays(1, &mVAO);
 }
 
-/// Finds pixels on the surface
+/// Finds pixels on the surface of the sphere using sphere-sphere intersection
+/// testing.
 void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 			double d_radius, double d_theta, double d_phi,
 			vector<unsigned int> &pixels_ids)
@@ -33,17 +34,31 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 	// Look up the (x,y,z) position of the target (r, theta, phi) center.
 	long target_pixel = 0;
 	ang2pix_nest(n_sides, theta, phi, &target_pixel);
-	vec3 target_xyz = pixel_xyz[target_pixel];
+	double pixel_radius = pixel_radii[target_pixel];
+
+	vec3 temp = pixel_xyz[target_pixel];
+
+	double x = pixel_radius * cos(phi) * sin(theta);
+	double y = pixel_radius * sin(phi) * sin(theta);
+	double z = pixel_radius * cos(theta);
+
+	vec3 target_xyz = vec3(x,y,z);
+	//target_xyz = normalize(target_xyz);
+
+//	cout << "us :   :" << target_xyz.x << " " << target_xyz.y << " " << target_xyz.z << endl;
 
 	// Compute the maximum allowable distance
-	double target_radius = sqrt(d_theta * d_theta + d_phi * d_phi);
-	cout << "Target radius: " << target_radius << endl;
+	double polar_radius = mParams[mBaseParams + 3];
+	double target_radius = polar_radius * sqrt(d_theta * d_theta + d_phi * d_phi);
 
 	vec3 t_pix_xyz;
 
 	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
 	{
-		double distance = length(target_xyz - pixel_xyz[i]);
+		t_pix_xyz = pixel_xyz[i];
+		t_pix_xyz *= pixel_radii[i];
+
+		double distance = length(target_xyz - t_pix_xyz);
 
 		if(distance <= target_radius)
 			pixels_ids.push_back(i);
