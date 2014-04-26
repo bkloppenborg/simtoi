@@ -44,11 +44,11 @@ CUniformSpot::CUniformSpot():
 	SetMin(2, 0.1);
 
 	// diameter of spot
-	mParamNames.push_back("spot_temperature");
-	SetParam(3, 100);
+	mParamNames.push_back("spot_delta_temperature");
+	SetParam(3, -500);
 	SetFree(3, false);
-	SetMax(3, 5000);
-	SetMin(3, 0.0);
+	SetMax(3, 2000);
+	SetMin(3, -2000.0);
 }
 
 CUniformSpot::~CUniformSpot()
@@ -63,7 +63,7 @@ void CUniformSpot::apply(CModel * model)
 	const double theta = mParams[0] * PI / 180;
 	const double phi = mParams[1] * PI / 180;
 	const double spot_radius = mParams[2] * PI / 180;
-	const double spot_temperature = mParams[3];
+	const double spot_delta_temperature = mParams[3];
 	vector<unsigned int> pixel_ids;
 
 	// Get a reference to the object's temperature grid
@@ -74,6 +74,6 @@ void CUniformSpot::apply(CModel * model)
 
 	for(auto pixel_id: pixel_ids)
 	{
-		temperatures[pixel_id] = spot_temperature;
+		temperatures[pixel_id] += spot_delta_temperature;
 	}
 }
