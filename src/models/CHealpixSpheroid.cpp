@@ -43,7 +43,6 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 	double z = pixel_radius * cos(theta);
 
 	vec3 target_xyz = vec3(x,y,z);
-	//target_xyz = normalize(target_xyz);
 
 //	cout << "us :   :" << target_xyz.x << " " << target_xyz.y << " " << target_xyz.z << endl;
 
