@@ -54,8 +54,8 @@ CPositionOrbit::CPositionOrbit()
 	mParamNames.push_back("omega");
 	mParamNames.push_back("Alpha");
 	mParamNames.push_back("e");
-	mParamNames.push_back("tau");
 	mParamNames.push_back("T");
+	mParamNames.push_back("P");
 	SetParam(6, 1.0);
 	SetAllFree(false);
 }
@@ -65,10 +65,10 @@ CPositionOrbit::~CPositionOrbit()
 	// TODO Auto-generated destructor stub
 }
 
-// Computes the mean angular velocity for the given period, T
-double CPositionOrbit::ComputeN(double T)
+// Computes the mean angular velocity for the given period, P
+double CPositionOrbit::ComputeN(double P)
 {
-	return 2.0 * PI / T;
+	return 2.0 * PI / P;
 }
 
 // Computes the mean anomaly given tau, n, and the time of observation, t.
@@ -179,14 +179,14 @@ void CPositionOrbit::GetXYZ(double & x, double & y, double & z)
     double inc = mParams[1] * PI / 180.0;
     double omega = mParams[2] * PI / 180.0;
     double alpha = mParams[3];
-    double e = mParams[4];
-    double tau = mParams[5];
-    double T = mParams[6];
+    double e = mParams[4];	// eccentricy
+    double T = mParams[5];	// time of periastron
+    double P = mParams[6];	// orbital period
     double t = mTime;
 
 	// Pre-compute a few values
-    double n = ComputeN(T);
-    double M = ComputeM(tau, n, t);
+    double n = ComputeN(P);
+    double M = ComputeM(T, n, t);
     double E = ComputeE(M, e);
 
     double cos_E = cos(E);
