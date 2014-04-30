@@ -19,6 +19,7 @@ add_subdirectory(scripts)
 add_subdirectory(models)
 add_subdirectory(features)
 add_subdirectory(minimizers)
+add_definitions(${MINIMISER_DEFINITIONS})
 
 file(GLOB SOURCE *.cpp
 positions/*.cpp tasks/*.cpp)
