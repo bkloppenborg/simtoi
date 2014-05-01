@@ -264,8 +264,10 @@ void CPhotometry::InitBuffers()
 void CPhotometry::InitGL()
 {
 	// Determine the maximum number of layers in the OpenGL 3D buffer:
-	GLint max_gl_layers = 0;
+	GLint max_gl_layers = 1;
+#ifndef __APPLE__
 	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_gl_layers);
+#endif // __APPLE__
 	unsigned int max_gl_depth = max_gl_layers;
 
 	// TODO: Look this up from the Open CL context.

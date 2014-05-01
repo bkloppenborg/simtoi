@@ -36,10 +36,18 @@
 #define CMODELLIST_H_
 
 #include <string>
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif // __APPLE__
+
 #include <memory>
 #include <vector>
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 using namespace std;
 

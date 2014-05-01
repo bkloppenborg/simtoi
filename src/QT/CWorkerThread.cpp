@@ -27,6 +27,7 @@
 #include "CWorkerThread.h"
 #include <QMutexLocker>
 #include <stdexcept>
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -101,14 +102,15 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
 {
     // Bind back to the default buffer (just in case something didn't do it),
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+CWorkerThread::CheckOpenGLError("A ");
     // Blit the application-defined render buffer to the on-screen render buffer.
     glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
-
+CWorkerThread::CheckOpenGLError("B ");
     /// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
     //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
-    glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
+    glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+CWorkerThread::CheckOpenGLError("C ");
     SwapBuffers();
 }
 
@@ -149,9 +151,10 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture, int n_layers)
 {
 	// enforce
-	GLint max_layers = 0;
+	GLint max_layers = 1;
+#ifndef __APPLE__	
 	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
-
+#endif // __APPLE__
 	if(n_layers > max_layers)
 		n_layers = max_layers;
 

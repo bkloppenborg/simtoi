@@ -38,8 +38,14 @@
 #ifndef CSHADER_H_
 #define CSHADER_H_
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif // __APPLE__
+
 #include <string>
 #include <vector>
 #include <utility>
