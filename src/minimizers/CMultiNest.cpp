@@ -31,6 +31,8 @@
  */
 
 #include "CMultiNest.h"
+#include "multinest.h"
+
 #include <limits>
 #include <cmath>
 #include <stdexcept>
