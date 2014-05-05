@@ -187,8 +187,8 @@ void CCylinder::GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elem
 		// in the row.
 		bottom = n_vec3_per_vertex * (z * phi_divisions);
 		top = n_vec3_per_vertex * ((z + 1) * phi_divisions);
-		elements.push_back(bottom + element_offset);
 		elements.push_back(top + element_offset);
+		elements.push_back(bottom + element_offset);
 	}
 }
 
