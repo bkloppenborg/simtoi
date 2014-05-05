@@ -7,7 +7,7 @@ INCLUDE(../)
 # Assemble all of the model source
 #file(GLOB SOURCE *.cpp)
 file(GLOB SOURCE CSphere.* CDensityDisk.* CDisk_Pascucci2004.* 
-CDisk_Andrews2009.* CCylinder.* 
+CDisk_Andrews2009.* CCylinder.* CDisk_ConcentricRings.* 
 CHealpixSpheroid.* CRocheBinary.* CRocheRotator.*)
 
 # Now add the library

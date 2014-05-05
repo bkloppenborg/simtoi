@@ -1,61 +1,65 @@
-/* CDensityDisk.h
+/* CDisk_ConcentricRings.h
  *
  *  Created on: Nov. 5, 2013
  *      Author: bkloppenborg
  */
 
-#include "CDensityDisk.h"
+#include "CDisk_ConcentricRings.h"
 #include "CShaderFactory.h"
 #include "CCylinder.h"
 
-CDensityDisk::CDensityDisk(int n_additional_params)
-: 	CModel(n_additional_params + 4)
+CDisk_ConcentricRings::CDisk_ConcentricRings()
+: 	CModel(4)
 {
 	// give this object a name
-	mName = "Density disk base class";
+	mName = "Concentric Ring Disk";
 
-	// Define the placement of the density disk model parameters
-	mParamNames.push_back("r_in");
+	// Set the members to something useful:
+	mParamNames.push_back("Inner Radius");
 	SetParam(mBaseParams + 1, 0.1);
-	SetFree(mBaseParams + 1, false);
-	SetMax(mBaseParams + 1, 10);
+	SetFree(mBaseParams + 1, true);
+	SetMax(mBaseParams + 1, 6.0);
 	SetMin(mBaseParams + 1, 0.1);
 
-	mParamNames.push_back("radial cutoff");
-	SetParam(mBaseParams + 2, 20);
-	SetFree(mBaseParams + 2, false);
-	SetMax(mBaseParams + 2, 10);
+	mParamNames.push_back("Outer Radius");
+	SetParam(mBaseParams + 2, 3.0);
+	SetFree(mBaseParams + 2, true);
+	SetMax(mBaseParams + 2, 6.0);
 	SetMin(mBaseParams + 2, 0.1);
 
-	mParamNames.push_back("height cutoff");
-	SetParam(mBaseParams + 3, 5);
-	SetFree(mBaseParams + 3, false);
-	SetMax(mBaseParams + 3, 10);
+	mParamNames.push_back("Height");
+	SetParam(mBaseParams + 3, 0.5);
+	SetFree(mBaseParams + 3, true);
+	SetMax(mBaseParams + 3, 2.0);
 	SetMin(mBaseParams + 3, 0.1);
 
-	mParamNames.push_back("n rings (int)");
+	mParamNames.push_back("N Rings (int)");
 	SetParam(mBaseParams + 4, 50);
 	SetFree(mBaseParams + 4, false);
-	SetMax(mBaseParams + 4, 100);
-	SetMin(mBaseParams + 4, 1);
+	SetMax(mBaseParams + 4, 50);
+	SetMin(mBaseParams + 4, 50);
 
 	// We load the default shader, but this should be replaced by something more
 	// specific later.
 	auto shaders = CShaderFactory::Instance();
-	mShader = shaders.CreateShader("default");
+	mShader = shaders.CreateShader("disk_power_law");
 
 	// Resize the texture, 1 element is sufficient.
 	mFluxTexture.resize(1);
 }
 
-CDensityDisk::~CDensityDisk()
+CDisk_ConcentricRings::~CDisk_ConcentricRings()
 {
 
 }
 
+shared_ptr<CModel> CDisk_ConcentricRings::Create()
+{
+	return shared_ptr<CModel>(new CDisk_ConcentricRings());
+}
 
+void CDisk_ConcentricRings::Init()
 
-void CDensityDisk::Init()
 {
 	// Generate the verticies and elements
 	vector<vec3> vbo_data;
@@ -100,21 +104,21 @@ void CDensityDisk::Init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	CWorkerThread::CheckOpenGLError("CDensityDisk.Init()");
+	CWorkerThread::CheckOpenGLError("CDisk_ConcentricRings.Init()");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
 }
 
-void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
+void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & view)
 {
 	if(!mModelReady)
 		Init();
 
 	// Look up the parameters:
 	const double r_in = mParams[mBaseParams + 1];
-	const double r_cutoff  = mParams[mBaseParams + 2];
-	const double h_cutoff  = mParams[mBaseParams + 3];
+	const double MaxRadius  = mParams[mBaseParams + 2];
+	const double MaxHeight  = mParams[mBaseParams + 3];
 	int n_rings  = ceil(mParams[mBaseParams + 4]);
 
 	// Set the color
@@ -130,6 +134,13 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// bind back to the VAO
 	glBindVertexArray(mVAO);
+
+	// Define the maximum height and radius
+	GLint uniMaxRadius = glGetUniformLocation(shader_program, "r_max");
+	glUniform1f(uniMaxRadius, MaxRadius);
+
+	GLint uniMaxHeight = glGetUniformLocation(shader_program, "z_max");
+	glUniform1f(uniMaxHeight, MaxHeight);
 
 	// Define the view:
 	GLint uniView = glGetUniformLocation(shader_program, "view");
@@ -156,14 +167,14 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
     // Init scale variables
 	double radius = 0;
-	double height = h_cutoff;
+	double height = MaxHeight;
 
     glm::mat4 scale;
     glm::mat4 r_scale;
     glm::mat4 h_scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, height));
 
     // Render each of the concentric rings
-	double dr = (r_cutoff - r_in) / (n_rings - 1);
+	double dr = (MaxRadius - r_in) / (n_rings - 1);
 	for(unsigned int i = 0; i < n_rings; i++)
 	{
 		// Scale the radius:
@@ -176,11 +187,11 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	}
 
 	// Render the midplane
-	r_scale = glm::scale(mat4(), glm::vec3(r_cutoff, r_cutoff, 1.0));
+	r_scale = glm::scale(mat4(), glm::vec3(MaxRadius, MaxRadius, 1.0));
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
 	// Draw the midplane
-	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
+//	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -193,7 +204,7 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 }
 
 /// Overrides the default CModel::SetShader function.
-void CDensityDisk::SetShader(CShaderPtr shader)
+void CDisk_ConcentricRings::SetShader(CShaderPtr shader)
 {
 	// This mode does not accept different shaders, do nothing here.
 }

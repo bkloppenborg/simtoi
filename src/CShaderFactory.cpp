@@ -54,6 +54,7 @@ CShaderFactory::CShaderFactory()
 	Register(EXE_FOLDER + "/shaders/ldl_fields2003.json");
 	Register(EXE_FOLDER + "/shaders/disk_pascucci2004.json");
 	Register(EXE_FOLDER + "/shaders/disk_andrews2009.json");
+	Register(EXE_FOLDER + "/shaders/disk_power_law.json");
 	Register(EXE_FOLDER + "/shaders/texture_2d.json");
 }
 

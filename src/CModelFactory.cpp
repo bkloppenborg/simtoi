@@ -39,7 +39,7 @@
 //#include "models/CDisk_A.h"
 //#include "models/CDisk_B.h"
 //#include "models/CDisk_C.h"
-//#include "models/CDisk_ConcentricRings.h"
+#include "models/CDisk_ConcentricRings.h"
 #include "models/CDisk_Pascucci2004.h"
 #include "models/CDisk_Andrews2009.h"
 #include "models/CRocheBinary.h"
@@ -53,7 +53,7 @@ CModelFactory::CModelFactory()
 //	Register("disk_a", &CDisk_A::Create);
 //	Register("disk_b", &CDisk_B::Create);
 //	Register("disk_c", &CDisk_C::Create);
-//	Register("disk_concentric_rings", &CDisk_ConcentricRings::Create);
+	Register("disk_concentric_rings", &CDisk_ConcentricRings::Create);
 	Register("disk_pascucci2004", &CDisk_Pascucci2004::Create);
 	Register("disk_andrews2009", &CDisk_Andrews2009::Create);
 	Register("roche_binary", &CRocheBinary::Create);
@@ -87,7 +87,7 @@ vector<string> CModelFactory::GetModelList()
 	vector<string> temp;
 
 	for(auto it: mFactory)
-		temp.push_back(it.first);
+	temp.push_back(it.first);
 
 	return temp;
 }
