@@ -34,7 +34,7 @@
 
 // OpenGL Headers:
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
+#include <OpenGL/gl3.h>
 #include <OpenGL/glu.h>
 #else
 #ifdef _WIN32
