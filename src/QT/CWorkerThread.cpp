@@ -156,9 +156,11 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 /// number of layers up to GL_MAX_FRAMEBUFFER_LAYERS.
 void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture, int n_layers)
 {
-	// enforce
-	GLint max_layers = 0;
+	// enforce the maxmium number of layers in images.
+	GLint max_layers = 128;
+#ifdef GL_MAX_FRAMEBUFFER_LAYERS
 	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
+#endif
 
 	if(n_layers > max_layers)
 		n_layers = max_layers;
