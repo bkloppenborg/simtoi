@@ -265,9 +265,9 @@ void CPhotometry::InitGL()
 {
 	// Determine the maximum number of layers in the OpenGL 3D buffer:
 	// enforce the maxmium number of layers in images.
-	GLint max_layers = 128;
+	GLint max_gl_layers = 128;
 #ifdef GL_MAX_FRAMEBUFFER_LAYERS
-	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
+	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_gl_layers);
 #endif
 
 	unsigned int max_gl_depth = max_gl_layers;
