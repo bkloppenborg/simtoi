@@ -51,8 +51,21 @@
 #include <memory>
 #include <queue>
 #include "json/json.h"
+
+// OpenGL Headers:
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
+#ifdef _WIN32
+  #include <windows.h>
+#endif
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
+
+// OpenGL mathematics library:
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 
 using namespace std;

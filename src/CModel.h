@@ -33,9 +33,17 @@
 #ifndef CMODEL_H_
 #define CMODEL_H_
 
-// Headers for OpenGL functions
+// OpenGL Headers:
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
+#ifdef _WIN32
+  #include <windows.h>
+#endif
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 #include "CParameters.h"
 #include "CPosition.h"
@@ -49,6 +57,7 @@
 #include <cstdio>
 #include <cassert>
 #include <memory>
+
 // OpenGL Math Library code.
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

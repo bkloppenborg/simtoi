@@ -261,6 +261,9 @@ void gui_main::Init(void)
 	QGLFormat fmt;
 	fmt.setVersion(3, 2);
 	fmt.setProfile(QGLFormat::CoreProfile);
+	fmt.setDoubleBuffer(true);
+//	fmt.setSampleBuffers(true);
+//	fmt.setSamples(4);
 	QGLFormat::setDefaultFormat(fmt);
 }
 
