@@ -48,7 +48,7 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 
 	// Compute the maximum allowable distance
 	double polar_radius = mParams[mBaseParams + 3];
-	double target_radius = polar_radius * sqrt(d_theta * d_theta + d_phi * d_phi);
+	double target_radius = polar_radius * std::sqrt(d_theta * d_theta + d_phi * d_phi);
 
 	vec3 t_pix_xyz;
 

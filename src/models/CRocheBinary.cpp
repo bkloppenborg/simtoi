@@ -110,7 +110,7 @@ CRocheBinary::CRocheBinary() :
 //	npix_estimate = 4. * PI
 //			* pow(radius_pole * rsun / (parallax * AU) * 1000.
 //							/ desired_resolution, 2.0);
-//	nside_estimate = sqrt(npix_estimate / 12.0);
+//	nside_estimate = std::sqrt(npix_estimate / 12.0);
 //	n_sides = pow(2, ceil(log(nside_estimate) / log(2.0)));
 //	npix = nside2npix(n_sides);
 //	cout << "Nside: " << n_sides << "\tNpix: " << npix << "\n";
@@ -162,7 +162,7 @@ void CRocheBinary::triaxial_gravity(const double radius,
 	x2 = separation_rsun - x1;
 	y = radius * sin(phi) * sin(theta);
 	z = radius * cos(theta);
-	radius2 = sqrt(x2 * x2 + y * y + z * z);
+	radius2 = std::sqrt(x2 * x2 + y * y + z * z);
 	radius1_pow3 = radius * radius * radius;
 	radius2_pow3 = radius2 * radius2 * radius2;
 
@@ -173,7 +173,7 @@ void CRocheBinary::triaxial_gravity(const double radius,
 			- omega_rot * omega_rot * rsun * y;
 	g_z = gmr2 * mass1 * z / radius1_pow3 + gmr2 * mass2 * z / radius2_pow3;
 
-	g_mag = sqrt(g_x * g_x + g_y * g_y + g_z * g_z);
+	g_mag = std::sqrt(g_x * g_x + g_y * g_y + g_z * g_z);
 }
 
 void CRocheBinary::surface_gravity(const double * radii, const double * theta, const double * phi,
@@ -210,7 +210,7 @@ void CRocheBinary::triaxial_pot(double & pot, double & dpot,
 	x3 = x1 - separation_rsun * massratio;
 	y = radius1 * mu;
 	z = radius1 * cos(theta);
-	radius2 = sqrt(x2 * x2 + y * y + z * z);
+	radius2 = std::sqrt(x2 * x2 + y * y + z * z);
 	pot = -gmr * (mass1 / radius1 + mass2 / radius2)
 			- 0.5 * omega_rot * omega_rot * rsun * rsun * (x3 * x3 + y * y);
 	dpot = gmr2

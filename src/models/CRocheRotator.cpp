@@ -124,7 +124,7 @@ void CRocheRotator::ComputeGravity(double g_pole, double r_pole, double omega,
 	double g_theta = g_pole * c1 * sin_theta * cos_theta;
 
 	// Compute the gravity vector magnitude
-	g_mag = sqrt(g_r * g_r + g_theta * g_theta);
+	g_mag = std::sqrt(g_r * g_r + g_theta * g_theta);
 
 	// Convert g_mag into Cartesian coordinates
 	g_x = g_mag * sin_theta * cos_phi;
