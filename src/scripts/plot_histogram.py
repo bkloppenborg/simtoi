@@ -111,17 +111,22 @@ def col_names(filename):
     Reads in the column names from the `best_fit.txt` files.
     Column names will always occur on the first non-comment line in the file.
     """
-    infile = open(filename, 'r')
-    
+
     columns = list()
-    
-    for line in infile:
-        if re.match('#', line):
-            continue
-        
-        line = line.strip()
-        columns = line.split(',')
-        break
+
+    try:
+        infile = open(filename, 'r')
+
+        for line in infile:
+            if re.match('#', line):
+                continue
+            
+            line = line.strip()
+            columns = line.split(',')
+            break
+
+    except:
+        print "Could not find best_fit.txt file. No graph titles will be created."
         
     return columns
 
