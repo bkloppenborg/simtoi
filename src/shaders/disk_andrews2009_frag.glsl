@@ -38,6 +38,7 @@ uniform float r0;
 uniform float h0;
 uniform float gamma;
 uniform float beta;
+uniform float r_in;
 uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
@@ -59,5 +60,10 @@ void main(void)
     float transparency = 1 - exp(-1 * kappa * rho);
     
     vec4 Color = texture(TexSampler, Tex_Coords);
-    out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
+    
+    // If we are inside the inner radius, everything is transparent.
+    if(radius - r_in < 1)
+        out_color = vec4(0.0, 0.0, 0.0, 0.0);
+    else
+        out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
 }

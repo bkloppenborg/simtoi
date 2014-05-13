@@ -142,6 +142,10 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & 
 	GLint uniMaxHeight = glGetUniformLocation(shader_program, "z_max");
 	glUniform1f(uniMaxHeight, MaxHeight);
 
+	// Set the value for the inner radius.
+	GLint uniInnerRadius = glGetUniformLocation(shader_program, "r_in");
+	glUniform1f(uniInnerRadius, r_in);
+
 	// Define the view:
 	GLint uniView = glGetUniformLocation(shader_program, "view");
 	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));

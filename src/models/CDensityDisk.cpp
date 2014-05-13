@@ -141,6 +141,10 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniRotation = glGetUniformLocation(shader_program, "rotation");
 	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
 
+	// Set the value for the inner radius.
+	GLint uniInnerRadius = glGetUniformLocation(shader_program, "r_in");
+	glUniform1f(uniInnerRadius, r_in);
+
 	// Look up the scale variable location. We use it below.
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 

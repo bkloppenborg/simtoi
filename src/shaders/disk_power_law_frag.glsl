@@ -39,6 +39,8 @@ uniform bool use_z_trans;
 uniform float z_max;
 uniform float beta_z;
 
+uniform float r_in;
+
 uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
@@ -61,5 +63,10 @@ void main(void)
     float transparency = r_trans * z_trans;
     
     vec4 Color = texture(TexSampler, Tex_Coords);
-    out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
+    
+    // If we are inside the inner radius, everything is transparent.
+    if(radius - r_in < 1)
+        out_color = vec4(0.0, 0.0, 0.0, 0.0);
+    else
+        out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
 }
