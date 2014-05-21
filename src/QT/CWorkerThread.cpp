@@ -27,6 +27,8 @@
 #include "CWorkerThread.h"
 #include <QMutexLocker>
 #include <stdexcept>
+
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -102,8 +104,14 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
     // Bind back to the default buffer (just in case something didn't do it),
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Bind to the default draw framebuffer
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
     // Blit the application-defined render buffer to the on-screen render buffer.
     glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+
+    // Set the default drawing framebuffer
+    glDrawBuffer(GL_BACK);
 
     /// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
     //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
@@ -148,9 +156,11 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 /// number of layers up to GL_MAX_FRAMEBUFFER_LAYERS.
 void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture, int n_layers)
 {
-	// enforce
-	GLint max_layers = 0;
+	// enforce the maxmium number of layers in images.
+	GLint max_layers = 128;
+#ifdef GL_MAX_FRAMEBUFFER_LAYERS
 	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
+#endif
 
 	if(n_layers > max_layers)
 		n_layers = max_layers;

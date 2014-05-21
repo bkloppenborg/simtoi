@@ -38,6 +38,8 @@
 #include <cmath>
 #include <float.h>
 
+#include "CShaderFactory.h"
+
 using namespace std;
 
 CSphere::CSphere()
@@ -58,6 +60,8 @@ CSphere::CSphere()
 	SetMin(mBaseParams + 1, 0.1);
 
 	mNumElements = 0;
+
+	mFluxTexture.resize(1);	// single element texture.
 
 	mModelReady = false;
 }
@@ -100,7 +104,10 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 		cos_phi[i] = cos(dphi * i);
 	}
 
-	// Generate the vertex positions.
+	// Generate the VBO. It will be populated as follows:
+	// [x0, y0, z0], [xN, yN, zN],
+	// because we store a unit sphere, the vertex positions are the same
+	// as the normals.
 	double x, y, z;
 	for(int i = 0; i < latitude_subdivisions + 1; i++)
 	{
@@ -111,23 +118,36 @@ void CSphere::GenerateSphere_LatLon(vector<vec3> & vbo_data, vector<unsigned int
 			z = cos_theta[i];
 			// The first three elements are the verticies
 			vbo_data.push_back(vec3(x, y, z));
+			// normals:
+			vbo_data.push_back(vec3(x, y, z));
+			// define the texture coordinate location
+			vbo_data.push_back(vec3(1.0, 0, 0));
 		}
 	}
+	// The number of vec3s that define a vertex
+	unsigned int n_vec3_per_vertex = 3;
 
 	// Now assign the elements. Go in the same direction as the vertices were
 	// generated above, namely in rows by latitude.
+	unsigned int top = 0, bottom = 0;
 	for(int lat = 0; lat < latitude_subdivisions; lat++)
 	{
 		for(int lon = 0; lon < longitude_subdivisions; lon++)
 		{
-			elements.push_back(lat * longitude_subdivisions + lon);
-			elements.push_back((lat + 1) * longitude_subdivisions + lon);
+			// compute the index of the top and bottom vertices
+			bottom = lat * longitude_subdivisions + lon;
+			top = (lat + 1) * longitude_subdivisions + lon;
+			elements.push_back(n_vec3_per_vertex * bottom);
+			elements.push_back(n_vec3_per_vertex * top);
 		}
 
 		// To complete a latitude row, link back to the first two vertices
 		// in the row.
-		elements.push_back(lat * longitude_subdivisions);
-		elements.push_back((lat + 1) * longitude_subdivisions);
+		bottom = lat * longitude_subdivisions;
+		top = (lat + 1) * longitude_subdivisions;
+
+		elements.push_back(n_vec3_per_vertex * bottom);
+		elements.push_back(n_vec3_per_vertex * top);
 	}
 }
 
@@ -157,32 +177,18 @@ void CSphere::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
-	// Next we need to define the storage format for this object for the shader.
-	// First get the shader and activate it
-	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
-	// Now start defining the storage for the VBO.
-	// The 'vbo_data' variable stores a unit sphere so the vertex data can
-	// be used as normals.
-	GLint posAttrib = glGetAttribLocation(shader_program, "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
-	// Now define the normals, if they are used
-	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	if(normAttrib > -1)
-	{
-		glEnableVertexAttribArray(normAttrib);
-		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), 0);
-	}
-
-	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CModelSphere.Init()");
+	// Initialize the shader variables and texture following the default packing
+	// scheme.
+	InitShaderVariables();
+	InitTexture();
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	CWorkerThread::CheckOpenGLError("CModelSphere.Init()");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
@@ -195,9 +201,11 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Rename a few variables for convenience:
 	double radius = float(mParams[mBaseParams + 1] / 2);
-	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, 1.0));
+	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
-	vec2 color = vec2(mParams[3], 1.0);
+	// Set the color.
+	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -205,8 +213,6 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
 	mShader->UseShader();
-	GLint uniColorFlag = glGetUniformLocation(shader_program, "color_from_uniform");
-	glUniform1i(uniColorFlag, true);
 
 	// bind back to the VAO
 	glBindVertexArray(mVAO);
@@ -224,11 +230,17 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
-    GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
-    glUniform2fv(uniColor, 1, glm::value_ptr(color));
+	// bind to this object's texture
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+	// upload the image
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
 
 	// render
 	glDrawElements(GL_TRIANGLE_STRIP, mNumElements, GL_UNSIGNED_INT, 0);
+
+	// Unbind
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 	// unbind from the Vertex Array Object, Vertex Buffer Object, and Element buffer object.
 	glBindVertexArray(0);

@@ -1,0 +1,9 @@
+// SIMTOI shader configuration file in JSON format.
+
+{
+    "fragment_shader" : "texture_2d_frag.glsl",
+    "human_name" : "2D texture",
+	"shader_id" : "texture_2d",
+    "vertex_shader" : "texture_2d_vert.glsl"
+}
+

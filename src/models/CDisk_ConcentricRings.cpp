@@ -1,21 +1,18 @@
-/*
- * CDisk_ConcentricRings.cpp
+/* CDisk_ConcentricRings.h
  *
- *  Created on: Dec 28, 2012
- *      Author: bkloppen
+ *  Created on: Nov. 5, 2013
+ *      Author: bkloppenborg
  */
 
 #include "CDisk_ConcentricRings.h"
 #include "CShaderFactory.h"
+#include "CCylinder.h"
 
 CDisk_ConcentricRings::CDisk_ConcentricRings()
-: 	CCylinder(6 - mDiskParams)
+: 	CModel(4)
 {
-	mName = "Concentric Rings";
-
-	// WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
-	for(int i = 0; i < 2; i++)
-		mParamNames.pop_back();
+	// give this object a name
+	mName = "Concentric Ring Disk";
 
 	// Set the members to something useful:
 	mParamNames.push_back("Inner Radius");
@@ -36,32 +33,24 @@ CDisk_ConcentricRings::CDisk_ConcentricRings()
 	SetMax(mBaseParams + 3, 2.0);
 	SetMin(mBaseParams + 3, 0.1);
 
-	mParamNames.push_back("Alpha (radius)");
-	SetParam(mBaseParams + 4, 1);
-	SetFree(mBaseParams + 4, true);
-	SetMax(mBaseParams + 4, 10);
-	SetMin(mBaseParams + 4, 0.1);
-
-	mParamNames.push_back("Beta (height)");
-	SetParam(mBaseParams + 5, 1);
-	SetFree(mBaseParams + 5, true);
-	SetMax(mBaseParams + 5, 10);
-	SetMin(mBaseParams + 5, 0.1);
-
 	mParamNames.push_back("N Rings (int)");
-	SetParam(mBaseParams + 6, 50);
-	SetFree(mBaseParams + 6, false);
-	SetMax(mBaseParams + 6, 50);
-	SetMin(mBaseParams + 6, 50);
+	SetParam(mBaseParams + 4, 50);
+	SetFree(mBaseParams + 4, false);
+	SetMax(mBaseParams + 4, 50);
+	SetMin(mBaseParams + 4, 50);
 
-	// This model ALWAYS uses the default (pass-through) shader.
+	// We load the default shader, but this should be replaced by something more
+	// specific later.
 	auto shaders = CShaderFactory::Instance();
-	mShader = shaders.CreateShader("default");
+	mShader = shaders.CreateShader("disk_power_law");
+
+	// Resize the texture, 1 element is sufficient.
+	mFluxTexture.resize(1);
 }
 
 CDisk_ConcentricRings::~CDisk_ConcentricRings()
 {
-	// TODO Auto-generated destructor stub
+
 }
 
 shared_ptr<CModel> CDisk_ConcentricRings::Create()
@@ -69,86 +58,157 @@ shared_ptr<CModel> CDisk_ConcentricRings::Create()
 	return shared_ptr<CModel>(new CDisk_ConcentricRings());
 }
 
+void CDisk_ConcentricRings::Init()
+
+{
+	// Generate the verticies and elements
+	vector<vec3> vbo_data;
+	vector<unsigned int> elements;
+	unsigned int z_divisions = 20;
+	unsigned int phi_divisions = 50;
+	unsigned int r_divisions = 20;
+
+	mRimStart = 0;
+	CCylinder::GenreateRim(vbo_data, elements, z_divisions, phi_divisions);
+	mRimSize = elements.size();
+	// Calculate the offset in vertex indexes for the GenerateMidplane function
+	// to generate correct element indices.
+	unsigned int vertex_offset = vbo_data.size();
+	mMidplaneStart = mRimSize;
+	CCylinder::GenerateMidplane(vbo_data, elements, vertex_offset, r_divisions, phi_divisions);
+	mMidplaneSize = elements.size() - mRimSize;
+
+	// Create a new Vertex Array Object, Vertex Buffer Object, and Element Buffer
+	// object to store the model's information.
+	//
+	// First generate the VAO, this stores all buffer information related to this object
+	glGenVertexArrays(1, &mVAO);
+	glBindVertexArray(mVAO);
+	// Generate and bind to the VBO. Upload the verticies.
+	glGenBuffers(1, &mVBO); // Generate 1 buffer
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glBufferData(GL_ARRAY_BUFFER, vbo_data.size() * sizeof(vec3), &vbo_data[0], GL_STATIC_DRAW);
+	// Generate and bind to the EBO. Upload the elements.
+	glGenBuffers(1, &mEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
+
+	// Initialize the shader variables and texture following the default packing
+	// scheme.
+	InitShaderVariables();
+	InitTexture();
+
+	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
+	// modified by subsequent calls.
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	CWorkerThread::CheckOpenGLError("CDisk_ConcentricRings.Init()");
+
+	// Indicate the model is ready to use.
+	mModelReady = true;
+}
+
+void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & view)
+{
+	if(!mModelReady)
+		Init();
+
+	// Look up the parameters:
+	const double r_in = mParams[mBaseParams + 1];
+	const double MaxRadius  = mParams[mBaseParams + 2];
+	const double MaxHeight  = mParams[mBaseParams + 3];
+	int n_rings  = ceil(mParams[mBaseParams + 4]);
+
+	// Set the color
+	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].a = 1.0;
+
+	// Bind to the framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
+
+	// Activate the shader
+	GLuint shader_program = mShader->GetProgram();
+	mShader->UseShader();
+
+	// bind back to the VAO
+	glBindVertexArray(mVAO);
+
+	// Define the maximum height and radius
+	GLint uniMaxRadius = glGetUniformLocation(shader_program, "r_max");
+	glUniform1f(uniMaxRadius, MaxRadius);
+
+	GLint uniMaxHeight = glGetUniformLocation(shader_program, "z_max");
+	glUniform1f(uniMaxHeight, MaxHeight);
+
+	// Set the value for the inner radius.
+	GLint uniInnerRadius = glGetUniformLocation(shader_program, "r_in");
+	glUniform1f(uniInnerRadius, r_in);
+
+	// Define the view:
+	GLint uniView = glGetUniformLocation(shader_program, "view");
+	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+
+	GLint uniTranslation = glGetUniformLocation(shader_program, "translation");
+	glUniformMatrix4fv(uniTranslation, 1, GL_FALSE, glm::value_ptr(Translate()));
+
+	GLint uniRotation = glGetUniformLocation(shader_program, "rotation");
+	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
+
+	// Look up the scale variable location. We use it below.
+	GLint uniScale = glGetUniformLocation(shader_program, "scale");
+
+	// bind to this object's texture
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+	// upload the image
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
+
+	glDisable(GL_DEPTH_TEST);
+
+	// Render each cylindrical wall:
+
+    // Init scale variables
+	double radius = 0;
+	double height = MaxHeight;
+
+    glm::mat4 scale;
+    glm::mat4 r_scale;
+    glm::mat4 h_scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, height));
+
+    // Render each of the concentric rings
+	double dr = (MaxRadius - r_in) / (n_rings - 1);
+	for(unsigned int i = 0; i < n_rings; i++)
+	{
+		// Scale the radius:
+		radius = r_in + i * dr;
+		r_scale = glm::scale(mat4(), glm::vec3(radius, radius, 1.0));
+		scale = h_scale * r_scale;
+
+		glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+		glDrawElements(GL_TRIANGLE_STRIP, mRimSize, GL_UNSIGNED_INT, 0);
+	}
+
+	// Render the midplane
+	r_scale = glm::scale(mat4(), glm::vec3(MaxRadius, MaxRadius, 1.0));
+	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+
+	// Draw the midplane
+	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
+
+	glEnable(GL_DEPTH_TEST);
+
+	// bind back to the default texture.
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+
+	// Return to the default framebuffer before leaving.
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	CWorkerThread::CheckOpenGLError("CDensityDisk.Render()");
+}
+
 /// Overrides the default CModel::SetShader function.
 void CDisk_ConcentricRings::SetShader(CShaderPtr shader)
 {
 	// This mode does not accept different shaders, do nothing here.
-}
-
-double CDisk_ConcentricRings::MidplaneTransparency(double radius)
-{
-	const double r_out = mParams[mBaseParams + 2];
-	const double alpha = mParams[mBaseParams + 4];
-
-	// If alpha exceeds its bounds, return 1 for the transparency (per the documentation)
-	if(alpha < mMinMax[mBaseParams + 4].first || alpha > mMinMax[mBaseParams + 4].second)
-		return 1;
-
-	return (1 - pow((radius) / (r_out), alpha));
-}
-
-void CDisk_ConcentricRings::Render(GLuint framebuffer_object, int width, int height)
-{
-	// Bind to the framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
-
-	// Parameters from CModelDisk_ConcentricRings:
-	const double r_in  = mParams[mBaseParams + 1];
-	const double r_out = mParams[mBaseParams + 2];
-	const double total_height = mParams[mBaseParams + 3];
-	const double alpha = mParams[mBaseParams + 4];
-	const double beta  = mParams[mBaseParams + 5];
-	int n_rings  = ceil(mParams[mBaseParams + 6]);
-
-	if(n_rings < 1)
-		n_rings = 1;
-
-	const double dr = (r_out - r_in) / n_rings;
-	const double half_height = total_height/2;
-
-	double min_xyz[3] = {r_in, r_in, 0};
-	double max_xyz[3] = {r_out, r_out, half_height};
-
-	glDisable(GL_DEPTH_TEST);
-
-	glPushMatrix();
-		SetupMatrix();
-		Color();
-		UseShader(min_xyz, max_xyz);
-
-		// Call base-class rotation and translation functions.
-		// NOTE: OpenGL applies these operations in a stack-like buffer so they are reversed
-		// compared to conventional application.
-		Translate();
-		Rotate();
-
-		// Draw the inner wall first
-		DrawSides(r_in, total_height);
-
-		// Iterate over the remaining rings, filling in the gaps and drawing the vertical wall
-		// at the outer-edge of r+dr
-		for(double radius = r_in; radius < r_out + dr; radius += dr)
-		{
-			DrawDisk(radius, radius + dr, 0);
-			DrawSides(radius + dr, total_height);
-		}
-
-	glPopMatrix();
-
-	glDisable(GL_DEPTH_TEST);
-
-	// Return to the default framebuffer before leaving.
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CWorkerThread::CheckOpenGLError("CModelDisk.Render()");
-}
-
-double CDisk_ConcentricRings::Transparency(double half_height, double at_z)
-{
-	const double beta  = mParams[mBaseParams + 5];
-
-	// If beta exceeds its bounds, return 1 for the transparency (per the documentation)
-	if(beta < mMinMax[mBaseParams + 5].first || beta > mMinMax[mBaseParams + 5].second)
-		return 1;
-
-	return 1 - pow(abs(at_z) / half_height, beta);
 }

@@ -1,4 +1,4 @@
-#version 150 core
+#version 330 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -26,8 +26,10 @@
  
 // Square root limb darkening
 // Implemented by decreasing the flux (color.x) of the vertex.
+
 in vec3 Normal;
-in vec2 Color;
+in vec2 Tex_Coords;
+
 in vec3 ModelPosition;
 
 uniform float rho0;
@@ -36,6 +38,8 @@ uniform float r0;
 uniform float h0;
 uniform float gamma;
 uniform float beta;
+uniform float r_in;
+uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
 
@@ -55,5 +59,11 @@ void main(void)
     // Compute the transparency
     float transparency = 1 - exp(-1 * kappa * rho);
     
-    out_color = vec4(Color.x, 0.0, 0.0, Color.y * transparency);
+    vec4 Color = texture(TexSampler, Tex_Coords);
+    
+    // If we are inside the inner radius, everything is transparent.
+    if(radius - r_in < 1)
+        out_color = vec4(0.0, 0.0, 0.0, 0.0);
+    else
+        out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
 }

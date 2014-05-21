@@ -2,31 +2,29 @@
  * CDisk_ConcentricRings.h
  *
  *  Created on: Dec 28, 2012
- *      Author: bkloppen
+ *      Author: bkloppenborg
  *
- *  A class implementing a disk model consisting of a series of partially
- *  opaque concentric rings.
- *
- *  The model has the following parameters:
- *  	r_in : the inner radius (>= 0)
- *  	r_out: the outer radius (> 0)
- *  	alpha: the radial power law decay coefficient for midplane transparency
- *  	beta : the z power law decay coefficient for transparency
- *  	n_rings: the number of concentric rings between r_in and r_out (> 0)
- *
- *  NOTE: If either alpha or beta are set outside of their specified bounds, the transparency
- *  in the corresponding direction will be set to zero (i.e. 100% opaque).
- *
- *  WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
  */
 
-#ifndef CDISK_CONCENTRICRINGS_H_
-#define CDISK_CONCENTRICRINGS_H_
+#ifndef CDISK_CONCENTRIC_RINGS_H_
+#define CDISK_CONCENTRIC_RINGS_H_
 
-#include "CCylinder.h"
+#include "CModel.h"
 
-class CDisk_ConcentricRings: public CCylinder
+class CDisk_ConcentricRings: public CModel
 {
+	protected:
+
+	unsigned int mRimStart;
+	unsigned int mRimSize;
+	unsigned int mMidplaneStart;
+	unsigned int mMidplaneSize;
+
+	GLuint mVAO;
+	GLuint mVBO;
+	GLuint mEBO;
+
+	bool mModelReady;
 
 public:
 	CDisk_ConcentricRings();
@@ -36,14 +34,12 @@ public:
 
 	virtual string GetID() { return "disk_concentric_rings"; };
 
-	virtual double MidplaneTransparency(double radius);
+	void Init();
 
-	void Render(GLuint framebuffer_object, int width, int height);
-
-	virtual double Transparency(double half_height, double at_z);
+	void Render(GLuint framebuffer_object, const glm::mat4 & view);
 
 	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
 
 };
 
-#endif /* CMODELDISK_CONCENTRICRINGS_H_ */
+#endif /* CDISK_CONCENTRIC_RINGS_H_ */

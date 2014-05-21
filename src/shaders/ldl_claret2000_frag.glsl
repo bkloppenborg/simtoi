@@ -1,4 +1,4 @@
-#version 150 core
+#version 330 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -27,11 +27,13 @@
 // Four-parameter limb darkening implemented according to Claret (2003)
 // Implemented by decreasing the flux (color.x) of the vertex.
 in vec3 Normal;
-in vec2 Color;
+in vec2 Tex_Coords;
+
 uniform float a1;
 uniform float a2;
 uniform float a3; 
 uniform float a4;
+uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
 
@@ -45,6 +47,8 @@ void main(void)
 	intensity -= a2 * (1 - mu);
 	intensity -= a3 * (1 - pow(mu, 1.5));
 	intensity -= a4 * (1 - pow(mu, 2));
-
-    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
+    
+    // look up the color from the texture.
+    vec4 Color = texture(TexSampler, Tex_Coords);
+    out_color = vec4(intensity * Color.x, 0, 0, Color.a);
 }

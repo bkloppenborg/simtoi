@@ -128,6 +128,8 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 void PrintHelp()
 {
 	cout << "SIMTOI: The SImulation and Modeling Tool for Optical Interferometry" << endl;
+	cout << "Copyright (c) Brian Kloppenborg and Fabien Baron 2012" << endl;
+	cout << endl;
 	cout << "Command line usage: simtoi [...]" << endl;
 	cout << endl;
 	cout << "Options:" << endl;

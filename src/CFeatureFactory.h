@@ -1,14 +1,12 @@
 /*
- * gui_common.h
+ * CFeatureFactory.h
  *
- *  Created on: Feb 12, 2013
- *      Author: bkloppen
- *
- *  Commonly used functions for GUIs that are not provided by QT.
+ *  Created on: Apr. 23, 2014
+ *      Author: bkloppenborg
  */
 
-/*
- * Copyright (c) 2012 Brian Kloppenborg
+ /*
+ * Copyright (c) 2014 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -32,43 +30,38 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GUI_COMMON_H_
-#define GUI_COMMON_H_
+#ifndef CFEATUREFACTORY_H_
+#define CFEATUREFACTORY_H_
 
-#include <QComboBox>
-#include <QString>
+#include <map>
+#include <memory>
 #include <vector>
-#include <QListWidget>
 
 using namespace std;
 
-class gui_common
-{
+class CFeature;
+
+typedef shared_ptr<CFeature> (*CreateFeatureFn)(void);
+
+
+class CFeatureFactory {
+private:
+
+	map<string, CreateFeatureFn> mFactory;
+
+	CFeatureFactory();
+
 public:
-	gui_common();
-	virtual ~gui_common();
+	virtual ~CFeatureFactory();
 
-	static void SetupOptions(QComboBox * widget, vector<string> values)
-	{
-		QString tmp_str = "";
+public:
+	shared_ptr<CFeature> CreateFeature(string PositionID);
 
-		for(unsigned int i = 0; i < values.size(); i++)
-		{
-			tmp_str = QString::fromStdString(values[i]);
-			widget->addItem(tmp_str);
-		}
-	}
+	static CFeatureFactory Instance();
 
-	static void SetupOptions(QListWidget * widget, vector<string> values)
-	{
-		QString tmp_str = "";
+	void Register(string FeatureID, CreateFeatureFn CreateFunction);
 
-		for(unsigned int i = 0; i < values.size(); i++)
-		{
-			tmp_str = QString::fromStdString(values[i]);
-			widget->addItem(tmp_str);
-		}
-	}
+	vector<string> GetFeatureList();
 };
 
-#endif /* GUI_COMMON_H_ */
+#endif /* CFEATUREFACTORY_H_ */

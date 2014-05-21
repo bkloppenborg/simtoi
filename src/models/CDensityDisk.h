@@ -47,9 +47,6 @@ public:
 	CDensityDisk(int n_additional_params);
 	virtual ~CDensityDisk();
 
-	static void GenreateCylinderRim(vector<vec3> & vertices, vector<unsigned int> & elements,
-			unsigned int z_divisions, unsigned int phi_divisions);
-
 	void Init();
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);

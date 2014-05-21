@@ -29,6 +29,7 @@
 #include "CModelFactory.h"
 #include "CPositionFactory.h"
 #include "CShaderFactory.h"
+#include "CFeatureFactory.h"
 
 gui_model::gui_model(QWidget *parent)
     : QDialog(parent)
@@ -71,6 +72,15 @@ shared_ptr<CModel> gui_model::GetModel(void)
 	string shader_id = ui.cboShaders->currentText().toStdString();
 	model->SetShader(shader_id);
 
+	QListWidgetItem * item;
+	string feature_id;
+	for ( int i = 0 ; i < ui.listFeatures->count() ; ++i )
+	{
+		item = ui.listFeatures->item(i);
+		feature_id = item->data(Qt::DisplayRole).toString().toStdString();
+		model->AddFeature(feature_id);
+	}
+
 	return model;
 }
 
@@ -82,11 +92,24 @@ void gui_model::SetupUI()
 	auto models = CModelFactory::Instance();
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
+	auto features = CFeatureFactory::Instance();
 
-	gui_common::SetupComboOptions(ui.cboModels, models.GetModelList());
-	gui_common::SetupComboOptions(ui.cboPositions, positions.GetPositionList());
-	gui_common::SetupComboOptions(ui.cboShaders, shaders.GetShaderList());
+	gui_common::SetupOptions(ui.cboModels, models.GetModelList());
+	gui_common::SetupOptions(ui.cboPositions, positions.GetPositionList());
+	gui_common::SetupOptions(ui.cboShaders, shaders.GetShaderList());
+	gui_common::SetupOptions(ui.cboFeatures, features.GetFeatureList());
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+}
+
+void gui_model::on_btnFeatureAdd_clicked()
+{
+	QString feature_id = ui.cboFeatures->currentText();
+	ui.listFeatures->addItem(feature_id);
+}
+
+void gui_model::on_btnFeatureRemove_clicked()
+{
+	qDeleteAll(ui.listFeatures->selectedItems());
 }

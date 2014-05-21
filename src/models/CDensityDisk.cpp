@@ -43,6 +43,9 @@ CDensityDisk::CDensityDisk(int n_additional_params)
 	// specific later.
 	auto shaders = CShaderFactory::Instance();
 	mShader = shaders.CreateShader("default");
+
+	// Resize the texture, 1 element is sufficient.
+	mFluxTexture.resize(1);
 }
 
 CDensityDisk::~CDensityDisk()
@@ -50,30 +53,7 @@ CDensityDisk::~CDensityDisk()
 
 }
 
-///// Draws a flat (planar) ring between r_in and r_out.
-//void CDensityDisk::DrawDisk(double r_in, double r_out)
-//{
-//	// lookup constants
-//	double color = mParams[3];
-//
-//	// Compute the transparency at the inner/out radii
-//	const double trans_in = Transparency(r_in, 0, 0);
-//	const double trans_out = Transparency(r_out, 0, 0);
-//
-//	glBegin(GL_QUAD_STRIP);
-//
-//	glNormal3d(0.0, 1.0, 0.0);
-//
-//	for(int j = 0; j <= mSlices; j++ )
-//	{
-//		glColor4d(color, 0.0, 0.0, trans_in);
-//		glVertex3d(mCosT[ j ] * r_in,  0, mSinT[ j ] * r_in);
-//		glColor4d(color, 0.0, 0.0, trans_out);
-//		glVertex3d(mCosT[ j ] * r_out, 0, mSinT[ j ] * r_out);
-//	}
-//
-//	glEnd();
-//}
+
 
 void CDensityDisk::Init()
 {
@@ -89,7 +69,7 @@ void CDensityDisk::Init()
 	mRimSize = elements.size();
 	// Calculate the offset in vertex indexes for the GenerateMidplane function
 	// to generate correct element indices.
-	unsigned int vertex_offset = vbo_data.size() / 2;
+	unsigned int vertex_offset = vbo_data.size();
 	mMidplaneStart = mRimSize;
 	CCylinder::GenerateMidplane(vbo_data, elements, vertex_offset, r_divisions, phi_divisions);
 	mMidplaneSize = elements.size() - mRimSize;
@@ -109,32 +89,18 @@ void CDensityDisk::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
-	// Next we need to define the storage format for this object for the shader.
-	// First get the shader and activate it
-	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
-	// Now start defining the storage for the VBO.
-	// The 'vbo_data' variable stores a unit cylindrical shell (i.e. r = 1,
-	// h = -0.5 ... 0.5).
-	GLint posAttrib = glGetAttribLocation(shader_program, "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 0);
-	// Now define the normals, if they are used
-	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	if(normAttrib > -1)
-	{
-		glEnableVertexAttribArray(normAttrib);
-		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
-	}
-
-	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CDensityDisk.Init()");
+	// Initialize the shader variables and texture following the default packing
+	// scheme.
+	InitShaderVariables();
+	InitTexture();
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	CWorkerThread::CheckOpenGLError("CDensityDisk.Init()");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
@@ -150,7 +116,10 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	const double r_cutoff  = mParams[mBaseParams + 2];
 	const double h_cutoff  = mParams[mBaseParams + 3];
 	int n_rings  = ceil(mParams[mBaseParams + 4]);
-	vec2 color = vec2(mParams[3], 1.0);
+
+	// Set the color
+	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -158,15 +127,9 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
 	mShader->UseShader();
-	GLint uniColorFlag = glGetUniformLocation(shader_program, "color_from_uniform");
-	glUniform1i(uniColorFlag, true);
 
 	// bind back to the VAO
 	glBindVertexArray(mVAO);
-
-	// Define the color
-    GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
-    glUniform2fv(uniColor, 1, glm::value_ptr(color));
 
 	// Define the view:
 	GLint uniView = glGetUniformLocation(shader_program, "view");
@@ -178,7 +141,18 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	GLint uniRotation = glGetUniformLocation(shader_program, "rotation");
 	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
 
+	// Set the value for the inner radius.
+	GLint uniInnerRadius = glGetUniformLocation(shader_program, "r_in");
+	glUniform1f(uniInnerRadius, r_in);
+
+	// Look up the scale variable location. We use it below.
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
+
+	// bind to this object's texture
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+	// upload the image
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -192,6 +166,7 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
     glm::mat4 r_scale;
     glm::mat4 h_scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, height));
 
+    // Render each of the concentric rings
 	double dr = (r_cutoff - r_in) / (n_rings - 1);
 	for(unsigned int i = 0; i < n_rings; i++)
 	{
@@ -204,10 +179,17 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		glDrawElements(GL_TRIANGLE_STRIP, mRimSize, GL_UNSIGNED_INT, 0);
 	}
 
+	// Render the midplane
+	r_scale = glm::scale(mat4(), glm::vec3(r_cutoff, r_cutoff, 1.0));
+	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+
 	// Draw the midplane
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
 	glEnable(GL_DEPTH_TEST);
+
+	// bind back to the default texture.
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

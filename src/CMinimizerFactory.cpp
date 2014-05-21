@@ -42,21 +42,29 @@ using namespace std;
 
 #include "minimizers/CBenchmark.h"
 #include "minimizers/CGridSearch.h"
+// Compiler directive to add support for levmar
+#ifdef _ADD_LEVMAR
 #include "minimizers/CLevmar.h"
+#include "minimizers/CBootstrap_Levmar.h"
+#endif //_ADD_LEVMAR
 // Compiler directive to add support for MultiNest
 #ifdef _ADD_MULTINEST
 #include "minimizers/CMultiNest.h"
 #endif // _ADD_MULTINEST
-#include "minimizers/CBootstrap_Levmar.h"
+
 
 /// \brief Private constructor. Use `Instance()` instead.
 CMinimizerFactory::CMinimizerFactory()
 {
 	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
 	Register("benchmark", &CBenchmark::Create);
-	Register("bootstrap_levmar", &CBootstrap_Levmar::Create);
 	Register("gridsearch", &CGridSearch::Create);
+
+#ifdef _ADD_LEVMAR
 	Register("levmar", &CLevmar::Create);
+	Register("bootstrap_levmar", &CBootstrap_Levmar::Create);
+#endif //_ADD_LEVMAR
+
 #ifdef _ADD_MULTINEST
 	Register("multinest", &CMultiNest::Create);
 #endif // _ADD_MULTINEST

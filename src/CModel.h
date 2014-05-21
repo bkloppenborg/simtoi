@@ -33,10 +33,17 @@
 #ifndef CMODEL_H_
 #define CMODEL_H_
 
-// Headers for OpenGL functions
+// OpenGL Headers:
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#include <OpenGL/glu.h>
+#else
+#ifdef _WIN32
+  #include <windows.h>
+#endif
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <memory>
+#endif
 
 #include "CParameters.h"
 #include "CPosition.h"
@@ -50,7 +57,9 @@
 #include <cstdio>
 #include <cassert>
 #include <memory>
+
 // OpenGL Math Library code.
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -71,6 +80,9 @@ typedef shared_ptr<CPosition> CPositionPtr;
 
 class CShader;
 typedef shared_ptr<CShader> CShaderPtr;
+
+class CFeature;
+typedef shared_ptr<CFeature> CFeaturePtr;
 
 /// \brief A base class for all models in SIMTOI
 ///
@@ -94,12 +106,22 @@ protected:
 	CShaderPtr mShader;	///< A shared pointer to the shader object.
 	double mScale;
 
+	GLuint mFluxTextureID; // texture id
+	vector<double> mPixelTemperatures;
+	vector<vec4> mFluxTexture;
+
+	vector<CFeaturePtr> mFeatures;
+
 protected:
 	glm::mat4 Rotate();
 	glm::mat4 Translate();
 
 public:
 	static void CircleTable( double * sint, double * cost, const int n );
+
+	virtual void FindPixels(double s0, double s1, double s2,
+			double ds0, double ds1, double ds2,
+			vector<unsigned int> &pixels_ids);
 
 	void GetAllParameters(double * params, int n_params);
 	// Set the parameters in this model, scaling from a uniform hypercube to physical units as necessary.
@@ -115,14 +137,26 @@ public:
 	CModel(int n_params);
 	virtual ~CModel();
 
+	void AddFeature(string feature_id);
+
 	virtual string GetID();
 	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();
 	int GetNShaderFreeParameters();
+	int GetNFeatureFreeParameters();
+	vector<double> & GetPixelTemperatures();
 	CPositionPtr GetPosition(void);
 	CShaderPtr GetShader(void);
+
+	const vector<CFeaturePtr> & GetFeatures() const;;
+
 	int GetTotalFreeParameters();
 
+protected:
+	virtual void InitTexture();
+	virtual void InitShaderVariables();
+
+public:
 	virtual void Render(GLuint framebuffer_object, const glm::mat4 & view) = 0;
 public:
 	void Restore(Json::Value input);
@@ -134,10 +168,15 @@ public:
 
 	virtual void SetShader(string shader_id);
 	virtual void SetShader(CShaderPtr shader);
-	void SetTime(double time);
+	virtual void SetTime(double time);
 protected:
 	void SetupMatrix();
 
+public:
+	static void TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
+			double wavelength, double max_temperature);
+	static void TemperatureToFlux(vector<double> temperatures, vector<vec4> & pixels,
+			double wavelength, double max_temperature);
 
 };
 

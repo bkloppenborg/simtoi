@@ -49,8 +49,8 @@ public:
 	virtual ~CPositionOrbit();
 
 protected:
-	double ComputeN(double T);
-	double ComputeM(double tau, double n, double t);
+	double ComputeN(double P);
+	double ComputeM(double T, double n, double t);
 	double ComputeE(double M, double e);
 	void Compute_Coefficients(double Omega, double inc, double omega,
 			double & L1, double & M1, double & N1, double & L2, double & M2, double & N2);

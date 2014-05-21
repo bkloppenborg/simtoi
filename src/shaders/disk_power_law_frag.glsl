@@ -1,6 +1,6 @@
 #version 330 core
 /* 
- * Copyright (c) 2013 Brian Kloppenborg
+ * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -24,25 +24,49 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-// A flux-conserving square-root limb darkening law based on Fields (2003)
-// Implemented by decreasing the flux (color.x) of the vertex.
+// 
 
 in vec3 Normal;
 in vec2 Tex_Coords;
 
-uniform float A;
-uniform float B;
+in vec3 ModelPosition;
+
+uniform bool use_r_trans;
+uniform float r_max;
+uniform float alpha_r;
+
+uniform bool use_z_trans;
+uniform float z_max;
+uniform float beta_z;
+
+uniform float r_in;
+
 uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
 
 void main(void)
 {
-    float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
-    float intensity = 1;
-    intensity -= A * (1 - 1.5*mu);
-    intensity -= B * (1 - 2.5*sqrt(mu));
+    // Compute the radius and height of this fragment
+    float radius = sqrt(ModelPosition.x * ModelPosition.x + ModelPosition.y * ModelPosition.y);
+    float z = abs(ModelPosition.z);
+    
+    float r_trans = 1;
+    float z_trans = 1;
+    
+    if(use_r_trans)
+        r_trans -= pow(radius / r_max, alpha_r);
+    if(use_z_trans)
+        z_trans -= pow(z / z_max, beta_z);
 
+    // Compute the transparency
+    float transparency = r_trans * z_trans;
+    
     vec4 Color = texture(TexSampler, Tex_Coords);
-    out_color = vec4(intensity * Color.x, 0, 0, Color.a);
+    
+    // If we are inside the inner radius, everything is transparent.
+    if(radius - r_in < 1)
+        out_color = vec4(0.0, 0.0, 0.0, 0.0);
+    else
+        out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
 }

@@ -34,7 +34,6 @@
 #define CMULTINEST_H_
 
 #include "CMinimizerThread.h"
-#include "multinest.h"
 
 class CMultiNest: public CMinimizerThread
 {

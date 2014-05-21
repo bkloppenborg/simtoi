@@ -38,11 +38,15 @@
  *  three values in mParameters.
  */
 
+#include <sstream>
+
 #include "CModel.h"
 // Header files for position objects.
 #include "CPosition.h"
 #include "CPositionFactory.h"
 #include "CShaderFactory.h"
+#include "CFeature.h"
+#include "CFeatureFactory.h"
 
 CModel::CModel(int n_params)
 	: CParameters(4 + n_params)
@@ -51,6 +55,7 @@ CModel::CModel(int n_params)
 
 	// Shader storage location, boolean if it is loaded:
 	mShader = CShaderPtr();
+	mFluxTextureID = 0;
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
 	mParamNames.push_back("Pos. Angle");
@@ -69,8 +74,35 @@ CModel::CModel(int n_params)
 
 CModel::~CModel()
 {
-
+	// Delete the texture if one was allocated.
+	if(mFluxTextureID)
+	{
+		glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+		glDeleteTextures(1, &mFluxTextureID);
+	}
 }
+
+/// \breif Adds the feature with feature_id to the current model.
+void CModel::AddFeature(string feature_id)
+{
+	auto features = CFeatureFactory::Instance();
+	auto feature = features.CreateFeature(feature_id);
+
+	if(feature != nullptr)
+		mFeatures.push_back(feature);
+}
+
+/// \breif Function for finding the IDs of pixels within the bounds
+/// (s0, s1, s2) +/- (ds0, ds1, ds2)
+/// where (s0, s1, s2) are the generalized coordinates in the model's
+/// coordinate system.
+void CModel::FindPixels(double s0, double s1, double s2,
+		double ds0, double ds1, double ds2,
+		vector<unsigned int> &pixels_ids)
+{
+	// base class function cannot match pixels. Do nothing here.
+}
+
 
 /// \brief Static function which creates a lookup table of sine and cosine values
 /// 	used in drawing things in polar coordinates.
@@ -103,6 +135,22 @@ string CModel::GetID()
 	return "model_base_invalid";
 }
 
+const vector<CFeaturePtr> & CModel::GetFeatures() const
+{
+	return mFeatures;
+};
+
+/// \brief Returns the number of free parameters used by all features
+int CModel::GetNFeatureFreeParameters()
+{
+	unsigned int n_free = 0;
+
+	for(auto feature: mFeatures)
+		n_free += feature->GetNFreeParams();
+
+	return n_free;
+}
+
 /// \brief Returns the number of free parameters in the model
 int CModel::GetNModelFreeParameters()
 {
@@ -118,13 +166,19 @@ int CModel::GetNPositionFreeParameters()
 	return 0;
 }
 
-/// \brief Retursn the number of free parameters used in the shader
+/// \brief Returns the number of free parameters used in the shader
 int CModel::GetNShaderFreeParameters()
 {
 	if(mShader != NULL)
 		return mShader->GetNFreeParams();
 
 	return 0;
+}
+
+/// \brief Get a reference to the pixel temperatures
+vector<double> & CModel::GetPixelTemperatures()
+{
+	return mPixelTemperatures;
 }
 
 /// \brief Get a copy of the position object. Note, this could be NULL.
@@ -160,6 +214,12 @@ void CModel::GetAllParameters(double * params, int n_params)
 		mShader->GetParams(params + n, n_params - n);
 		n += mShader->GetNParams();
 	}
+
+	for(auto feature: mFeatures)
+	{
+		feature->GetParams(params + n, n_params - n);
+		n += feature->GetNParams();
+	}
 }
 
 /// \brief Get a vector containing the minimum/maximum values for all free parameters.
@@ -177,6 +237,12 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 	if(mShader != NULL)
 	{
 		tmp2 = mShader->GetFreeMinMaxes();
+		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	}
+
+	for(auto feature: mFeatures)
+	{
+		tmp2 = feature->GetFreeMinMaxes();
 		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	}
 
@@ -207,6 +273,12 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 		mShader->GetFreeParams(params + n, n_params - n, scale_params);
 		n += mShader->GetNFreeParams();
 	}
+
+	for(auto feature: mFeatures)
+	{
+		feature->GetFreeParams(params + n, n_params - n, scale_params);
+		n += feature->GetNFreeParams();
+	}
 }
 
 
@@ -222,6 +294,12 @@ vector<string> CModel::GetFreeParameterNames()
 	if(mShader != NULL)
 	{
 		tmp2 = mShader->GetFreeParamNames();
+		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	}
+
+	for(auto feature: mFeatures)
+	{
+		tmp2 = feature->GetFreeParamNames();
 		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	}
 
@@ -242,6 +320,12 @@ void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 		mShader->GetFreeParamSteps(steps + n, size - n);
 		n += mShader->GetNFreeParams();
 	}
+
+	for(auto feature: mFeatures)
+	{
+		feature->GetFreeParamSteps(steps + n, size - n);
+		n += feature->GetNFreeParams();
+	}
 }
 
 /// \brief Gets the total number of free parameters in the model.
@@ -250,7 +334,87 @@ int CModel::GetTotalFreeParameters()
 	// Sum up the free parameters from the model, position, and features
 	return this->GetNModelFreeParameters() +
 			this->GetNPositionFreeParameters() +
-			this->GetNShaderFreeParameters();
+			this->GetNShaderFreeParameters() +
+			this->GetNFeatureFreeParameters();
+}
+
+/// Initalizes the shader variables `position`, `normal`, and `tex_coords`
+/// following the default packing scheme of:
+///		[vec3(x,y,z), vec3(n_x, n_y, n_z), (t_x, t_y, t_z)]
+/// where (x,y,z) is the position, (n_x, n_y, n_z) are the normals and
+/// (t_x, t_y, t_z) are the texture coordinates.
+/// All values are assumed to be floating point values.
+void CModel::InitShaderVariables()
+{
+	// Next we need to define the storage format for this object for the shader.
+	// First get the shader and activate it
+	GLuint shader_program = mShader->GetProgram();
+	glUseProgram(shader_program);
+
+	// Define the storage format for the VBO. Each vertex is defined by
+	// three vec3s that are packed as follows:
+	// [vec3(x,y,z), vec3(n_x, n_y, n_z), (t_x, t_y, t_z)]
+	// First we define the position attribute:
+	GLint posAttrib = glGetAttribLocation(shader_program, "position");
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			(GLvoid *) 0);
+	glEnableVertexAttribArray(posAttrib);
+	// Setup the normals. Their offset is (3 * sizeof(float)) from the start
+	// of the current index
+	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
+	// If the normal shader variable is not used, it can be optimized out
+	// verify that it is in use before setting any properties..
+	if(normAttrib > -1)
+	{
+		glEnableVertexAttribArray(normAttrib);
+		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE,
+				3 * sizeof(float), (GLvoid *) (3 * sizeof(float)));
+	}
+
+	// Setup the texture coordinate lookup variables. Their offset
+	// is (6 * sizeof(float)) from the start of the current index
+	GLint texAttrib = glGetAttribLocation(shader_program, "tex_coords");
+	glVertexAttribPointer(texAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+			(GLvoid *) (6 * sizeof(float)));
+	glEnableVertexAttribArray(texAttrib);
+
+	// Setup the texture sampler. Have it use texture sampler Unit 0.
+	GLuint TextureSamp = glGetUniformLocation(shader_program, "TexSampler");
+	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
+
+	// Check that things loaded correctly.
+	CWorkerThread::CheckOpenGLError("CModel.InitShaderVariables()");
+}
+
+/// Initializes the texture by setting properties and uploading a default
+/// (smooth gradient) texture to the texture buffer.
+void CModel::InitTexture()
+{
+	glActiveTexture(GL_TEXTURE0);
+
+	// Create a new texture of type GL_TEXTURE_RECTANGLE and bind to it.
+	glGenTextures(1, &mFluxTextureID);
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+
+	// Load a default (smooth graident) texture into the texture buffer
+	for(unsigned int i = 0; i < mFluxTexture.size(); i++)
+	{
+		mFluxTexture[i].r = float(i) / mFluxTexture.size();
+		mFluxTexture[i].a = 1.0;
+	}
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
+
+	// Set wrapping and lookup filters
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	// All done. Unbind.
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
+
+	CWorkerThread::CheckOpenGLError("CModel.InitTexture(), texture setup");
 }
 
 /// \brief Constructs the rotation matrix according to the set parameters.
@@ -259,16 +423,16 @@ int CModel::GetTotalFreeParameters()
 /// of the model is specified relative to the orbital plane.
 glm::mat4 CModel::Rotate()
 {
-	double Omega = mParams[0];
-	double inc = mParams[1];
-	double omega = mParams[2];
+	double Omega = mParams[0] * M_PI / 180;
+	double inc = mParams[1] * M_PI / 180;
+	double omega = mParams[2] * M_PI / 180;
 
 	// If we have a dynamic position, simply add the angles
 	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
 	{
-		double orbit_Omega = mPosition->GetParam(0);
-		double orbit_inc = mPosition->GetParam(1);
-		double orbit_omega = mPosition->GetParam(2);
+		double orbit_Omega = mPosition->GetParam(0) * M_PI / 180;
+		double orbit_inc = mPosition->GetParam(1) * M_PI / 180;
+		double orbit_omega = mPosition->GetParam(2) * M_PI / 180;
 
 		Omega += orbit_Omega;
 		inc += orbit_inc;
@@ -276,7 +440,7 @@ glm::mat4 CModel::Rotate()
 	}
 
 	glm::mat4 A = glm::rotate(mat4(), float(Omega), vec3(0.0, 0.0, 1.0));
-	glm::mat4 B = glm::rotate(mat4(), float(inc), vec3(1.0, 0.0, 0.0));
+	glm::mat4 B = glm::rotate(mat4(), float(inc),   vec3(1.0, 0.0, 0.0));
 	glm::mat4 C = glm::rotate(mat4(), float(omega), vec3(0.0, 0.0, 1.0));
 	return A * B * C;
 }
@@ -301,6 +465,7 @@ void CModel::Restore(Json::Value input)
 
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
+	auto features = CFeatureFactory::Instance();
 
 	// Look up the name of the position model, if none is specified use "xy" by default.
 	string position_id = input["position_id"].asString();
@@ -319,6 +484,51 @@ void CModel::Restore(Json::Value input)
 	auto shader = shaders.CreateShader(shader_id);
 	shader->Restore(input["shader_data"]);
 	CModel::SetShader(shader);
+
+	// Lastly restore features:
+	unsigned int i = 0;
+	string feature_id;
+	stringstream temp;
+	while(true)
+	{
+		// Attempt to restore the shader, if this fails it's ok.
+		try
+		{
+			// Look up the ID
+			temp.clear();
+			temp.str(std::string());
+			temp << "feature_" << i << "_id";
+			feature_id = input[temp.str()].asString();
+
+			// If there was no string found, quit searching.
+			if(feature_id.size() == 0)
+				break;
+
+			// Find the feature
+			auto feature = features.CreateFeature(feature_id);
+			// See if the feature was found, if not print out an error
+			if(feature == nullptr)
+			{
+				throw runtime_error("The feature with ID '" + feature_id + "' not registered with CFeatureFactory");
+				break;
+			}
+
+			temp.clear();
+			temp.str(std::string());
+			temp << "feature_" << i << "_data";
+			feature->Restore(input[temp.str()]);
+
+			// The feature is restored, add it to the list.
+			mFeatures.push_back(feature);
+
+			// increment the feature counter
+			i++;
+		}
+		catch(...)
+		{
+			break;
+		}
+	}
 }
 
 /// \brief Serializes a model object into a JSON object.
@@ -341,6 +551,25 @@ Json::Value CModel::Serialize()
 
 	output["shader_id"] = mShader->GetID();
 	output["shader_data"] = mShader->Serialize();
+
+	stringstream temp;
+
+	// Serialize each feature ID as
+	//  "feature_id_#" -> feature_id
+	//  "feature_data_#" -> seralized data for the feature
+	for(unsigned int i = 0; i < mFeatures.size(); i++)
+	{
+		auto feature = mFeatures[i];
+
+		temp.clear();
+		temp.str(std::string());
+		temp << "feature_" << i << "_id";
+		output[temp.str()] = feature->GetID();
+		temp.clear();
+		temp.str(std::string());
+		temp << "feature_" << i << "_data";
+		output[temp.str()] = feature->Serialize();
+	}
 
 	return output;
 }
@@ -369,8 +598,13 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 		mShader->SetFreeParams(in_params + n, n_params - n, scale_params);
 		n += mShader->GetNFreeParams();
 	}
-	// Lastly the features
-	//features->SetParams(in_params + n, n_params - n);
+
+	for(auto feature: mFeatures)
+	{
+		feature->SetFreeParams(in_params + n, n_params - n, scale_params);
+		n += feature->GetNFreeParams();
+	}
+
 }
 
 /// \brief Assigns the position object from a position id
@@ -412,6 +646,57 @@ void CModel::SetShader(string shader_id)
 void CModel::SetShader(CShaderPtr shader)
 {
 	mShader = shader;
+}
+
+/// Computes the flux for pixels given the input temperatures following Planck's
+/// law.
+/// @param temperatures An array of temperatures of in Kelvin
+/// @param fluxes Array into which computed fluxes will be stored
+/// @param wavelength The wavelength of observation
+/// @param max_temperature The maximum temperature of all models (used for normalization)
+void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
+		double wavelength, double max_temperature)
+{
+	// The pixel and temperature buffers must be of the same size.
+	assert(fluxes.size() == temperatures.size());
+
+	// Planck's law:
+	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
+	// h*c/k = 0.0143877696 m K
+	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	for (unsigned int i = 0; i < temperatures.size(); i++)
+	{
+		fluxes[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+
+		fluxes[i] /= max_flux;
+	}
+
+}
+
+/// Computes the flux for pixels given the input temperatures following Planck's
+/// law.
+/// @param temperatures An array of temperatures of in Kelvin
+/// @param pixels A vector of RGBA pixels into which the computes fluxes will be stored
+/// @param wavelength The wavelength of observation
+/// @param max_temperature The maximum temperature of all models (used for normalization)
+void CModel::TemperatureToFlux(vector<double> temperatures, vector<vec4> & fluxes,
+		double wavelength, double max_temperature)
+{
+	// The pixel and temperature buffers must be of the same size.
+	assert(fluxes.size() == temperatures.size());
+
+	// Planck's law:
+	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
+	// h*c/k = 0.0143877696 m K
+	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	for (unsigned int i = 0; i < temperatures.size(); i++)
+	{
+		// fill in the Red component.
+		fluxes[i].r = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+
+		fluxes[i].r /= max_flux;
+	}
+
 }
 
 /// \brief Constructs the translation matrix from the position model.

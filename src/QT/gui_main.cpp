@@ -252,7 +252,7 @@ void gui_main::Init(void)
 
 	// Setup the combo boxes.
 	auto minimizers = CMinimizerFactory::Instance();
-	gui_common::SetupComboOptions(this->cboMinimizers, minimizers.GetMinimizerList());
+	gui_common::SetupOptions(this->cboMinimizers, minimizers.GetMinimizerList());
 
 	// Setup the text boxes
 	this->textSaveFolder->setText(mDefaultSaveDir.c_str());
@@ -261,6 +261,9 @@ void gui_main::Init(void)
 	QGLFormat fmt;
 	fmt.setVersion(3, 2);
 	fmt.setProfile(QGLFormat::CoreProfile);
+	fmt.setDoubleBuffer(true);
+//	fmt.setSampleBuffers(true);
+//	fmt.setSamples(4);
 	QGLFormat::setDefaultFormat(fmt);
 }
 

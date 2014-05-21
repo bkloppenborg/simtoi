@@ -1,4 +1,4 @@
-#version 150 core
+#version 330 core
 /* 
  * Copyright (c) 2012 Brian Kloppenborg
  *
@@ -26,10 +26,13 @@
  
 // Quadratic limb darkening
 // Implemented by decreasing the flux (color.x) of the vertex.
+
 in vec3 Normal;
-in vec2 Color;
+in vec2 Tex_Coords;
+
 uniform float a1;
 uniform float a2;
+uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
 
@@ -42,5 +45,6 @@ void main(void)
 	intensity -= a1 * (1 - mu);
 	intensity -= a2 * pow( (1 - mu), 2.0);
 
-    out_color = vec4(intensity * Color.x, 0, 0, Color.y);
+    vec4 Color = texture(TexSampler, Tex_Coords);
+    out_color = vec4(intensity * Color.x, 0, 0, Color.a);
 }

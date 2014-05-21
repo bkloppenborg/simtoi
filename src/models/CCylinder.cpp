@@ -53,6 +53,9 @@ CCylinder::CCylinder()
 	mMidplaneSize = 0;
 	mRimStart = 0;
 	mRimSize = 0;
+
+	// Resize the texture. Single pixel is all that is required.
+	mFluxTexture.resize(1);
 }
 
 CCylinder::~CCylinder()
@@ -98,24 +101,32 @@ void CCylinder::GenerateMidplane(vector<vec3> & vertices, vector<unsigned int> &
 			y = sin_phi[phi] * r;
 			vertices.push_back(vec3(x, y, 0)); // vertex position
 			vertices.push_back(vec3(0, 0, 1)); // normal vector
+			vertices.push_back(vec3(1, 0, 0)); // texture vector
 		}
 	}
+	// The number of vec3s that define a (complete) vertex
+	unsigned int n_vec3_per_vertex = 3;
 
 	// now generate the indices
 	// Now assign the elements. Go in the same direction as the vertices were
 	// generated above, namely in rows by latitude.
+	double top, bottom;
 	for(unsigned int r = 0; r < r_divisions; r++)
 	{
 		for(unsigned int phi = 0; phi < phi_divisions; phi++)
 		{
-			elements.push_back(r * phi_divisions + phi + vertex_offset);
-			elements.push_back((r + 1) * phi_divisions + phi + vertex_offset);
+			bottom = n_vec3_per_vertex * (r * phi_divisions + phi);
+			top = n_vec3_per_vertex * ((r + 1) * phi_divisions + phi);
+			elements.push_back(bottom + vertex_offset);
+			elements.push_back(top + vertex_offset);
 		}
 
 		// To complete a z-row, link back to the first two vertices
 		// in the row.
-		elements.push_back(r * phi_divisions + vertex_offset);
-		elements.push_back((r + 1) * phi_divisions + vertex_offset);
+		bottom = n_vec3_per_vertex * (r * phi_divisions);
+		top = n_vec3_per_vertex * ((r + 1) * phi_divisions);
+		elements.push_back(bottom + vertex_offset);
+		elements.push_back(top + vertex_offset);
 	}
 }
 
@@ -152,24 +163,32 @@ void CCylinder::GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elem
 			y = sin_phi[phi];
 			vertices.push_back(vec3(x, y, z)); // vertex position
 			vertices.push_back(vec3(x, y, 0)); // normal vector
+			vertices.push_back(vec3(1, 0, 0)); // texture vector
 		}
 	}
+	// The number of vec3s that define a vertex
+	unsigned int n_vec3_per_vertex = 3;
 
 	// now generate the indices
 	// Now assign the elements. Go in the same direction as the vertices were
 	// generated above, namely in rows by latitude.
+	double top, bottom;
 	for(unsigned int z = 0; z < z_divisions; z++)
 	{
 		for(unsigned int phi = 0; phi < phi_divisions; phi++)
 		{
-			elements.push_back(z * phi_divisions + phi + element_offset);
-			elements.push_back((z + 1) * phi_divisions + phi + element_offset);
+			bottom = n_vec3_per_vertex * (z * phi_divisions + phi);
+			top = n_vec3_per_vertex * ((z + 1) * phi_divisions + phi);
+			elements.push_back(top + element_offset);
+			elements.push_back(bottom + element_offset);
 		}
 
 		// To complete a z-row, link back to the first two vertices
 		// in the row.
-		elements.push_back(z * phi_divisions + element_offset);
-		elements.push_back((z + 1) * phi_divisions + element_offset);
+		bottom = n_vec3_per_vertex * (z * phi_divisions);
+		top = n_vec3_per_vertex * ((z + 1) * phi_divisions);
+		elements.push_back(top + element_offset);
+		elements.push_back(bottom + element_offset);
 	}
 }
 
@@ -187,7 +206,7 @@ void CCylinder::Init()
 	mRimSize = elements.size();
 	// Calculate the offset in vertex indexes for the GenerateMidplane function
 	// to generate correct element indices.
-	unsigned int vertex_offset = vbo_data.size() / 2;
+	unsigned int vertex_offset = vbo_data.size();
 	mMidplaneStart = mRimSize;
 	GenerateMidplane(vbo_data, elements, vertex_offset, r_divisions, phi_divisions);
 	mMidplaneSize = elements.size() - mRimSize;
@@ -207,26 +226,10 @@ void CCylinder::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
-	// Next we need to define the storage format for this object for the shader.
-	// First get the shader and activate it
-	GLuint shader_program = mShader->GetProgram();
-	glUseProgram(shader_program);
-	// Now start defining the storage for the VBO.
-	// The 'vbo_data' variable stores a unit cylindrical shell (i.e. r = 1,
-	// h = -0.5 ... 0.5).
-	GLint posAttrib = glGetAttribLocation(shader_program, "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 0);
-	// Now define the normals, if they are used
-	GLint normAttrib = glGetAttribLocation(shader_program, "normal");
-	if(normAttrib > -1)
-	{
-		glEnableVertexAttribArray(normAttrib);
-		glVertexAttribPointer(normAttrib, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
-	}
-
-	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CDensityDisk.Init()");
+	// Initialize the shader variables and texture following the default packing
+	// scheme.
+	InitShaderVariables();
+	InitTexture();
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.
@@ -248,7 +251,8 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	const double radius = diameter / 2;
 	const double height  = mParams[mBaseParams + 2];
 
-	vec2 color = vec2(mParams[3], 1.0);
+	mFluxTexture[0].x = mParams[3];
+	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
@@ -256,15 +260,9 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
 	mShader->UseShader();
-	GLint uniColorFlag = glGetUniformLocation(shader_program, "color_from_uniform");
-	glUniform1i(uniColorFlag, true);
 
 	// bind back to the VAO
 	glBindVertexArray(mVAO);
-
-	// Define the color
-    GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
-    glUniform2fv(uniColor, 1, glm::value_ptr(color));
 
 	// Define the view:
 	GLint uniView = glGetUniformLocation(shader_program, "view");
@@ -281,6 +279,11 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
     glm::mat4 h_scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, height));
     glm::mat4 scale = r_scale * h_scale;
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
+
+	// bind to this object's texture, upload the image.
+	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
 
 	// Render
 	glDisable(GL_DEPTH_TEST);
@@ -302,6 +305,9 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
 	glEnable(GL_DEPTH_TEST);
+
+	// Unbind
+	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);

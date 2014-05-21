@@ -1,0 +1,37 @@
+// SIMTOI shader configuration file in JSON format.
+
+{
+    "fragment_shader" : "disk_power_law_frag.glsl",
+    "human_name" : "Power law disk",
+    "param_0":
+    {
+        "name" : "alpha_r",
+        "min" : 0.0,
+        "max" : 10,
+        "default" : 1
+    },
+    "param_1":
+    {
+        "name" : "use_r_trans",
+        "min" : 0.0,
+        "max" : 1,
+        "default" : 1
+    },
+    "param_2":
+    {
+        "name" : "beta_z",
+        "min" : 0.0,
+        "max" : 10,
+        "default" : 1
+    },
+    "param_3":
+    {
+        "name" : "use_z_trans",
+        "min" : 0.0,
+        "max" : 1,
+        "default" : 1
+    },
+	"shader_id" : "disk_power_law",
+    "vertex_shader" : "default_vert.glsl"
+}
+
