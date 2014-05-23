@@ -39,6 +39,9 @@
  */
 
 #include <sstream>
+#include <stdexcept>
+
+using namespace std;
 
 #include "CModel.h"
 // Header files for position objects.
