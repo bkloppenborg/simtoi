@@ -44,7 +44,6 @@
 CPositionOrbit::CPositionOrbit()
 	: CPosition(7)
 {
-	mTime = 0;
 	mName = "Orbit";
 	mPositionID = "orbit_bound";
 	mPositionType = DYNAMIC;
