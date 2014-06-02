@@ -77,6 +77,12 @@
     </item>
     <item row="0" column="1" rowspan="2">
      <widget class="QTreeView" name="treeOpenFiles">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>100</height>
+       </size>
+      </property>
       <attribute name="headerMinimumSectionSize">
        <number>1</number>
       </attribute>
@@ -92,7 +98,7 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>500</width>
+        <width>550</width>
         <height>0</height>
        </size>
       </property>
@@ -415,7 +421,6 @@
    <zorder>mdiArea</zorder>
    <zorder>treeModels</zorder>
    <zorder>tabWidget</zorder>
-   <zorder>treeOpenFiles</zorder>
    <zorder>treeOpenFiles</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
