@@ -299,12 +299,32 @@ void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
 	ButtonCheck();
 }
 
+/// Opens one or more saved model files.
 void gui_main::Open(QStringList & filenames)
 {
 	for(auto filename : filenames)
 	{
 		CGLWidget * widget = new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir);
-		widget->Open(filename.toStdString());
+
+		// Attempt to open the file.
+		try
+		{
+			widget->Open(filename.toStdString());
+		}
+		catch(runtime_error e)
+		{
+			// An error was thrown. Display a message to the user
+			QMessageBox msgBox;
+			msgBox.setWindowTitle("SIMTOI Error");
+			msgBox.setText(e.what());
+			msgBox.exec();
+
+			// Delete the widget and continue to the next file.
+			delete widget;
+			continue;
+		}
+
+		// If we opened the file successfully,
 		AddGLArea(widget);
 	}
 }

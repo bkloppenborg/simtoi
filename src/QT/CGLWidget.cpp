@@ -217,9 +217,12 @@ void CGLWidget::Open(string filename)
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(!parsingSuccessful)
 	{
-		string error_messages = reader.getFormatedErrorMessages();
-		throw runtime_error("Could not parse SIMTOI save file '" + filename + "'.\n" + error_messages);
+		string error_message = reader.getFormatedErrorMessages();
 
+		throw runtime_error("Could not parse SIMTOI configuration file: \n'"
+				+ filename + "'\n"
+				+ "The error message follows: \n"
+				+ error_message);
 	}
 
 	int width = input["area_width"].asInt();
