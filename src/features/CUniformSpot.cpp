@@ -44,7 +44,7 @@ CUniformSpot::CUniformSpot():
 	SetMin(2, 0.1);
 
 	// diameter of spot
-	mParamNames.push_back("spot_delta_temperature");
+	mParamNames.push_back("delta_T");
 	SetParam(3, -500);
 	SetFree(3, false);
 	SetMax(3, 2000);
