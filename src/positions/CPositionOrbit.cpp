@@ -48,13 +48,56 @@ CPositionOrbit::CPositionOrbit()
 	mPositionID = "orbit_bound";
 	mPositionType = DYNAMIC;
 
-	mParamNames.push_back("Omega");	// Omega, keep as elements 0 for CModel::SetAnglesFromPosition
+	// Omega, keep as elements 0 for CModel::SetAnglesFromPosition
+	// Position angle of the ascending node
+	mParamNames.push_back("Omega");
+	SetParam(0, 0);
+	SetFree(0, false);
+	SetMax(0, 360);
+	SetMin(0, 0);
+
+	// Inclination
 	mParamNames.push_back("Inc");	// Inclination, keep as element 1 for CModel::SetAnglesFromPosition
+	SetParam(1, 0);
+	SetFree(1, false);
+	SetMax(1, 360);
+	SetMin(1, 0);
+
+	// Argument of periapsis
 	mParamNames.push_back("omega");
+	SetParam(2, 0);
+	SetFree(2, false);
+	SetMax(2, 360);
+	SetMin(2, 0);
+
+	// Orbital semi-major axis
 	mParamNames.push_back("Alpha");
+	SetParam(3, 0);
+	SetFree(3, false);
+	SetMax(3, 10);
+	SetMin(3, 0);
+
+	// Eccentricy
 	mParamNames.push_back("e");
+	SetParam(4, 0);
+	SetFree(4, false);
+	SetMax(4, 1);
+	SetMin(4, 0);
+
+	// time of periastron
 	mParamNames.push_back("T");
+	SetParam(5, 0);
+	SetFree(5, false);
+	SetMax(5, 1000);
+	SetMin(5, 0);
+
+	// Obital period
 	mParamNames.push_back("P");
+	SetParam(6, 0);
+	SetFree(6, false);
+	SetMax(6, 360);
+	SetMin(6, 0);
+
 	SetParam(6, 1.0);
 	SetAllFree(false);
 }

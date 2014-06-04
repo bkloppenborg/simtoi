@@ -62,17 +62,28 @@ CModel::CModel(int n_params)
 
 	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
 	mParamNames.push_back("Pos. Angle");
-	SetParam(1, 0);
-	SetFree(1, false);
-	mParamNames.push_back("Inclination");
 	SetParam(0, 0);
 	SetFree(0, false);
+	SetMax(0, 360);
+	SetMin(0, 0);
+
+	mParamNames.push_back("Inclination");
+	SetParam(1, 0);
+	SetFree(1, false);
+	SetMax(1, 360);
+	SetMin(1, 0);
+
 	mParamNames.push_back("Rotation");
 	SetParam(2, 0);
 	SetFree(2, false);
+	SetMax(2, 360);
+	SetMin(2, 0);
+
 	mParamNames.push_back("Color");
-	SetParam(3, 1.0);
+	SetParam(3, 0);
 	SetFree(3, false);
+	SetMax(3, 1);
+	SetMin(3, 0);
 }
 
 CModel::~CModel()
