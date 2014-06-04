@@ -233,6 +233,7 @@ void gui_main::Init(void)
 {
 	// Init the UI
 	this->setupUi(this);
+	this->setWindowTitle("SIMTOI");
 
 	// Now init variables:
 
@@ -501,6 +502,33 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 	else // start a new minimizer.
 	{
 		string id = this->cboMinimizers->currentText().toStdString();
+
+		QAbstractItemModel *model;
+
+		// Ensure that a model exists before starting the minimizer
+		model = this->treeModels->model();
+		if(model->rowCount() == 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setWindowTitle("Error");
+			msgBox.setText("Please add a model before starting the minimization engine");
+			msgBox.exec();
+
+			return;
+		}
+
+		// Ensure that some data is loaded before starting the minimizer.
+		model = this->treeOpenFiles->model();
+		if(model->rowCount() == 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setWindowTitle("Error");
+			msgBox.setText("Please load data before starting the minimization engine");
+			msgBox.exec();
+
+			return;
+		}
+
 		MinimizerRun(id, sw);
 	}
 
