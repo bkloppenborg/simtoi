@@ -60,8 +60,8 @@ CPositionOrbit::CPositionOrbit()
 	mParamNames.push_back("Inc");	// Inclination, keep as element 1 for CModel::SetAnglesFromPosition
 	SetParam(1, 0);
 	SetFree(1, false);
-	SetMax(1, 360);
-	SetMin(1, 0);
+	SetMax(1, 180);
+	SetMin(1, -180);
 
 	// Argument of periapsis
 	mParamNames.push_back("omega");
