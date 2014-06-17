@@ -612,6 +612,8 @@ void gui_main::on_mdiArea_subWindowActivated()
 	this->treeModels->setHeaderHidden(false);
 	this->treeModels->setModel(widget->GetTreeModel());
 	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
+	// expand the tree fully
+	this->treeModels->expandAll();
 }
 
 void gui_main::on_btnNewModelArea_clicked()
