@@ -102,6 +102,9 @@ void CBootstrap_Levmar::run()
 		if(!mRun)
 			break;
 
+		// Get a bootstrapped data set
+		mWorkerThread->BootstrapNext(mMaxBootstrapFailures);
+
 		// Set the starting position.  Note these values are [0...1] and need to be scaled.
 		model_list->SetFreeParameters(&nominal_params[0], mLevmar->mNParams, true);
 
@@ -134,9 +137,6 @@ void CBootstrap_Levmar::run()
 		// Write the results to a file:
 		// Save to the file
 		WriteRow(mLevmar->mParams, mLevmar->mNParams, chi2r_ave, mOutputFile);
-
-		// Get the next bootstrapped data set and repeat.
-		mWorkerThread->BootstrapNext(mMaxBootstrapFailures);
 	}
 
 	ExportResults();
