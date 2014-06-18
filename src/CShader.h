@@ -38,17 +38,7 @@
 #ifndef CSHADER_H_
 #define CSHADER_H_
 
-// OpenGL Headers:
-#ifdef __APPLE__
-#include <OpenGL/gl3.h>
-#include <OpenGL/glu.h>
-#else
-#ifdef _WIN32
-  #include <windows.h>
-#endif
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
 #include <string>
 #include <vector>
