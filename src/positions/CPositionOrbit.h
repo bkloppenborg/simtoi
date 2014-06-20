@@ -41,8 +41,6 @@ int const ORBIT_MAX_ITERATIONS = 50;
 
 class CPositionOrbit: public CPosition
 {
-protected:
-	float mTime;
 
 public:
 	CPositionOrbit();

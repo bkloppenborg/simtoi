@@ -42,8 +42,22 @@ CPositionXYZ::CPositionXYZ()
 	// Init the position variables, set them to be fixed.
 	// Init the position variables, set them to be fixed.
 	mParamNames.push_back("N");
+	SetParam(0, 0);
+	SetFree(0, false);
+	SetMax(0, 1);
+	SetMin(0, -1);
+
 	mParamNames.push_back("E");
+	SetParam(1, 0);
+	SetFree(1, false);
+	SetMax(1, 1);
+	SetMin(1, -1);
+
 	mParamNames.push_back("Z");
+	SetParam(2, 0);
+	SetFree(2, false);
+	SetMax(2, 1);
+	SetMin(2, -1);
 
 	SetAllFree(false);
 }

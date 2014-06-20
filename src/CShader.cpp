@@ -79,7 +79,14 @@ CShader::CShader(string json_config_file)
 	string file_contents = ReadFile(json_config_file, "Could not read shader save file: '" + json_config_file + "'.");
 	bool parsingSuccessful = reader.parse(file_contents, input);
 	if(!parsingSuccessful)
-		throw runtime_error("JSON parse error in shader configuration file '" + json_config_file + "'. Shader not loaded.");
+	{
+		string error_message = reader.getFormatedErrorMessages();
+
+		throw runtime_error("Could not parse shader section of the configuration file: \n'"
+				+ json_config_file + "'\n"
+				+ "The error message follows: \n"
+				+ error_message);
+	}
 
 	// Now read in the parameters from the file
 	stringstream tmp;

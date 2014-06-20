@@ -157,7 +157,7 @@ void CGridSearch::run()
 	mOutputFile.width(15);
 	mOutputFile.precision(8);
 	// write a somewhat descriptive header
-	mOutputFile << "Param0, Param1, ..., ParamN, chi2r" << endl;
+	mOutputFile << "# Param0, Param1, ..., ParamN, chi2r" << endl;
 
 	// run the minimizer
 	mIsRunning = true;

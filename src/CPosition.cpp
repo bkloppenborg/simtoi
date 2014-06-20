@@ -36,6 +36,7 @@ CPosition::CPosition(int n_parameters)
 	: CParameters(n_parameters)
 {
 	mPositionID = "position_base_invalid";
+	mTime = 0;
 }
 
 CPosition::~CPosition()

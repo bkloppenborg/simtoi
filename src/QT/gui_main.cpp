@@ -233,6 +233,7 @@ void gui_main::Init(void)
 {
 	// Init the UI
 	this->setupUi(this);
+	this->setWindowTitle("SIMTOI");
 
 	// Now init variables:
 
@@ -299,12 +300,32 @@ void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
 	ButtonCheck();
 }
 
+/// Opens one or more saved model files.
 void gui_main::Open(QStringList & filenames)
 {
 	for(auto filename : filenames)
 	{
 		CGLWidget * widget = new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir);
-		widget->Open(filename.toStdString());
+
+		// Attempt to open the file.
+		try
+		{
+			widget->Open(filename.toStdString());
+		}
+		catch(runtime_error e)
+		{
+			// An error was thrown. Display a message to the user
+			QMessageBox msgBox;
+			msgBox.setWindowTitle("SIMTOI Error");
+			msgBox.setText(e.what());
+			msgBox.exec();
+
+			// Delete the widget and continue to the next file.
+			delete widget;
+			continue;
+		}
+
+		// If we opened the file successfully,
 		AddGLArea(widget);
 	}
 }
@@ -481,6 +502,33 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 	else // start a new minimizer.
 	{
 		string id = this->cboMinimizers->currentText().toStdString();
+
+		QAbstractItemModel *model;
+
+		// Ensure that a model exists before starting the minimizer
+		model = this->treeModels->model();
+		if(model->rowCount() == 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setWindowTitle("Error");
+			msgBox.setText("Please add a model before starting the minimization engine");
+			msgBox.exec();
+
+			return;
+		}
+
+		// Ensure that some data is loaded before starting the minimizer.
+		model = this->treeOpenFiles->model();
+		if(model->rowCount() == 0)
+		{
+			QMessageBox msgBox;
+			msgBox.setWindowTitle("Error");
+			msgBox.setText("Please load data before starting the minimization engine");
+			msgBox.exec();
+
+			return;
+		}
+
 		MinimizerRun(id, sw);
 	}
 
@@ -564,6 +612,8 @@ void gui_main::on_mdiArea_subWindowActivated()
 	this->treeModels->setHeaderHidden(false);
 	this->treeModels->setModel(widget->GetTreeModel());
 	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
+	// expand the tree fully
+	this->treeModels->expandAll();
 }
 
 void gui_main::on_btnNewModelArea_clicked()

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8) 
-project(simtoi CXX C Fortran)
+project(simtoi CXX C)
 
 find_package(OpenGL REQUIRED)
 MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
@@ -27,7 +27,6 @@ positions/*.cpp tasks/*.cpp)
 # Now add the binary
 add_executable(simtoi ${SOURCE})
 
-SET_TARGET_PROPERTIES(simtoi PROPERTIES LINKER_LANGUAGE Fortran)
 target_link_libraries(simtoi simtoi_models simtoi_minimizers simtoi_features
 QT_files jsoncpp levmar oi_static textio_static chealpix 
 ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
