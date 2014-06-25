@@ -51,39 +51,15 @@ using namespace std;
 #include "CFeature.h"
 #include "CFeatureFactory.h"
 
-CModel::CModel(int n_params)
-	: CParameters(4 + n_params)
+CModel::CModel()
 {
-	mBaseParams = 3;	// Number of base params, less one (zero indexed).
-
 	// Shader storage location, boolean if it is loaded:
 	mShader = CShaderPtr();
 	mFluxTextureID = 0;
 
-	// Init the yaw, pitch, and roll to be zero and fixed.  Set their names:
-	mParamNames.push_back("Pos. Angle");
-	SetParam(0, 0);
-	SetFree(0, false);
-	SetMax(0, 360);
-	SetMin(0, 0);
-
-	mParamNames.push_back("Inclination");
-	SetParam(1, 0);
-	SetFree(1, false);
-	SetMax(1, 360);
-	SetMin(1, 0);
-
-	mParamNames.push_back("Rotation");
-	SetParam(2, 0);
-	SetFree(2, false);
-	SetMax(2, 360);
-	SetMin(2, 0);
-
-	mParamNames.push_back("Color");
-	SetParam(3, 0);
-	SetFree(3, false);
-	SetMax(3, 1);
-	SetMin(3, 0);
+	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position Angle", "Position Angle defined from North rotating East (degrees)");
+	addParameter("inclination", 0, -180, 180, false, 1.0, "Inclination", "Inclination defined from the plane of the sky (degrees)");
+	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation", "Rotation angle about model's internal z-axis (degrees)");
 }
 
 CModel::~CModel()
@@ -104,6 +80,35 @@ void CModel::AddFeature(string feature_id)
 
 	if(feature != nullptr)
 		mFeatures.push_back(feature);
+}
+
+/// Adds an additional parameter for this model with no help text
+unsigned int CModel::addParameter(string internal_name, double value, double min, double max, bool free, double step_size,
+		string human_name)
+{
+	return addParameter(internal_name, value, min, max, free, step_size, human_name, string());
+}
+
+/// Adds an additional parameter for this model
+unsigned int CModel::addParameter(string internal_name, double value, double min, double max, bool free, double step_size,
+		string human_name, string help)
+{
+	// create the parameter, set some default values.
+	CParameter temp;
+	temp.setInternalName(internal_name);
+	temp.setMin(min);
+	temp.setMax(max);
+	temp.setValue(value);
+	temp.setFree(free);
+	temp.setStepSize(step_size);
+	temp.setHumanName(human_name);
+	temp.setHelpText(help);
+
+	// append it to the vector
+	mParams[internal_name] = temp;
+
+	// return the parameter number
+	return mParams.size() - 1;
 }
 
 /// \breif Function for finding the IDs of pixels within the bounds
@@ -143,12 +148,6 @@ void CModel::CircleTable( double * sint, double * cost, const int n )
     cost[ size ] = cost[ 0 ];
 }
 
-/// \brief Returns the type of the model
-string CModel::GetID()
-{
-	return "model_base_invalid";
-}
-
 const vector<CFeaturePtr> & CModel::GetFeatures() const
 {
 	return mFeatures;
@@ -168,7 +167,14 @@ int CModel::GetNFeatureFreeParameters()
 /// \brief Returns the number of free parameters in the model
 int CModel::GetNModelFreeParameters()
 {
-	return mNFreeParams;
+	unsigned int n_free = 0;
+	for(auto parameter: mParams)
+	{
+		if(parameter.second.isFree())
+			n_free++;
+	}
+
+	return n_free;
 }
 
 /// \brief Returns the number of free parameters in the positioning model
@@ -218,8 +224,8 @@ void CModel::GetAllParameters(double * params, int n_params)
 	// Send parameter set command to the components of this model.
 	// We use pointer math to advance the position of the array passed to the functions
 	int n = 0;
-	GetParams(params, n_params);
-	n += this->mNParams;
+//	GetParams(params, n_params);
+//	n += this->mNParams;
 	mPosition->GetParams(params + n, n_params - n);
 	n += mPosition->GetNParams();
 
@@ -243,8 +249,9 @@ void CModel::GetAllParameters(double * params, int n_params)
 vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 {
 	vector< pair<double, double> > tmp1;
-	vector< pair<double, double> > tmp2 = GetFreeMinMaxes();
-	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	vector< pair<double, double> > tmp2;
+//	tmp2 = GetFreeMinMaxes();
+//	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	tmp2 = mPosition->GetFreeMinMaxes();
 	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 
@@ -277,8 +284,8 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	int n = 0;
-	GetFreeParams(params, n_params, scale_params);
-	n += this->mNFreeParams;
+//	GetFreeParams(params, n_params, scale_params);
+//	n += this->mNFreeParams;
 	mPosition->GetFreeParams(params + n, n_params - n, scale_params);
 	n += mPosition->GetNFreeParams();
 
@@ -300,8 +307,9 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 vector<string> CModel::GetFreeParameterNames()
 {
 	vector<string> tmp1;
-	vector<string> tmp2 = GetFreeParamNames();
-	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+	vector<string> tmp2;
+//	tmp2 = GetFreeParamNames();
+//	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	tmp2 = mPosition->GetFreeParamNames();
 	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 
@@ -324,8 +332,8 @@ vector<string> CModel::GetFreeParameterNames()
 void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 {
 	int n = 0;
-	GetFreeParamSteps(steps, size);
-	n += this->mNFreeParams;
+//	GetFreeParamSteps(steps, size);
+//	n += this->mNFreeParams;
 	mPosition->GetFreeParamSteps(steps + n, size - n);
 	n += mPosition->GetNFreeParams();
 
@@ -437,9 +445,9 @@ void CModel::InitTexture()
 /// of the model is specified relative to the orbital plane.
 glm::mat4 CModel::Rotate()
 {
-	double Omega = mParams[0] * M_PI / 180;
-	double inc = mParams[1] * M_PI / 180;
-	double omega = mParams[2] * M_PI / 180;
+	double Omega = mParams["position_angle"].getValue() * M_PI / 180;
+	double inc = mParams["inclination"].getValue() * M_PI / 180;
+	double omega = mParams["z_axis_rotation"].getValue() * M_PI / 180;
 
 	// If we have a dynamic position, simply add the angles
 	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
@@ -475,7 +483,7 @@ glm::mat4 CModel::Rotate()
 void CModel::Restore(Json::Value input)
 {
 	// Restore the base parameters
-	CParameters::Restore(input["base_data"]);
+//	CParameters::Restore(input["base_data"]);
 
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
@@ -558,7 +566,7 @@ Json::Value CModel::Serialize()
 {
 	Json::Value output;
 	output["base_id"] = GetID();
-	output["base_data"] = CParameters::Serialize();
+//	output["base_data"] = CParameters::Serialize();
 
 	output["position_id"] = mPosition->GetID();
 	output["position_data"] = mPosition->Serialize();
@@ -601,8 +609,8 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	// Here we use pointer math to advance the position of the array passed to the functions
 	// that set the parameters.  First assign values to this model (use pull_params):
 	int n = 0;
-	SetFreeParams(in_params, n_params, scale_params);
-	n += mNFreeParams;
+//	SetFreeParams(in_params, n_params, scale_params);
+//	n += mNFreeParams;
 	// Now set the values for the position object
 	mPosition->SetFreeParams(in_params + n, n_params - n, scale_params);
 	n += mPosition->GetNFreeParams();

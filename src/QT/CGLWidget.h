@@ -95,8 +95,10 @@ public:
     bool IsAnimating();
 
 protected:
+    void LoadParameters(QStandardItem * parent_widget, CModel * model);
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
+    QList<QStandardItem *> LoadParametersHeader(QString name, CModel * model);
 
 public:
     void Open(string filename);

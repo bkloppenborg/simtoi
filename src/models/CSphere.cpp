@@ -43,24 +43,14 @@
 using namespace std;
 
 CSphere::CSphere()
-	: CModel(1)
+	: CModel()
 {
-	// CModel(1) because we have one additional parameter for this model
-	// Remember, mParams[0] = yaw, mParams[1] = pitch, mParams[2] = roll.
-	// and mParams[3] = color
+	internal_name = "sphere";
+	human_name = "Sphere";
 
-	mName = "Sphere";
 
-	// Set the color to 1
-	SetParam(3, 1);
-
-	// Set the radius to some useful value, make it free.
-	// NOTE: it is necessary to set max BEFORE setting min so logic test min < max works correctly.
-	mParamNames.push_back("Diameter");
-	SetParam(mBaseParams + 1, 1);
-	SetFree(mBaseParams + 1, true);
-	SetMax(mBaseParams + 1, 3.0);
-	SetMin(mBaseParams + 1, 0.1);
+	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel");
+	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere");
 
 	mNumElements = 0;
 
@@ -203,11 +193,11 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		Init();
 
 	// Rename a few variables for convenience:
-	double radius = float(mParams[mBaseParams + 1] / 2);
+	double radius = float(mParams["diameter"].getValue() / 2);
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
 	// Set the color.
-	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].r = mParams["color"].getValue();
 	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer

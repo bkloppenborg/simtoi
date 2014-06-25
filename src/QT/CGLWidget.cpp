@@ -152,6 +152,12 @@ void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * para
 	}
 }
 
+void CGLWidget::LoadParameters(QStandardItem * parent_widget, CModel * model)
+{
+
+}
+
+
 QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters * param_base)
 {
 	QList<QStandardItem *> items;
@@ -161,6 +167,20 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	item = new QStandardItem(QString(""));
 	items << item;
 	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
+	items << item;
+
+	return items;
+}
+
+QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CModel * model)
+{
+	QList<QStandardItem *> items;
+	QStandardItem * item;
+	item = new QStandardItem(name);
+	items << item;
+	item = new QStandardItem(QString(""));
+	items << item;
+	item = new QStandardItem(QString::fromStdString(model->GetName()));
 	items << item;
 
 	return items;
