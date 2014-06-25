@@ -51,6 +51,9 @@ CSphere::CSphere()
 
 	mName = "Sphere";
 
+	// Set the color to 1
+	SetParam(3, 1);
+
 	// Set the radius to some useful value, make it free.
 	// NOTE: it is necessary to set max BEFORE setting min so logic test min < max works correctly.
 	mParamNames.push_back("Diameter");
