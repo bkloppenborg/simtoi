@@ -221,11 +221,18 @@ CShaderPtr CModel::GetShader(void)
 /// \param n_params The size of `params`
 void CModel::GetAllParameters(double * params, int n_params)
 {
-	// Send parameter set command to the components of this model.
-	// We use pointer math to advance the position of the array passed to the functions
+	// Current parameter number
 	int n = 0;
-//	GetParams(params, n_params);
-//	n += this->mNParams;
+
+	for(auto it: mParams)
+	{
+		if(n > n_params)
+			break;
+
+		params[n] = it.second.getValue();
+		n++;
+	}
+
 	mPosition->GetParams(params + n, n_params - n);
 	n += mPosition->GetNParams();
 
@@ -248,23 +255,31 @@ void CModel::GetAllParameters(double * params, int n_params)
 /// that the free parameters are permitted to take.
 vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 {
+	vector< pair<double, double> > min_maxes;
 	vector< pair<double, double> > tmp1;
-	vector< pair<double, double> > tmp2;
-//	tmp2 = GetFreeMinMaxes();
-//	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
-	tmp2 = mPosition->GetFreeMinMaxes();
-	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+
+	for(auto it: mParams)
+	{
+		pair<double, double> tmp;
+		tmp.first = it.second.getMin();
+		tmp.second = it.second.getMax();
+		tmp1.push_back(tmp);
+	}
+
+	min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
+	tmp1 = mPosition->GetFreeMinMaxes();
+	min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
 
 	if(mShader != NULL)
 	{
-		tmp2 = mShader->GetFreeMinMaxes();
-		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+		tmp1 = mShader->GetFreeMinMaxes();
+		min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
 	}
 
 	for(auto feature: mFeatures)
 	{
-		tmp2 = feature->GetFreeMinMaxes();
-		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+		tmp1 = feature->GetFreeMinMaxes();
+		min_maxes.insert( tmp1.end(), tmp1.begin(), tmp1.end() );
 	}
 
 	return tmp1;
@@ -284,8 +299,19 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	int n = 0;
-//	GetFreeParams(params, n_params, scale_params);
-//	n += this->mNFreeParams;
+
+	for(auto it: mParams)
+	{
+		if(n > n_params)
+			break;
+
+		if(it.second.isFree())
+		{
+			params[n] = it.second.getValue(scale_params);
+			n++;
+		}
+	}
+
 	mPosition->GetFreeParams(params + n, n_params - n, scale_params);
 	n += mPosition->GetNFreeParams();
 
@@ -308,8 +334,13 @@ vector<string> CModel::GetFreeParameterNames()
 {
 	vector<string> tmp1;
 	vector<string> tmp2;
-//	tmp2 = GetFreeParamNames();
-//	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
+
+	for(auto it: mParams)
+	{
+		string name = it.second.getHumanName();
+		tmp1.push_back(name);
+	}
+
 	tmp2 = mPosition->GetFreeParamNames();
 	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 
@@ -332,8 +363,19 @@ vector<string> CModel::GetFreeParameterNames()
 void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 {
 	int n = 0;
-//	GetFreeParamSteps(steps, size);
-//	n += this->mNFreeParams;
+
+	for(auto it: mParams)
+	{
+		if(n > size)
+			break;
+
+		if(it.second.isFree())
+		{
+			steps[n] = it.second.getStepSize();
+			n++;
+		}
+	}
+
 	mPosition->GetFreeParamSteps(steps + n, size - n);
 	n += mPosition->GetNFreeParams();
 
