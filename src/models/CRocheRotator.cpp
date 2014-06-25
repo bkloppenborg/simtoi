@@ -58,8 +58,8 @@ CRocheRotator::CRocheRotator() :
 	SetMax(mBaseParams + 6, 1.0);
 	SetMin(mBaseParams + 6, 0.01);
 
-	// Rotational period (units 1/day)
-	mParamNames.push_back("Omega_dot");
+	// Rotational period in days
+	mParamNames.push_back("rotational_T");
 	SetParam(mBaseParams + 7, 0.5);
 	SetFree(mBaseParams + 7, false);
 	SetMax(mBaseParams + 7, 1.0);
@@ -285,12 +285,13 @@ void CRocheRotator::SetTime(double time)
 	// Call the base class method (updates orbital parameters, etc.)
 	CModel::SetTime(time);
 
-	// Get the rotation rate:
-	const double Omega_dot = mParams[mBaseParams + 7];
+	// Get the rotational period (in days)
+	const double rotational_T = mParams[mBaseParams + 7];
+	double Omega_dot = 2 * PI / rotational_T;
 
 	// Compute the change in rotational angle
 	double dt = time - mTime;
-	mParams[2] = mParams[2] + dt * Omega_dot;
+	mParams[2] = mParams[2] + Omega_dot * dt;
 
 	// Update the current time.
 	mTime = time;
