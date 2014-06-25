@@ -90,6 +90,9 @@ double CRocheRotator::ComputeRadius(double polar_radius, double omega_rot, doubl
 	if(abs(sin_theta) < 1E-3)	// ~ 0.1 degrees from the pole
 		return polar_radius;
 
+	if(omega_rot < 1E-5)
+		return polar_radius;
+
 	double omega_sin_theta = omega_rot * sin_theta;
 
 	double radius = 3 * (polar_radius) / (omega_sin_theta) *
@@ -119,7 +122,7 @@ void CRocheRotator::ComputeGravity(double g_pole, double r_pole, double omega,
 	double c1 = 8./27 * r_ratio * omega * omega;
 
 	// Reverse the gravitational vector
-	double g_r = -1 * g_pole * (-1 / (r_ratio * r_ratio) + c1 * sin_theta * sin_theta);
+	double g_r = -1 * g_pole * (-1.0 / (r_ratio * r_ratio) + c1 * sin_theta * sin_theta);
 
 	double g_theta = g_pole * c1 * sin_theta * cos_theta;
 
