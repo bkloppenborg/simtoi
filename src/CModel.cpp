@@ -82,35 +82,6 @@ void CModel::AddFeature(string feature_id)
 		mFeatures.push_back(feature);
 }
 
-/// Adds an additional parameter for this model with no help text
-unsigned int CModel::addParameter(string internal_name, double value, double min, double max, bool free, double step_size,
-		string human_name)
-{
-	return addParameter(internal_name, value, min, max, free, step_size, human_name, string());
-}
-
-/// Adds an additional parameter for this model
-unsigned int CModel::addParameter(string internal_name, double value, double min, double max, bool free, double step_size,
-		string human_name, string help)
-{
-	// create the parameter, set some default values.
-	CParameter temp;
-	temp.setInternalName(internal_name);
-	temp.setMin(min);
-	temp.setMax(max);
-	temp.setValue(value);
-	temp.setFree(free);
-	temp.setStepSize(step_size);
-	temp.setHumanName(human_name);
-	temp.setHelpText(help);
-
-	// append it to the vector
-	mParams[internal_name] = temp;
-
-	// return the parameter number
-	return mParams.size() - 1;
-}
-
 /// \breif Function for finding the IDs of pixels within the bounds
 /// (s0, s1, s2) +/- (ds0, ds1, ds2)
 /// where (s0, s1, s2) are the generalized coordinates in the model's
@@ -260,10 +231,13 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 
 	for(auto it: mParams)
 	{
-		pair<double, double> tmp;
-		tmp.first = it.second.getMin();
-		tmp.second = it.second.getMax();
-		tmp1.push_back(tmp);
+		if(it.second.isFree())
+		{
+			pair<double, double> tmp;
+			tmp.first = it.second.getMin();
+			tmp.second = it.second.getMax();
+			tmp1.push_back(tmp);
+		}
 	}
 
 	min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
@@ -282,7 +256,7 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 		min_maxes.insert( tmp1.end(), tmp1.begin(), tmp1.end() );
 	}
 
-	return tmp1;
+	return min_maxes;
 }
 
 /// \brief Gets the nominal value for the free parameters in this model, including
@@ -337,8 +311,11 @@ vector<string> CModel::GetFreeParameterNames()
 
 	for(auto it: mParams)
 	{
-		string name = it.second.getHumanName();
-		tmp1.push_back(name);
+		if(it.second.isFree())
+		{
+			string name = it.second.getHumanName();
+			tmp1.push_back(name);
+		}
 	}
 
 	tmp2 = mPosition->GetFreeParamNames();
@@ -651,8 +628,18 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	// Here we use pointer math to advance the position of the array passed to the functions
 	// that set the parameters.  First assign values to this model (use pull_params):
 	int n = 0;
-//	SetFreeParams(in_params, n_params, scale_params);
-//	n += mNFreeParams;
+	for(auto & it: mParams)
+	{
+		if(n > n_params)
+			break;
+
+		if(it.second.isFree())
+		{
+			it.second.setValue(in_params[n], scale_params);
+			n++;
+		}
+	}
+
 	// Now set the values for the position object
 	mPosition->SetFreeParams(in_params + n, n_params - n, scale_params);
 	n += mPosition->GetNFreeParams();

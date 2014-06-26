@@ -33,13 +33,28 @@
 #include "CParameterItem.h"
 
 #include <QtDebug>
+#include <QMessageBox>
 
 #include "CParameters.h"
+#include "CModel.h"
+#include "CParameter.h"
 
 CParameterItem::CParameterItem(CParameters * item_parent, int id)
 {
 	mParent = item_parent;
 	mID = id;
+
+	mParentModel = NULL;
+	mStringID = "";
+}
+
+CParameterItem::CParameterItem(CModel * parent_model, string id)
+{
+	mParentModel = parent_model;
+	mStringID = id;
+
+	mParent = NULL;
+	mID = 0;
 }
 
 CParameterItem::~CParameterItem()
@@ -58,19 +73,52 @@ void CParameterItem::setData(const QVariant & value, int role)
 	// we should find a different way of doing it?
 	int col = column();
 
-	if(role == Qt::CheckStateRole || role == Qt::EditRole)
+	bool exception_thrown = false;
+
+	if(mParent != NULL)
 	{
-		if(col == 1)
-			mParent->SetFree(mID, value.toBool());
-		if(col == 2)	// Parameter value
-			mParent->SetParam(mID, float(value.toDouble()));
-		if(col == 3)	// min value
-			mParent->SetMin(mID, float(value.toDouble()));
-		if(col == 4)	// max value
-			mParent->SetMax(mID, float(value.toDouble()));
-		if(col == 5)
-			mParent->SetStepSize(mID, float(value.toDouble()));
+		if(role == Qt::CheckStateRole || role == Qt::EditRole)
+		{
+			if(col == 1)
+				mParent->SetFree(mID, value.toBool());
+			if(col == 2)	// Parameter value
+				mParent->SetParam(mID, float(value.toDouble()));
+			if(col == 3)	// min value
+				mParent->SetMin(mID, float(value.toDouble()));
+			if(col == 4)	// max value
+				mParent->SetMax(mID, float(value.toDouble()));
+			if(col == 5)
+				mParent->SetStepSize(mID, float(value.toDouble()));
+		}
+	}
+	else
+	{
+		CParameter & parameter = mParentModel->getParameter(mStringID);
+
+		try
+		{
+			if(col == 1)
+				parameter.setFree( value.toBool() );
+			if(col == 2)	// Parameter value
+				parameter.setValue( value.toDouble() );
+			if(col == 3)	// min value
+				parameter.setMin( value.toDouble() );
+			if(col == 4)	// max value
+				parameter.setMax( value.toDouble() );
+			if(col == 5)
+				parameter.setStepSize( value.toDouble() );
+		}
+		catch(range_error & e)
+		{
+			QMessageBox msgBox;
+			msgBox.setText(QString(e.what()));
+			msgBox.exec();
+
+			exception_thrown = true;
+		}
+
 	}
 
-	QStandardItem::setData(value, role);
+	if(!exception_thrown)
+		QStandardItem::setData(value, role);
 }

@@ -66,15 +66,17 @@ void CParameter::setValue(double new_value, bool is_normalized)
 	if(is_normalized)
 		new_value = new_value * (max - min) + min;
 
+	// Check that value is within bounds
+	if(new_value > max)
+		throw range_error("The new value exceeds the set maximum.");
+	else if(new_value < min)
+		throw range_error("The new value is less than the set minimum.");
+
 	// set the dirty flag, if needed.
 	if(fabs(value - new_value) > precision)
 		dirty = true;
 	else
 		dirty = false;
-
-	// Check that value is within bounds
-	if(value > max || value < min)
-		throw range_error("The new value is out of bounds");
 
 	value = new_value;
 }
@@ -107,12 +109,17 @@ void CParameter::setMax(double new_max)
 void CParameter::setStepSize(double new_step_size)
 {
 	if(!(new_step_size > 0))
-		throw range_error("The step size cannot be less than 0");
+		throw range_error("The step size cannot be less than 0.");
 
 	step_size = new_step_size;
 }
 
 /// Sets whether or not this parameter is dirty (i.e. the value has changed)
+///
+/// Normally the setValue() function will set the dirty flag automatically if
+/// the value changes by more than the specified precision. In some
+/// circumstances it may be desirable to change the state of the dirty flag,
+/// hence this function.
 void CParameter::setDirty(bool is_dirty)
 {
 	dirty = is_dirty;

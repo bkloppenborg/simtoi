@@ -43,8 +43,11 @@
 #define CPARAMETERITEM_H_
 
 #include<QStandardItem>
+#include <string>
+using namespace std;
 
 class CParameters;
+class CModel;
 
 class CParameterItem : public QStandardItem
 {
@@ -52,8 +55,12 @@ protected:
 	CParameters * mParent;
 	int mID;
 
+	CModel * mParentModel;
+	string mStringID;
+
 public:
 	CParameterItem(CParameters * item_parent, int id);
+	CParameterItem(CModel * model, string name);
 	virtual ~CParameterItem();
 
 	QVariant data(int role = Qt::UserRole + 1) const;

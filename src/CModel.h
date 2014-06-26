@@ -40,8 +40,8 @@
 #include "CShader.h"
 #include "CWorkerThread.h"
 #include "CModelList.h"
+#include "CParameterMap.h"
 
-#include <map>
 #include <cstdlib>
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -87,13 +87,12 @@ typedef shared_ptr<CFeature> CFeaturePtr;
 ///
 /// This class is derived from `CParameters` which is used to store the
 /// values of model parameters.
-class CModel
+class CModel: public CParameterMap
 {
 
 protected:
 	string internal_name;
 	string human_name;
-	map<string, CParameter> mParams; ///< The parameters used in this model.
 
 	CPositionPtr mPosition;	///< A shared pointer to the position object.
 
@@ -109,10 +108,6 @@ protected:
 protected:
 	glm::mat4 Rotate();
 	glm::mat4 Translate();
-
-	unsigned int addParameter(string internal_name, double value, double min, double max, bool free, double step_size, string human_name);
-	unsigned int addParameter(string internal_name, double value, double min, double max, bool free, double step_size, string human_name, string help);
-
 
 public:
 	static void CircleTable( double * sint, double * cost, const int n );
