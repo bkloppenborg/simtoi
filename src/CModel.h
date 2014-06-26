@@ -91,8 +91,8 @@ class CModel: public CParameterMap
 {
 
 protected:
-	string internal_name;
-	string human_name;
+	string id;
+	string name;
 
 	CPositionPtr mPosition;	///< A shared pointer to the position object.
 
@@ -132,8 +132,8 @@ public:
 
 	void AddFeature(string feature_id);
 
-	virtual string GetID() const { return internal_name; };
-	virtual string GetName() const { return human_name; };
+	virtual string GetID() const { return id; };
+	virtual string GetName() const { return name; };
 	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();
 	int GetNShaderFreeParameters();

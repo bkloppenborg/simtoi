@@ -22,9 +22,11 @@ private:
 	bool free;				/// Whether or not the parameter is free (or fixed) for the minimization process.
 	unsigned int decimal_places;	/// The number of decimal places to display in the GUI or serialize to a file.
 	double precision;
-	string internal_name;	/// An internal name for the parameter, used in seralization
+	string id;	/// An internal name for the parameter, used in seralization
 	string human_name;		/// A human-friendly name used in GUI elements
 	string help_text;		/// Help text displayed to the user in the GUI.
+
+	bool check_bounds;		/// Whether or not this object should check that values are within bounds.
 
 public:
 	CParameter();
@@ -35,11 +37,12 @@ public:
 	double 	getMax() const { return max; };
 	double 	getStepSize() const { return step_size; };
 	double 	getDecimalPlaces() const { return decimal_places; };
-	bool   	isDirty() const { return dirty; };
-	bool   	isFree() const { return free; };
-	string 	getInternalName() const { return internal_name; };
+	string 	getID() const { return id; };
 	string	getHumanName() const { return human_name; };
 	string  getHelpText() const { return help_text; };
+
+	bool   	isDirty() const { return dirty; };
+	bool   	isFree() const { return free; };
 
 	void	setDecimalPlaces(unsigned int num_places);
 	void	setValue(double new_value, bool is_normalized = false);
@@ -48,9 +51,11 @@ public:
 	void	setStepSize(double new_step_size);
 	void	setDirty(bool is_dirty);
 	void	setFree(bool is_free);
-	void	setInternalName(string new_internal_name);
+	void	setID(string new_id);
 	void	setHumanName(string new_human_name);
 	void	setHelpText(string new_help_text);
+
+	void 	toggleBoundsChecks(bool enable_checks);
 };
 
 #endif /* CPARAMETER_H_ */

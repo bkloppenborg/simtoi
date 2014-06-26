@@ -8,11 +8,12 @@
 #ifndef CPARAMETERMAP_H_
 #define CPARAMETERMAP_H_
 
-class CParameter;
-
 #include <string>
 #include <map>
 using namespace std;
+
+class CParameter;
+#include "json/json.h"
 
 class CParameterMap
 {
@@ -30,9 +31,14 @@ public:
 			double min, double max, bool free, double step_size,
 			string human_name, string help);
 
+	void getFreeParameters(double * params, unsigned int n_params, bool normalize_value);
+	unsigned int getFreeParameterCount();
 	const map<string, CParameter> & getParameterMap() { return mParams; };
 
 	CParameter & getParameter(string id);
+
+	void restore(Json::Value input);
+	Json::Value serialize();
 };
 
 #endif /* CPARAMETERMAP_H_ */

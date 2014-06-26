@@ -274,17 +274,8 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
 	int n = 0;
 
-	for(auto it: mParams)
-	{
-		if(n > n_params)
-			break;
-
-		if(it.second.isFree())
-		{
-			params[n] = it.second.getValue(scale_params);
-			n++;
-		}
-	}
+	CParameterMap::getFreeParameters(params, n_params, scale_params);
+	n += getFreeParameterCount();
 
 	mPosition->GetFreeParams(params + n, n_params - n, scale_params);
 	n += mPosition->GetNFreeParams();
@@ -502,7 +493,7 @@ glm::mat4 CModel::Rotate()
 void CModel::Restore(Json::Value input)
 {
 	// Restore the base parameters
-//	CParameters::Restore(input["base_data"]);
+	CParameterMap::restore(input["base_data"]);
 
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
@@ -585,7 +576,7 @@ Json::Value CModel::Serialize()
 {
 	Json::Value output;
 	output["base_id"] = GetID();
-//	output["base_data"] = CParameters::Serialize();
+	output["base_data"] = CParameterMap::serialize();
 
 	output["position_id"] = mPosition->GetID();
 	output["position_data"] = mPosition->Serialize();

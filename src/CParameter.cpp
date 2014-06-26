@@ -23,9 +23,10 @@ CParameter::CParameter()
 	free = false;
 	decimal_places = 1;
 	precision = 0.1;
-	internal_name = "invalid_parameter";
+	id = "invalid_id";
 	human_name = "Text not set by developer.";
 	help_text = "Text not set by developer.";
+	check_bounds = true;
 }
 
 CParameter::~CParameter()
@@ -67,9 +68,9 @@ void CParameter::setValue(double new_value, bool is_normalized)
 		new_value = new_value * (max - min) + min;
 
 	// Check that value is within bounds
-	if(new_value > max)
+	if(check_bounds && new_value > max)
 		throw range_error("The new value exceeds the set maximum.");
-	else if(new_value < min)
+	else if(check_bounds && new_value < min)
 		throw range_error("The new value is less than the set minimum.");
 
 	// set the dirty flag, if needed.
@@ -86,7 +87,7 @@ void CParameter::setValue(double new_value, bool is_normalized)
 /// An range_error exception is thrown if min < max.
 void CParameter::setMin(double new_min)
 {
-	if(new_min > max)
+	if(check_bounds && new_min > max)
 		throw range_error("New minimum value is less than the specified maximum.");
 
 	min = new_min;
@@ -97,7 +98,7 @@ void CParameter::setMin(double new_min)
 /// An range_error exception is thrown if max < min.
 void CParameter::setMax(double new_max)
 {
-	if(new_max < min)
+	if(check_bounds && new_max < min)
 		throw range_error("New maximum value is less than the specified minimum.");
 
 	max = new_max;
@@ -108,7 +109,7 @@ void CParameter::setMax(double new_max)
 /// @param new_step_size The new step size. This value must be greater than zero.
 void CParameter::setStepSize(double new_step_size)
 {
-	if(!(new_step_size > 0))
+	if(check_bounds && !(new_step_size > 0))
 		throw range_error("The step size cannot be less than 0.");
 
 	step_size = new_step_size;
@@ -131,10 +132,12 @@ void CParameter::setFree(bool is_free)
 	free = is_free;
 }
 
-/// Sets the internal name for this parameter
-void CParameter::setInternalName(string new_internal_name)
+/// Sets the internal name for this parameter.
+///
+/// After the objects is initalized, this probably shouldn't be changed.
+void CParameter::setID(string new_id)
 {
-	internal_name = new_internal_name;
+	id = new_id;
 }
 
 /// Sets a new human-friendly name for this parameter.
@@ -147,4 +150,10 @@ void CParameter::setHumanName(string new_human_name)
 void CParameter::setHelpText(string new_help_text)
 {
 	help_text = new_help_text;
+}
+
+/// Enable or disable value/min/max bounds checking
+void CParameter::toggleBoundsChecks(bool enable_checks)
+{
+	check_bounds = enable_checks;
 }
