@@ -32,6 +32,8 @@ public:
 	CParameter();
 	virtual ~CParameter();
 
+	void	clearFlags();
+
 	double 	getValue(bool normalized = false) const;
 	double 	getMin() const { return min; };
 	double 	getMax() const { return max; };

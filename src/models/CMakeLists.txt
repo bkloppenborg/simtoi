@@ -6,7 +6,8 @@ INCLUDE(../)
 
 # Assemble all of the model source
 #file(GLOB SOURCE *.cpp)
-file(GLOB SOURCE CSphere.* CCylinder.* CDensityDisk.* CDisk_Andrews2009.* CDisk_ConcentricRings.*)
+file(GLOB SOURCE CSphere.* CCylinder.* CDensityDisk.* CDisk_Andrews2009.* 
+CDisk_ConcentricRings.* CDisk_Pascucci2004.* CHealpixSpheroid.* CRocheRotator.*)
 
 #file(GLOB SOURCE CSphere.* CDensityDisk.* CDisk_Pascucci2004.* 
 #CDisk_Andrews2009.* CCylinder.* CDisk_ConcentricRings.* 

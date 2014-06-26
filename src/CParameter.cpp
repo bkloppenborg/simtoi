@@ -34,6 +34,12 @@ CParameter::~CParameter()
 	// TODO Auto-generated destructor stub
 }
 
+/// Clears flags that may have been set due to parameters changing value.
+void 	CParameter::clearFlags()
+{
+	dirty = false;
+}
+
 /// Returns the value of the parameter.
 ///
 /// @param normalized 	If set to true, returns the value in the range [0, 1],

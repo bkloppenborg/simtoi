@@ -56,10 +56,16 @@ CModel::CModel()
 	// Shader storage location, boolean if it is loaded:
 	mShader = CShaderPtr();
 	mFluxTextureID = 0;
+	mTime = 0;
 
-	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position Angle", "Position Angle defined from North rotating East (degrees)");
-	addParameter("inclination", 0, -180, 180, false, 1.0, "Inclination", "Inclination defined from the plane of the sky (degrees)");
-	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation", "Rotation angle about model's internal z-axis (degrees)");
+	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position angle",
+			"Position Angle defined from North rotating East (degrees)");
+	addParameter("inclination", 0, -180, 180, false, 1.0, "Inclination",
+			"Inclination defined from the plane of the sky (degrees)");
+	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation zero point",
+			"Initial rotation angle about model's internal z-axis (degrees). Unless you have a specific reason, this should be zero.");
+	addParameter("z_axis_rotational_period", 0, 0, 100, false, 1, "Rotational period",
+			"Rotational period about the model'z z-axis (days)");
 }
 
 CModel::~CModel()
@@ -667,12 +673,26 @@ void CModel::SetPositionModel(CPositionPtr position)
 }
 
 /// \brief Sets the time at which the model should be rendered.
+///
+/// Sets the time for the current model. Internally this updates any time-dependent
+/// properties such as the position and rotation about the z-axis.
 void CModel::SetTime(double time)
 {
-	if(mPosition == NULL)
-		return;
+	// Call the base class method (updates orbital parameters, etc.)
+	if(mPosition != NULL)
+		mPosition->SetTime(time);
 
-	mPosition->SetTime(time);
+	// Get the rotational period (in days)
+	const double rotational_period = mParams["z_axis_rotational_period"].getValue();
+	const double rotation_zero_point = mParams["z_axis_rotation"].getValue();
+	double Omega_dot = 2 * PI / rotational_period;
+
+	// Compute the change in rotational angle
+	double dt = time - mTime;
+	mParams["z_axis_rotation"].setValue( rotation_zero_point + Omega_dot * dt);
+
+	// Update the current time.
+	mTime = time;
 }
 
 /// \brief Replaces the loaded shader with the one specified by shader_id

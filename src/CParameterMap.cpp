@@ -48,6 +48,13 @@ unsigned int CParameterMap::addParameter(string internal_name, double value, dou
 	return mParams.size() - 1;
 }
 
+/// Clears all flags set on the parameters
+void CParameterMap::clearFlags()
+{
+	for(map<string,CParameter>::iterator it = mParams.begin(); it != mParams.end(); ++it)
+		it->second.clearFlags();
+}
+
 /// Copies the nominal values of the free parameters into the `params` array
 ///
 /// @param params A double array of size 'n_params' to which the parameters will be copied

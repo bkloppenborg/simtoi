@@ -94,6 +94,8 @@ protected:
 	string id;
 	string name;
 
+	double mTime;		///< The current time for this object.
+
 	CPositionPtr mPosition;	///< A shared pointer to the position object.
 
 	CShaderPtr mShader;	///< A shared pointer to the shader object.

@@ -8,14 +8,16 @@
 #include "CHealpixSpheroid.h"
 
 CHealpixSpheroid::CHealpixSpheroid(int n_params) :
-	CModel(n_params)
+	CModel()
 {
 	mVAO = 0;
 	mVBO = 0;
 	mEBO = 0;
 
-	n_sides = 4;
 	n_pixels = 0;
+
+	addParameter("n_side_power", 4, 1, 10, false, 1, "Healpix Sides", "Number of pixels per Healpix grid site. 4-6 is often adequate.");
+	addParameter("r_pole", 1, 1, 10, false, 1, "R_pole", "Radius at the pole (unit agnostic)");
 }
 
 CHealpixSpheroid::~CHealpixSpheroid()
@@ -33,6 +35,7 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 {
 	// Look up the (x,y,z) position of the target (r, theta, phi) center.
 	long target_pixel = 0;
+	const unsigned long n_sides = mParams["n_side_power"].getValue();
 	ang2pix_nest(n_sides, theta, phi, &target_pixel);
 	double pixel_radius = pixel_radii[target_pixel];
 
@@ -47,7 +50,7 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 //	cout << "us :   :" << target_xyz.x << " " << target_xyz.y << " " << target_xyz.z << endl;
 
 	// Compute the maximum allowable distance
-	double polar_radius = mParams[mBaseParams + 3];
+	double polar_radius = mParams["r_pole"].getValue();
 	double target_radius = polar_radius * std::sqrt(d_theta * d_theta + d_phi * d_phi);
 
 	vec3 t_pix_xyz;
@@ -169,6 +172,8 @@ void CHealpixSpheroid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, v
 
 void CHealpixSpheroid::Init()
 {
+	const unsigned int n_sides = mParams["n_side_power"].getValue();
+
 	n_pixels = nside2npix(n_sides);
 
 	gravity.resize(n_pixels);

@@ -57,8 +57,6 @@ public:
 
 	void VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta);
 
-	void SetTime(double time);
-
 };
 
 #endif /* CROCHEROTATOR_H_ */

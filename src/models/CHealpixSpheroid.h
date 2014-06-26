@@ -28,7 +28,6 @@ protected:
 	vector<double> pixel_phi;
 	vector<double> pixel_radii;
 	vector<vec3>   pixel_xyz;
-	unsigned int n_sides;
 	unsigned int n_pixels;
 
 	vector<double> corner_theta;

@@ -31,6 +31,8 @@ public:
 			double min, double max, bool free, double step_size,
 			string human_name, string help);
 
+	void clearFlags();
+
 	void getFreeParameters(double * params, unsigned int n_params, bool normalize_value);
 	unsigned int getFreeParameterCount();
 	const map<string, CParameter> & getParameterMap() { return mParams; };
