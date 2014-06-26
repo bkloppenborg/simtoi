@@ -12,7 +12,7 @@
 #include "CShaderFactory.h"
 
 CRocheBinary::CRocheBinary() :
-	CHealpixSpheroid(2)
+	CHealpixSpheroid()
 {
 
 //	mParamNames.push_back("Wavelength (um)");
@@ -75,17 +75,7 @@ CRocheBinary::CRocheBinary() :
 //	SetMax(mBaseParams + 10, 0.01);
 //	SetMin(mBaseParams + 10, 1.0);
 
-	mParamNames.push_back("Scale (temp)");
-	SetParam(mBaseParams + 1, 0.2);
-	SetFree(mBaseParams + 1, false);
-	SetMax(mBaseParams + 1, 10.0);
-	SetMin(mBaseParams + 1, 0.01);
-
-	mParamNames.push_back("n_side_power");
-	SetParam(mBaseParams + 2, 4);
-	SetFree(mBaseParams + 2, false);
-	SetMax(mBaseParams + 2, 10.0);
-	SetMin(mBaseParams + 2, 1);
+	addParameter("scale", 0.2, 0.01, 10, false, 0.1, "Scale (temp)", "Model Scale (a temporary implementation)");
 
 //	// Fundamental properties of the star
 	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
@@ -274,15 +264,15 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	if (!mModelReady)
 		Init();
 
-	unsigned int t_n_sides = floor(pow(2, mParams[mBaseParams + 2]));
-	if(t_n_sides != n_sides)
+	// See if the user change the tesselation
+	const unsigned int n_sides = mParams["n_side_power"].getValue();
+	if(mParams["n_side_power"].isDirty())
 	{
-		n_sides = t_n_sides;
 		Init();
 	}
 
 	// Rename a few variables for convenience:
-	double radial_scale = mParams[mBaseParams + 1];
+	double radial_scale = mParams["scale"].getValue();
 	mat4 scale = glm::scale(mat4(),
 			glm::vec3(radial_scale, radial_scale, radial_scale));
 
@@ -329,6 +319,7 @@ void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
 {
 	// Generate a unit Healpix sphere
+	const unsigned int n_sides = mParams["n_side_power"].getValue();
 	GenerateHealpixSphere(n_pixels, n_sides);
 
 	// Compute geometry of the Roche spheroid

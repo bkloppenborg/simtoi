@@ -12,7 +12,7 @@
 #include "CFeature.h"
 
 CRocheRotator::CRocheRotator() :
-		CHealpixSpheroid(7)
+		CHealpixSpheroid()
 {
 	id = "roche_rotator";
 	name = "Roche Rotator";

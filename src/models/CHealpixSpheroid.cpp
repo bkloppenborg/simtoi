@@ -7,7 +7,7 @@
 
 #include "CHealpixSpheroid.h"
 
-CHealpixSpheroid::CHealpixSpheroid(int n_params) :
+CHealpixSpheroid::CHealpixSpheroid() :
 	CModel()
 {
 	mVAO = 0;
@@ -35,7 +35,7 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 {
 	// Look up the (x,y,z) position of the target (r, theta, phi) center.
 	long target_pixel = 0;
-	const unsigned long n_sides = mParams["n_side_power"].getValue();
+	const unsigned int n_sides = mParams["n_side_power"].getValue();
 	ang2pix_nest(n_sides, theta, phi, &target_pixel);
 	double pixel_radius = pixel_radii[target_pixel];
 

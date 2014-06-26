@@ -7,33 +7,37 @@
 #include "CVoronoi.h"
 #include "CShaderFactory.h"
 
-CVoronoi::CVoronoi(unsigned int n_regions = 1)
-: 	CModel(3*n_regions)
+#include <sstream>
+using namespace std;
+
+CVoronoi::CVoronoi()
+: 	CModel()
 {
 	// give this object a name
-	mName = "Voronoi tesselation model";
-	mNRegions = n_regions;
+	id = "voronoi_pixels";
+	name = "Voronoi tesselation model";
+	mNRegions = 20;
+
+	stringstream x_id;
+	stringstream y_id;
+	stringstream flux_id;
 
 	for(unsigned int i = 0; i < mNRegions; i++)
 	{
-		// Define the placement of the density disk model parameters
-		mParamNames.push_back("x");
-		SetParam(mBaseParams + 3*i + 1, 0);
-		SetFree(mBaseParams + 3*i + 1, true);
-		SetMax(mBaseParams + 3*i + 1, -12);
-		SetMin(mBaseParams + 3*i + 1, 12);
+		// create unique IDs for mapping the pixels
+		x_id << "x_" << i;
+		y_id << "y_" << i;
+		flux_id << "flux_" << i;
 
-		mParamNames.push_back("y");
-		SetParam(mBaseParams + 3*i + 2, 0);
-		SetFree(mBaseParams + 3*i + 2, true);
-		SetMax(mBaseParams + 3*i + 2, -12);
-		SetMin(mBaseParams + 3*i + 2, 12);
+		// add the parameters
+		addParameter(x_id.str(), 0, -12, 12, true, 1, x_id.str(), "x position");
+		addParameter(y_id.str(), 0, -12, 12, true, 1, y_id.str(), "y position");
+		addParameter(flux_id.str(), 0, -12, 12, true, 1, flux_id.str(), "Pixel flux");
 
-		mParamNames.push_back("flux");
-		SetParam(mBaseParams + 3*i + 3, 1);
-		SetFree(mBaseParams + 3*i + 3, true);
-		SetMax(mBaseParams + 3*i + 3, 1);
-		SetMin(mBaseParams + 3*i + 3, 0);
+		// clear the stringstreams
+		x_id.str(std::string());
+		y_id.str(std::string());
+		flux_id.str(std::string());
 	}
 
 	// We only ever use the default shader in this instance.
@@ -48,7 +52,7 @@ CVoronoi::~CVoronoi()
 
 shared_ptr<CModel> CVoronoi::Create()
 {
-	return shared_ptr<CModel>(new CVoronoi(16));
+	return shared_ptr<CModel>(new CVoronoi());
 }
 
 /// Draws a unit cylindrical wall in the z-direction from (z = -0.5 ... 0.5, at r = 1)
@@ -185,12 +189,21 @@ void CVoronoi::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	float y = 0;
 	vec2 color = vec2(0.0, 1.0);
 	glm::mat4 location;
+
+	stringstream x_id;
+	stringstream y_id;
+	stringstream flux_id;
+
 	for(unsigned int region = 0; region < mNRegions; region++)
 	{
-		x = mParams[mBaseParams + 3*region + 1];
-		y = mParams[mBaseParams + 3*region + 2];
-		// redefine the color
-		color.x = mParams[mBaseParams + 3*region + 3];
+		// create unique IDs for mapping the pixels
+		x_id << "x_" << region;
+		y_id << "y_" << region;
+		flux_id << "flux_" << region;
+
+		x = mParams[x_id.str()].getValue();
+		y = mParams[y_id.str()].getValue();
+		color.x = mParams[flux_id.str()].getValue();
 
 		// define the position
 		location = glm::translate(mat4(), vec3(x, y, 0.0));
@@ -202,6 +215,11 @@ void CVoronoi::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		// draw the cone
 //		glDrawElements(GL_POINTS, mNElements, GL_UNSIGNED_INT, 0);
 		glDrawElements(GL_TRIANGLES, mNElements, GL_UNSIGNED_INT, 0);
+
+		// clear the stringstreams
+		x_id.str(std::string());
+		y_id.str(std::string());
+		flux_id.str(std::string());
 	}
 
 	// Return to the default framebuffer before leaving.
