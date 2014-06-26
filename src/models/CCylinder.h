@@ -80,8 +80,6 @@ public:
 	static void GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
 			unsigned int z_divisions, unsigned int phi_divisions);
 
-	virtual string GetID() { return "cylinder"; };
-
 	void Init();
 
 	void Render(GLuint framebuffer_object, const glm::mat4 & view);

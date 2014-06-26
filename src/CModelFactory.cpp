@@ -49,7 +49,7 @@
 CModelFactory::CModelFactory()
 {
 	Register("sphere", &CSphere::Create);
-//	Register("cylinder", &CCylinder::Create);
+	Register("cylinder", &CCylinder::Create);
 //	Register("disk_a", &CDisk_A::Create);
 //	Register("disk_b", &CDisk_B::Create);
 //	Register("disk_c", &CDisk_C::Create);
