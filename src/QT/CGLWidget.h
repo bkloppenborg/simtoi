@@ -42,7 +42,7 @@
 #include "CWorkerThread.h"
 #include "CTreeModel.h"
 
-class CModel;
+class CParameterMap;
 
 class CGLWidget : public QGLWidget
 {
@@ -95,10 +95,10 @@ public:
     bool IsAnimating();
 
 protected:
-    void LoadParameters(QStandardItem * parent_widget, CModel * model);
+    void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);
     void LoadParameters(QStandardItem * parent, CParameters * parameters);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
-    QList<QStandardItem *> LoadParametersHeader(QString name, CModel * model);
+    QList<QStandardItem *> LoadParametersHeader(QString name, CParameterMap * param_map);
 
 public:
     void Open(string filename);

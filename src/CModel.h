@@ -91,8 +91,6 @@ class CModel: public CParameterMap
 {
 
 protected:
-	string id;
-	string name;
 
 	double mTime;		///< The current time for this object.
 
@@ -134,8 +132,6 @@ public:
 
 	void AddFeature(string feature_id);
 
-	virtual string GetID() const { return id; };
-	virtual string GetName() const { return name; };
 	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();
 	int GetNShaderFreeParameters();

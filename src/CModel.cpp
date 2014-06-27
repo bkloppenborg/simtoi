@@ -136,7 +136,7 @@ int CModel::GetNFeatureFreeParameters()
 	unsigned int n_free = 0;
 
 	for(auto feature: mFeatures)
-		n_free += feature->GetNFreeParams();
+		n_free += feature->getFreeParameterCount();
 
 	return n_free;
 }
@@ -221,8 +221,8 @@ void CModel::GetAllParameters(double * params, int n_params)
 
 	for(auto feature: mFeatures)
 	{
-		feature->GetParams(params + n, n_params - n);
-		n += feature->GetNParams();
+		feature->getFreeParameters(params + n, n_params - n);
+		n += feature->getFreeParameterCount();
 	}
 }
 
@@ -235,18 +235,9 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 	vector< pair<double, double> > min_maxes;
 	vector< pair<double, double> > tmp1;
 
-	for(auto it: mParams)
-	{
-		if(it.second.isFree())
-		{
-			pair<double, double> tmp;
-			tmp.first = it.second.getMin();
-			tmp.second = it.second.getMax();
-			tmp1.push_back(tmp);
-		}
-	}
-
+	tmp1 = CParameterMap::getFreeParameterMinMaxes();
 	min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
+
 	tmp1 = mPosition->GetFreeMinMaxes();
 	min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
 
@@ -258,7 +249,7 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 
 	for(auto feature: mFeatures)
 	{
-		tmp1 = feature->GetFreeMinMaxes();
+		tmp1 = feature->getFreeParameterMinMaxes();
 		min_maxes.insert( tmp1.end(), tmp1.begin(), tmp1.end() );
 	}
 
@@ -294,8 +285,8 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 
 	for(auto feature: mFeatures)
 	{
-		feature->GetFreeParams(params + n, n_params - n, scale_params);
-		n += feature->GetNFreeParams();
+		feature->getFreeParameters(params + n, n_params - n, scale_params);
+		n += feature->getFreeParameterCount();
 	}
 }
 
@@ -326,7 +317,7 @@ vector<string> CModel::GetFreeParameterNames()
 
 	for(auto feature: mFeatures)
 	{
-		tmp2 = feature->GetFreeParamNames();
+		tmp2 = feature->getFreeParameterNames();
 		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	}
 
@@ -338,17 +329,7 @@ void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 {
 	int n = 0;
 
-	for(auto it: mParams)
-	{
-		if(n > size)
-			break;
-
-		if(it.second.isFree())
-		{
-			steps[n] = it.second.getStepSize();
-			n++;
-		}
-	}
+	n += CParameterMap::getFreeParameterStepSizes(steps, size);
 
 	mPosition->GetFreeParamSteps(steps + n, size - n);
 	n += mPosition->GetNFreeParams();
@@ -360,10 +341,7 @@ void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 	}
 
 	for(auto feature: mFeatures)
-	{
-		feature->GetFreeParamSteps(steps + n, size - n);
-		n += feature->GetNFreeParams();
-	}
+		n += feature->getFreeParameterStepSizes(steps + n, size - n);
 }
 
 /// \brief Gets the total number of free parameters in the model.
@@ -554,7 +532,7 @@ void CModel::Restore(Json::Value input)
 			temp.clear();
 			temp.str(std::string());
 			temp << "feature_" << i << "_data";
-			feature->Restore(input[temp.str()]);
+			feature->restore(input[temp.str()]);
 
 			// The feature is restored, add it to the list.
 			mFeatures.push_back(feature);
@@ -581,7 +559,7 @@ void CModel::Restore(Json::Value input)
 Json::Value CModel::Serialize()
 {
 	Json::Value output;
-	output["base_id"] = GetID();
+	output["base_id"] = getID();
 	output["base_data"] = CParameterMap::serialize();
 
 	output["position_id"] = mPosition->GetID();
@@ -602,11 +580,11 @@ Json::Value CModel::Serialize()
 		temp.clear();
 		temp.str(std::string());
 		temp << "feature_" << i << "_id";
-		output[temp.str()] = feature->GetID();
+		output[temp.str()] = feature->getID();
 		temp.clear();
 		temp.str(std::string());
 		temp << "feature_" << i << "_data";
-		output[temp.str()] = feature->Serialize();
+		output[temp.str()] = feature->serialize();
 	}
 
 	return output;
@@ -622,20 +600,10 @@ Json::Value CModel::Serialize()
 /// \param scale_params True if `in_params` is on a unit hypercube, false otherwise.
 void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_params = false)
 {
+	unsigned int n = 0;
 	// Here we use pointer math to advance the position of the array passed to the functions
 	// that set the parameters.  First assign values to this model (use pull_params):
-	int n = 0;
-	for(auto & it: mParams)
-	{
-		if(n > n_params)
-			break;
-
-		if(it.second.isFree())
-		{
-			it.second.setValue(in_params[n], scale_params);
-			n++;
-		}
-	}
+	n += CParameterMap::setFreeParameterValues(in_params, n_params, scale_params);
 
 	// Now set the values for the position object
 	mPosition->SetFreeParams(in_params + n, n_params - n, scale_params);
@@ -649,8 +617,7 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 
 	for(auto feature: mFeatures)
 	{
-		feature->SetFreeParams(in_params + n, n_params - n, scale_params);
-		n += feature->GetNFreeParams();
+		n += feature->setFreeParameterValues(in_params + n, n_params - n, scale_params);
 	}
 
 }

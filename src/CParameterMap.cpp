@@ -76,6 +76,45 @@ void CParameterMap::getFreeParameters(double * params, unsigned int n_params, bo
 	}
 }
 
+/// Returns a vector full of pairs of min (first) max (second) values for
+/// the free parameters.
+vector<pair<double,double> > CParameterMap::getFreeParameterMinMaxes()
+{
+	vector< pair<double, double> > min_maxes;
+
+	for(auto it: mParams)
+	{
+		if(it.second.isFree())
+		{
+			pair<double, double> tmp;
+			tmp.first = it.second.getMin();
+			tmp.second = it.second.getMax();
+			min_maxes.push_back(tmp);
+		}
+	}
+	return min_maxes;
+}
+
+/// Returns the step sizes of the free parameters.
+unsigned int CParameterMap::getFreeParameterStepSizes(double * steps, unsigned int size)
+{
+	int n = 0;
+
+	for(auto it: mParams)
+	{
+		if(n > size)
+			break;
+
+		if(it.second.isFree())
+		{
+			steps[n] = it.second.getStepSize();
+			n++;
+		}
+	}
+
+	return n;
+}
+
 /// Counts the number of free parameters in the map.
 unsigned int CParameterMap::getFreeParameterCount()
 {
@@ -84,6 +123,20 @@ unsigned int CParameterMap::getFreeParameterCount()
 		if(it.second.isFree()) n++;
 
 	return n;
+}
+
+/// \brief Returns a vector of strings containing the names of the free parameters
+/// prefixed with the name of the parent object.
+vector<string> CParameterMap::getFreeParameterNames()
+{
+	vector<string> tmp;
+	for(auto it: mParams)
+	{
+		if(it.second.isFree())
+			tmp.push_back(name + '.' + it.second.getHumanName());
+	}
+
+	return tmp;
 }
 
 /// Returns a reference to the specified parameter or throws an out_of_range
@@ -148,4 +201,28 @@ Json::Value CParameterMap::serialize()
 	}
 
 	return output;
+}
+
+/// Sets the free parameter values from an input array of doubles. Returns the
+/// number of values set during the call.
+///
+/// @param values An input array of parameter values
+/// @param n_values The number of elements in values
+/// @param normalized_values Whether or not the values are normalized
+unsigned int CParameterMap::setFreeParameterValues(double * values, unsigned int n_values, bool normalized_values)
+{
+	int n = 0;
+	for(auto & it: mParams)
+	{
+		if(n > n_values)
+			break;
+
+		if(it.second.isFree())
+		{
+			it.second.setValue(values[n], normalized_values);
+			n++;
+		}
+	}
+
+	return n;
 }

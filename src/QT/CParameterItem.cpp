@@ -48,9 +48,9 @@ CParameterItem::CParameterItem(CParameters * item_parent, int id)
 	mStringID = "";
 }
 
-CParameterItem::CParameterItem(CModel * parent_model, string id)
+CParameterItem::CParameterItem(CParameterMap * param_parent, string id)
 {
-	mParentModel = parent_model;
+	mParentModel = param_parent;
 	mStringID = id;
 
 	mParent = NULL;

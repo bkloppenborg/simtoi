@@ -19,6 +19,8 @@ class CParameterMap
 {
 protected:
 	map<string, CParameter> mParams; ///< The parameters used in this model.
+	string name;						///< A human-readable name for the object
+	string id;						///< An internal ID for this object
 
 public:
 	CParameterMap();
@@ -33,14 +35,22 @@ public:
 
 	void clearFlags();
 
-	void getFreeParameters(double * params, unsigned int n_params, bool normalize_value);
+	void getFreeParameters(double * params, unsigned int n_params, bool normalize_value = false);
 	unsigned int getFreeParameterCount();
-	const map<string, CParameter> & getParameterMap() { return mParams; };
+	vector<string> getFreeParameterNames();
+	vector<pair<double,double> > getFreeParameterMinMaxes();
+	unsigned int getFreeParameterStepSizes(double * steps, unsigned int size);
 
+	const map<string, CParameter> & getParameterMap() { return mParams; };
+	virtual string getID() const { return id; };
+	virtual string getName() const { return name; };
 	CParameter & getParameter(string id);
 
 	void restore(Json::Value input);
+
 	Json::Value serialize();
+
+	unsigned int setFreeParameterValues(double * values, unsigned int n_values, bool normalized_values = false);
 };
 
 #endif /* CPARAMETERMAP_H_ */
