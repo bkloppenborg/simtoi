@@ -50,6 +50,7 @@ using namespace std;
 #include "CShaderFactory.h"
 #include "CFeature.h"
 #include "CFeatureFactory.h"
+#include "misc.h"
 
 CModel::CModel()
 {
@@ -627,11 +628,15 @@ void CModel::SetTime(double time)
 	// Get the rotational period (in days)
 	const double rotational_period = mParams["z_axis_rotational_period"].getValue();
 	const double rotation_zero_point = mParams["z_axis_rotation"].getValue();
-	double Omega_dot = 2 * PI / rotational_period;
+	double omega_dot = 2 * PI / rotational_period;
 
-	// Compute the change in rotational angle
+	// Compute current rotation angle and set it.
 	double dt = time - mTime;
-	mParams["z_axis_rotation"].setValue( rotation_zero_point + Omega_dot * dt);
+	// Compute the modulus using Mod (in misc.h) rather than fmod as this function
+	// is more resiliant to edge cases than fmod.
+	double rotation = Mod(rotation_zero_point + omega_dot * dt, 360.0d);
+	cout << rotation << endl;
+	mParams["z_axis_rotation"].setValue(rotation);
 
 	// Update the current time.
 	mTime = time;

@@ -37,7 +37,7 @@ CPosition::CPosition()
 {
 	id = "position_base_invalid";
 	name = "not set by developer";
-
+	mPositionType = STATIC;
 	mTime = 0;
 }
 

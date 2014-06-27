@@ -205,7 +205,6 @@ void CShader::Init()
     for(auto it: mParams)
     {
     	mParam_locations[i] = glGetUniformLocation(mProgram, it.second.getID().c_str());
-    	cout << "ID: " << it.second.getID() << " Location: " << mParam_locations[i] << endl;
     	CWorkerThread::CheckOpenGLError("Could find variable in shader source.");
     	i++;
     }

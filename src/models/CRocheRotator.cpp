@@ -126,14 +126,9 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 
 	// recomputing the sphereoid is very expensive. Make use of the dirty flags
 	// to only compute that which is absolutely necessary.
-	if(mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
-		ComputeRadii(r_pole, omega_rot);
-
-	if(mParams["g_pole"].isDirty() || mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
-		ComputeGravity(g_pole, r_pole, omega_rot);
-
-	if(mParams["T_eff_pole"].isDirty() || mParams["g_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
-		VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
+	ComputeRadii(r_pole, omega_rot);
+	ComputeGravity(g_pole, r_pole, omega_rot);
+	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
 	for(auto feature: mFeatures)
 		feature->apply(this);
@@ -172,9 +167,14 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	const double T_eff_pole = mParams["T_eff_pole"].getValue();
 	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
 
-	ComputeRadii(r_pole, omega_rot);
-	ComputeGravity(g_pole, r_pole, omega_rot);
-	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
+	if(mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
+		ComputeRadii(r_pole, omega_rot);
+
+	if(mParams["g_pole"].isDirty() || mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
+		ComputeGravity(g_pole, r_pole, omega_rot);
+
+	if(mParams["T_eff_pole"].isDirty() || mParams["g_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
+		VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
 	for(auto feature: mFeatures)
 		feature->apply(this);
