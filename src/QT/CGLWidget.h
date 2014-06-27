@@ -43,6 +43,7 @@
 #include "CTreeModel.h"
 
 class CParameterMap;
+class CParameters;
 
 class CGLWidget : public QGLWidget
 {

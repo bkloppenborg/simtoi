@@ -60,7 +60,7 @@ void CParameterMap::clearFlags()
 /// @param params A double array of size 'n_params' to which the parameters will be copied
 /// @param n_params The size of `params`
 /// @param normalize_value Whether or not the parameters should be normalized.
-void CParameterMap::getFreeParameters(double * params, unsigned int n_params, bool normalize_value)
+unsigned int CParameterMap::getFreeParameters(double * params, unsigned int n_params, bool normalize_value)
 {
 	unsigned int n = 0;
 	for(auto it: mParams)
@@ -74,6 +74,8 @@ void CParameterMap::getFreeParameters(double * params, unsigned int n_params, bo
 			n++;
 		}
 	}
+
+	return n;
 }
 
 /// Returns a vector full of pairs of min (first) max (second) values for
@@ -92,6 +94,7 @@ vector<pair<double,double> > CParameterMap::getFreeParameterMinMaxes()
 			min_maxes.push_back(tmp);
 		}
 	}
+
 	return min_maxes;
 }
 

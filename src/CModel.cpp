@@ -158,7 +158,7 @@ int CModel::GetNModelFreeParameters()
 int CModel::GetNPositionFreeParameters()
 {
 	if(mPosition != NULL)
-		return mPosition->GetNFreeParams();
+		return mPosition->getFreeParameterCount();
 
 	return 0;
 }
@@ -210,8 +210,7 @@ void CModel::GetAllParameters(double * params, int n_params)
 		n++;
 	}
 
-	mPosition->GetParams(params + n, n_params - n);
-	n += mPosition->GetNParams();
+	n += mPosition->getFreeParameters(params + n, n_params - n);
 
 	if(mShader != NULL)
 	{
@@ -220,10 +219,7 @@ void CModel::GetAllParameters(double * params, int n_params)
 	}
 
 	for(auto feature: mFeatures)
-	{
-		feature->getFreeParameters(params + n, n_params - n);
-		n += feature->getFreeParameterCount();
-	}
+		n += feature->getFreeParameters(params + n, n_params - n);
 }
 
 /// \brief Get a vector containing the minimum/maximum values for all free parameters.
@@ -238,7 +234,7 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 	tmp1 = CParameterMap::getFreeParameterMinMaxes();
 	min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
 
-	tmp1 = mPosition->GetFreeMinMaxes();
+	tmp1 = mPosition->getFreeParameterMinMaxes();
 	min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
 
 	if(mShader != NULL)
@@ -274,8 +270,7 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 	CParameterMap::getFreeParameters(params, n_params, scale_params);
 	n += getFreeParameterCount();
 
-	mPosition->GetFreeParams(params + n, n_params - n, scale_params);
-	n += mPosition->GetNFreeParams();
+	n += mPosition->getFreeParameters(params + n, n_params - n, scale_params);
 
 	if(mShader != NULL)
 	{
@@ -284,10 +279,7 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 	}
 
 	for(auto feature: mFeatures)
-	{
-		feature->getFreeParameters(params + n, n_params - n, scale_params);
-		n += feature->getFreeParameterCount();
-	}
+		n += feature->getFreeParameters(params + n, n_params - n, scale_params);
 }
 
 
@@ -306,7 +298,7 @@ vector<string> CModel::GetFreeParameterNames()
 		}
 	}
 
-	tmp2 = mPosition->GetFreeParamNames();
+	tmp2 = mPosition->getFreeParameterNames();
 	tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 
 	if(mShader != NULL)
@@ -330,9 +322,7 @@ void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 	int n = 0;
 
 	n += CParameterMap::getFreeParameterStepSizes(steps, size);
-
-	mPosition->GetFreeParamSteps(steps + n, size - n);
-	n += mPosition->GetNFreeParams();
+	n += mPosition->getFreeParameterStepSizes(steps + n, size - n);
 
 	if(mShader != NULL)
 	{
@@ -446,9 +436,9 @@ glm::mat4 CModel::Rotate()
 	// If we have a dynamic position, simply add the angles
 	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
 	{
-		double orbit_Omega = mPosition->GetParam(0) * M_PI / 180;
-		double orbit_inc = mPosition->GetParam(1) * M_PI / 180;
-		double orbit_omega = mPosition->GetParam(2) * M_PI / 180;
+		double orbit_Omega = mPosition->getParameter("Omega").getValue() * M_PI / 180;
+		double orbit_inc = mPosition->getParameter("inclination").getValue() * M_PI / 180;
+		double orbit_omega = mPosition->getParameter("omega").getValue() * M_PI / 180;
 
 		Omega += orbit_Omega;
 		inc += orbit_inc;
@@ -489,7 +479,7 @@ void CModel::Restore(Json::Value input)
 		position_id = "xy";
 
 	auto position = positions.CreatePosition(position_id);
-	position->Restore(input["position_data"]);
+	position->restore(input["position_data"]);
 	CModel::SetPositionModel(position);
 
 	// Find the shader
@@ -562,8 +552,8 @@ Json::Value CModel::Serialize()
 	output["base_id"] = getID();
 	output["base_data"] = CParameterMap::serialize();
 
-	output["position_id"] = mPosition->GetID();
-	output["position_data"] = mPosition->Serialize();
+	output["position_id"] = mPosition->getID();
+	output["position_data"] = mPosition->serialize();
 
 	output["shader_id"] = mShader->GetID();
 	output["shader_data"] = mShader->Serialize();
@@ -606,8 +596,7 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	n += CParameterMap::setFreeParameterValues(in_params, n_params, scale_params);
 
 	// Now set the values for the position object
-	mPosition->SetFreeParams(in_params + n, n_params - n, scale_params);
-	n += mPosition->GetNFreeParams();
+	n += mPosition->setFreeParameterValues(in_params + n, n_params - n, scale_params);
 	// Then the shader.
 	if(mShader != NULL)
 	{
@@ -616,10 +605,7 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	}
 
 	for(auto feature: mFeatures)
-	{
 		n += feature->setFreeParameterValues(in_params + n, n_params - n, scale_params);
-	}
-
 }
 
 /// \brief Assigns the position object from a position id

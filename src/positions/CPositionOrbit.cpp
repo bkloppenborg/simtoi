@@ -42,64 +42,19 @@
 #endif
 
 CPositionOrbit::CPositionOrbit()
-	: CPosition(7)
 {
-	mName = "Orbit";
-	mPositionID = "orbit_bound";
+	name = "Orbit";
+	id = "orbit_bound";
+
 	mPositionType = DYNAMIC;
 
-	// Omega, keep as elements 0 for CModel::SetAnglesFromPosition
-	// Position angle of the ascending node
-	mParamNames.push_back("Omega");
-	SetParam(0, 0);
-	SetFree(0, false);
-	SetMax(0, 360);
-	SetMin(0, 0);
-
-	// Inclination
-	mParamNames.push_back("Inc");	// Inclination, keep as element 1 for CModel::SetAnglesFromPosition
-	SetParam(1, 0);
-	SetFree(1, false);
-	SetMax(1, 180);
-	SetMin(1, -180);
-
-	// Argument of periapsis
-	mParamNames.push_back("omega");
-	SetParam(2, 0);
-	SetFree(2, false);
-	SetMax(2, 360);
-	SetMin(2, 0);
-
-	// Orbital semi-major axis
-	mParamNames.push_back("Alpha");
-	SetParam(3, 0);
-	SetFree(3, false);
-	SetMax(3, 10);
-	SetMin(3, 0);
-
-	// Eccentricy
-	mParamNames.push_back("e");
-	SetParam(4, 0);
-	SetFree(4, false);
-	SetMax(4, 1);
-	SetMin(4, 0);
-
-	// time of periastron
-	mParamNames.push_back("T");
-	SetParam(5, 0);
-	SetFree(5, false);
-	SetMax(5, 1000);
-	SetMin(5, 0);
-
-	// Obital period
-	mParamNames.push_back("P");
-	SetParam(6, 0);
-	SetFree(6, false);
-	SetMax(6, 360);
-	SetMin(6, 0);
-
-	SetParam(6, 1.0);
-	SetAllFree(false);
+	addParameter("Omega", 0, 0, 360, false, 1, "Omega", "Position angle of the ascending node (degrees).");
+	addParameter("inclination", 0, -180, 180, false, 1, "Inclination", "Inclination measured from the plane of the sky (degrees).");
+	addParameter("omega", 0, 0, 360, false, 1, "omega", "Argument of periapsis (degrees).");
+	addParameter("alpha", 0, 0, 10, false, 1, "alpha", "Orbital semi-major axis");
+	addParameter("e", 0, 0, 1, false, 0.1, "e", "Eccentricy");
+	addParameter("T", 0, 0, 1000, false, 10, "T", "Time of periastron.");
+	addParameter("P", 0, 0, 360, false, 1, "P", "Orbital period.");
 }
 
 CPositionOrbit::~CPositionOrbit()
@@ -217,13 +172,13 @@ void CPositionOrbit::GetXYZ(double & x, double & y, double & z)
 	// Local variables (mostly renaming mParams variables for convenience).
 	// Remember to convert the angular parameters into radians.
     double l1, m1, n1, l2, m2, n2;
-    double Omega = mParams[0] * PI / 180.0;
-    double inc = mParams[1] * PI / 180.0;
-    double omega = mParams[2] * PI / 180.0;
-    double alpha = mParams[3];
-    double e = mParams[4];	// eccentricy
-    double T = mParams[5];	// time of periastron
-    double P = mParams[6];	// orbital period
+    double Omega = mParams["Omega"].getValue() * PI / 180.0;
+    double inc = mParams["inclination"].getValue() * PI / 180.0;
+    double omega = mParams["omega"].getValue() * PI / 180.0;
+    double alpha = mParams["alpha"].getValue();
+    double e = mParams["e"].getValue();	// eccentricy
+    double T = mParams["T"].getValue();	// time of periastron
+    double P = mParams["P"].getValue();	// orbital period
     double t = mTime;
 
 	// Pre-compute a few values

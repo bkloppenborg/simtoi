@@ -12,8 +12,9 @@
 #include <map>
 using namespace std;
 
-class CParameter;
 #include "json/json.h"
+
+#include "CParameter.h"
 
 class CParameterMap
 {
@@ -35,7 +36,7 @@ public:
 
 	void clearFlags();
 
-	void getFreeParameters(double * params, unsigned int n_params, bool normalize_value = false);
+	unsigned int getFreeParameters(double * params, unsigned int n_params, bool normalize_value = false);
 	unsigned int getFreeParameterCount();
 	vector<string> getFreeParameterNames();
 	vector<pair<double,double> > getFreeParameterMinMaxes();
