@@ -251,23 +251,3 @@ void CShader::UseShader()
 
 	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUniform1fv");
 }
-
-//void CShader::UseShader(double * params, unsigned int in_params)
-//{
-//	if(!mShaderLoaded)
-//		Init();
-//
-//	// Tell OpenGL to use the mProgram
-//	glUseProgram(mProgram);
-//	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUseProgram");
-//
-//	// Set the shader-specific parameters.  Notice again the intentional downcast.
-//	GLfloat tmp;
-//	unsigned int nParams = mParams.size();
-//	for(int i = 0; (i < nParams && i < in_params); i++)
-//	{
-//		tmp = GLfloat(params[i]);
-//		glUniform1fv(mParam_locations[i], 1, &tmp);
-//	}
-//	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUniform1fv");
-//}

@@ -77,7 +77,6 @@ public:
 	void LinkProgram(GLuint program);
 
 	void UseShader();
-//	void UseShader(double * params, unsigned int in_params);
 };
 
 #endif /* CGLSHADER_H_ */
