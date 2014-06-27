@@ -108,8 +108,6 @@ CShader::CShader(string json_config_file)
 		// init the step size to something reasonable, say 1/10th of the range.
 		double step_size = (param_max - param_min) / 10;
 
-		cout << "Read in ID: " << param_id << " and name: " << param_name << endl;
-
 		// Add the parameter to this object.
 		addParameter(param_id, param_val, param_min, param_max, false, step_size, param_name, param_help);
 	}
@@ -247,7 +245,6 @@ void CShader::UseShader()
 	for(auto it: mParams)
 	{
 		tmp = GLfloat(it.second.getValue());
-		cout << "Value: " << tmp << endl;
 		glUniform1fv(mParam_locations[i], 1, &tmp);
 		i++;
 	}
