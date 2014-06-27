@@ -33,21 +33,14 @@
 #include "CCylinder.h"
 
 CCylinder::CCylinder()
-	: CModel(2)
+	: CModel()
 {
-	mName = "Cylinder";
+	id = "cylinder";
+	name = "Cylinder";
 
-	mParamNames.push_back("Diameter");
-	SetParam(mBaseParams + 1, 3.0);
-	SetFree(mBaseParams + 1, true);
-	SetMax(mBaseParams + 1, 6.0);
-	SetMin(mBaseParams + 1, 0.1);
-
-	mParamNames.push_back("Height");
-	SetParam(mBaseParams + 2, 0.5);
-	SetFree(mBaseParams + 2, true);
-	SetMax(mBaseParams + 2, 2.0);
-	SetMin(mBaseParams + 2, 0.1);
+	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
+	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter", "Diameter of the cylinder");
+	addParameter("height", 0.5, 0.1, 2.0, true, 0.1, "Height", "Total height of the cylinder");
 
 	mMidplaneStart = 0;
 	mMidplaneSize = 0;
@@ -247,11 +240,11 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		Init();
 
 	// Look up the parameters:
-	const double diameter = mParams[mBaseParams + 1];
+	const double diameter = mParams["diameter"].getValue();
 	const double radius = diameter / 2;
-	const double height  = mParams[mBaseParams + 2];
+	const double height  = mParams["height"].getValue();
 
-	mFluxTexture[0].x = mParams[3];
+	mFluxTexture[0].x = mParams["color"].getValue();
 	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer

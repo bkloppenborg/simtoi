@@ -9,9 +9,11 @@
 #include "CShaderFactory.h"
 
 CDisk_Pascucci2004::CDisk_Pascucci2004()
-: 	CDensityDisk(0)
+: 	CDensityDisk()
 {
-	mName = "Flared Disk (Pascucci 2004)";
+	id = "disk_pascucci2004";
+	name = "Flared Disk (Pascucci 2004)";
+
 
 	// This model ALWAYS uses the default (pass-through) shader.
 	auto shaders = CShaderFactory::Instance();

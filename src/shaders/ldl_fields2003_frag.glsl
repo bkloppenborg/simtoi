@@ -30,8 +30,8 @@
 in vec3 Normal;
 in vec2 Tex_Coords;
 
-uniform float A;
-uniform float B;
+uniform float Gamma;
+uniform float Alpha;
 uniform sampler2DRect TexSampler;
 
 out vec4 out_color;
@@ -40,8 +40,8 @@ void main(void)
 {
     float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
     float intensity = 1;
-    intensity -= A * (1 - 1.5*mu);
-    intensity -= B * (1 - 2.5*sqrt(mu));
+    intensity -= Gamma * (1 - 1.5*mu);
+    intensity -= Alpha * (1 - 2.5*sqrt(mu));
 
     vec4 Color = texture(TexSampler, Tex_Coords);
     out_color = vec4(intensity * Color.x, 0, 0, Color.a);

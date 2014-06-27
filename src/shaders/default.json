@@ -2,7 +2,7 @@
 
 {
     "fragment_shader" : "default_frag.glsl",
-    "human_name" : "Default (None)",
+    "shader_name" : "Default (None)",
 	"shader_id" : "default",
 	"vertex_shader" : "default_vert.glsl"
 }

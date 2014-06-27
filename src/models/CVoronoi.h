@@ -14,7 +14,7 @@
 
 class CVoronoi: public CModel
 {
-	protected:
+protected:
 
 	unsigned int mNRegions;
 	unsigned int mNElements;
@@ -26,7 +26,7 @@ class CVoronoi: public CModel
 	bool mModelReady;
 
 public:
-	CVoronoi(unsigned int n_regions);
+	CVoronoi();
 	virtual ~CVoronoi();
 
 	static shared_ptr<CModel> Create();

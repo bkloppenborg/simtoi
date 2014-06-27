@@ -32,10 +32,12 @@
 
 #include "CPosition.h"
 
-CPosition::CPosition(int n_parameters)
-	: CParameters(n_parameters)
+CPosition::CPosition()
+	: CParameterMap()
 {
-	mPositionID = "position_base_invalid";
+	id = "position_base_invalid";
+	name = "not set by developer";
+
 	mTime = 0;
 }
 

@@ -8,36 +8,18 @@
 #include "CShaderFactory.h"
 #include "CCylinder.h"
 
-CDensityDisk::CDensityDisk(int n_additional_params)
-: 	CModel(n_additional_params + 4)
+CDensityDisk::CDensityDisk()
+: 	CModel()
 {
 	// give this object a name
-	mName = "Density disk base class";
+	id = "density_disk";
+	name = "Density disk base class";
 
-	// Define the placement of the density disk model parameters
-	mParamNames.push_back("r_in");
-	SetParam(mBaseParams + 1, 0.1);
-	SetFree(mBaseParams + 1, false);
-	SetMax(mBaseParams + 1, 10);
-	SetMin(mBaseParams + 1, 0.1);
-
-	mParamNames.push_back("radial cutoff");
-	SetParam(mBaseParams + 2, 20);
-	SetFree(mBaseParams + 2, false);
-	SetMax(mBaseParams + 2, 10);
-	SetMin(mBaseParams + 2, 0.1);
-
-	mParamNames.push_back("height cutoff");
-	SetParam(mBaseParams + 3, 5);
-	SetFree(mBaseParams + 3, false);
-	SetMax(mBaseParams + 3, 10);
-	SetMin(mBaseParams + 3, 0.1);
-
-	mParamNames.push_back("n rings (int)");
-	SetParam(mBaseParams + 4, 50);
-	SetFree(mBaseParams + 4, false);
-	SetMax(mBaseParams + 4, 100);
-	SetMin(mBaseParams + 4, 1);
+	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
+	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius");
+	addParameter("r_cutoff", 20, 0.1, 20, false, 1.0, "Radial cutoff", "Cutoff radius beyond which the model will not exist");
+	addParameter("h_cutoff", 5, 0.1, 10, false, 1.0, "Height cutoff", "Cutoff height beyond which the model will not exist");
+	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model");
 
 	// We load the default shader, but this should be replaced by something more
 	// specific later.
@@ -112,13 +94,13 @@ void CDensityDisk::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		Init();
 
 	// Look up the parameters:
-	const double r_in = mParams[mBaseParams + 1];
-	const double r_cutoff  = mParams[mBaseParams + 2];
-	const double h_cutoff  = mParams[mBaseParams + 3];
-	int n_rings  = ceil(mParams[mBaseParams + 4]);
+	const double r_in = mParams["r_in"].getValue();
+	const double r_cutoff  = mParams["r_cutoff"].getValue();
+	const double h_cutoff  = mParams["h_cutoff"].getValue();
+	int n_rings  = ceil(mParams["n_rings"].getValue());
 
 	// Set the color
-	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].r = mParams["color"].getValue();
 	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer

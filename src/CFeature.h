@@ -9,18 +9,25 @@
 #define CFEATURE_H_
 
 #include <memory>
+#include <string>
+using namespace std;
 
-#include "CParameters.h"
+#include "CParameterMap.h"
 
 class CModel;
 
-class CFeature: public CParameters
+class CFeature: public CParameterMap
 {
+protected:
+	string id;
+	string name;
+
 public:
-	CFeature(int n_params);
+	CFeature();
 	virtual ~CFeature();
 
-	virtual string GetID() { return "invalid_feature"; };
+	virtual string getID() const { return id; };
+	virtual string getName() const { return name; }
 
 	virtual void apply(CModel * model) = 0;
 };

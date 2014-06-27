@@ -44,7 +44,7 @@ class CDensityDisk: public CModel
 	bool mModelReady;
 
 public:
-	CDensityDisk(int n_additional_params);
+	CDensityDisk();
 	virtual ~CDensityDisk();
 
 	void Init();

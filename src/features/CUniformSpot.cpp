@@ -18,37 +18,15 @@
 #include <iostream>
 
 CUniformSpot::CUniformSpot():
-	CFeature(4)
+	CFeature()
 {
-	mName = "Uniform Spot";
+	id = "uniform_spot";
+	name = "Uniform Spot";
 
-	// coordinate on surface (degrees)
-	mParamNames.push_back("theta");
-	SetParam(0, 0.0);
-	SetFree(0, false);
-	SetMax(0, 180);
-	SetMin(0, 0.1);
-
-	// coordinate on surface (degrees)
-	mParamNames.push_back("phi");
-	SetParam(1, 0.0);
-	SetFree(1, false);
-	SetMax(1, 360);
-	SetMin(1, 0.0);
-
-	// radius of spot (degrees)
-	mParamNames.push_back("radius");
-	SetParam(2, 1.0);
-	SetFree(2, false);
-	SetMax(2, 6.0);
-	SetMin(2, 0.1);
-
-	// diameter of spot
-	mParamNames.push_back("delta_T");
-	SetParam(3, -500);
-	SetFree(3, false);
-	SetMax(3, 2000);
-	SetMin(3, -2000.0);
+	addParameter("theta", 0, 0, 180, false, 0.1, "Theta", "Angular position of the spot on the surface (degrees).");
+	addParameter("phi", 0, 0, 180, false, 0.1, "Phi", "Angular position of the spot on the surface (degrees).");
+	addParameter("radius", 1.0, 0, 10, false, 1, "Radius", "Radius of the spot on the surface  (degrees)");
+	addParameter("delta_T", -500, -2000, 2000, false, 100, "Delta T", "Temperature of the spot relative to the surface temperature");
 }
 
 CUniformSpot::~CUniformSpot()
@@ -60,10 +38,10 @@ CUniformSpot::~CUniformSpot()
 void CUniformSpot::apply(CModel * model)
 {
 	// init locals. Convert (user specified) degrees to radians
-	const double theta = mParams[0] * PI / 180;
-	const double phi = mParams[1] * PI / 180;
-	const double spot_radius = mParams[2] * PI / 180;
-	const double spot_delta_temperature = mParams[3];
+	const double theta = mParams["theta"].getValue() * PI / 180;
+	const double phi = mParams["phi"].getValue() * PI / 180;
+	const double spot_radius = mParams["radius"].getValue() * PI / 180;
+	const double spot_delta_temperature = mParams["delta_T"].getValue();
 	vector<unsigned int> pixel_ids;
 
 	// Get a reference to the object's temperature grid

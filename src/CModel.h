@@ -35,11 +35,12 @@
 
 #include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
-#include "CParameters.h"
+#include "CParameter.h"
 #include "CPosition.h"
 #include "CShader.h"
 #include "CWorkerThread.h"
 #include "CModelList.h"
+#include "CParameterMap.h"
 
 #include <cstdlib>
 #define _USE_MATH_DEFINES
@@ -86,10 +87,12 @@ typedef shared_ptr<CFeature> CFeaturePtr;
 ///
 /// This class is derived from `CParameters` which is used to store the
 /// values of model parameters.
-class CModel : public CParameters
+class CModel: public CParameterMap
 {
+
 protected:
-	int mBaseParams;	///< The number of parameters used in the CModel base class.
+
+	double mTime;		///< The current time for this object.
 
 	CPositionPtr mPosition;	///< A shared pointer to the position object.
 
@@ -124,12 +127,11 @@ public:
 
 
 public:
-	CModel(int n_params);
+	CModel();
 	virtual ~CModel();
 
 	void AddFeature(string feature_id);
 
-	virtual string GetID();
 	int GetNModelFreeParameters();
 	int GetNPositionFreeParameters();
 	int GetNShaderFreeParameters();
