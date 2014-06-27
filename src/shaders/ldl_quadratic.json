@@ -2,20 +2,24 @@
 
 {
     "fragment_shader" : "ldl_quadratic_frag.glsl",
-    "human_name" : "LDL - Quadratic",
+    "shader_name" : "LDL - Quadratic",
 	"param_0":
 	{
-		"name" : "a1",
+        "help" : "Linear coefficeint",
+		"id" : "a1",
+        "name": "a1",
         "min" : 0.001,
         "max" : 1,
-        "default" : 0.1
+        "value" : 0.1
 	},
 	"param_1":
 	{
-		"name" : "a2",
+        "help" : "Quadratic coefficient",
+		"id" : "a2",
+        "name": "a2",
         "min" : 0.001,
         "max" : 1,
-        "default" : 0.1
+        "value" : 0.1
 	},
 	"shader_id" : "ldl_quadratic",
     "vertex_shader" : "default_vert.glsl"

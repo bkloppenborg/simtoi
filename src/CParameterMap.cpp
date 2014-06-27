@@ -32,6 +32,9 @@ unsigned int CParameterMap::addParameter(string internal_name, double value, dou
 {
 	// create the parameter, set some default values.
 	CParameter temp;
+	// Disable bounds checking during setup.
+	temp.toggleBoundsChecks(false);
+	// Set the values
 	temp.setID(internal_name);
 	temp.setMin(min);
 	temp.setMax(max);
@@ -40,6 +43,8 @@ unsigned int CParameterMap::addParameter(string internal_name, double value, dou
 	temp.setStepSize(step_size);
 	temp.setHumanName(human_name);
 	temp.setHelpText(help);
+	// Enable bounds checking.
+	temp.toggleBoundsChecks(true);
 
 	// append it to the vector
 	mParams[internal_name] = temp;

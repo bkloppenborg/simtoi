@@ -101,7 +101,7 @@ CShaderFactory CShaderFactory::Instance()
 void CShaderFactory::Register(string json_config_file)
 {
 	CShaderPtr temp(new CShader(json_config_file));
-	mFactory[temp->GetID()] = temp;
+	mFactory[temp->getID()] = temp;
 }
 
 /// Registers a GLShader with the name "GLShaderID" and creation function "CreateFunction" with the factory.

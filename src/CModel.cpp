@@ -167,7 +167,7 @@ int CModel::GetNPositionFreeParameters()
 int CModel::GetNShaderFreeParameters()
 {
 	if(mShader != NULL)
-		return mShader->GetNFreeParams();
+		return mShader->getFreeParameterCount();
 
 	return 0;
 }
@@ -213,10 +213,7 @@ void CModel::GetAllParameters(double * params, int n_params)
 	n += mPosition->getFreeParameters(params + n, n_params - n);
 
 	if(mShader != NULL)
-	{
-		mShader->GetParams(params + n, n_params - n);
-		n += mShader->GetNParams();
-	}
+		n += mShader->getFreeParameters(params + n, n_params - n);
 
 	for(auto feature: mFeatures)
 		n += feature->getFreeParameters(params + n, n_params - n);
@@ -239,7 +236,7 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 
 	if(mShader != NULL)
 	{
-		tmp1 = mShader->GetFreeMinMaxes();
+		tmp1 = mShader->getFreeParameterMinMaxes();
 		min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
 	}
 
@@ -273,10 +270,8 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 	n += mPosition->getFreeParameters(params + n, n_params - n, scale_params);
 
 	if(mShader != NULL)
-	{
-		mShader->GetFreeParams(params + n, n_params - n, scale_params);
-		n += mShader->GetNFreeParams();
-	}
+		n += mShader->getFreeParameters(params + n, n_params - n, scale_params);
+
 
 	for(auto feature: mFeatures)
 		n += feature->getFreeParameters(params + n, n_params - n, scale_params);
@@ -303,7 +298,7 @@ vector<string> CModel::GetFreeParameterNames()
 
 	if(mShader != NULL)
 	{
-		tmp2 = mShader->GetFreeParamNames();
+		tmp2 = mShader->getFreeParameterNames();
 		tmp1.insert( tmp1.end(), tmp2.begin(), tmp2.end() );
 	}
 
@@ -325,10 +320,7 @@ void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 	n += mPosition->getFreeParameterStepSizes(steps + n, size - n);
 
 	if(mShader != NULL)
-	{
-		mShader->GetFreeParamSteps(steps + n, size - n);
-		n += mShader->GetNFreeParams();
-	}
+		n += mShader->getFreeParameterStepSizes(steps + n, size - n);
 
 	for(auto feature: mFeatures)
 		n += feature->getFreeParameterStepSizes(steps + n, size - n);
@@ -488,7 +480,7 @@ void CModel::Restore(Json::Value input)
 		shader_id = "default";
 
 	auto shader = shaders.CreateShader(shader_id);
-	shader->Restore(input["shader_data"]);
+	shader->restore(input["shader_data"]);
 	CModel::SetShader(shader);
 
 	// Lastly restore features:
@@ -555,8 +547,8 @@ Json::Value CModel::Serialize()
 	output["position_id"] = mPosition->getID();
 	output["position_data"] = mPosition->serialize();
 
-	output["shader_id"] = mShader->GetID();
-	output["shader_data"] = mShader->Serialize();
+	output["shader_id"] = mShader->getID();
+	output["shader_data"] = mShader->serialize();
 
 	stringstream temp;
 
@@ -599,10 +591,7 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 	n += mPosition->setFreeParameterValues(in_params + n, n_params - n, scale_params);
 	// Then the shader.
 	if(mShader != NULL)
-	{
-		mShader->SetFreeParams(in_params + n, n_params - n, scale_params);
-		n += mShader->GetNFreeParams();
-	}
+		n += mShader->setFreeParameterValues(in_params + n, n_params - n, scale_params);
 
 	for(auto feature: mFeatures)
 		n += feature->setFreeParameterValues(in_params + n, n_params - n, scale_params);

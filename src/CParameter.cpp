@@ -16,7 +16,7 @@ CParameter::CParameter()
 {
 	// Put in some (reasonable) default values.
 	value = 0;
-	min = numeric_limits<double>::min();
+	min = numeric_limits<double>::lowest();
 	max = numeric_limits<double>::max();
 	step_size = 0.1;
 	dirty = true;

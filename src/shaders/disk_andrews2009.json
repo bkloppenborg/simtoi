@@ -2,48 +2,60 @@
 
 {
     "fragment_shader" : "disk_andrews2009_frag.glsl",
-    "human_name" : "Andrews 2009 Disk",
+    "shader_name" : "Andrews 2009 Disk",
     "param_0":
     {
+        "help_text": "Characteristic density",
+        "id" : "rho0",
         "name" : "rho0",
         "min" : 0.1,
         "max" : 100,
-        "default" : 1
+        "value" : 1
     },
     "param_1":
     {
+        "help_text": "Opacity",
+        "id" : "kappa",
         "name" : "kappa",
         "min" : 0.1,
         "max" : 10,
-        "default" : 1
+        "value" : 1
     },
     "param_2":
     {
+        "help_text": "Scale radius (in native model units, normally mas)",
+        "id" : "r0",
         "name" : "r0",
         "min" : 0.1,
         "max" : 6,
-        "default" : 1
+        "value" : 1
     },
     "param_3":
     {
+        "help_text": "Scale height (in native model units, normally mas)",
+        "id" : "h0",
         "name" : "h0",
         "min" : 0.1,
         "max" : 10,
-        "default" : 1
+        "value" : 1
     },
     "param_4":
     {
+        "help_text": "Value for the radial power law / exponential decay found in equation 4.",
+        "id" : "gamma",
         "name" : "gamma",
         "min" : 0.1,
         "max" : 10,
-        "default" : 1
+        "value" : 1
     },
     "param_5":
     {
+        "help_text": "Value for height-dependent power law found in equation 2.",
+        "id" : "beta",
         "name" : "beta",
         "min" : 0.1,
         "max" : 10,
-        "default" : 1
+        "value" : 1
     },
 	"shader_id" : "disk_andrews2009",
     "vertex_shader" : "default_vert.glsl"

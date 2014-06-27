@@ -2,13 +2,15 @@
 
 {
     "fragment_shader" : "ldl_power_law_frag.glsl",
-    "human_name" : "LDL - Power Law",
+    "shader_name" : "LDL - Power Law",
 	"param_0":
 	{
-		"name" : "alpha",
+        "help" : "Value of the power used in the power law",
+		"id" : "alpha",
+        "name": "alpha",
         "min" : 0.1,
         "max" : 1,
-        "default" : 0.5
+        "value" : 0.5
 	},
 	"shader_id" : "ldl_power_law",
     "vertex_shader" : "default_vert.glsl"

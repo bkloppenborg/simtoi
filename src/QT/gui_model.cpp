@@ -45,7 +45,7 @@ gui_model::gui_model(QWidget *parent, shared_ptr<CModel> model)
 	// Find the model, position, and shader IDs from the combo boxes:
 	int model_id = ui.cboModels->findText(QString::fromStdString(model->getID()));
 	int position_id = ui.cboPositions->findText(QString::fromStdString(model->GetPosition()->getID()));
-	int shader_id = ui.cboShaders->findText(QString::fromStdString(model->GetShader()->GetID()));
+	int shader_id = ui.cboShaders->findText(QString::fromStdString(model->GetShader()->getID()));
 
 	// Set the current selected text based upon the model IDs
 	ui.cboModels->setCurrentIndex(model_id);

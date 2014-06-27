@@ -97,8 +97,8 @@ public:
 
 protected:
     void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);
-    void LoadParameters(QStandardItem * parent, CParameters * parameters);
-    QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
+//    void LoadParameters(QStandardItem * parent, CParameters * parameters);
+//    QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
     QList<QStandardItem *> LoadParametersHeader(QString name, CParameterMap * param_map);
 
 public:

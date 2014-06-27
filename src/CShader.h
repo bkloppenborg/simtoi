@@ -44,38 +44,32 @@
 #include <vector>
 #include <utility>
 
-#include "CParameters.h"
+#include "CParameterMap.h"
 
 using namespace std;
 
 class CShader;
 
-class CShader : public CParameters
+class CShader : public CParameterMap
 {
 protected:
 	GLuint mProgram;
 	GLuint mShader_vertex;
 	GLuint mShader_fragment;
-	GLuint * mParam_locations;
+	vector<GLuint> mParam_locations;
 	string mVertShaderFileName;
 	string mFragShaderFilename;
 	string mShader_dir;
-
-	string mShaderID;
 
 	bool mShaderLoaded;
 
 public:
 	CShader(const CShader & other);
 	CShader(string json_config_file);
-	CShader(string shader_id, string shader_dir, string vertex_shader_filename, string fragment_shader_filename,
-			string friendly_name, int n_parameters,
-			vector<string> parameter_names, vector<float> starting_values, vector< pair<float, float> > minmax);
 	virtual ~CShader();
 
 	void CompileShader(GLuint shader);
 
-	string GetID() { return mShaderID; };
 	GLuint GetProgram();
 
 	void Init();
@@ -83,7 +77,7 @@ public:
 	void LinkProgram(GLuint program);
 
 	void UseShader();
-	void UseShader(double * params, unsigned int in_params);
+//	void UseShader(double * params, unsigned int in_params);
 };
 
 #endif /* CGLSHADER_H_ */

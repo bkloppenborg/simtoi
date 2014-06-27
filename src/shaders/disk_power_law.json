@@ -2,34 +2,42 @@
 
 {
     "fragment_shader" : "disk_power_law_frag.glsl",
-    "human_name" : "Power law disk",
+    "shader_name" : "Power law disk",
     "param_0":
     {
-        "name" : "alpha_r",
+        "help" : "Value for the radial power law",
+        "id" : "alpha_r",
+        "name": "",
         "min" : 0.0,
         "max" : 10,
-        "default" : 1
+        "value" : 1
     },
     "param_1":
     {
-        "name" : "use_r_trans",
+        "help" : "Whether or not the radial power law should be used [0 = false, 1 = true]",
+        "id" : "use_r_trans",
+        "name": "",
         "min" : 0.0,
         "max" : 1,
-        "default" : 1
+        "value" : 1
     },
     "param_2":
     {
-        "name" : "beta_z",
+        "help" : "Value for the height-dependent power law ",
+        "id" : "beta_z",
+        "name": "",
         "min" : 0.0,
         "max" : 10,
-        "default" : 1
+        "value" : 1
     },
     "param_3":
     {
-        "name" : "use_z_trans",
+        "help" : "Whether or not the height-dependent power law should be used [0 = false, 1 = true]",
+        "id" : "use_z_trans",
+        "name": "",
         "min" : 0.0,
         "max" : 1,
-        "default" : 1
+        "value" : 1
     },
 	"shader_id" : "disk_power_law",
     "vertex_shader" : "default_vert.glsl"
