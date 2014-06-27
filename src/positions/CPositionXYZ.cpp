@@ -36,6 +36,7 @@ CPositionXYZ::CPositionXYZ()
 {
 	name = "XYZ";
 	id = "xyz";
+	mPositionType = STATIC;
 
 	// Init the position variables, set them to be fixed.
 	addParameter("N", 0, -1, 1, false, 0.1, "North", "North (positive is up on the screen)");
