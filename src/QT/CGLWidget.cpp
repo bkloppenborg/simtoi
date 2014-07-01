@@ -397,7 +397,11 @@ void CGLWidget::Save(string filename)
 
 	// Serialize the mWorker object first
 	output = mWorker->Serialize();
-	output.setComment("// Model save file from SIMTOI in JSON format.", Json::commentBefore);
+	// Add a comment that provides some information about what wrote the file.
+	output["_file_info"] = "Save file from the SImulation and Modeling Tool for "
+			"Optical Interferometry (SIMTOI). See "
+			"https://github.com/bkloppenborg/simtoi for information about this "
+			"format.";
 
 	// Now save the OpenGL area information.
 	output["area_width"] = mWorker->GetImageWidth();
