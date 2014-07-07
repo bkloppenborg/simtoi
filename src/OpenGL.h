@@ -11,6 +11,10 @@
 #ifndef OPENGL_H_
 #define OPENGL_H_
 
+#include <string>
+#include <iostream>
+#include <stdexcept>
+
 // Standard OpenGL Headers
 #ifdef __APPLE__
 #include <OpenGL/gl3.h>
@@ -22,6 +26,34 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
+
+#define OPENGL_SUCCESS 0
+#define OPENGL_FAILURE 1
+
+/// Checks for the status of an OpenGL error and generates an error message is one is
+/// detected.
+static int checkGLError(GLenum input, GLenum reference, std::string message, bool critical_error = true)
+{
+	if(critical_error && input != reference)
+	{
+		// Look up the OpenGL error message
+		std::string error_string = (const char *) gluErrorString(input);
+		std::cout << "Error: "<< message << " Error code : " << input << std::endl;;
+		std::cout << error_string << std::endl;
+
+		return OPENGL_FAILURE;
+	}
+
+	return OPENGL_SUCCESS;
+}
+
+/// Macro which checks and marks the source of an OpenGL error and throws a runtime_error if
+#define CHECK_OPENGL_ERROR(actual, msg) \
+    if(checkGLError(actual, GL_NO_ERROR, msg)) \
+    { \
+        std::cout << "Location : " << __FILE__ << ":" << __LINE__<< std::endl; \
+        throw runtime_error("OpenGL error detected."); \
+    }
 
 // Workaround for GL_TEXTURE_RECTANGLE not being defined on CentOS 6.5
 // GL_TEXTURE_RECTANGLE_ARB is defined though.
