@@ -141,7 +141,7 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 	// Set the parameters from the unit hypercube and retrieve the scaled values:
 	CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
 	model_list->SetFreeParameters(params, npars, true);
-	model_list->GetFreeParameters(params, npars, true);
+	model_list->GetFreeParameters(params, npars, false);
 
 	// Now get the residuals and compute the chi values. Store these in the output double.
 	minimizer->mWorkerThread->GetChi(&minimizer->mChis[0], minimizer->mChis.size());
