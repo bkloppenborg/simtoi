@@ -255,20 +255,20 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 /// \param scale_params If false, returns the parameters in a uniform
 /// 		hypercube (x = [0...1]). If true, scales the values into
 /// 		their native ranges (x = [param.min... param.max]).
-void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
+void CModel::GetFreeParameters(double * params, int n_params, bool normalize_values)
 {
 	unsigned int n = 0;
 
-	CParameterMap::getFreeParameters(params, n_params, scale_params);
+	CParameterMap::getFreeParameters(params, n_params, normalize_values);
 	n += getFreeParameterCount();
 
-	n += mPosition->getFreeParameters(params + n, n_params - n, scale_params);
+	n += mPosition->getFreeParameters(params + n, n_params - n, normalize_values);
 
 	if(mShader != NULL)
-		n += mShader->getFreeParameters(params + n, n_params - n, scale_params);
+		n += mShader->getFreeParameters(params + n, n_params - n, normalize_values);
 
 	for(auto feature: mFeatures)
-		n += feature->getFreeParameters(params + n, n_params - n, scale_params);
+		n += feature->getFreeParameters(params + n, n_params - n, normalize_values);
 }
 
 
