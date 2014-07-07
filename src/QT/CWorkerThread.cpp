@@ -111,31 +111,13 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
     glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
 
     // Set the default drawing framebuffer
-//    glDrawBuffer(GL_BACK);
-    glDrawBuffer(GL_FRONT);
-
-	CWorkerThread::CheckOpenGLError("A");
+    glDrawBuffer(GL_BACK);
 
     /// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
     //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
     glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-//    GL_INVALID_OPERATION is generated if mask contains GL_COLOR_BUFFER_BIT and any of the following conditions hold:
-//
-//    * The read buffer contains fixed-point or floating-point values and any draw buffer contains neither fixed-point nor floating-point values.
-//
-//    * The read buffer contains unsigned integer values and any draw buffer does not contain unsigned integer values.
-//
-//    * The read buffer contains signed integer values and any draw buffer does not contain signed integer values.
-//
-//    GL_INVALID_OPERATION is generated if filter is GL_LINEAR and the read buffer contains integer data.
-//
-//    GL_INVALID_OPERATION is generated if the value of GL_SAMPLES for the read and draw buffers is not identical. - I don't think this is it.
-
-
-	CWorkerThread::CheckOpenGLError("C");
-
-    //SwapBuffers();
+    SwapBuffers();
 }
 
 /// \brief Instructs the task lists to prepare a bootstrapped data set
@@ -239,7 +221,11 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R32F, width, height, depth, 0, GL_RED, GL_FLOAT, NULL);
 
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
+	// ATI's implementation of OpenGL doesn't seem to have glFramebufferTexture
+	// so we use the 2D version instead:
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO_storage_texture, 0);
+	// If your implementation gives you an error, try this line instead:
+//	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -474,33 +460,33 @@ void CWorkerThread::run()
 		switch(op)
 		{
 
-//		case BOOTSTRAP_NEXT:
-//			mTaskList->BootstrapNext(mTempUint);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case EXPORT:
-//			// Instruct the worker to export data
-//			mTaskList->Export(mTempString);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case GET_CHI:
-//			// uses mTempArray
-//			mTaskList->GetChi(mTempArray, mTempArraySize);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case GET_UNCERTAINTIES:
-//			// uses mTempArray
-//			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
-//			mWorkerSemaphore.release(1);
-//			break;
-//
-//		case OPEN_DATA:
-//			// Instruct the task list to open the file.
-//			mTaskList->OpenData(mTempString);
-//			mWorkerSemaphore.release(1);
+		case BOOTSTRAP_NEXT:
+			mTaskList->BootstrapNext(mTempUint);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case EXPORT:
+			// Instruct the worker to export data
+			mTaskList->Export(mTempString);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case GET_CHI:
+			// uses mTempArray
+			mTaskList->GetChi(mTempArray, mTempArraySize);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case GET_UNCERTAINTIES:
+			// uses mTempArray
+			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
+			mWorkerSemaphore.release(1);
+			break;
+
+		case OPEN_DATA:
+			// Instruct the task list to open the file.
+			mTaskList->OpenData(mTempString);
+			mWorkerSemaphore.release(1);
 
 		case RENDER:
 			mModelList->Render(mFBO, mView);
