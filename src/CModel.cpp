@@ -65,7 +65,7 @@ CModel::CModel()
 			"Inclination defined from the plane of the sky (degrees)");
 	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation zero point",
 			"Initial rotation angle about model's internal z-axis (degrees). Unless you have a specific reason, this should be zero.");
-	addParameter("z_axis_rotational_period", 0, 0, 100, false, 1, "Rotational period",
+	addParameter("z_axis_rotational_period", 1, 0, 100, false, 1, "Rotational period",
 			"Rotational period about the model'z z-axis (days)");
 }
 
@@ -200,7 +200,7 @@ CShaderPtr CModel::GetShader(void)
 void CModel::GetAllParameters(double * params, int n_params)
 {
 	// Current parameter number
-	int n = 0;
+	unsigned int n = 0;
 	// Get this object's parameters
 	CParameterMap::getAllParameters(params + n, n_params - n);
 
@@ -257,7 +257,7 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 /// 		their native ranges (x = [param.min... param.max]).
 void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 {
-	int n = 0;
+	unsigned int n = 0;
 
 	CParameterMap::getFreeParameters(params, n_params, scale_params);
 	n += getFreeParameterCount();
@@ -266,7 +266,6 @@ void CModel::GetFreeParameters(double * params, int n_params, bool scale_params)
 
 	if(mShader != NULL)
 		n += mShader->getFreeParameters(params + n, n_params - n, scale_params);
-
 
 	for(auto feature: mFeatures)
 		n += feature->getFreeParameters(params + n, n_params - n, scale_params);
@@ -309,7 +308,7 @@ vector<string> CModel::GetFreeParameterNames()
 // \brief Gets the step sizes for the free parameters.
 void CModel::GetFreeParameterSteps(double * steps, unsigned int size)
 {
-	int n = 0;
+	unsigned int n = 0;
 
 	n += CParameterMap::getFreeParameterStepSizes(steps, size);
 	n += mPosition->getFreeParameterStepSizes(steps + n, size - n);
@@ -629,7 +628,6 @@ void CModel::SetTime(double time)
 	// Compute the modulus using Mod (in misc.h) rather than fmod as this function
 	// is more resiliant to edge cases than fmod.
 	double rotation = Mod(rotation_zero_point + omega_dot * dt, 360.0d);
-	cout << rotation << endl;
 	mParams["z_axis_rotation"].setValue(rotation);
 
 	// Update the current time.
