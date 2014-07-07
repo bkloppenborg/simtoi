@@ -95,7 +95,10 @@ CMinimizerPtr CMultiNest::Create()
 }
 
 /// Dumper (do nothing)
-void CMultiNest::dumper(int &nSamples, int &nlive, int &nPar, double **physLive, double **posterior, double ** paramConstr, double &maxLogLike, double & logZ, double & logZerr, void * misc)
+void CMultiNest::dumper(int &nSamples, int &nlive, int &nPar,
+		double **physLive, double **posterior, double **paramConstr,
+		double &maxLogLike, double &logZ, double &INSlogZ, double &logZerr,
+		void *context)
 {
 /*
 //	 paramConstr(4*nPar):
