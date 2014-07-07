@@ -36,6 +36,7 @@ public:
 
 	void clearFlags();
 
+	unsigned int getAllParameters(double * params, unsigned int n_params, bool normalize_value = false);
 	unsigned int getFreeParameters(double * params, unsigned int n_params, bool normalize_value = false);
 	unsigned int getFreeParameterCount();
 	vector<string> getFreeParameterNames();

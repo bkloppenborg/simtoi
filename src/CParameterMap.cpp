@@ -60,6 +60,22 @@ void CParameterMap::clearFlags()
 		it->second.clearFlags();
 }
 
+/// Returns up to n_params values of the parameters for this object.
+unsigned int CParameterMap::getAllParameters(double * params, unsigned int n_params, bool normalize_value)
+{
+	unsigned int n = 0;
+	for(auto it: mParams)
+	{
+		if(n > n_params)
+			break;
+
+		params[n] = it.second.getValue(normalize_value);
+		n++;
+	}
+
+	return n;
+}
+
 /// Copies the nominal values of the free parameters into the `params` array
 ///
 /// @param params A double array of size 'n_params' to which the parameters will be copied

@@ -201,23 +201,17 @@ void CModel::GetAllParameters(double * params, int n_params)
 {
 	// Current parameter number
 	int n = 0;
+	// Get this object's parameters
+	CParameterMap::getAllParameters(params + n, n_params - n);
 
-	for(auto it: mParams)
-	{
-		if(n > n_params)
-			break;
-
-		params[n] = it.second.getValue();
-		n++;
-	}
-
-	n += mPosition->getFreeParameters(params + n, n_params - n);
+	// Get parameters from the position object.
+	n += mPosition->getAllParameters(params + n, n_params - n);
 
 	if(mShader != NULL)
-		n += mShader->getFreeParameters(params + n, n_params - n);
+		n += mShader->getAllParameters(params + n, n_params - n);
 
 	for(auto feature: mFeatures)
-		n += feature->getFreeParameters(params + n, n_params - n);
+		n += feature->getAllParameters(params + n, n_params - n);
 }
 
 /// \brief Get a vector containing the minimum/maximum values for all free parameters.
