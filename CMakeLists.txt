@@ -18,7 +18,7 @@ endif()
 #SET(MULTINEST_ROOT_HINT /homes/bkloppen/local)
 
 # If a library is in a non-standard location, add it to the search path here:
-set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/lib64/fglrx)
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/lib/fglrx)
 
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
