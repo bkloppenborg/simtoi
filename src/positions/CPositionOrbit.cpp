@@ -54,7 +54,7 @@ CPositionOrbit::CPositionOrbit()
 	addParameter("alpha", 0, 0, 10, false, 1, "alpha", "Orbital semi-major axis");
 	addParameter("e", 0, 0, 1, false, 0.1, "e", "Eccentricy");
 	addParameter("T", 0, 0, 1000, false, 10, "T", "Time of periastron.");
-	addParameter("P", 0, 0, 360, false, 1, "P", "Orbital period.");
+	addParameter("P", 1, 0, 360, false, 1, "P", "Orbital period.");
 }
 
 CPositionOrbit::~CPositionOrbit()
