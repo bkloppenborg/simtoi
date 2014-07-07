@@ -65,7 +65,7 @@ CModel::CModel()
 			"Inclination defined from the plane of the sky (degrees)");
 	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation zero point",
 			"Initial rotation angle about model's internal z-axis (degrees). Unless you have a specific reason, this should be zero.");
-	addParameter("z_axis_rotational_period", 1, 0, 100, false, 1, "Rotational period",
+	addParameter("z_axis_rotational_period", 0, 0, 100, false, 1, "Rotational period",
 			"Rotational period about the model'z z-axis (days)");
 }
 
@@ -621,14 +621,17 @@ void CModel::SetTime(double time)
 	// Get the rotational period (in days)
 	const double rotational_period = mParams["z_axis_rotational_period"].getValue();
 	const double rotation_zero_point = mParams["z_axis_rotation"].getValue();
-	double omega_dot = 2 * PI / rotational_period;
+	if(rotational_period > 0)
+	{
+		double omega_dot = 2 * PI / rotational_period;
 
-	// Compute current rotation angle and set it.
-	double dt = time - mTime;
-	// Compute the modulus using Mod (in misc.h) rather than fmod as this function
-	// is more resiliant to edge cases than fmod.
-	double rotation = Mod(rotation_zero_point + omega_dot * dt, 360.0d);
-	mParams["z_axis_rotation"].setValue(rotation);
+		// Compute current rotation angle and set it.
+		double dt = time - mTime;
+		// Compute the modulus using Mod (in misc.h) rather than fmod as this function
+		// is more resiliant to edge cases than fmod.
+		double rotation = Mod(rotation_zero_point + omega_dot * dt, 360.0d);
+		mParams["z_axis_rotation"].setValue(rotation);
+	}
 
 	// Update the current time.
 	mTime = time;
