@@ -487,6 +487,7 @@ void CWorkerThread::run()
 			// Instruct the task list to open the file.
 			mTaskList->OpenData(mTempString);
 			mWorkerSemaphore.release(1);
+			break;
 
 		case RENDER:
 			mModelList->Render(mFBO, mView);
