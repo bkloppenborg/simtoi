@@ -33,25 +33,14 @@
 #include "CPositionXY.h"
 
 CPositionXY::CPositionXY()
-	: CPosition(2)
 {
-	mName = "XY";
-	mPositionID = "xy";
+	name = "XY";
+	id = "xy";
+	mPositionType = STATIC;
 
 	// Init the position variables, set them to be fixed.
-	mParamNames.push_back("N");
-	SetParam(0, 0);
-	SetFree(0, false);
-	SetMax(0, 1);
-	SetMin(0, -1);
-
-	mParamNames.push_back("E");
-	SetParam(1, 0);
-	SetFree(1, false);
-	SetMax(1, 1);
-	SetMin(1, -1);
-
-	SetAllFree(false);
+	addParameter("N", 0, -1, 1, false, 0.1, "North", "North (positive is up on the screen)");
+	addParameter("E", 0, -1, 1, false, 0.1, "East", "East (positive is left on the screen)");
 }
 
 CPositionXY::~CPositionXY()
@@ -70,8 +59,8 @@ void CPositionXY::GetXYZ(double & x, double & y, double & z)
 	// OpenGL has (x,y) = (right,up)
 	// So we reassign (x,y) = (-East, North)
 
-	x = -1 * mParams[1];
-	y = mParams[0];
+	x = -1 * mParams["E"].getValue();
+	y = mParams["N"].getValue();
 
 	// By default
 	z = 0;

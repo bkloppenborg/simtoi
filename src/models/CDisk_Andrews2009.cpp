@@ -9,9 +9,10 @@
 #include "CShaderFactory.h"
 
 CDisk_Andrews2009::CDisk_Andrews2009()
-: 	CDensityDisk(0)
+: 	CDensityDisk()
 {
-	mName = "Flared Disk (Andrews 2009)";
+	id = "disk_andrews2009";
+	name = "Flared Disk (Andrews 2009)";
 
 	// This model ALWAYS uses the Andrews 2009 disk shader.
 	auto shaders = CShaderFactory::Instance();

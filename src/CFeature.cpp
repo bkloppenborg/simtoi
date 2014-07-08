@@ -7,11 +7,11 @@
 
 #include "CFeature.h"
 
-CFeature::CFeature(int n_params)
-	: CParameters(n_params)
+CFeature::CFeature()
+	: CParameterMap()
 {
-	// TODO Auto-generated constructor stub
-
+	id = "invalid_feature";
+	name = "Not set by developer";
 }
 
 CFeature::~CFeature()

@@ -36,18 +36,17 @@
 #ifndef CPOSITION_H_
 #define CPOSITION_H_
 
-#include "CParameters.h"
 #include <vector>
 #include <utility>
 #include <memory>
-
 using namespace std;
 
-class CPosition;
+#include "CParameterMap.h"
 
+class CPosition;
 typedef shared_ptr<CPosition> CPositionPtr;
 
-class CPosition : public CParameters
+class CPosition : public CParameterMap
 {
 public:
 	enum PositionTypes
@@ -57,15 +56,14 @@ public:
 	};
 
 protected:
-	string mPositionID;
+
 	PositionTypes mPositionType;
 	double mTime;
 
 public:
-	CPosition(int n_parameters);
+	CPosition();
 	virtual ~CPosition();
 
-	virtual string GetID() { return mPositionID; };
 	PositionTypes GetPositionType() { return mPositionType; };
 
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.

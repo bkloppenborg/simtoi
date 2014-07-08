@@ -169,6 +169,9 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 	GLint max_layers = 128;
 #ifdef GL_MAX_FRAMEBUFFER_LAYERS
 	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
+
+	// Get and clear the status, if this function fails it is not a critical error.
+	GLenum status = glGetError();
 #endif
 
 =======
@@ -215,6 +218,7 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 
     // All done, bind back to the default framebuffer.
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	CWorkerThread::CheckOpenGLError("CWorkerThread::CreateGLMultisampleRenderBuffer()");
 }
 
 void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int height, unsigned int depth, GLuint & FBO_storage, GLuint & FBO_storage_texture)
@@ -233,7 +237,11 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R32F, width, height, depth, 0, GL_RED, GL_FLOAT, NULL);
 
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
+	// ATI's implementation of OpenGL doesn't seem to have glFramebufferTexture
+	// so we use the 2D version instead:
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO_storage_texture, 0);
+	// If your implementation gives you an error, try this line instead:
+//	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -249,6 +257,7 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
     // All done, bind back to the default framebuffer
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	CWorkerThread::CheckOpenGLError("CWorkerThread::CreateGLStorageBuffer()");
 }
 
 // Clears the worker task queue.
@@ -450,6 +459,7 @@ void CWorkerThread::run()
 
 	// Now have the workers initialize any OpenGL objects they need
 	mTaskList->InitGL();
+	CWorkerThread::CheckOpenGLError("CWorkerThread::run() InitGL");
 
 	// ########
 	// Remaining OpenCL initialization (context done above)
@@ -493,6 +503,7 @@ void CWorkerThread::run()
 			// Instruct the task list to open the file.
 			mTaskList->OpenData(mTempString);
 			mWorkerSemaphore.release(1);
+			break;
 
 		case RENDER:
 			mModelList->Render(mFBO, mView);

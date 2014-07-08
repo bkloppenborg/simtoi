@@ -28,7 +28,6 @@ protected:
 	vector<double> pixel_phi;
 	vector<double> pixel_radii;
 	vector<vec3>   pixel_xyz;
-	unsigned int n_sides;
 	unsigned int n_pixels;
 
 	vector<double> corner_theta;
@@ -42,7 +41,7 @@ protected:
 	vector<double> g_z;
 
 public:
-	CHealpixSpheroid(int n_params);
+	CHealpixSpheroid();
 	virtual ~CHealpixSpheroid();
 
 	void FindPixels(double s0, double s1, double s2,

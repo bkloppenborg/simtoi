@@ -2,20 +2,24 @@
 
 {
     "fragment_shader" : "ldl_fields2003_frag.glsl",
-    "human_name" : "LDL - Fields 2003",
+    "shader_name" : "LDL - Fields 2003",
 	"param_0":
 	{
-		"name" : "A",
+        "help" : "Linear coefficient as found in equation 1",
+		"id" : "Gamma",
+        "name": "Gamma",
         "min" : 0.001,
         "max" : 1,
-        "default" : 0.5
+        "value" : 0.5
 	},
    "param_1":
     {
-        "name" : "B",
+        "help" : "Square root coefficient as found in equation 1.",
+        "id" : "Alpha",
+        "name": "Alpha",
         "min" : 0.001,
         "max" : 1,
-        "default" : 0.5
+        "value" : 0.5
     },
 	"shader_id" : "ldl_fields2003",
     "vertex_shader" : "default_vert.glsl"

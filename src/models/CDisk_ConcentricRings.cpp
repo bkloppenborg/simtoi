@@ -9,38 +9,19 @@
 #include "CCylinder.h"
 
 CDisk_ConcentricRings::CDisk_ConcentricRings()
-: 	CModel(4)
+: 	CModel()
 {
 	// give this object a name
-	mName = "Concentric Ring Disk";
+	id = "disk_concentric_rings";
+	name = "Concentric Ring Disk";
 
-	// Set the members to something useful:
-	mParamNames.push_back("Inner Radius");
-	SetParam(mBaseParams + 1, 0.1);
-	SetFree(mBaseParams + 1, true);
-	SetMax(mBaseParams + 1, 6.0);
-	SetMin(mBaseParams + 1, 0.1);
+	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
+	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius");
+	addParameter("radius", 20, 0.1, 20, false, 1.0, "Radius", "Radius of the disk");
+	addParameter("height", 5, 0.1, 10, false, 1.0, "Height", "Height of the disk");
+	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model");
 
-	mParamNames.push_back("Outer Radius");
-	SetParam(mBaseParams + 2, 3.0);
-	SetFree(mBaseParams + 2, true);
-	SetMax(mBaseParams + 2, 6.0);
-	SetMin(mBaseParams + 2, 0.1);
-
-	mParamNames.push_back("Height");
-	SetParam(mBaseParams + 3, 0.5);
-	SetFree(mBaseParams + 3, true);
-	SetMax(mBaseParams + 3, 2.0);
-	SetMin(mBaseParams + 3, 0.1);
-
-	mParamNames.push_back("N Rings (int)");
-	SetParam(mBaseParams + 4, 50);
-	SetFree(mBaseParams + 4, false);
-	SetMax(mBaseParams + 4, 50);
-	SetMin(mBaseParams + 4, 50);
-
-	// We load the default shader, but this should be replaced by something more
-	// specific later.
+	// We load the power-law shader by default.
 	auto shaders = CShaderFactory::Instance();
 	mShader = shaders.CreateShader("disk_power_law");
 
@@ -116,13 +97,13 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & 
 		Init();
 
 	// Look up the parameters:
-	const double r_in = mParams[mBaseParams + 1];
-	const double MaxRadius  = mParams[mBaseParams + 2];
-	const double MaxHeight  = mParams[mBaseParams + 3];
-	int n_rings  = ceil(mParams[mBaseParams + 4]);
+	const double r_in = mParams["r_in"].getValue();
+	const double MaxRadius  = mParams["radius"].getValue();
+	const double MaxHeight  = mParams["height"].getValue();
+	int n_rings  = ceil(mParams["n_rings"].getValue());
 
 	// Set the color
-	mFluxTexture[0].r = mParams[3];
+	mFluxTexture[0].r = mParams["color"].getValue();
 	mFluxTexture[0].a = 1.0;
 
 	// Bind to the framebuffer

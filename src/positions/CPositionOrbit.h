@@ -61,8 +61,6 @@ public:
 	static CPositionPtr Create();
 
 	void GetXYZ(double & x, double & y, double & z);
-
-	void SetTime(double t) { mTime = t; };
 };
 
 #endif /* CPOSITIONORBIT_H_ */

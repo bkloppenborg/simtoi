@@ -169,6 +169,7 @@ void CModelList::Render(GLuint fbo, const mat4 & view)
     for(auto model : models)
     {
     	model->Render(fbo, view);
+    	model->clearFlags();
     }
 
     // Bind back to the default framebuffer and let OpenGL finish:

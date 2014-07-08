@@ -103,56 +103,126 @@ void CGLWidget::Export(QString save_folder)
 	mWorker->ExportResults(save_folder);
 }
 
-void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
+//void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
+//{
+//	for(int j = 0; j < parameters->GetNParams(); j++)
+//	{
+//		QList<QStandardItem *> items;
+//		QStandardItem * item;
+//
+//		// First the name
+//		item = new QStandardItem(QString::fromStdString(parameters->GetParamName(j)));
+//		items << item;
+//
+//		// Now the checkbox
+//		item = new CParameterItem(parameters, j);
+//		item->setEditable(true);
+//		item->setCheckable(true);
+//		if(parameters->IsFree(j))
+//			item->setCheckState(Qt::Checked);
+//		else
+//			item->setCheckState(Qt::Unchecked);
+//		items << item;
+//
+//		// The Value
+//		item = new CParameterItem(parameters, j);
+//		item->setEditable(true);
+//		item->setData(QVariant((double)parameters->GetParam(j)), Qt::DisplayRole);
+//		items << item;
+//
+//		// Minimum parameter value
+//		item = new CParameterItem(parameters, j);
+//		item->setEditable(true);
+//		item->setData(QVariant((double)parameters->GetMin(j)), Qt::DisplayRole);
+//		items << item;
+//
+//		// Maximum parameter value
+//		item = new CParameterItem(parameters, j);
+//		item->setEditable(true);
+//		item->setData(QVariant((double)parameters->GetMax(j)), Qt::DisplayRole);
+//		items << item;
+//
+//		// Maximum step size
+//		item = new CParameterItem(parameters, j);
+//		item->setEditable(true);
+//		item->setData(QVariant((double)parameters->GetStepSize(j)), Qt::DisplayRole);
+//		items << item;
+//
+//		parent_widget->appendRow(items);
+//	}
+//}
+
+void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
 {
-	for(int j = 0; j < parameters->GetNParams(); j++)
+	// Get a reference to the map.
+	const map<string, CParameter> parameter_map = param_map->getParameterMap();
+
+	for(auto id_parameter: parameter_map)
 	{
+		const string parameter_id = id_parameter.first;
+		const CParameter parameter = id_parameter.second;
+
 		QList<QStandardItem *> items;
 		QStandardItem * item;
 
 		// First the name
-		item = new QStandardItem(QString::fromStdString(parameters->GetParamName(j)));
+		item = new QStandardItem(QString::fromStdString( parameter.getHumanName() ));
 		items << item;
 
 		// Now the checkbox
-		item = new CParameterItem(parameters, j);
+		item = new CParameterItem(param_map, parameter_id);
 		item->setEditable(true);
 		item->setCheckable(true);
-		if(parameters->IsFree(j))
+		if(parameter.isFree())
 			item->setCheckState(Qt::Checked);
 		else
 			item->setCheckState(Qt::Unchecked);
 		items << item;
 
 		// The Value
-		item = new CParameterItem(parameters, j);
+		item = new CParameterItem(param_map, parameter_id);
 		item->setEditable(true);
-		item->setData(QVariant((double)parameters->GetParam(j)), Qt::DisplayRole);
+		item->setData(QVariant( parameter.getValue() ), Qt::DisplayRole);
 		items << item;
 
 		// Minimum parameter value
-		item = new CParameterItem(parameters, j);
+		item = new CParameterItem(param_map, parameter_id);
 		item->setEditable(true);
-		item->setData(QVariant((double)parameters->GetMin(j)), Qt::DisplayRole);
+		item->setData(QVariant( parameter.getMin() ), Qt::DisplayRole);
 		items << item;
 
 		// Maximum parameter value
-		item = new CParameterItem(parameters, j);
+		item = new CParameterItem(param_map, parameter_id);
 		item->setEditable(true);
-		item->setData(QVariant((double)parameters->GetMax(j)), Qt::DisplayRole);
+		item->setData(QVariant( parameter.getMax() ), Qt::DisplayRole);
 		items << item;
 
 		// Maximum step size
-		item = new CParameterItem(parameters, j);
+		item = new CParameterItem(param_map, parameter_id);
 		item->setEditable(true);
-		item->setData(QVariant((double)parameters->GetStepSize(j)), Qt::DisplayRole);
+		item->setData(QVariant( parameter.getStepSize()), Qt::DisplayRole);
 		items << item;
 
 		parent_widget->appendRow(items);
 	}
 }
 
-QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters * param_base)
+
+//QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters * param_base)
+//{
+//	QList<QStandardItem *> items;
+//	QStandardItem * item;
+//	item = new QStandardItem(name);
+//	items << item;
+//	item = new QStandardItem(QString(""));
+//	items << item;
+//	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
+//	items << item;
+//
+//	return items;
+//}
+
+QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameterMap * param_map)
 {
 	QList<QStandardItem *> items;
 	QStandardItem * item;
@@ -160,7 +230,7 @@ QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters
 	items << item;
 	item = new QStandardItem(QString(""));
 	items << item;
-	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
+	item = new QStandardItem(QString::fromStdString(param_map->getName()));
 	items << item;
 
 	return items;
@@ -327,7 +397,11 @@ void CGLWidget::Save(string filename)
 
 	// Serialize the mWorker object first
 	output = mWorker->Serialize();
-	output.setComment("// Model save file from SIMTOI in JSON format.", Json::commentBefore);
+	// Add a comment that provides some information about what wrote the file.
+	output["_file_info"] = "Save file from the SImulation and Modeling Tool for "
+			"Optical Interferometry (SIMTOI). See "
+			"https://github.com/bkloppenborg/simtoi for information about this "
+			"format.";
 
 	// Now save the OpenGL area information.
 	output["area_width"] = mWorker->GetImageWidth();

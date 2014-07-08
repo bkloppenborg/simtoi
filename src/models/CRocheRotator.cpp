@@ -12,63 +12,19 @@
 #include "CFeature.h"
 
 CRocheRotator::CRocheRotator() :
-		CHealpixSpheroid(7)
+		CHealpixSpheroid()
 {
-	mName = "Roche Rotator";
+	id = "roche_rotator";
+	name = "Roche Rotator";
 
 	// Tesselation parameter for healpix, 4-6 is adequate for our uses.
-	mParamNames.push_back("n_side_power");
-	SetParam(mBaseParams + 1, 4);
-	SetFree(mBaseParams + 1, false);
-	SetMax(mBaseParams + 1, 10.0);
-	SetMin(mBaseParams + 1, 1);
-
-	// gravity at the pole (= G M / (R_pole)^2 === m/s^2)
-	mParamNames.push_back("g_pole");
-	SetParam(mBaseParams + 2, 1);
-	SetFree(mBaseParams + 2, false);
-	SetMax(mBaseParams + 2, 10000.0);
-	SetMin(mBaseParams + 2, 0.01);
-
-	// Radius at the pole (units irrelevant, normally millarcseconds)
-	mParamNames.push_back("r_pole");
-	SetParam(mBaseParams + 3, 1);
-	SetFree(mBaseParams + 3, false);
-	SetMax(mBaseParams + 3, 10.0);
-	SetMin(mBaseParams + 3, 1);
-
-	// Fraction of critical rotation rate, unitless.
-	mParamNames.push_back("omega_rot");
-	SetParam(mBaseParams + 4, 0.5);
-	SetFree(mBaseParams + 4, false);
-	SetMax(mBaseParams + 4, 1.0);
-	SetMin(mBaseParams + 4, 0.01);
-
-	// The effective temperature at the pole
-	mParamNames.push_back("T_eff_pole");
-	SetParam(mBaseParams + 5, 5000);
-	SetFree(mBaseParams + 5, false);
-	SetMax(mBaseParams + 5, 1E6);
-	SetMin(mBaseParams + 5, 2E3);
-
-	// The von Zeipel gravity darkening coefficient.
-	mParamNames.push_back("von_zeipel_beta");
-	SetParam(mBaseParams + 6, 0.5);
-	SetFree(mBaseParams + 6, false);
-	SetMax(mBaseParams + 6, 1.0);
-	SetMin(mBaseParams + 6, 0.01);
-
-	// Rotational period (units 1/day)
-	mParamNames.push_back("Omega_dot");
-	SetParam(mBaseParams + 7, 0.5);
-	SetFree(mBaseParams + 7, false);
-	SetMax(mBaseParams + 7, 1.0);
-	SetMin(mBaseParams + 7, 0.01);
+	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)");
+	addParameter("omega_rot", 0.5, 0, 1, false, 0.1, "omega", "Fraction of critical rotational velocity [range: 0...1]");
+	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)");
+	addParameter("von_zeipel_beta", 0.5, 0.01, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
 
 	// TODO: Remove this variable
 	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
-
-	mTime = 0;
 }
 
 CRocheRotator::~CRocheRotator()
@@ -88,6 +44,9 @@ double CRocheRotator::ComputeRadius(double polar_radius, double omega_rot, doubl
 	double sin_theta = sin(theta);
 
 	if(abs(sin_theta) < 1E-3)	// ~ 0.1 degrees from the pole
+		return polar_radius;
+
+	if(omega_rot < 1E-5)
 		return polar_radius;
 
 	double omega_sin_theta = omega_rot * sin_theta;
@@ -119,7 +78,7 @@ void CRocheRotator::ComputeGravity(double g_pole, double r_pole, double omega,
 	double c1 = 8./27 * r_ratio * omega * omega;
 
 	// Reverse the gravitational vector
-	double g_r = -1 * g_pole * (-1 / (r_ratio * r_ratio) + c1 * sin_theta * sin_theta);
+	double g_r = -1 * g_pole * (-1.0 / (r_ratio * r_ratio) + c1 * sin_theta * sin_theta);
 
 	double g_theta = g_pole * c1 * sin_theta * cos_theta;
 
@@ -155,15 +114,18 @@ void CRocheRotator::ComputeGravity(double g_pole, double r_pole, double omega_ro
 
 void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements)
 {
-	const double g_pole = mParams[mBaseParams + 2];
-	const double r_pole = mParams[mBaseParams + 3];
-	const double omega_rot = mParams[mBaseParams + 4];
-	const double T_eff_pole = mParams[mBaseParams + 5];
-	const double von_zeipel_beta = mParams[mBaseParams + 6];
+	const double g_pole = mParams["g_pole"].getValue();
+	const double r_pole = mParams["r_pole"].getValue();
+	const double omega_rot = mParams["omega_rot"].getValue();
+	const double T_eff_pole = mParams["T_eff_pole"].getValue();
+	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
+	const unsigned int n_sides = mParams["n_side_power"].getValue();
 
 	// Generate a unit Healpix sphere
 	GenerateHealpixSphere(n_pixels, n_sides);
 
+	// recomputing the sphereoid is very expensive. Make use of the dirty flags
+	// to only compute that which is absolutely necessary.
 	ComputeRadii(r_pole, omega_rot);
 	ComputeGravity(g_pole, r_pole, omega_rot);
 	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
@@ -193,22 +155,26 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		Init();
 
 	// See if the user change the tesselation
-	unsigned int t_n_sides = floor(pow(2, mParams[mBaseParams + 1]));
-	if(t_n_sides != n_sides)
+	const unsigned int n_sides = mParams["n_side_power"].getValue();
+	if(mParams["n_side_power"].isDirty())
 	{
-		n_sides = t_n_sides;
 		Init();
 	}
 
-	const double g_pole = mParams[mBaseParams + 2];
-	const double r_pole = mParams[mBaseParams + 3];
-	const double omega_rot = mParams[mBaseParams + 4];
-	const double T_eff_pole = mParams[mBaseParams + 5];
-	const double von_zeipel_beta = mParams[mBaseParams + 6];
+	const double g_pole = mParams["g_pole"].getValue();
+	const double r_pole = mParams["r_pole"].getValue();
+	const double omega_rot = mParams["omega_rot"].getValue();
+	const double T_eff_pole = mParams["T_eff_pole"].getValue();
+	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
 
-	ComputeRadii(r_pole, omega_rot);
-	ComputeGravity(g_pole, r_pole, omega_rot);
-	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
+	if(mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
+		ComputeRadii(r_pole, omega_rot);
+
+	if(mParams["g_pole"].isDirty() || mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
+		ComputeGravity(g_pole, r_pole, omega_rot);
+
+	if(mParams["T_eff_pole"].isDirty() || mParams["g_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
+		VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
 	for(auto feature: mFeatures)
 		feature->apply(this);
@@ -278,20 +244,4 @@ void CRocheRotator::VonZeipelTemperatures(double T_eff_pole, double g_pole, doub
 {
 	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
 		mPixelTemperatures[i] = T_eff_pole * pow(gravity[i] / g_pole, beta);
-}
-
-void CRocheRotator::SetTime(double time)
-{
-	// Call the base class method (updates orbital parameters, etc.)
-	CModel::SetTime(time);
-
-	// Get the rotation rate:
-	const double Omega_dot = mParams[mBaseParams + 7];
-
-	// Compute the change in rotational angle
-	double dt = time - mTime;
-	mParams[2] = mParams[2] + dt * Omega_dot;
-
-	// Update the current time.
-	mTime = time;
 }

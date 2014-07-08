@@ -36,9 +36,6 @@
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
 #include "models/CSphere.h"
 #include "models/CCylinder.h"
-//#include "models/CDisk_A.h"
-//#include "models/CDisk_B.h"
-//#include "models/CDisk_C.h"
 #include "models/CDisk_ConcentricRings.h"
 #include "models/CDisk_Pascucci2004.h"
 #include "models/CDisk_Andrews2009.h"
@@ -50,9 +47,6 @@ CModelFactory::CModelFactory()
 {
 	Register("sphere", &CSphere::Create);
 	Register("cylinder", &CCylinder::Create);
-//	Register("disk_a", &CDisk_A::Create);
-//	Register("disk_b", &CDisk_B::Create);
-//	Register("disk_c", &CDisk_C::Create);
 	Register("disk_concentric_rings", &CDisk_ConcentricRings::Create);
 	Register("disk_pascucci2004", &CDisk_Pascucci2004::Create);
 	Register("disk_andrews2009", &CDisk_Andrews2009::Create);
