@@ -184,7 +184,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 
 	// Copy out the initial values for the parameters:
 	CModelListPtr model_list = mWorkerThread->GetModelList();
-	model_list->GetFreeParameters(mParams, mNParams, true);
+	model_list->GetFreeParameters(mParams, mNParams, false);
 	vector<string> names = model_list->GetFreeParamNames();
 	vector< pair<double, double> > min_max = model_list->GetFreeParamMinMaxes();
 
