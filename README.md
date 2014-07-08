@@ -66,7 +66,10 @@ http://askubuntu.com/questions/205112/how-do-i-get-amd-intel-hybrid-graphics-dri
 
 #### Intel Integrated / Iris Graphics
 
-
+Support for SIMTOI on Intel Integrated or Intel Iris graphics is currently
+being explored. We have successfully built and used liboi on Intel HD Graphics 
+4000 devices; however, there are a few lingering OpenGL issues which we must
+resolve.
 
 ## Optional prerequisites
 
