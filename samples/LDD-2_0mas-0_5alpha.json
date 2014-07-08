@@ -1,15 +1,18 @@
 // Model save file from SIMTOI in JSON format.
 
 {
+	"area_height" : 128,
+	"area_scale" : 0.0250,
+	"area_width" : 128,
 	"model_0" : 
 	{
 		"base_data" : 
 		{
-			"Color" : [ 1.0, 0.0, 0.0, false ],
-			"Diameter" : [ 2.0, 1.0, 3.0, true ],
-			"Inclination" : [ 0.0, 0.0, 0.0, false ],
-			"Pos. Angle" : [ 0.0, 0.0, 0.0, false ],
-			"Rotation" : [ 0.0, 0.0, 0.0, false ]
+			"color" : [ 1.0, 0.0, 0.0, false ],
+			"diameter" : [ 2.0, 1.0, 3.0, true ],
+			"inclination" : [ 0.0, 0.0, 0.0, false ],
+			"position_angle" : [ 0.0, 0.0, 0.0, false ],
+			"z_axis_rotation" : [ 0.0, 0.0, 0.0, false ]
 		},
 		"base_id" : "sphere",
 		"position_data" : 
