@@ -5,6 +5,8 @@ The SImulation and Modeling Tool for Optical Interferometry
 
 ## Installing prerequisites
 
+### Build environment
+
 If you are building SIMTOI from scratch, you will need a C, C++, and Fortran
 compiler along with the CMake build system. On a Debian-based system these
 can be installed using `apt-get`:
@@ -19,16 +21,70 @@ All of the minimization engines presently used in SIMTOI use LAPACK and/or BLAS
 for solving linear systems of equations. SIMTOI also requires ccfits, cfitsio
 QT4 and an OpenGL library. These can all be installed via. `apt-get`:
 
-    sudo apt-get install liblapack-dev libblas-dev libccfits0 libccfits-dev libqt4-dev libglu1-mesa libglu1-mesa-dev
+    sudo apt-get install liblapack-dev libblas-dev libccfits0 libccfits-dev 
+        libqt4-dev libglu1-mesa libglu1-mesa-dev
 
-In order to run SIMTOI you must also have an installation of OpenCL for your graphics
-card. If you have an NVidia GPU simply install the video card drivers. On ATI GPUs
-you must install *both* the drivers *and* the [AMD APP SDK](http://developer.amd.com/tools/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/).
+### OpenGL and OpenCL
 
-Lastly, SIMTOI has optional support for [MultiNest 2.17](http://ccpforge.cse.rl.ac.uk/gf/project/multinest/)
-(a Bayesian nested sampling minimization engine). As the MultiNest API has significantly changed
-in the last few revisions, SIMTOI may not support the latest MultiNest. Please pay close attention
-to version numbers!
+In order to run SIMTOI you must also have an installation of OpenCL for your 
+graphics card. 
+
+#### NVidia hardware
+
+On *NVidia* hardware, simply install the video card drivers (either from your
+package manager or from NVidia directly). Both OpenGL and OpenCL are installed 
+automatically. On Ubuntu, this can be done with a command similar to the
+following:
+
+    sudo apt-get install nvidia-331 nvidia-opencl-icd-331 nvidia-opencl-dev 
+
+where you should (probably) choose the most current drivers rather than the 
+`nvidia-331` branch. Please note that I have not tested installations involving
+`bumblebee` (a.k.a. Optimus for Linux).
+
+#### ATI hardware
+
+On *ATI* hardware the installation is a multi-stage process. First install
+the video card drivers (either from your package manager or from ATI directly).
+For example, on Ubuntu simply install the `fglrx` package:
+
+    sudo apt-get install fglrx fglrx-dev
+
+Next you need to download and install the 
+[AMD APP SDK](http://developer.amd.com/tools/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/).
+
+When you compile SIMTOI pay close attention to the OpenGL drivers that were 
+found. If the driver path does not contain `fglrx`, (e.g. `/usr/lib/fglrx/libGL.so`)
+then try changing the `CMAKE_LIBRARY_PATH` in `simtoi/CMakeLists.txt` to 
+the directory in which `libgl.so` is installed. For example:
+
+    set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/lib/fglrx)
+
+Related links: 
+http://askubuntu.com/questions/205112/how-do-i-get-amd-intel-hybrid-graphics-drivers-to-work
+
+
+#### Intel Integrated / Iris Graphics
+
+
+
+## Optional prerequisites
+
+### MultiNest
+
+SIMTOI supports the [MultiNest](http://ccpforge.cse.rl.ac.uk/gf/project/multinest/)
+Bayesian nested sampling minimization engine. In order to enable support,
+download, compile, and install the *CMake* version of MultiNest.
+SIMTOI has been tested with MultiNest v3.7, but should work with more
+recent version as well (as long as the API hasn't changed). SIMTOI will 
+automatically attempt to locate MultiNest. If it is found, you will get a 
+message similar to the following during the CMake stage:
+
+    # cmake ..
+    ...
+    -- Found MULTINEST: /usr/local/lib/libmultinest.so;/usr/lib/liblapack.so;/usr/lib/libblas.so 
+    -- MultiNest found
+    --  SIMTOI will include the MultiNest minimizer
 
 ## Checkout / getting a copy of SIMTOI source code
 
