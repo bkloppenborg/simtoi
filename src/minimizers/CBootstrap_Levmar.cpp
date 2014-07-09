@@ -97,6 +97,14 @@ void CBootstrap_Levmar::run()
 	valarray<double> nominal_params(mLevmar->mNParams);
 	model_list->GetFreeParameters(&nominal_params[0], mLevmar->mNParams, false);
 
+	// Run one iteration with the original data and best-fit values as specified
+	// in the model file.
+	model_list->SetFreeParameters(&nominal_params[0], mLevmar->mNParams, false);
+	mWorkerThread->GetChi(&mChis[0], mChis.size());
+	chi2r_ave = ComputeChi2r(mChis, mNParams);
+	WriteRow(&nominal_params[0], mLevmar->mNParams, chi2r_ave, mOutputFile);
+
+	// Now run the bootstraps.
 	for(int iteration = 0; iteration < mIterations; iteration++)
 	{
 		if(!mRun)
