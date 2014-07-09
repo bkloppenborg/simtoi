@@ -237,7 +237,7 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	CWorkerThread::CheckOpenGLError("CRocheRotator.Render()");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }
 
 void CRocheRotator::VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta)

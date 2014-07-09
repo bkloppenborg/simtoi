@@ -177,14 +177,13 @@ void CShader::Init()
 
     // Now create the mProgram with vertex and fragement shaders
 	mProgram = glCreateProgram();
-    CWorkerThread::CheckOpenGLError("Could not create shader mProgram.");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create shader program");
+
     mShader_vertex = glCreateShader(GL_VERTEX_SHADER);
-    if(!bool(glIsShader(mShader_vertex)))
-    	CWorkerThread::CheckOpenGLError("Could not create vertex shader.");
+	CHECK_OPENGL_STATUS_ERROR(!glIsShader(mShader_vertex), "Failed to create OpenGL vertex shader");
 
     mShader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    if(!bool(glIsShader(mShader_vertex)))
-    	CWorkerThread::CheckOpenGLError("Could not create fragment shader.");
+	CHECK_OPENGL_STATUS_ERROR(!glIsShader(mShader_fragment), "Failed to create OpenGL fragment shader");
 
     glAttachShader(mProgram, mShader_vertex);
     glAttachShader(mProgram, mShader_fragment);
@@ -198,14 +197,14 @@ void CShader::Init()
 
     LinkProgram(mProgram);
 
-    CWorkerThread::CheckOpenGLError("Could not link shader mProgram.");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to link shader");
 
     // Now the shader-specific parameters:
     unsigned int i = 0;
     for(auto it: mParams)
     {
     	mParam_locations[i] = glGetUniformLocation(mProgram, it.second.getID().c_str());
-    	CWorkerThread::CheckOpenGLError("Could find variable in shader source.");
+    	CHECK_OPENGL_STATUS_WARNING(glGetError(), "Could not find shader variable in source. Shader may not function correctly");
     	i++;
     }
 
@@ -236,7 +235,7 @@ void CShader::UseShader()
 
 	// Tell OpenGL to use the mProgram
 	glUseProgram(mProgram);
-	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUseProgram");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Could not use shader");
 
 	// Set the shader-specific parameters.  Notice again the intentional downcast.
 	GLfloat tmp;
@@ -248,5 +247,5 @@ void CShader::UseShader()
 		i++;
 	}
 
-	CWorkerThread::CheckOpenGLError("CShader::UseShader, glUniform1fv");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Could not set shader variable value");
 }

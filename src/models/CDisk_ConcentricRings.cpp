@@ -74,6 +74,8 @@ void CDisk_ConcentricRings::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Could not create buffers");
+
 	// Initialize the shader variables and texture following the default packing
 	// scheme.
 	InitShaderVariables();
@@ -85,7 +87,7 @@ void CDisk_ConcentricRings::Init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	CWorkerThread::CheckOpenGLError("CDisk_ConcentricRings.Init()");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to bind back default buffers");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
@@ -185,7 +187,8 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & 
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CWorkerThread::CheckOpenGLError("CDensityDisk.Render()");
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed.");
 }
 
 /// Overrides the default CModel::SetShader function.

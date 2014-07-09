@@ -95,7 +95,7 @@ void CWorkerThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer)
 	glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	glFinish();
 
-  	CWorkerThread::CheckOpenGLError("CGLThread BlitToBuffer");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to blit buffers");
 }
 
 /// Blits the off-screen framebuffer to the foreground buffer.
@@ -118,6 +118,8 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
 
     glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
+    CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to blit buffers");
+
     SwapBuffers();
 }
 
@@ -132,19 +134,6 @@ void CWorkerThread::BootstrapNext(unsigned int maxBootstrapFailures)
 
 	// Wait for the operation to complete.
 	mWorkerSemaphore.acquire(1);
-}
-
-/// Static function for checking OpenGL errors:
-void CWorkerThread::CheckOpenGLError(string function_name)
-{
-    GLenum status = glGetError(); // Check that status of our generated frame buffer
-    // If the frame buffer does not report back as complete
-    if (status != 0)
-    {
-        string errstr =  (const char *) gluErrorString(status);
-        printf("Encountered OpenGL Error %x %s\n %s", status, errstr.c_str(), function_name.c_str());
-        throw;
-    }
 }
 
 /// Create an OpenGL framebuffer and storage buffers matching the default OpenGL image
@@ -163,7 +152,7 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
 
 	// Get and clear the status, if this function fails it is not a critical error.
-	GLenum status = glGetError();
+	CHECK_OPENGL_STATUS_WARNING(glGetError(), "Failed to query GL_MAX_FRAMEBUFFER_LAYERS, using default value of 128");
 #endif
 	if(n_layers > max_layers)
 		n_layers = max_layers;
@@ -189,6 +178,8 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FBO_depth);
 
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create renderbuffer storage");
+
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
     // Check that status of our generated frame buffer
@@ -202,7 +193,8 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 
     // All done, bind back to the default framebuffer.
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CWorkerThread::CheckOpenGLError("CWorkerThread::CreateGLMultisampleRenderBuffer()");
+
+    CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to bind back to default buffer");
 }
 
 void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int height, unsigned int depth, GLuint & FBO_storage, GLuint & FBO_storage_texture)
@@ -220,6 +212,8 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R32F, width, height, depth, 0, GL_RED, GL_FLOAT, NULL);
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create storage buffer");
 
 	// ATI's implementation of OpenGL doesn't seem to have glFramebufferTexture
 	// so we use the 2D version instead:
@@ -241,7 +235,8 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
     // All done, bind back to the default framebuffer
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CWorkerThread::CheckOpenGLError("CWorkerThread::CreateGLStorageBuffer()");
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to bind back to default buffer");
 }
 
 // Clears the worker task queue.
@@ -435,7 +430,7 @@ void CWorkerThread::run()
 	double depth = 500; // hard-coded to 500 units (typically mas) in each direction.
 	mView = glm::ortho(-half_width, half_width, -half_height, half_height, -depth, depth);
 
-	CWorkerThread::CheckOpenGLError("Error occurred during GL Thread Initialization.");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to initalize OpenGL");
 
 	// Now create this thread's off-screen buffers to match other off-screen buffers
 	// All rendering of objects from the UI happens here.
@@ -443,7 +438,7 @@ void CWorkerThread::run()
 
 	// Now have the workers initialize any OpenGL objects they need
 	mTaskList->InitGL();
-	CWorkerThread::CheckOpenGLError("CWorkerThread::run() InitGL");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to initialze task list OpenGL functions");
 
 	// ########
 	// Remaining OpenCL initialization (context done above)
@@ -565,6 +560,7 @@ void CWorkerThread::stop()
 void CWorkerThread::SwapBuffers()
 {
 	glFinish();
+
     mGLWidget->swapBuffers();
-    CWorkerThread::CheckOpenGLError("CWorkerThread::SwapBuffers()");
+    CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to swap buffers");
 }

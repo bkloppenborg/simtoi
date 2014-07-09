@@ -155,7 +155,7 @@ public:
     void BlitToScreen(GLuint FBO);
     void BootstrapNext(unsigned int maxBootstrapFailures);
 
-    static void CheckOpenGLError(string function_name);
+//    static void CheckOpenGLError(string function_name);
 protected:
     void ClearQueue();
 public:

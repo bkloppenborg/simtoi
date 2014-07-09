@@ -219,6 +219,8 @@ void CCylinder::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Could not create OpenGL buffers");
+
 	// Initialize the shader variables and texture following the default packing
 	// scheme.
 	InitShaderVariables();
@@ -229,6 +231,8 @@ void CCylinder::Init()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Could not bind to default buffers");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
@@ -304,5 +308,6 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CWorkerThread::CheckOpenGLError("CModelDisk.Render()");
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed.");
 }

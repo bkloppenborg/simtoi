@@ -172,6 +172,11 @@ void CHealpixSpheroid::GenerateVBO(unsigned int n_pixels, unsigned int n_side, v
 
 void CHealpixSpheroid::Init()
 {
+	// See if buffers are allocated, if so free them before re-initing them
+	if(mEBO) glDeleteBuffers(1, &mEBO);
+	if(mVBO) glDeleteBuffers(1, &mVBO);
+	if(mVAO) glDeleteVertexArrays(1, &mVAO);
+
 	const unsigned int n_sides = mParams["n_side_power"].getValue();
 
 	n_pixels = nside2npix(n_sides);
@@ -204,6 +209,8 @@ void CHealpixSpheroid::Init()
 			mElements.size() * sizeof(unsigned int), &mElements[0],
 			GL_DYNAMIC_DRAW);
 
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create buffers");
+
 	InitShaderVariables();
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
@@ -234,7 +241,7 @@ void CHealpixSpheroid::Init()
 	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
 	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CRocheSpheroid.Init()");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed bind back to default buffer.");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;

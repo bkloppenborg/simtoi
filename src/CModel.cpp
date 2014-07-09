@@ -375,7 +375,7 @@ void CModel::InitShaderVariables()
 	glUniform1i(TextureSamp, 0); // Set "TexSampler" to user texture Unit 0
 
 	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CModel.InitShaderVariables()");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed find texture storage location.");
 }
 
 /// Initializes the texture by setting properties and uploading a default
@@ -403,10 +403,12 @@ void CModel::InitTexture()
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create and configure texture.");
+
 	// All done. Unbind.
 	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
 
-	CWorkerThread::CheckOpenGLError("CModel.InitTexture(), texture setup");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to bind back to default buffer.");
 }
 
 /// \brief Constructs the rotation matrix according to the set parameters.

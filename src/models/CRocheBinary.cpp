@@ -312,6 +312,8 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }
 
 /// Computes the geometry of the spherical Healpix surface
@@ -344,25 +346,6 @@ void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 		if(mPixelTemperatures[i] > max_temperature)
 			max_temperature = mPixelTemperatures[i];
 	}
-
-//	double dtheta;
-//	double dphi;
-//
-//	 Add simple spots (TBD: overlap)
-//	for (j = 0; j < nspots; j++)
-//	{
-//		for (i = 0; i < npix; i++)
-//		{
-//			// test for spot presence
-//			// cout <<  abs( theta_center[i] - spot_theta[j] ) << "\t" << spot_thetasize[j] << "\n";
-//			dtheta = (pixel_theta[i] - spot_theta[j]) / spot_thetasize[j];
-//			dphi = (pixel_phi[i] - spot_phi[j]) / spot_phisize[j];
-//			if (dtheta * dtheta + dphi * dphi <= 1.)
-//			{
-//				temperature[i] = spot_temperature[i];
-//			}
-//		}
-//	}
 
 	// Convert temperature into fluxes
 	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);

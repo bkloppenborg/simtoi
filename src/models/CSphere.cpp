@@ -169,6 +169,8 @@ void CSphere::Init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), &elements[0], GL_STATIC_DRAW);
 
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create buffers");
+
 	// Initialize the shader variables and texture following the default packing
 	// scheme.
 	InitShaderVariables();
@@ -180,7 +182,7 @@ void CSphere::Init()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	CWorkerThread::CheckOpenGLError("CModelSphere.Init()");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed bind back the default buffers");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
@@ -239,5 +241,6 @@ void CSphere::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CWorkerThread::CheckOpenGLError("CModelSphere.Render()");
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }

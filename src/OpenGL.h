@@ -34,25 +34,33 @@
 /// detected.
 static int checkGLError(GLenum input, GLenum reference, std::string message, bool critical_error = true)
 {
-	if(critical_error && input != reference)
+	if(input != reference)
 	{
 		// Look up the OpenGL error message
 		std::string error_string = (const char *) gluErrorString(input);
 		std::cout << "Error: "<< message << " Error code : " << input << std::endl;;
 		std::cout << error_string << std::endl;
 
-		return OPENGL_FAILURE;
+		if(critical_error)
+			return OPENGL_FAILURE;
 	}
 
 	return OPENGL_SUCCESS;
 }
 
 /// Macro which checks and marks the source of an OpenGL error and throws a runtime_error if
-#define CHECK_OPENGL_ERROR(actual, msg) \
+#define CHECK_OPENGL_STATUS_ERROR(actual, msg) \
     if(checkGLError(actual, GL_NO_ERROR, msg)) \
     { \
         std::cout << "Location : " << __FILE__ << ":" << __LINE__<< std::endl; \
         throw runtime_error("OpenGL error detected."); \
+    }
+
+/// Macro which checks and marks the source of an OpenGL error and
+#define CHECK_OPENGL_STATUS_WARNING(actual, msg) \
+    if(checkGLError(actual, GL_NO_ERROR, msg, false)) \
+    { \
+        std::cout << "Location : " << __FILE__ << ":" << __LINE__<< std::endl; \
     }
 
 // Workaround for GL_TEXTURE_RECTANGLE not being defined on CentOS 6.5

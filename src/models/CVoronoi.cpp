@@ -137,13 +137,15 @@ void CVoronoi::Init()
 	}
 
 	// Check that things loaded correctly.
-	CWorkerThread::CheckOpenGLError("CVoronoi.Init()");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create buffers");
 
 	// All done. Un-bind from the VAO, VBO, and EBO to prevent it from being
 	// modified by subsequent calls.
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to bind back to default buffers");
 
 	// Indicate the model is ready to use.
 	mModelReady = true;
@@ -224,7 +226,8 @@ void CVoronoi::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Return to the default framebuffer before leaving.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CWorkerThread::CheckOpenGLError("CVoronoi.Render()");
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }
 
 /// Overrides the default CModel::SetShader function.
