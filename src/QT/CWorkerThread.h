@@ -55,11 +55,6 @@
 #include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
 // OpenGL mathematics library:
-=======
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif // __APPLE__
->>>>>>> f880df83c9585db29cd66016073ff1e8ebd44fea
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 

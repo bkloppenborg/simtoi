@@ -103,7 +103,6 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
 {
     // Bind back to the default buffer (just in case something didn't do it),
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-<<<<<<< HEAD
 
     // Bind to the default draw framebuffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -114,17 +113,11 @@ void CWorkerThread::BlitToScreen(GLuint FBO)
     // Set the default drawing framebuffer
     glDrawBuffer(GL_BACK);
 
-=======
-CWorkerThread::CheckOpenGLError("A ");
-    // Blit the application-defined render buffer to the on-screen render buffer.
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
-CWorkerThread::CheckOpenGLError("B ");
->>>>>>> f880df83c9585db29cd66016073ff1e8ebd44fea
     /// TODO: In QT I don't know what GL_BACK is.  Seems GL_DRAW_FRAMEBUFFER is already set to it though.
     //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, GL_BACK);
 
     glBlitFramebuffer(0, 0, mImageWidth, mImageHeight, 0, 0, mImageWidth, mImageHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-CWorkerThread::CheckOpenGLError("C ");
+
     SwapBuffers();
 }
 
@@ -164,7 +157,6 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 /// number of layers up to GL_MAX_FRAMEBUFFER_LAYERS.
 void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture, int n_layers)
 {
-<<<<<<< HEAD
 	// enforce the maxmium number of layers in images.
 	GLint max_layers = 128;
 #ifdef GL_MAX_FRAMEBUFFER_LAYERS
@@ -173,14 +165,6 @@ void CWorkerThread::CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & 
 	// Get and clear the status, if this function fails it is not a critical error.
 	GLenum status = glGetError();
 #endif
-
-=======
-	// enforce
-	GLint max_layers = 1;
-#ifndef __APPLE__	
-	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_layers);
-#endif // __APPLE__
->>>>>>> f880df83c9585db29cd66016073ff1e8ebd44fea
 	if(n_layers > max_layers)
 		n_layers = max_layers;
 
