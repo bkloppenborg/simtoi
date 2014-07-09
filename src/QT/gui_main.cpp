@@ -545,6 +545,7 @@ void gui_main::on_btnPlayPause_clicked()
 	{
 		widget->StopAnimation();
 		btnPlayPause->setText("P");
+		doubleSpinBoxJD->setValue(widget->GetTime());
 	}
 	else
 	{
