@@ -120,7 +120,17 @@ void CBootstrap_Levmar::run()
 		cout << endl << "Starting iteration " << iteration + 1 << endl;
 
 		// run the minimizer. The best-fit parameters are stored in mParams upon completion
-		mLevmar->run(&CLevmar::ErrorFunc);
+		try
+		{
+			mLevmar->run(&CLevmar::ErrorFunc);
+		}
+		catch(range_error & e)
+		{
+			cerr << " Warning: A parameter range error was detected: " << e.what() << endl;
+			cerr << " This iteration will be repeated." << endl;
+			iteration--;
+			continue;
+		}
 
 		// Set the best-fit parameters, then compute the average reduced chi2 per data set
 		model_list->SetFreeParameters(mLevmar->mParams, mNParams, false);
