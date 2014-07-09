@@ -34,6 +34,7 @@
 #include "CWorkerThread.h"
 #include "CModelList.h"
 #include <QDir>
+#include <iomanip>
 
 using namespace std;
 
@@ -181,9 +182,9 @@ void CMinimizerThread::stop()
 void CMinimizerThread::WriteRow(double * data, unsigned int size, double chi2r, ofstream & output)
 {
 	for(int i = 0; i < size; i++)
-		output << data[i] << ", ";
+		output << std::setprecision(6) << std::scientific << data[i] << ", ";
 
-	output << chi2r << endl;
+	output << std::setprecision(6) << chi2r << endl;
 }
 
 /// \brief Writes the parameter names

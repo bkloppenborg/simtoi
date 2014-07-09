@@ -113,8 +113,8 @@ void CBootstrap_Levmar::run()
 		// Get a bootstrapped data set
 		mWorkerThread->BootstrapNext(mMaxBootstrapFailures);
 
-		// Set the starting position.  Note these values are [0...1] and need to be scaled.
-		model_list->SetFreeParameters(&nominal_params[0], mLevmar->mNParams, true);
+		// Set the starting position.
+		model_list->SetFreeParameters(&nominal_params[0], mLevmar->mNParams, false);
 
 		// Print a status message:
 		cout << endl << "Starting iteration " << iteration + 1 << endl;

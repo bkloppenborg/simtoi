@@ -75,9 +75,9 @@ void CParameter::setValue(double new_value, bool is_normalized)
 
 	// Check that value is within bounds
 	if(check_bounds && new_value > max)
-		throw range_error("The new value exceeds the set maximum.");
+		throw range_error("The new value for " + human_name + " exceeds the set maximum.");
 	else if(check_bounds && new_value < min)
-		throw range_error("The new value is less than the set minimum.");
+		throw range_error("The new value for " + human_name + " is less than the set minimum.");
 
 	// set the dirty flag, if needed.
 	if(fabs(value - new_value) > precision)

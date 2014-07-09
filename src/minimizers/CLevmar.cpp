@@ -178,7 +178,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	//  opts[4]= LM_DIFF_DELTA;
 	opts[0]= 1;
 	opts[1]= 1E-4;
-	opts[2]= 1E-4;
+	opts[2]= 1E-5;
 	opts[3]= 1E-12;
 	opts[4]= LM_DIFF_DELTA;
 
