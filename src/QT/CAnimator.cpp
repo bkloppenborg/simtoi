@@ -35,8 +35,6 @@ void CAnimator::start_animation(double start, double step)
 		Sleeper::msleep(50);
 		mTime += step;
 	}
-
-	cout << "Animation stopped." << endl;
 }
 
 void CAnimator::stop_animation()
