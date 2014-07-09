@@ -103,55 +103,6 @@ void CGLWidget::Export(QString save_folder)
 	mWorker->ExportResults(save_folder);
 }
 
-//void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameters * parameters)
-//{
-//	for(int j = 0; j < parameters->GetNParams(); j++)
-//	{
-//		QList<QStandardItem *> items;
-//		QStandardItem * item;
-//
-//		// First the name
-//		item = new QStandardItem(QString::fromStdString(parameters->GetParamName(j)));
-//		items << item;
-//
-//		// Now the checkbox
-//		item = new CParameterItem(parameters, j);
-//		item->setEditable(true);
-//		item->setCheckable(true);
-//		if(parameters->IsFree(j))
-//			item->setCheckState(Qt::Checked);
-//		else
-//			item->setCheckState(Qt::Unchecked);
-//		items << item;
-//
-//		// The Value
-//		item = new CParameterItem(parameters, j);
-//		item->setEditable(true);
-//		item->setData(QVariant((double)parameters->GetParam(j)), Qt::DisplayRole);
-//		items << item;
-//
-//		// Minimum parameter value
-//		item = new CParameterItem(parameters, j);
-//		item->setEditable(true);
-//		item->setData(QVariant((double)parameters->GetMin(j)), Qt::DisplayRole);
-//		items << item;
-//
-//		// Maximum parameter value
-//		item = new CParameterItem(parameters, j);
-//		item->setEditable(true);
-//		item->setData(QVariant((double)parameters->GetMax(j)), Qt::DisplayRole);
-//		items << item;
-//
-//		// Maximum step size
-//		item = new CParameterItem(parameters, j);
-//		item->setEditable(true);
-//		item->setData(QVariant((double)parameters->GetStepSize(j)), Qt::DisplayRole);
-//		items << item;
-//
-//		parent_widget->appendRow(items);
-//	}
-//}
-
 void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
 {
 	// Get a reference to the map.
@@ -206,21 +157,6 @@ void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameterMap * pa
 		parent_widget->appendRow(items);
 	}
 }
-
-
-//QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameters * param_base)
-//{
-//	QList<QStandardItem *> items;
-//	QStandardItem * item;
-//	item = new QStandardItem(name);
-//	items << item;
-//	item = new QStandardItem(QString(""));
-//	items << item;
-//	item = new QStandardItem(QString::fromStdString(param_base->GetName()));
-//	items << item;
-//
-//	return items;
-//}
 
 QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameterMap * param_map)
 {
