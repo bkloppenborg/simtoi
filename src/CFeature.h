@@ -26,10 +26,10 @@ public:
 	CFeature();
 	virtual ~CFeature();
 
+	virtual void apply(CModel * model) = 0;
+
 	virtual string getID() const { return id; };
 	virtual string getName() const { return name; }
-
-	virtual void apply(CModel * model) = 0;
 };
 
 #endif /* CFEATURE_H_ */
