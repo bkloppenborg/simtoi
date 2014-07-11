@@ -119,7 +119,7 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 	const double omega_rot = mParams["omega_rot"].getValue();
 	const double T_eff_pole = mParams["T_eff_pole"].getValue();
 	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
-	const unsigned int n_sides = mParams["n_side_power"].getValue();
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 
 	// Generate a unit Healpix sphere
 	GenerateHealpixSphere(n_pixels, n_sides);
@@ -155,7 +155,7 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 		Init();
 
 	// See if the user change the tesselation
-	const unsigned int n_sides = mParams["n_side_power"].getValue();
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 	if(mParams["n_side_power"].isDirty())
 	{
 		Init();

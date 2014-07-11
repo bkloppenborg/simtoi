@@ -16,7 +16,8 @@ CHealpixSpheroid::CHealpixSpheroid() :
 
 	n_pixels = 0;
 
-	addParameter("n_side_power", 4, 1, 10, false, 1, "Healpix Sides", "Number of pixels per Healpix grid site. 4-6 is often adequate.");
+	addParameter("n_side_power", 5, 1, 10, false, 1, "Healpix subdivisions",
+			"The square of this number becomes the number of pixels per healpix pixel. A value of 4-6 is often adequate.");
 	addParameter("r_pole", 1, 1, 10, false, 1, "R_pole", "Radius at the pole (unit agnostic)");
 }
 
@@ -35,7 +36,7 @@ void CHealpixSpheroid::FindPixels(double radius, double theta, double phi,
 {
 	// Look up the (x,y,z) position of the target (r, theta, phi) center.
 	long target_pixel = 0;
-	const unsigned int n_sides = mParams["n_side_power"].getValue();
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 	ang2pix_nest(n_sides, theta, phi, &target_pixel);
 	double pixel_radius = pixel_radii[target_pixel];
 
@@ -177,7 +178,7 @@ void CHealpixSpheroid::Init()
 	if(mVBO) glDeleteBuffers(1, &mVBO);
 	if(mVAO) glDeleteVertexArrays(1, &mVAO);
 
-	const unsigned int n_sides = mParams["n_side_power"].getValue();
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 
 	n_pixels = nside2npix(n_sides);
 
