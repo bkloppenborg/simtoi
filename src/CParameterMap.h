@@ -48,6 +48,8 @@ public:
 	virtual string getName() const { return name; };
 	CParameter & getParameter(string id);
 
+	virtual bool isDirty();
+
 	void restore(Json::Value input);
 
 	Json::Value serialize();

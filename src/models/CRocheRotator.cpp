@@ -173,7 +173,11 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	if(mParams["g_pole"].isDirty() || mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
 		ComputeGravity(g_pole, r_pole, omega_rot);
 
-	if(mParams["T_eff_pole"].isDirty() || mParams["g_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
+	bool feature_dirty = false;
+	for(auto feature: mFeatures)
+		feature_dirty |= feature->isDirty();
+
+	if(feature_dirty || mParams["T_eff_pole"].isDirty() || mParams["g_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
 		VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
 	for(auto feature: mFeatures)

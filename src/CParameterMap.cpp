@@ -170,6 +170,18 @@ CParameter & CParameterMap::getParameter(string id)
 	return mParams.at(id);
 }
 
+/// Determines whether or not ANY of the dirty flags are set for this object
+/// If at least one dirty flag is set the object is considered dirty.
+bool CParameterMap::isDirty()
+{
+	bool is_dirty = false;
+
+	for(auto it: mParams)
+		is_dirty |= it.second.isDirty();
+
+	return is_dirty;
+}
+
 /// \brief Restores parameters values from the JSON value
 ///
 /// Restores parameter values, names, and min/max values from a JSON save file.

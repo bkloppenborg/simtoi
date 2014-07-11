@@ -18,4 +18,3 @@ CFeature::~CFeature()
 {
 	// TODO Auto-generated destructor stub
 }
-
