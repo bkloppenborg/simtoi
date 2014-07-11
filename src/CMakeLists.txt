@@ -15,6 +15,10 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/QT ${CMAKE_CURRENT_BINARY_DIR}/QT)
 add_subdirectory(QT) 
 
+# Define the version of QT found
+add_definitions( -DQT_VERSION_MAJOR=${QT_VERSION_MAJOR} )
+add_definitions( -DQT_VERSION_MINOR=${QT_VERSION_MINOR} )
+
 add_subdirectory(scripts)
 add_subdirectory(models)
 add_subdirectory(features)

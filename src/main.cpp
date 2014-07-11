@@ -35,9 +35,19 @@
 
 #include <QtGui>
 #include <QApplication>
+
+// Include to enable threads on X11
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>
-#endif
+#endif // Q_WS_X11
+
+// Definition of the QT version. These should be set by the CMake script using compiler directives.
+#ifndef QT_VERSION_MAJOR
+#define QT_VERSION_MAJOR 4
+#endif // QT_VERSION_MAJOR
+#ifndef QT_VERSION_MINOR
+#define QT_VERSION_MINOR 0
+#endif // QT_VERSION_MINOR
 
 #include <iostream>
 
@@ -51,15 +61,21 @@ extern string EXE_FOLDER;
 // The main routine.
 int main(int argc, char *argv[])
 {
-#ifdef Q_WS_X11
-    // X11 requires an explicit initialization for threading:
+	// X11 requires some special initialzation for threaded OpenGL rendering.
+#if QT_VERSION_MAJOR >= 4 && QT_VERSION_MINOR >= 8
+	// For QT >= 4.8, we have to set a global QT attribute
+    QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
+#elif defined Q_WS_X11
+    // For all other versions of QT running on X11, the following (should) be sufficient.
     XInitThreads();
-    // For QT 4.8 we'll need to use this line instead.
-    //app.setAttribute(Qt::AA_X11InitThreads, true);
 #endif
+
+    // QT versions < 4.8, the above
+
 
 	// Pass off to the GUI:
     QApplication app(argc, argv);
+
 
     // determine the absolute directory from which SIMTOI is running
     EXE_FOLDER = app.applicationDirPath().toStdString();
