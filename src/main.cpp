@@ -82,9 +82,8 @@ int main(int argc, char *argv[])
 
     main_window.SetOutputDir(output_dir);
 
-    if(data_files.size() > 0)
+    if(data_files.size() > 0 || model_files.size() > 0)
     	main_window.CommandLine(data_files, model_files, minimizer, close_simtoi);
-
 
     return app.exec();
 }
