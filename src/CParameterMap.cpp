@@ -184,6 +184,10 @@ void CParameterMap::restore(Json::Value input)
 		CParameter & param = it->second;
 		string id = param.getID();
 
+		// If this parameter is not in the JSON file, skip it.
+		if(!input.isMember(id))
+			continue;
+
 		// Disable bounds checking while restoring values.
 		// Hopefully the save files are consistent!
 		param.toggleBoundsChecks(false);
