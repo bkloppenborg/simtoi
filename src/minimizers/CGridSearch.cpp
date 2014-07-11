@@ -104,7 +104,7 @@ void CGridSearch::GridSearch(unsigned int level)
 	{
 		double step = mSteps[level];
 		double min = mMinMax[level].first;
-		double max = mMinMax[level].second + step;
+		double max = mMinMax[level].second;
 		for(double value = min; value < max; value += step)
 		{
 			if(!mRun)
