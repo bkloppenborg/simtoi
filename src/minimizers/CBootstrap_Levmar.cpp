@@ -37,26 +37,6 @@ CMinimizerPtr CBootstrap_Levmar::Create()
 	return CMinimizerPtr(new CBootstrap_Levmar());
 }
 
-/// \brief Overwride the CMinimizerThread::ExportResult
-///
-/// The CLevmar::run() function calls CMinimizerThread::ExportResult whenever a minimization
-///	run completes. This writes out files which we don't need when bootstrapping. Here we
-/// override that functionality and only write out the names of the best-fit parameters.
-void CBootstrap_Levmar::ExportResults()
-{
-	ofstream outfile;
-
-	// Get a pointer to the model list;
-    CModelListPtr model_list = mWorkerThread->GetModelList();
-	vector<string> names = model_list->GetFreeParamNames();
-
-	OpenStatisticsFile(outfile);
-	WriteHeader(names, outfile);
-
-	outfile.flush();
-	outfile.close();
-}
-
 void CBootstrap_Levmar::Init(shared_ptr<CWorkerThread> worker_thread)
 {
 	// call the base class initialization routine
@@ -156,6 +136,11 @@ void CBootstrap_Levmar::run()
 		// Save to the file
 		WriteRow(mLevmar->mParams, mLevmar->mNParams, chi2r_ave, mOutputFile);
 	}
+
+	// Copy the nominal values back to the best-fit values
+
+	for(unsigned int i = 0; i < mNParams; i++)
+		mParams[i] = nominal_params[i];
 
 	ExportResults();
 

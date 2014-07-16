@@ -30,7 +30,6 @@ protected:
 	shared_ptr<CLevmar> mLevmar;
 
 public:
-	virtual void ExportResults();
 	void Init(shared_ptr<CWorkerThread> worker_thread);
 
 	virtual void run();
