@@ -69,7 +69,7 @@ double CMinimizerThread::ComputeChi2r(valarray<double> & chis, unsigned int n_pa
 	return chi2_sum / (chis.size() - n_params - 1);
 }
 
-/// \brief Exports the parameter names, best-fit values, and model data.
+/// \brief Exports the parameter names, best-fit values, and JSON save file, and model data.
 ///
 /// Exports minimization results using the best-fit parameters stored in
 /// the mParams buffer.
