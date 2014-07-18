@@ -5,24 +5,45 @@ The SImulation and Modeling Tool for Optical Interferometry
 
 ## Installing prerequisites
 
-### Build environment
+If you are building SIMTOI from scratch you will need several prerequisites.
 
-If you are building SIMTOI from scratch, you will need a C, C++, and Fortran
-compiler along with the CMake build system. On a Debian-based system these
-can be installed using `apt-get`:
+### The OpenCL Interferometry Library (liboi)
 
-    sudo apt-get install build-essential cmake gfortran
+SIMTOI depends extensively on the 
+[OpenCL Interferometry Library (liboi)](https://github.com/bkloppenborg/liboi)
+for computing interferometric observables. Before you attempt to install SIMTOI,
+please install the prerequisites for `liboi`, build it, and run the `liboi_test`
+and `liboi_benchmark` programs. 
 
-If you intend to use Git to checkout the repository, you also need to install it
+During this process you will end up installing several prerequisites that are 
+not mentioned below including `cfitsio`, `ccfits`
 
-    sudo apt-get install git
+### Apple / OS X
 
-All of the minimization engines presently used in SIMTOI use LAPACK and/or BLAS
-for solving linear systems of equations. SIMTOI also requires ccfits, cfitsio
-QT4 and an OpenGL library. These can all be installed via. `apt-get`:
+In addition to the requirements for installing the [OpenCL Interferometry Library (liboi)](https://github.com/bkloppenborg/liboi) you will also need to install:
 
-    sudo apt-get install liblapack-dev libblas-dev libccfits0 libccfits-dev 
-        libqt4-dev libglu1-mesa libglu1-mesa-dev
+* QT4
+* LAPACK and BLAS (optional for SIMTOI, but required for most minimization engines)
+
+These packages can be installed using port with the following command:
+
+    port install qt4-mac 
+
+Please note, depending on the status of QT within macport, you may also need 
+to install the `qt4-mac-devel` package.
+
+### Ubuntu / Debian
+
+In addition to the requirements for installing the [OpenCL Interferometry Library (liboi)](https://github.com/bkloppenborg/liboi) you will also need to install:
+
+* QT4
+* LAPACK and BLAS (optional for SIMTOI, but required for most minimization engines)
+* OpenGL libraries 
+
+These can all be installed with `apt-get` using the following command:
+
+    sudo apt-get install libqt4-dev liblapack-dev libblas-dev
+        libglu1-mesa libglu1-mesa-dev
 
 ### OpenGL and OpenCL
 
