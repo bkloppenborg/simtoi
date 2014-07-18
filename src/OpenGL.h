@@ -30,6 +30,8 @@
 #define OPENGL_SUCCESS 0
 #define OPENGL_FAILURE 1
 
+static void printGLErrorDetail(GLenum error_code, std::string message);
+
 /// Checks for the status of an OpenGL error and generates an error message is one is
 /// detected.
 static int checkGLError(GLenum input, GLenum reference, std::string message, bool critical_error = true)
@@ -37,15 +39,21 @@ static int checkGLError(GLenum input, GLenum reference, std::string message, boo
 	if(input != reference)
 	{
 		// Look up the OpenGL error message
-		std::string error_string = (const char *) gluErrorString(input);
-		std::cout << "Error: "<< message << " Error code : " << input << std::endl;;
-		std::cout << error_string << std::endl;
+		printGLErrorDetail(input, message);
 
 		if(critical_error)
 			return OPENGL_FAILURE;
 	}
 
 	return OPENGL_SUCCESS;
+}
+
+static void printGLErrorDetail(GLenum error_code, std::string message)
+{
+	std::string error_string = (const char *) gluErrorString(error_code);
+	std::cout << "Error: "<< message << std::endl;
+	std::cout << "OpenGL error code: " << error_code << std::endl;;
+	std::cout << "OpenGL error description: " << error_string << std::endl;
 }
 
 /// Macro which checks and marks the source of an OpenGL error and throws a runtime_error if

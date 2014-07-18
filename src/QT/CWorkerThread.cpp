@@ -180,15 +180,14 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create renderbuffer storage");
 
+    // Get the status of the OpenGL framebuffer
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-    // Check that status of our generated frame buffer
-    if (status != GL_FRAMEBUFFER_COMPLETE)
+    // Check the status. If it is not GL_FRAMEBUFFER_COMPLETE generate an error message
+    // and throw a runtime error.
+    if(checkGLError(status, GL_FRAMEBUFFER_COMPLETE, "Could not create multisample render buffer."))
     {
-    	const GLubyte * errStr = gluErrorString(status);
-        printf("Couldn't create multisample frame buffer: %x %s\n", status, (char*)errStr);
-        delete errStr;
-        exit(0); // Exit the application
+        cout << "Location : " << __FILE__ << ":" << __LINE__<< std::endl; \
+        throw runtime_error("OpenGL error detected."); \
     }
 
     // All done, bind back to the default framebuffer.
@@ -221,15 +220,14 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 	// If your implementation gives you an error, try this line instead:
 //	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
 
+    // Get the status of the OpenGL framebuffer
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-    // Check that status of our generated frame buffer
-    if (status != GL_FRAMEBUFFER_COMPLETE)
+    // Check the status. If it is not GL_FRAMEBUFFER_COMPLETE generate an error message
+    // and throw a runtime error.
+    if(checkGLError(status, GL_FRAMEBUFFER_COMPLETE, "Could not create storage buffer."))
     {
-    	const GLubyte * errStr = gluErrorString(status);
-        printf("Couldn't create storage frame buffer: %x %s\n", status, (char*)errStr);
-        delete errStr;
-        exit(0); // Exit the application
+        cout << "Location : " << __FILE__ << ":" << __LINE__<< std::endl; \
+        throw runtime_error("OpenGL error detected."); \
     }
 
     // All done, bind back to the default framebuffer
