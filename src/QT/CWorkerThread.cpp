@@ -214,11 +214,18 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create storage buffer");
 
-	// ATI's implementation of OpenGL doesn't seem to have glFramebufferTexture
-	// so we use the 2D version instead:
+	// Some OpenGL implementation seem to be missing glFramebufferTexture, but
+	// they have glFramebufferTexture2D. The src/CMakeLists.txt file sets the
+	// HAVE_GL_FRAMEBUFFER_TEXTURE and/or HAVE_GL_FRAMEBUFFER_TEXTURE_2D
+	// directives depending on which is detected at during the CMake invocation.
+#ifdef HAVE_GL_FRAMEBUFFER_TEXTURE
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
+#elif HAVE_GL_FRAMEBUFFER_TEXTURE_2D
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO_storage_texture, 0);
-	// If your implementation gives you an error, try this line instead:
-//	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FBO_storage_texture, 0);
+#else
+#error "OpenGL implmentation does not define glFramebufferTexture or glFramebufferTexture2D"
+#endif // HAVE_GL_FRAMEBUFFER_TEXTURE
+
 
     // Get the status of the OpenGL framebuffer
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
