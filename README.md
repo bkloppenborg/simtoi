@@ -24,10 +24,11 @@ In addition to the requirements for installing the [OpenCL Interferometry Librar
 
 * QT4
 * LAPACK and BLAS (optional for SIMTOI, but required for most minimization engines)
+* OpenGL Mathematics Library (glm)
 
 These packages can be installed using port with the following command:
 
-    port install qt4-mac 
+    port install qt4-mac glm
 
 Please note, depending on the status of QT within macport, you may also need 
 to install the `qt4-mac-devel` package.
@@ -39,11 +40,12 @@ In addition to the requirements for installing the [OpenCL Interferometry Librar
 * QT4
 * LAPACK and BLAS (optional for SIMTOI, but required for most minimization engines)
 * OpenGL libraries 
+* OpenGL Mathematics Library (glm)
 
 These can all be installed with `apt-get` using the following command:
 
     sudo apt-get install libqt4-dev liblapack-dev libblas-dev
-        libglu1-mesa libglu1-mesa-dev
+        libglu1-mesa libglu1-mesa-dev libglm-dev
 
 ### OpenGL and OpenCL
 
