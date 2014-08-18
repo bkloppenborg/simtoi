@@ -72,9 +72,9 @@ void CGridSearch::ExportResults()
 	CMinimizerThread::ExportResults();
 }
 
-/// \brief A recurisve gridsearch function
+/// \brief A recursive gridsearch function
 ///
-/// Recursivly calls gridsearch until the final level is found. At this level
+/// Recursively calls gridsearch until the final level is found. At this level
 /// the data are simulated and written to mOutputFile. Data are flushed to disk
 /// after a level %2 == 0 iteration completes.
 void CGridSearch::GridSearch(unsigned int level)
@@ -100,7 +100,7 @@ void CGridSearch::GridSearch(unsigned int level)
 			mBestFit[mNParams] = chi2r;
 		}
 	}
-	else	// Otherwise set the current parameter value and then recursivly call the next level.
+	else	// Otherwise set the current parameter value and then recursively call the next level.
 	{
 		double step = mSteps[level];
 		double min = mMinMax[level].first;
