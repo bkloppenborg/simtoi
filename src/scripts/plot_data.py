@@ -95,8 +95,18 @@ def plot_v2(data, model, axis):
     if data == None or model == None:
         return None, None
     
+    # Matplotlib can't plot error bars with lower bounds <= 0 on a logarithmic
+    # plot. To get around this we 
+    v2_data = data['v2']
+    v2_err_ub = data['v2_err']
+    v2_err_lb = data['v2_err']
+
+    for i in range(0, len(v2_data)):
+        if(v2_err_lb[i] >= v2_data[i]):
+            v2_err_lb[i] = 0.99999 * v2_data[i]
+
     # in the top plot, put the data and model
-    plotline_data = axis.errorbar(data['uv_mag'], data['v2'], yerr=data['v2_err'], 
+    plotline_data = axis.errorbar(data['uv_mag'], v2_data, yerr=[v2_err_lb, v2_err_ub], 
         fmt='+', label="Data")
     plotline_model = axis.errorbar(model['uv_mag'], model['v2'], fmt='x', 
         label="Model")
@@ -114,7 +124,7 @@ def plot_v2_residuals(data, model, axis):
     """
 
     if data == None or model == None:
-        return None, None
+        return None, None, None
     
     # in the bottom plot, put the residuals
     ylimits = [-5, 5]
@@ -166,17 +176,27 @@ def t3_plot(data_file, model_file, autosave=False, saveformat='svg', title=None,
     else:
         plt.show()
 
-def plot_t3_amp(data, model, axis):
+def plot_t3_amp(data, model, axis, ylim=None):
     """Plots the t3 amplitude and phase
     Returns plotlines for the data and model
     """
 
     if data == None or model == None:
         return None, None
+
+    # Matplotlib can't plot error bars with lower bounds <= 0 on a logarithmic
+    # plot. To get around this we 
+    t3_data = data['t3_amp']
+    t3_err_ub = data['t3_amp_err']
+    t3_err_lb = data['t3_amp_err']
+
+    for i in range(0, len(t3_data)):
+        if(t3_err_lb[i] >= t3_data[i]):
+            t3_err_lb[i] = 0.99999 * t3_data[i]
     
     # in the top plot, put the data and model
-    plotline_data = axis.errorbar(data['uv_mag'], data['t3_amp'], 
-        yerr=data['t3_amp_err'], fmt='+', label="Data")
+    plotline_data = axis.errorbar(data['uv_mag'], t3_data, 
+        yerr=[t3_err_lb,t3_err_ub], fmt='+', label="Data")
     plotline_model = axis.errorbar(model['uv_mag'], model['t3_amp'], fmt='x', label="Model")
     axis.set_ylabel("$T_3$ A")
     axis.grid(True)
