@@ -47,6 +47,7 @@
 #include <QMutex>
 #include <QSemaphore>
 #include <QSize>
+#include <QGLFramebufferObject>
 #include <valarray>
 #include <memory>
 #include <queue>
@@ -151,6 +152,9 @@ public:
     void AllocateBuffer();
 
 public:
+    void BlitToBuffer(QGLFramebufferObject * input, QGLFramebufferObject * output);
+    void BlitToScreen(QGLFramebufferObject * input);
+
     void BlitToBuffer(GLuint in_buffer, GLuint out_buffer);
     void BlitToScreen(GLuint FBO);
     void BootstrapNext(unsigned int maxBootstrapFailures);
@@ -159,6 +163,9 @@ public:
 protected:
     void ClearQueue();
 public:
+    QGLFramebufferObject * CreateMAARenderbuffer();
+    QGLFramebufferObject * CreateStorageBuffer();
+
     void CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture, int n_layers);
     void CreateGLBuffer(GLuint & FBO, GLuint & FBO_texture, GLuint & FBO_depth, GLuint & FBO_storage, GLuint & FBO_storage_texture);
     void CreateGLMultisampleRenderBuffer(unsigned int width, unsigned int height, unsigned int samples,

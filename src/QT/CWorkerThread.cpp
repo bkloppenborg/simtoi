@@ -26,6 +26,8 @@
 
 #include "CWorkerThread.h"
 #include <QMutexLocker>
+#include <QGLFramebufferObjectFormat>
+#include <QRect>
 #include <stdexcept>
 
 #define GLM_FORCE_RADIANS
@@ -86,6 +88,19 @@ void CWorkerThread::AddModel(CModelPtr model)
 	Enqueue(RENDER);
 }
 
+/// Blits the contents of the input buffer to the output buffer
+void CWorkerThread::BlitToBuffer(QGLFramebufferObject * input, QGLFramebufferObject * output)
+{
+    QRect region(0, 0, mImageWidth, mImageHeight);
+    QGLFramebufferObject::blitFramebuffer (input, region, output, region);
+}
+
+/// Blits the content of the intput buffer to screen.
+void CWorkerThread::BlitToScreen(QGLFramebufferObject * input)
+{
+	BlitToBuffer(input, NULL);
+}
+
 void CWorkerThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer)
 {
 	// TODO: Need to figure out how to use the layer
@@ -134,6 +149,35 @@ void CWorkerThread::BootstrapNext(unsigned int maxBootstrapFailures)
 
 	// Wait for the operation to complete.
 	mWorkerSemaphore.acquire(1);
+}
+
+/// Creates an RGBA32F MAA framebuffer
+QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
+{
+    // Create an RGBA32F MAA buffer
+    QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
+    fbo_format.setInternalTextureFormat(GL_RGBA32F);
+    fbo_format.setTextureTarget(GL_TEXTURE_2D);
+
+    const QSize size(mImageWidth, mImageHeight);
+
+    QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
+    return FBO;
+}
+
+/// Creates an R32F non-MAA framebuffer
+QGLFramebufferObject * CWorkerThread::CreateStorageBuffer()
+{
+    // Create an RGBA32F MAA buffer
+    QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
+    fbo_format.setInternalTextureFormat(GL_R32F);
+    fbo_format.setSamples(0);
+    fbo_format.setTextureTarget(GL_TEXTURE_2D);
+
+    const QSize size(mImageWidth, mImageHeight);
+
+    QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
+    return FBO;
 }
 
 /// Create an OpenGL framebuffer and storage buffers matching the default OpenGL image
