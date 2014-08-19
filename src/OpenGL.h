@@ -52,7 +52,15 @@ static int checkGLError(GLenum input, GLenum reference, std::string message, boo
 
 static void printGLErrorDetail(GLenum error_code, std::string message)
 {
+	// Ugly workaround for OSX 10.9 deprecating gluErrorString
+#ifdef __APPLE__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wno-deprecated"
+#endif // __APPLE__
 	std::string error_string = (const char *) gluErrorString(error_code);
+#ifdef __APPLE__
+#pragma GCC diagnostic pop
+#endif // __APPLE__
 	std::cout << "Error: "<< message << std::endl;
 	std::cout << "OpenGL error code: " << error_code << std::endl;;
 	std::cout << "OpenGL error description: " << error_string << std::endl;
