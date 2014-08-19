@@ -40,11 +40,8 @@ extern string EXE_FOLDER;
 CPhotometry::CPhotometry(CWorkerThread * WorkerThread)
 	: CTask(WorkerThread)
 {
-	mFBO = 0;
-	mFBO_texture = 0;
-	mFBO_depth = 0;
-	mFBO_storage = 0;
-	mFBO_storage_texture = 0;
+	mFBO_render = NULL;
+	mFBO_storage = NULL;
 
 	mLibOI = NULL;
 	mLibOIInitialized = false;
@@ -58,11 +55,8 @@ CPhotometry::~CPhotometry()
 {
 	delete mLibOI;
 
-	if(mFBO) glDeleteFramebuffers(1, &mFBO);
-	if(mFBO_texture) glDeleteFramebuffers(1, &mFBO_texture);
-	if(mFBO_depth) glDeleteFramebuffers(1, &mFBO_depth);
-	if(mFBO_storage) glDeleteFramebuffers(1, &mFBO_storage);
-	if(mFBO_storage_texture) glDeleteFramebuffers(1, &mFBO_storage_texture);
+	if(mFBO_render) delete mFBO_render;
+	if(mFBO_storage) delete mFBO_storage;
 }
 
 /// \brief Creates a new data set by selecting a subset of the loaded data
@@ -251,7 +245,7 @@ void CPhotometry::InitBuffers()
 
 		// Initalize remaining OpenCL items.
 		mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
-		mLibOI->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
+		mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
 		mLibOI->SetImageInfo(width, height, depth, scale);
 
 		// Get LibOI up and running
@@ -263,21 +257,11 @@ void CPhotometry::InitBuffers()
 
 void CPhotometry::InitGL()
 {
-	// enforce the maxmium number of layers in images.
-	GLint max_gl_layers = 128;
-#ifdef GL_MAX_FRAMEBUFFER_LAYERS
-	glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &max_gl_layers);
-#endif
+	if(mFBO_render) delete mFBO_render;
+	if(mFBO_storage) delete mFBO_storage;
 
-	unsigned int max_gl_depth = max_gl_layers;
-
-	// TODO: Look this up from the Open CL context.
-	unsigned int max_cl_depth = 256;
-
-	unsigned int max_layers = min(max_gl_depth, max_cl_depth);
-
-	// Init framebuffers
-	mWorkerThread->CreateGLBuffer(mFBO, mFBO_texture, mFBO_depth, mFBO_storage, mFBO_storage_texture, max_layers);
+	mFBO_render = mWorkerThread->CreateMAARenderbuffer();
+	mFBO_storage = mWorkerThread->CreateStorageBuffer();
 }
 
 void CPhotometry::InitCL()
@@ -343,12 +327,14 @@ double CPhotometry::SimulatePhotometry(CModelListPtr model_list, double jd)
 
 	// Set the time, render the model
 	model_list->SetTime(jd);
-	model_list->Render(mFBO, mWorkerThread->GetView());
+	mFBO_render->bind();
+	model_list->Render(mWorkerThread->GetView());
+	mFBO_render->release();
 
 	// Blit to the storage buffer (for liboi to use the image)
-	mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+	mWorkerThread->BlitToBuffer(mFBO_render, mFBO_storage);
 	// Blit to the screen (to show the user, not required, but nice.
-	mWorkerThread->BlitToScreen(mFBO);
+	mWorkerThread->BlitToScreen(mFBO_render);
 
 	// Compute the flux:
 	mLibOI->CopyImageToBuffer(0);

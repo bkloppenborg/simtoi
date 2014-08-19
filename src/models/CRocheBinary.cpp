@@ -259,7 +259,7 @@ void CRocheBinary::ComputeRadii(double * radii, const double * theta,
 	}
 }
 
-void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
+void CRocheBinary::Render(const glm::mat4 & view)
 {
 	if (!mModelReady)
 		Init();
@@ -275,9 +275,6 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 	double radial_scale = mParams["scale"].getValue();
 	mat4 scale = glm::scale(mat4(),
 			glm::vec3(radial_scale, radial_scale, radial_scale));
-
-	// Bind to the framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
@@ -309,9 +306,6 @@ void CRocheBinary::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// unbind from the Vertex Array Object, Vertex Buffer Object, and Element buffer object.
 	glBindVertexArray(0);
-
-	// Return to the default framebuffer before leaving.
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }

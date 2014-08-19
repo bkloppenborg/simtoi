@@ -149,7 +149,7 @@ protected:
 	virtual void InitShaderVariables();
 
 public:
-	virtual void Render(GLuint framebuffer_object, const glm::mat4 & view) = 0;
+	virtual void Render(const glm::mat4 & view) = 0;
 public:
 	void Restore(Json::Value input);
 

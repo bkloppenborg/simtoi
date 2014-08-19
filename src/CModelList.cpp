@@ -153,7 +153,7 @@ vector<string> CModelList::GetTypes(void)
 }
 
 // Render the image to the specified OpenGL framebuffer object.
-void CModelList::Render(GLuint fbo, const mat4 & view)
+void CModelList::Render(const mat4 & view)
 {
 	// We render the models in order by depth (i.e. z-direction).
 	// To do this, we do a shallow copy of the model vector, then sort by z.
@@ -161,19 +161,19 @@ void CModelList::Render(GLuint fbo, const mat4 & view)
 	sort(models.begin(), models.end(), SortByZ);
 
 	// First clear the buffer.
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+//    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
     // Now call render on all of the models:
     for(auto model : models)
     {
-    	model->Render(fbo, view);
+    	model->Render(view);
     	model->clearFlags();
     }
 
     // Bind back to the default framebuffer and let OpenGL finish:
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glFlush();
     glFinish();
 }

@@ -18,7 +18,7 @@ public:
 
 public:
 
-	void Render(GLuint framebuffer_object, const glm::mat4 & view);
+	void Render(const glm::mat4 & view);
 
 	static shared_ptr<CModel> Create();
 

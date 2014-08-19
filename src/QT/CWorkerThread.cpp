@@ -28,6 +28,7 @@
 #include <QMutexLocker>
 #include <QGLFramebufferObjectFormat>
 #include <QRect>
+#include <QImage>
 #include <stdexcept>
 
 #define GLM_FORCE_RADIANS
@@ -58,6 +59,8 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageScale = 0.05;
     mImageSamples = 4;
 
+    mFBO_render = NULL;
+
 	// Initialize the model and task lists:
     mModelList = CModelListPtr(new CModelList());
 	mTaskList = CTaskListPtr(new CTaskList(this));
@@ -70,11 +73,7 @@ CWorkerThread::~CWorkerThread()
 		stop();
 
 	// Free local OpenGL objects.
-	glDeleteFramebuffers(1, &mFBO);
-	glDeleteFramebuffers(1, &mFBO_texture);
-	glDeleteFramebuffers(1, &mFBO_depth);
-	glDeleteFramebuffers(1, &mFBO_storage);
-	glDeleteFramebuffers(1, &mFBO_storage_texture);
+	if(mFBO_render) delete mFBO_render;
 }
 
 /// Appends a model to the list of models.
@@ -89,16 +88,19 @@ void CWorkerThread::AddModel(CModelPtr model)
 }
 
 /// Blits the contents of the input buffer to the output buffer
-void CWorkerThread::BlitToBuffer(QGLFramebufferObject * input, QGLFramebufferObject * output)
+void CWorkerThread::BlitToBuffer(QGLFramebufferObject * source, QGLFramebufferObject * target)
 {
     QRect region(0, 0, mImageWidth, mImageHeight);
-    QGLFramebufferObject::blitFramebuffer (input, region, output, region);
+    QGLFramebufferObject::blitFramebuffer (target, region, source, region);
+    CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to blit buffer");
 }
 
 /// Blits the content of the intput buffer to screen.
 void CWorkerThread::BlitToScreen(QGLFramebufferObject * input)
 {
-	BlitToBuffer(input, NULL);
+	BlitToBuffer(input, 0);
+
+    SwapBuffers();
 }
 
 void CWorkerThread::BlitToBuffer(GLuint in_buffer, GLuint out_buffer)
@@ -162,6 +164,9 @@ QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
     const QSize size(mImageWidth, mImageHeight);
 
     QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
+
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a RGBA32F MAA framebuffer");
+
     return FBO;
 }
 
@@ -177,6 +182,7 @@ QGLFramebufferObject * CWorkerThread::CreateStorageBuffer()
     const QSize size(mImageWidth, mImageHeight);
 
     QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a R32F non-MAA framebuffer");
     return FBO;
 }
 
@@ -453,6 +459,7 @@ void CWorkerThread::run()
     // Setup the OpenGL context
     // Set the clear color to black:
 	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Dithering is a fractional pixel filling technique that allows you to
 	// combine some colors to create the effect of other colors. The non-full
 	// fill fraction of pixels could negativly impact the interferometric
@@ -481,9 +488,10 @@ void CWorkerThread::run()
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to initalize OpenGL");
 
-	// Now create this thread's off-screen buffers to match other off-screen buffers
-	// All rendering of objects from the UI happens here.
-	CreateGLBuffer(mFBO, mFBO_texture, mFBO_depth, mFBO_storage, mFBO_storage_texture);
+
+	if(mFBO_render) delete mFBO_render;
+	mFBO_render = CreateMAARenderbuffer();
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create off-screen renderbuffer");
 
 	// Now have the workers initialize any OpenGL objects they need
 	mTaskList->InitGL();
@@ -534,8 +542,12 @@ void CWorkerThread::run()
 			break;
 
 		case RENDER:
-			mModelList->Render(mFBO, mView);
-			BlitToScreen(mFBO);
+			mFBO_render->bind();
+			mModelList->Render(mView);
+		    mFBO_render->release();
+
+		    BlitToScreen(mFBO_render);
+
 			break;
 
 		case SET_TIME:

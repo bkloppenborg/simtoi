@@ -44,11 +44,8 @@ using namespace liboi;
 class COI: public CTask
 {
 protected:
-    GLuint mFBO;
-	GLuint mFBO_texture;
-	GLuint mFBO_depth;
-    GLuint mFBO_storage;
-	GLuint mFBO_storage_texture;
+	QGLFramebufferObject * mFBO_render;
+	QGLFramebufferObject * mFBO_storage;
 
 	CLibOI * mLibOI;
 	bool mLibOIInitialized;

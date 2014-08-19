@@ -48,11 +48,8 @@ extern string EXE_FOLDER;
 COI::COI(CWorkerThread * WorkerThread)
 	: CTask(WorkerThread)
 {
-    mFBO = 0;
-	mFBO_texture = 0;
-	mFBO_depth = 0;
-    mFBO_storage = 0;
-	mFBO_storage_texture = 0;
+	mFBO_render = NULL;
+	mFBO_storage = NULL;
 
 	mLibOI = NULL;
 	mLibOIInitialized = false;
@@ -71,11 +68,8 @@ COI::~COI()
 	delete mLibOI;
 	if(mTempFloat) delete mTempFloat;
 
-	if(mFBO) glDeleteFramebuffers(1, &mFBO);
-	if(mFBO_texture) glDeleteFramebuffers(1, &mFBO_texture);
-	if(mFBO_depth) glDeleteFramebuffers(1, &mFBO_depth);
-	if(mFBO_storage) glDeleteFramebuffers(1, &mFBO_storage);
-	if(mFBO_storage_texture) glDeleteFramebuffers(1, &mFBO_storage_texture);
+	if(mFBO_render) delete mFBO_render;
+	if(mFBO_storage) delete mFBO_storage;
 }
 
 /// \brief Creates a new data set via. bootstrapping and replacing currently loaded data.
@@ -170,10 +164,12 @@ void COI::Export(string folder_name)
 
 		// Set the current JD, render the model.
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
-		model_list->Render(mFBO, mWorkerThread->GetView());
+		mFBO_render->bind();
+		model_list->Render(mWorkerThread->GetView());
+		mFBO_render->release();
 		// Blit to the storage buffer (for liboi to use the image)
-		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
-		mWorkerThread->BlitToScreen(mFBO);
+		mWorkerThread->BlitToBuffer(mFBO_render, mFBO_storage);
+		mWorkerThread->BlitToScreen(mFBO_render);
 		mLibOI->CopyImageToBuffer(0);
 
 		// Now export the image, overwriting any image that already exists:
@@ -240,12 +236,14 @@ void COI::GetChi(double * chis, unsigned int size)
 	{
 		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
-		model_list->Render(mFBO, mWorkerThread->GetView());
+		mFBO_render->bind();
+		model_list->Render(mWorkerThread->GetView());
+		mFBO_render->release();
 
 		// Blit to the storage buffer (for liboi to use the image)
-		mWorkerThread->BlitToBuffer(mFBO, mFBO_storage);
+		mWorkerThread->BlitToBuffer(mFBO_render, mFBO_storage);
 		// Blit to the screen (to show the user, not required, but nice.
-		mWorkerThread->BlitToScreen(mFBO);
+		mWorkerThread->BlitToScreen(mFBO_render);
 
 		mLibOI->CopyImageToBuffer(0);
 
@@ -316,7 +314,7 @@ void COI::InitBuffers()
 
 		// Initalize remaining OpenCL items.
 		mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
-		mLibOI->SetImageSource(mFBO_storage_texture, LibOIEnums::OPENGL_TEXTUREBUFFER);
+		mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
 		mLibOI->SetImageInfo(width, height, depth, scale);
 
 		// Get LibOI up and running
@@ -328,8 +326,11 @@ void COI::InitBuffers()
 
 void COI::InitGL()
 {
-	// Init framebuffers
-	mWorkerThread->CreateGLBuffer(mFBO, mFBO_texture, mFBO_depth, mFBO_storage, mFBO_storage_texture);
+	if(mFBO_render) delete mFBO_render;
+	if(mFBO_storage) delete mFBO_storage;
+
+	mFBO_render = mWorkerThread->CreateMAARenderbuffer();
+	mFBO_storage = mWorkerThread->CreateStorageBuffer();
 }
 
 void COI::InitCL()

@@ -93,7 +93,7 @@ void CDisk_ConcentricRings::Init()
 	mModelReady = true;
 }
 
-void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & view)
+void CDisk_ConcentricRings::Render(const glm::mat4 & view)
 {
 	if(!mModelReady)
 		Init();
@@ -107,9 +107,6 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & 
 	// Set the color
 	mFluxTexture[0].r = mParams["color"].getValue();
 	mFluxTexture[0].a = 1.0;
-
-	// Bind to the framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
@@ -184,9 +181,6 @@ void CDisk_ConcentricRings::Render(GLuint framebuffer_object, const glm::mat4 & 
 
 	// bind back to the default texture.
 	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-
-	// Return to the default framebuffer before leaving.
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed.");
 }

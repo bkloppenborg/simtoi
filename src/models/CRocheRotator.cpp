@@ -149,7 +149,7 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 	GenerateHealpixVBOIndicies(n_pixels, elements);
 }
 
-void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
+void CRocheRotator::Render(const glm::mat4 & view)
 {
 	if (!mModelReady)
 		Init();
@@ -196,9 +196,6 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	mat4 scale = glm::scale(mat4(), glm::vec3(1, 1, 1));
 
-	// Bind to the framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
-
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
 	mShader->UseShader();
@@ -237,9 +234,6 @@ void CRocheRotator::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// unbind from the Vertex Array Object, Vertex Buffer Object, and Element buffer object.
 	glBindVertexArray(0);
-
-	// Return to the default framebuffer before leaving.
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }

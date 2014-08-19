@@ -54,7 +54,7 @@ public:
 
 	virtual void GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements) = 0;
 
-	virtual void Render(GLuint framebuffer_object, const glm::mat4 & view) = 0;
+	virtual void Render(const glm::mat4 & view) = 0;
 	virtual void Init();
 
 	void UploadVBO();

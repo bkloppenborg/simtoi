@@ -82,7 +82,7 @@ public:
 
 	void Init();
 
-	void Render(GLuint framebuffer_object, const glm::mat4 & view);
+	void Render(const glm::mat4 & view);
 };
 
 #endif /* CMODELDISK_GAUSS_H_ */

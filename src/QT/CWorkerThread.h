@@ -113,11 +113,7 @@ protected:
 
     // Off-screen framebuffer (this matches the buffer created by CreateGLBuffer)
     // All rendering from the UI happens in these buffers. Results are blitted to screen.
-    GLuint mFBO;
-	GLuint mFBO_texture;
-	GLuint mFBO_depth;
-    GLuint mFBO_storage;
-	GLuint mFBO_storage_texture;
+	QGLFramebufferObject * mFBO_render;
 
     // OpenCL
     COpenCLPtr mOpenCL;
@@ -152,7 +148,7 @@ public:
     void AllocateBuffer();
 
 public:
-    void BlitToBuffer(QGLFramebufferObject * input, QGLFramebufferObject * output);
+    void BlitToBuffer(QGLFramebufferObject * source, QGLFramebufferObject * target);
     void BlitToScreen(QGLFramebufferObject * input);
 
     void BlitToBuffer(GLuint in_buffer, GLuint out_buffer);

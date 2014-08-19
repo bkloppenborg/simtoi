@@ -80,7 +80,7 @@ public:
 
 	static vector<string> GetTypes(void);
 
-	void Render(GLuint fbo, const glm::mat4 & view);
+	void Render(const glm::mat4 & view);
 	void Restore(Json::Value input);
 
 	Json::Value Serialize();

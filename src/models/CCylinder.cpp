@@ -238,7 +238,7 @@ void CCylinder::Init()
 	mModelReady = true;
 }
 
-void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
+void CCylinder::Render(const glm::mat4 & view)
 {
 	if(!mModelReady)
 		Init();
@@ -250,9 +250,6 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	mFluxTexture[0].x = mParams["color"].getValue();
 	mFluxTexture[0].a = 1.0;
-
-	// Bind to the framebuffer
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_object);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
@@ -305,9 +302,6 @@ void CCylinder::Render(GLuint framebuffer_object, const glm::mat4 & view)
 
 	// Unbind
 	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
-
-	// Return to the default framebuffer before leaving.
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed.");
 }
