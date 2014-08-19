@@ -55,7 +55,7 @@ static void printGLErrorDetail(GLenum error_code, std::string message)
 	// Ugly workaround for OSX 10.9 deprecating gluErrorString
 #ifdef __APPLE__
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wno-deprecated"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif // __APPLE__
 	std::string error_string = (const char *) gluErrorString(error_code);
 #ifdef __APPLE__
