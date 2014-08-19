@@ -164,9 +164,11 @@ void COI::Export(string folder_name)
 
 		// Set the current JD, render the model.
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		// render
 		mFBO_render->bind();
 		model_list->Render(mWorkerThread->GetView());
 		mFBO_render->release();
+
 		// Blit to the storage buffer (for liboi to use the image)
 		mWorkerThread->BlitToBuffer(mFBO_render, mFBO_storage);
 		mWorkerThread->BlitToScreen(mFBO_render);
