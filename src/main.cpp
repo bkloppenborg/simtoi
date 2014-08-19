@@ -35,6 +35,7 @@
 
 #include <QtGui>
 #include <QApplication>
+#include <QGLFormat>
 
 // Include to enable threads on X11
 #ifdef Q_WS_X11
@@ -70,11 +71,17 @@ int main(int argc, char *argv[])
     XInitThreads();
 #endif
 
-    // QT versions < 4.8, the above
-
-
 	// Pass off to the GUI:
     QApplication app(argc, argv);
+
+	// Set the default OpenGL format
+	QGLFormat fmt;
+	fmt.setVersion(3, 2);
+	fmt.setProfile(QGLFormat::CoreProfile);
+	fmt.setDoubleBuffer(true);
+	fmt.setSampleBuffers(true);
+	fmt.setSamples(4);
+	QGLFormat::setDefaultFormat(fmt);
 
 
     // determine the absolute directory from which SIMTOI is running

@@ -257,15 +257,6 @@ void gui_main::Init(void)
 
 	// Setup the text boxes
 	this->textSaveFolder->setText(mDefaultSaveDir.c_str());
-
-	// Set the default OpenGL format
-	QGLFormat fmt;
-	fmt.setVersion(3, 2);
-	fmt.setProfile(QGLFormat::CoreProfile);
-	fmt.setDoubleBuffer(true);
-//	fmt.setSampleBuffers(true);
-//	fmt.setSamples(4);
-	QGLFormat::setDefaultFormat(fmt);
 }
 
 void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
