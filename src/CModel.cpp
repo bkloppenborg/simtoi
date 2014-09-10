@@ -238,7 +238,7 @@ vector< pair<double, double> > CModel::GetFreeParamMinMaxes()
 	for(auto feature: mFeatures)
 	{
 		tmp1 = feature->getFreeParameterMinMaxes();
-		min_maxes.insert( tmp1.end(), tmp1.begin(), tmp1.end() );
+		min_maxes.insert( min_maxes.end(), tmp1.begin(), tmp1.end() );
 	}
 
 	return min_maxes;
