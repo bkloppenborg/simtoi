@@ -621,11 +621,11 @@ void CModel::SetTime(double time)
 		mPosition->SetTime(time);
 
 	// Get the rotational period (in days)
-	const double rotational_period = mParams["z_axis_rotational_period"].getValue();
+	const double rotational_period = mParams["z_axis_rotational_period"].getValue();	// in days
 	const double rotation_zero_point = mParams["z_axis_rotation"].getValue();
 	if(rotational_period > 0)
 	{
-		double omega_dot = 2 * PI / rotational_period;
+		double omega_dot = 360.0 / rotational_period;
 
 		// Compute current rotation angle and set it.
 		double dt = time - mTime;
