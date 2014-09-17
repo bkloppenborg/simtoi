@@ -65,6 +65,12 @@ where you should (probably) choose the most current drivers rather than the
 `nvidia-331` branch. Please note that I have not tested installations involving
 `bumblebee` (a.k.a. Optimus for Linux).
 
+If you receive an
+`Could NOT find OpenCL (missing: OPENCL_LIBRARY OPENCL_VERSION)`
+error during the `cmake` stage. Make sure the `libOpenCL.so` file exists in
+your system library directory. You may need to manually create a
+symbolic link to `libOpenCL.so.1`.
+
 #### ATI hardware
 
 On *ATI* hardware the installation is a multi-stage process. First install
