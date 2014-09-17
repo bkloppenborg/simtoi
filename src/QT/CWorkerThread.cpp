@@ -470,6 +470,9 @@ void CWorkerThread::run()
 	glEnable(GL_MULTISAMPLE);
 	// Enable depth testing to permit vertex culling
 	glEnable(GL_DEPTH_TEST);
+	glFrontFace( GL_CCW );
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 	// Enable alpha blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

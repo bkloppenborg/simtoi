@@ -135,7 +135,9 @@ void CDensityDisk::Render(const glm::mat4 & view)
 	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
 			GL_FLOAT, &mFluxTexture[0]);
 
+	// disable detph testing and backface culling, we need to render the whole thing.
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 
 	// Render each cylindrical wall:
 
@@ -167,6 +169,7 @@ void CDensityDisk::Render(const glm::mat4 & view)
 	// Draw the midplane
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
 	// bind back to the default texture.
