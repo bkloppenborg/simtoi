@@ -3,7 +3,7 @@ simtoi
 
 The SImulation and Modeling Tool for Optical Interferometry
 
-## Installing prerequisites
+# Installing prerequisites
 
 The requirements for SIMTOI are:
 
@@ -18,24 +18,29 @@ The requirements for SIMTOI are:
 
 We detail below how to install each of these for OSX or GNU/Linux.
 
-# Apple/OSX
+## Apple/OSX
 
-#### OpenGL and OpenCL
+### OpenGL and OpenCL
 
 OpenGL and OpenCL come pre-installed with the system.
 To be able to use OpenCL 1.1, you just need to use OS X 10.7 or higher.
 
-#### Compiler and libraries
+Note however that support for SIMTOI on Intel Integrated or Intel Iris
+graphics is currently being explored. We have successfully built and
+used liboi on Intel HD Graphics 4000 devices; however, there are a few
+lingering OpenGL issues which we must resolve.
+
+### Compiler and libraries
 
 We have sucessfully used MacPorts to install the prerequisites for SIMTOI. 
 
-#### gcc
+### gcc
 
 OS X uses clang as its default compiler and /opt/local/bin/gcc is a
 wrapper for clang, and not actually a true gcc. clang support of C++11
 is spotty so it is advised to use gcc 4.7 instead.
 
-#### Libraries
+### Libraries
 
 OS X already includes LAPACK and BLAS, so there is no need to install these.
 
@@ -58,9 +63,9 @@ make
 sudo make install
 
 
-# Debian-based GNU/Linux (including Ubuntu)
+## Debian-based GNU/Linux (including Ubuntu)
 
-## OpenGL and OpenCL
+### OpenGL and OpenCL
 
 To enable OpenCL-OpenGL interoperability you should also install the
 mesa OpenGL library and the basic OpenCL headers:
@@ -71,7 +76,7 @@ For OpenCL capabilities you need to install drivers for your device,
 and an OpenCL Installable Client Driver (ICD) loader, which are vendor
 dependent:
 
-### NVIDIA
+#### NVIDIA
 
 On NVidia hardware, simply install the video card drivers (either from your
 package manager or from NVidia directly) which also contain the OpenGL and OpenCL libraries.
@@ -83,7 +88,7 @@ where you should (probably) choose the most current drivers rather than the
 
 If you prefer, you can also install download the drivers directly from the NVIDIA website instead.
 
-### AMD GPUs and AMD CPUs:
+#### AMD GPUs and AMD CPUs:
 
 On ATI hardware the installation is a multi-stage process. First install
 the video card drivers.
@@ -93,7 +98,7 @@ the video card drivers.
 Next you need to download and install the 
 [AMD APP SDK](http://developer.amd.com/tools/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/).
 
-### Intel CPUs and GPUs
+#### Intel CPUs and GPUs
 
 For Intel CPUs you need to install the Intel OpenCL SDK
 
@@ -105,7 +110,7 @@ We have successfully compiled liboi and verified that it functions
 with Beignet, however doing so was not a straightforward process. See
 the beignet.md document in this directory for further details.
 
-#### Compiler and libraries
+### Compiler and libraries
 
 Recent version of Debian-based GNU/Linux should meet the requirements of C++11
 support for their gcc/g++ compiler.
@@ -113,13 +118,6 @@ support for their gcc/g++ compiler.
 All the libraries can be installed with:
 
 sudo apt-get install build-essential g++ cmake libccfits0 libccfits-dev git libqt4-dev liblapack-dev libblas-dev libglu1-mesa libglu1-mesa-dev libglm-dev
-
-### Intel Integrated / Iris Graphics
-
-Support for SIMTOI on Intel Integrated or Intel Iris graphics is currently
-being explored. We have successfully built and used liboi on Intel HD Graphics 
-4000 devices; however, there are a few lingering OpenGL issues which we must
-resolve.
 
 # Installation
 
