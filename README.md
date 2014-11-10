@@ -128,8 +128,9 @@ a copy of SIMTOI and initialize the submodules for [liboi](https://github.com/bk
  [textio](https://github.com/bkloppenborg/textio), and [ccoifits](https://github.com/bkloppenborg/ccoifits).
 To do this simply run the following commands:
 
-    git clone https://github.com/bkloppenborg/simtoi
+    git clone https://github.com/fabienbaron/simtoi.git
     cd simtoi
+    git checkout gsu
     git submodule update --init
 
 ## 2.2 Building instructions
