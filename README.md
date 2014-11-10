@@ -44,23 +44,23 @@ is spotty so it is advised to use gcc 4.7 instead.
 
 OS X already includes LAPACK and BLAS, so there is no need to install these.
 
-sudo port install cmake cfitsio git qt4-mac glm
+    sudo port install cmake cfitsio git qt4-mac glm
 
 Please note, depending on the status of QT within macport, you may also need 
 to install the `qt4-mac-devel` package.
 
 Next you will need to download and install ccfits. You can do this using commands similar to the following
-wget http://heasarc.gsfc.nasa.gov/fitsio/CCfits/CCfits-2.4.tar.gz
-tar xvzf CCfits-2.4.tar.gz
-cd CCfits
+    wget http://heasarc.gsfc.nasa.gov/fitsio/CCfits/CCfits-2.4.tar.gz
+    tar xvzf CCfits-2.4.tar.gz
+    cd CCfits
 
 At this point you need to specify that you want to use the Macports gcc compiler and not clang:
 export CC=/opt/local/bin/gcc-mp-4.7
 export CXX=/opt/local/bin/g++-mp-4.7
 
-./configure --prefix=/opt/local --with-cfitsio=/opt/local
-make
-sudo make install
+    ./configure --prefix=/opt/local --with-cfitsio=/opt/local
+    make
+    sudo make install
 
 
 ## Debian-based GNU/Linux (including Ubuntu)
@@ -70,7 +70,7 @@ sudo make install
 To enable OpenCL-OpenGL interoperability you should also install the
 mesa OpenGL library and the basic OpenCL headers:
 
-sudo apt-get install libglu1-mesa libglu1-mesa-dev opencl-headers
+     sudo apt-get install libglu1-mesa libglu1-mesa-dev opencl-headers
 
 For OpenCL capabilities you need to install drivers for your device,
 and an OpenCL Installable Client Driver (ICD) loader, which are vendor
@@ -81,7 +81,7 @@ dependent:
 On NVidia hardware, simply install the video card drivers (either from your
 package manager or from NVidia directly) which also contain the OpenGL and OpenCL libraries.
 
-sudo apt-get install nvidia-331 nvidia-opencl-icd-331 nvidia-331-uvm nvidia-modprobe nvidia-opencl-dev 
+     sudo apt-get install nvidia-331 nvidia-opencl-icd-331 nvidia-331-uvm nvidia-modprobe nvidia-opencl-dev 
 
 where you should (probably) choose the most current drivers rather than the 
 `nvidia-331` branch. 
@@ -117,7 +117,7 @@ support for their gcc/g++ compiler.
 
 All the libraries can be installed with:
 
-sudo apt-get install build-essential g++ cmake libccfits0 libccfits-dev git libqt4-dev liblapack-dev libblas-dev libglu1-mesa libglu1-mesa-dev libglm-dev
+    sudo apt-get install build-essential g++ cmake libccfits0 libccfits-dev git libqt4-dev liblapack-dev libblas-dev libglu1-mesa libglu1-mesa-dev libglm-dev
 
 # Installation
 
