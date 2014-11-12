@@ -49,19 +49,22 @@ OS X already includes LAPACK and BLAS, so there is no need to install these.
 Please note, depending on the status of QT within macport, you may also need 
 to install the `qt4-mac-devel` package.
 
-Next you will need to download and install ccfits. You can do this using commands similar to the following
+Next you will need to download and install ccfits. You can do this using 
+commands similar to the following
+
     wget http://heasarc.gsfc.nasa.gov/fitsio/CCfits/CCfits-2.4.tar.gz
     tar xvzf CCfits-2.4.tar.gz
     cd CCfits
 
-At this point you need to specify that you want to use the Macports gcc compiler and not clang:
-export CC=/opt/local/bin/gcc-mp-4.7
-export CXX=/opt/local/bin/g++-mp-4.7
+At this point you need to specify that you want to use the Macports gcc compiler
+and not clang:
+
+    export CC=/opt/local/bin/gcc-mp-4.7
+    export CXX=/opt/local/bin/g++-mp-4.7
 
     ./configure --prefix=/opt/local --with-cfitsio=/opt/local
     make
     sudo make install
-
 
 ## 1.2 Debian-based GNU/Linux (including Ubuntu)
 
@@ -79,14 +82,16 @@ dependent:
 #### 1.2.1.1 NVIDIA
 
 On NVidia hardware, simply install the video card drivers (either from your
-package manager or from NVidia directly) which also contain the OpenGL and OpenCL libraries.
+package manager or from NVidia directly) which also contain the OpenGL and 
+OpenCL libraries.
 
      sudo apt-get install nvidia-331 nvidia-opencl-icd-331 nvidia-331-uvm nvidia-modprobe nvidia-opencl-dev 
 
 where you should (probably) choose the most current drivers rather than the 
 `nvidia-331` branch. 
 
-If you prefer, you can also install download the drivers directly from the NVIDIA website instead.
+If you prefer, you can also install download the drivers directly from the 
+NVIDIA website instead.
 
 #### 1.2.1.2 AMD GPUs and AMD CPUs:
 
@@ -100,15 +105,8 @@ Next you need to download and install the
 
 #### 1.2.1.3 Intel CPUs and GPUs
 
-For Intel CPUs you need to install the Intel OpenCL SDK
-
-Unlike on Windows and Apple systems, Intel does not provide support
-for OpenCL on their GPUs with their display drivers. Instead an open
-source project called Beignet is filling the gap.
-
-We have successfully compiled liboi and verified that it functions
-with Beignet, however doing so was not a straightforward process. See
-the beignet.md document in this directory for further details.
+Neither CPUs or Intel GPUs are fully supported at this time. Please contact us
+if you wish to assist with development on these platforms.
 
 ### 1.2.2 Compiler and libraries
 
@@ -134,8 +132,8 @@ To do this simply run the following commands:
 
 ## 2.2 Building instructions
 
-After you have installed the prerequisites and checked out SIMTOI and submodules, complilation
-is easy:
+After you have installed the prerequisites and checked out SIMTOI and 
+submodules, complilation is easy:
 
     cd build
     cmake ..
@@ -179,16 +177,22 @@ SIMTOI supports, but our repositories do not include MultiNest (a Bayesian neste
 sampling minimization engine).
 * [MultiNest](http://ccpforge.cse.rl.ac.uk/gf/project/multinest/)
 
-SIMTOI is free software, distributed under the [GNU Lesser General Public License (Version 3)](<http://www.gnu.org/licenses/lgpl.html). 
+SIMTOI is free software, distributed under the 
+[GNU Lesser General Public License (Version 3)](<http://www.gnu.org/licenses/lgpl.html). 
 
-If you use this software as part of a scientific publication, please cite the following works:
+If you use this software as part of a scientific publication, please cite the 
+following works:
 
-Kloppenborg, B.; Baron, F. (2012) "SIMTOI: SImulation and Modeling Tool for Optical Interferometry" (Version X).  Available from  <https://github.com/bkloppenborg/simtoi>.
+Kloppenborg, B.; Baron, F. (2012) "SIMTOI: SImulation and Modeling Tool for 
+Optical Interferometry" (Version X).  Available from 
+<https://github.com/bkloppenborg/simtoi>.
 
 Kloppenborg, B.; Baron, F. (2012), "LibOI: The OpenCL Interferometry Library"
 (Version X). Available from  <https://github.com/bkloppenborg/liboi>.
 
-If you use the _levmar_ minmizer, see their instruction for including [a suitable reference](http://www.ics.forth.gr/~lourakis/levmar/bibentry.html).
+If you use the _levmar_ minmizer, see their instruction for including 
+[a suitable reference](http://www.ics.forth.gr/~lourakis/levmar/bibentry.html).
 
-If you use the _MultiNest_ minimizer see reference instructions on the [_MultiNest_ website](http://ccpforge.cse.rl.ac.uk/gf/project/multinest/)
+If you use the _MultiNest_ minimizer see reference instructions on the 
+[_MultiNest_ website](http://ccpforge.cse.rl.ac.uk/gf/project/multinest/)
 
