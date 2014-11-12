@@ -3,6 +3,12 @@
  *
  *  Created on: Feb 28, 2014
  *      Author: fbaron
+ *  Description:
+ *  The following class implements the equations for the Roche surface of an
+ *  asynchronously rotating star under the assumption that the mass is centrally
+ *  concentrated and uniformly rotating.
+ *  voin Zeipel law is used to compute gravity darkening
+ *
  */
 
 #ifndef CROCHEBINARY_H_
@@ -16,6 +22,20 @@ public:
 	CRocheBinary();
 	virtual ~CRocheBinary();
 
+private:
+	// Constants
+	const double AU = 1.496e11; // meters
+	const double rsun = 6.955e8; // m
+	const double G = 6.67428e-11; // m3 kg-1 s-2
+	const double parsec = 3.08567758e16; // m
+	const double msun = 1.9891e30; // kg
+	const double gmr = G * msun / rsun;
+	const double gmr2 = gmr / rsun;
+
+	// Main parameters
+	double lambda; // wavelength of observation
+	double mTime;
+
 public:
 
 	void Render(const glm::mat4 & view);
@@ -26,63 +46,24 @@ public:
 	{
 		return "roche_binary";
 	};
+	void GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements);
 
-private:
-	// Constants
-	const double AU = 1.496e11; // meters
-	const double rsun = 6.955e8; // m	
-	const double G = 6.67428e-11; // m3 kg-1 s-2
-	const double parsec = 3.08567758e16; // m
-	const double msun = 1.9891e30; // kg
-	const double gmr = G * msun / rsun;
-	const double gmr2 = gmr / rsun;
+	void ComputeModel(double g_pole, double r_pole, double omega_rot);
 
-	// Main parameters
-	double lambda; // wavelength of observation, used to convert temperatures to fluxes, in meters
-	double parallax; // distance from the sun, in pc
-	double orbital_period; // days, orbital period of the star
-	double rotation_period; // days, rotation period of the star
-	double radius_pole; //  rsun, polar radius of the star
-	double desired_resolution; // mas, Healpix resolution
-	double gravity_darkening;
+	void VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta);
 
-	double mass1; // mass of the Roche-lobed star
-	double mass2; // mass of the other star in the binary
-	double teff_pole; // temperature of the Roche-lobed star
+	void ComputeGravity(const double g_pole, const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio);
+	void ComputeGravity(const double g_pole, const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio,
+                        const double radius, const double theta, const double phi,
+                        double & g_x, double & g_y, double & g_z, double & g_mag);
 
-	double massratio;
-	double omega_rot; // orbital period in Hz
+	void ComputeRadii(const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio);
+	double ComputeRadius(const double polar_radius, const double separation, const double mass_ratio,
+			     const double asynchronous_ratio, const double theta, const double phi);
 
-	double separation_rsun;
+	void ComputePotential(double & pot, double & dpot, const double radius, const double theta, const double phi,
+			      const double separation, const double mass_ratio, const double asynchronous_ratio);
 
-	double npix_estimate;
-	double nside_estimate;
-
-
-	// Spots (should be a class, really)
-//	int nspots; // number of spots
-//	double* spot_temperature;
-//	double* spot_theta;
-//	double* spot_phi;
-//	double* spot_thetasize;
-//	double* spot_phisize;
-
-	//void normalize_vert(double * vec);
-	void triaxial_pot(double & pot, double & dpot, const double radius,
-			const double theta, const double phi);
-	void triaxial_gravity(const double radius,
-			const double theta, const double phi,
-			double & g_x, double & g_y, double & g_z, double & g_mag);
-	void ComputeRadii(double* radii, const double *theta, const double *phi,
-			const unsigned int vsize);
-	void surface_gravity(const double * radii, const double * theta, const double * phi,
-			double * g_x, double * g_y, double * g_z, double * g_mag,
-			const unsigned int vsize);
-	void surface_temperature(double* temperature, const double* gravity,
-			const double gravity_pole, const unsigned int vsize);
-public:
-	void GenerateModel(vector<vec3> & vbo_data,
-			vector<unsigned int> & elements);
 
 };
 
