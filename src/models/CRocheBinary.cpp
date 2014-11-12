@@ -3,130 +3,30 @@
  *
  *  Created on: Feb 28, 2014
  *      Author: fbaron
- *      Description: basic stellar shape based on Roche equations, with gravity darkening
+ *      Description: basic Roche lobe with co-aligned self-rotation and orbital rotation
+ *                   and non-synchronous rotation periods
  *      Note:   most of the code is not optimized at the moment...
- * 
  */
 
 #include "CRocheBinary.h"
 #include "CShaderFactory.h"
+#include "CFeature.h"
 
 CRocheBinary::CRocheBinary() :
 	CHealpixSpheroid()
 {
+	id = "roche_binary";
+	name = "Roche Binary";
 
-//	mParamNames.push_back("Wavelength (um)");
-//	SetParam(mBaseParams + 1,  1.4);
-//	SetFree(mBaseParams + 1, false);
-//	SetMax(mBaseParams + 1, 5);
-//	SetMin(mBaseParams + 1, 0.1);
-//
-//	mParamNames.push_back("Parallax (mas)");
-//	SetParam(mBaseParams + 2, 28.8);
-//	SetFree(mBaseParams + 2, false);
-//	SetMax(mBaseParams + 2, 0.1);
-//	SetMin(mBaseParams + 2, 50);
-//
-//	mParamNames.push_back("Orbital Period (d)");
-//	SetParam(mBaseParams + 3, 2.87);
-//	SetFree(mBaseParams + 3, false);
-//	SetMax(mBaseParams + 3, 0.1);
-//	SetMin(mBaseParams + 3, 50);
-//
-//	mParamNames.push_back("Rotation Period (d)");
-//	SetParam(mBaseParams + 4, 2.87);
-//	SetFree(mBaseParams + 4, false);
-//	SetMax(mBaseParams + 4, 0.1);
-//	SetMin(mBaseParams + 4, 50);
-//
-//	mParamNames.push_back("Healpix Resolution (mas)");
-//	SetParam(mBaseParams + 5, 0.05);
-//	SetFree(mBaseParams + 5, false);
-//	SetMax(mBaseParams + 5, 0.01);
-//	SetMin(mBaseParams + 5, 5.0);
-//
-//	mParamNames.push_back("Mass 1 (MSolar)");
-//	SetParam(mBaseParams + 6, 0.75);
-//	SetFree(mBaseParams + 6, false);
-//	SetMax(mBaseParams + 6, 0.1);
-//	SetMin(mBaseParams + 6, 50.0);
-//
-//	mParamNames.push_back("Mass 2 (MSolar)");
-//	SetParam(mBaseParams + 7, 3.2);
-//	SetFree(mBaseParams + 7, false);
-//	SetMax(mBaseParams + 7, 0.1);
-//	SetMin(mBaseParams + 7, 50.0);
-//
-//	mParamNames.push_back("Polar Temperature (K)");
-//	SetParam(mBaseParams + 8, 3700);
-//	SetFree(mBaseParams + 8, false);
-//	SetMax(mBaseParams + 8, 1500);
-//	SetMin(mBaseParams + 8, 25000.0);
-//
-//	mParamNames.push_back("Polar Radius (RSolar)");
-//	SetParam(mBaseParams + 9, 3.25);
-//	SetFree(mBaseParams + 9, false);
-//	SetMax(mBaseParams + 9, 1.0);
-//	SetMin(mBaseParams + 9, 1000);
-//
-//	mParamNames.push_back("Gravity Darkening");
-//	SetParam(mBaseParams + 10, 0.2);
-//	SetFree(mBaseParams + 10, false);
-//	SetMax(mBaseParams + 10, 0.01);
-//	SetMin(mBaseParams + 10, 1.0);
+	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)");
+	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)");
+	addParameter("von_zeipel_beta", 0.5, 0.0, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
+	addParameter("separation", 1.5 , 0.1, 100.0, false, 0.01, "Separation", "Separation between components (mas)");
+	addParameter("mass_ratio", 1.0 , 0.001, 100.0, false, 0.01, "Mass ratio", "Mass ratio M2/M1) (unitless)");
+	addParameter("asynchronism_ratio", 1.0 , 0.01, 2.0, false, 0.01, "Async ratio", "Asynchronous ratio rotation/revolution (unitless)");
 
-	addParameter("scale", 0.2, 0.01, 10, false, 0.1, "Scale (temp)", "Model Scale (a temporary implementation)");
-
-//	// Fundamental properties of the star
-	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
-	parallax = 28.8; // distance from the sun, in pc
-	orbital_period = 2.87; // days
-	rotation_period = orbital_period; // days, using synchronous rotation, but can work asynchronously
-	desired_resolution = .05; // mas
-	mass1 = 0.75; // mass of the Roche-lobed star
-	mass2 = 3.2; // mass of the other star in the binary
-	teff_pole = 3700.; // temperature of the Roche-lobed star
-	radius_pole = 3.25; //  rsun
-	gravity_darkening = 0.2;
-
-	// Derived values
-	separation_rsun = pow((pow(orbital_period / 365.24, 2) * (mass1 + mass2)),
-			1. / 3.) * AU / rsun; // TBD: replace this semimajor axis by the instantaneous separation
-	cout << "Estimated semimajor axis: " << separation_rsun << " Rsun \n";
-	massratio = mass2 / (mass1 + mass2);
-	omega_rot = 2.0 * PI / (rotation_period * 3600. * 24.); // in Hz
-
-	// Setup Healpix and geometry
-//	npix_estimate = 4. * PI
-//			* pow(radius_pole * rsun / (parallax * AU) * 1000.
-//							/ desired_resolution, 2.0);
-//	nside_estimate = std::sqrt(npix_estimate / 12.0);
-//	n_sides = pow(2, ceil(log(nside_estimate) / log(2.0)));
-//	npix = nside2npix(n_sides);
-//	cout << "Nside: " << n_sides << "\tNpix: " << npix << "\n";
-
-	// Volume-equivalent Roche lobe radius from Eggleton
-	double q = mass1 / mass2;
-	double rl_rsun = separation_rsun * 0.49 * pow(q, 2. / 3.)
-			/ (0.6 * pow(q, 2. / 3.) + log(1. + pow(q, 1. / 3.)));
-	cout << "Rl (rsun): " << rl_rsun << "\n";
-
-	// Setup spots
-
-//	nspots = 0;
-	/*
-	 spot_theta = new double[nspots];
-	 spot_phi = new double[nspots];
-	 spot_thetasize = new double[nspots];
-	 spot_phisize = new double[nspots];
-	 spot_temperature = new double[nspots];
-
-	 spot_theta[0] = 45./180.*PI ;
-	 spot_phi[0] = 45./180.*PI ;
-	 spot_thetasize[0] = 15./180.*PI ;
-	 spot_phisize[0] = 10./180.*PI ;
-	 spot_temperature[0] = 7000.;
-	 */
+	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
+	//	omega_rot = 2.0 * PI / (orbital_period * 3600. * 24.); // in Hz
 }
 
 CRocheBinary::~CRocheBinary()
@@ -139,81 +39,89 @@ shared_ptr<CModel> CRocheBinary::Create()
 	return shared_ptr < CModel > (new CRocheBinary());
 }
 
+void CRocheBinary::ComputeRadii(const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio)
+{
+
+
+	// Compute the radii for the pixels and corners:
+	for(unsigned int i = 0; i < pixel_radii.size(); i++)
+	  pixel_radii[i] = ComputeRadius(r_pole, separation, mass_ratio, asynchronism_ratio, pixel_theta[i], pixel_phi[i]);
+
+	for(unsigned int i = 0; i < corner_radii.size(); i++)
+	  corner_radii[i] = ComputeRadius(r_pole, separation, mass_ratio, asynchronism_ratio, corner_theta[i], corner_phi[i]);
+}
+
+void CRocheBinary::ComputeGravity(const double g_pole, const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio)
+{
+	double gnorm, tempx, tempy, tempz;
+	ComputeGravity(1., r_pole, separation, mass_ratio, asynchronism_ratio, r_pole, 0., 0., tempx, tempy, tempz, gnorm);
+    // Compute the gravity vector for each pixel:
+	for(unsigned int i = 0; i < gravity.size(); i++)
+	{
+	  ComputeGravity(g_pole / gnorm, r_pole, separation, mass_ratio, asynchronism_ratio, pixel_radii[i], pixel_theta[i], pixel_phi[i], g_x[i], g_y[i], g_z[i], gravity[i]);
+	}
+}
+void CRocheBinary::VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta)
+{
+	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
+		mPixelTemperatures[i] = T_eff_pole * pow(gravity[i] / g_pole, beta);
+}
+
 /// Computes the tangential components and magnitude of gravity at the
 /// specified (r, theta, phi) coordinates.
-void CRocheBinary::triaxial_gravity(const double radius,
-		const double theta, const double phi,
-		double & g_x, double & g_y, double & g_z, double & g_mag)
+void CRocheBinary::ComputeGravity(const double g_pole, const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio, const double radius, const double theta, const double phi, double & g_x, double & g_y, double & g_z, double & g_mag)
 {
-	double x1, x2, x3, y, z, radius1, radius2, radius1_pow3, radius2_pow3, l,
-			mu;
 
-	x1 = radius * cos(phi) * sin(theta);
-	x2 = separation_rsun - x1;
-	y = radius * sin(phi) * sin(theta);
-	z = radius * cos(theta);
-	radius2 = std::sqrt(x2 * x2 + y * y + z * z);
-	radius1_pow3 = radius * radius * radius;
-	radius2_pow3 = radius2 * radius2 * radius2;
+  double radius1 = radius / separation;  // dimensionless
+  double l = cos(phi) * sin(theta);
+  double mu = sin(phi) * sin(theta);
+  double x = radius1 * l;
+  double y = radius1 * mu;
+  double z = radius1 * cos(theta);
+  double xc =  mass_ratio / (1. + mass_ratio);
+  double radius2 = std::sqrt( (x - 1.0) * (x - 1.0) + y * y + z * z);
 
-	// gx, gy, gz are the coordinates of the gravity vector
-	g_x = gmr2 * mass1 * x1 / radius1_pow3 - gmr2 * mass2 * x2 / radius2_pow3
-			- omega_rot * omega_rot * rsun * (x1 - separation_rsun * massratio);
-	g_y = gmr2 * mass1 * y / radius1_pow3 + gmr2 * mass2 * y / radius2_pow3
-			- omega_rot * omega_rot * rsun * y;
-	g_z = gmr2 * mass1 * z / radius1_pow3 + gmr2 * mass2 * z / radius2_pow3;
+  double radius1_pow3 = radius1 * radius1 * radius1;
+  double radius2_pow3 = radius2 * radius2 * radius2;
 
-	g_mag = std::sqrt(g_x * g_x + g_y * g_y + g_z * g_z);
+  // gx, gy, gz are the cartesian coordinates of the gravity vector
+  // we need them in cartesian form to compute the vertices for limb-darkening
+
+   g_x =  x / radius1_pow3 + mass_ratio * (x - 1.0) / radius2_pow3 + (mass_ratio + 1.0) * (x-xc) + (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * x;
+   g_y =  y / radius1_pow3 + mass_ratio * y         / radius2_pow3 + (mass_ratio + 1.0) *  y     + (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * y;
+   g_z =  z / radius1_pow3 + mass_ratio * z         / radius2_pow3;
+
+   g_mag = g_pole * std::sqrt(g_x * g_x + g_y * g_y + g_z * g_z);
+
 }
 
-void CRocheBinary::surface_gravity(const double * radii, const double * theta, const double * phi,
-		double * g_x, double * g_y, double * g_z, double * g_mag,
-		const unsigned int vsize)
-{
-	for (unsigned int i = 0; i < vsize; i++)
-		triaxial_gravity(radii[i], theta[i], phi[i], g_x[i], g_y[i], g_z[i], gravity[i]);
-}
 
-void CRocheBinary::surface_temperature(double * temperature,
-		const double * gravity, const double gravity_pole,
-		const unsigned int vsize)
+void CRocheBinary::ComputePotential(double & pot, double & dpot, const double radius, const double theta, const double phi, const double separation, const double mass_ratio, const double asynchronism_ratio)
 {
-	for (unsigned int i = 0; i < vsize; i++)
-		temperature[i] = teff_pole
-				* pow(gravity[i] / gravity_pole, gravity_darkening);
-}
-
-void CRocheBinary::triaxial_pot(double & pot, double & dpot,
-		const double radius, const double theta, const double phi)
-{
-	// TBD this is using Pringle 1985, or for a more recent ref Regos 2005 (http://adsabs.harvard.edu/abs/2005MNRAS.358..544R )
-	// This is only valid for circular + synchronous rotation, so this will be replaced by Sepinsky 2007
+	// This is only valid for circular, aligned, asynchronous rotation, and will be replaced by Sepinsky 2007
 	// theta in radians: co-latitude -- vector
 	// phi in radians: phi phi=0 points toward companion -- vector
-	// vsize = vector size
-	double x1, x2, x3, y, z, radius1, radius2, l, mu;
-	radius1 = fabs(radius);
-	l = cos(phi) * sin(theta);
-	mu = sin(phi) * sin(theta);
-	x1 = radius1 * l;
-	x2 = x1 - separation_rsun;
-	x3 = x1 - separation_rsun * massratio;
-	y = radius1 * mu;
-	z = radius1 * cos(theta);
-	radius2 = std::sqrt(x2 * x2 + y * y + z * z);
-	pot = -gmr * (mass1 / radius1 + mass2 / radius2)
-			- 0.5 * omega_rot * omega_rot * rsun * rsun * (x3 * x3 + y * y);
-	dpot = gmr2
-			* (mass1 / (radius1 * radius1)
-					+ mass2 / (radius2 * radius2 * radius2)
-							* (radius1 - separation_rsun * l))
-			- omega_rot * omega_rot * rsun
-					* (radius1 * l * l - l * separation_rsun * massratio
-							+ radius1 * mu * mu);
+
+	const double radius1 = radius / separation;  // dimensionless
+	const double l = cos(phi) * sin(theta);
+	const double mu = sin(phi) * sin(theta);
+	const double x = radius1 * l;
+	const double y = radius1 * mu;
+	const double z = radius1 * cos(theta);
+	const double xc =  mass_ratio / (1. + mass_ratio);
+	const double radius2 = std::sqrt( (x - 1.0) * (x - 1.0) + y * y + z * z);
+
+	pot = - 1.0 / radius1 - mass_ratio / radius2
+          - 0.5 * (mass_ratio + 1.0) * ( (x - xc) * (x - xc) + y * y)
+          - 0.5 * (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * (x * x + y * y );
+
+	dpot =  1.0 / (radius1 * radius1) + mass_ratio / (radius2 * radius2 * radius2) * (radius1 - l)
+	        - (mass_ratio + 1.0) * (radius1 * (l * l + mu * mu)   - l * xc)
+            - (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * radius1 * ( l * l + mu * mu);
 }
 
-void CRocheBinary::ComputeRadii(double * radii, const double * theta,
-		const double * phi, const unsigned int vsize)
+
+double CRocheBinary::ComputeRadius(const double r_pole, const double separation, const double mass_ratio, const double asynchronous_ratio, const double theta, const double phi)
 {
 	// in this function we compute the roche radius based on masses/ distance / orbital_period, for each (theta, phi)
 	const double epsilon = 1;
@@ -221,42 +129,20 @@ void CRocheBinary::ComputeRadii(double * radii, const double * theta,
 	double pot_surface, pot, dpot;
 	double newton_step;
 
-	triaxial_pot(pot_surface, dpot, radius_pole, 0.0, 0.0); // potential at the equator
+	ComputePotential(pot_surface, dpot, r_pole, 0.0, 0.0, separation, mass_ratio, asynchronous_ratio ); // potential at the equator
 
-	for (i = 0; i < vsize; i++)
-		radii[i] = 1.22 * radius_pole; // initial guess for the radius
+	double radius = 1.22 * r_pole; // initial guess for the radius, TBD: improve !
 
-	unsigned short converged[vsize]; // tracks the convergence for each radius
-	for (i = 0; i < vsize; i++)
-		converged[i] = 0;
-
-	unsigned int all_converged = 0;
-	//unsigned int counter =0;
-
-	while (all_converged < vsize - 1)
-	{
-		all_converged = 0;
-
-		for (i = 0; i < vsize; i++)
-		{
-			if (converged[i] == 0)
-			{
-				// we compute only up to the precision for each element, then we skip
-				// not sure if this is faster than vectorizing...
-				triaxial_pot(pot, dpot, radii[i], theta[i], phi[i]);
-				newton_step = (pot - pot_surface) / (rsun * dpot); // newton step
-				radii[i] = radii[i] - newton_step;
-				if (fabs(newton_step) < epsilon)
-				{
-					converged[i] = 1;
-					all_converged += 1;
-				}
-				//      counter++;
-			}
-		}
-
-		cout << "Convergence " << all_converged << "\n";
-	}
+	bool converged = FALSE;
+	for(int i=0; i<8;i++)//while(converged == FALSE)
+	  {
+	    ComputePotential(pot, dpot, radius, theta, phi, separation, mass_ratio, asynchronous_ratio );
+	    newton_step = (pot - pot_surface) / dpot; // newton step
+	    radius = radius* (1. - newton_step);
+	    if (fabs(newton_step) < epsilon)
+	      converged = TRUE;
+	  }
+	return radius;
 }
 
 void CRocheBinary::Render(const glm::mat4 & view)
@@ -265,16 +151,49 @@ void CRocheBinary::Render(const glm::mat4 & view)
 		Init();
 
 	// See if the user change the tesselation
-	const unsigned int n_sides = mParams["n_side_power"].getValue();
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 	if(mParams["n_side_power"].isDirty())
 	{
 		Init();
 	}
 
-	// Rename a few variables for convenience:
-	double radial_scale = mParams["scale"].getValue();
-	mat4 scale = glm::scale(mat4(),
-			glm::vec3(radial_scale, radial_scale, radial_scale));
+	const double g_pole = mParams["g_pole"].getValue();
+	const double r_pole = mParams["r_pole"].getValue();
+	const double omega_rot = mParams["omega_rot"].getValue();
+	const double T_eff_pole = mParams["T_eff_pole"].getValue();
+	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
+	const double separation = mParams["separation"].getValue();
+	const double mass_ratio = mParams["mass_ratio"].getValue();
+	const double asynchronism_ratio = mParams["asynchronism_ratio"].getValue();
+
+	//	if(mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
+	ComputeRadii(r_pole, separation, mass_ratio, asynchronism_ratio);
+
+			//if(mParams["g_pole"].isDirty() || mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
+	ComputeGravity(g_pole, r_pole, separation, mass_ratio, asynchronism_ratio);
+
+	bool feature_dirty = false;
+	for(auto feature: mFeatures)
+		feature_dirty |= feature->isDirty();
+
+	if(feature_dirty || mParams["T_eff_pole"].isDirty() || mParams["g_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
+		VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
+
+	for(auto feature: mFeatures)
+		feature->apply(this);
+
+	double max_temperature = 0;
+	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
+	{
+		if(mPixelTemperatures[i] > max_temperature)
+			max_temperature = mPixelTemperatures[i];
+	}
+
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+
+	GenerateVBO(n_pixels, n_sides, mVBOData);
+
+	mat4 scale = glm::scale(mat4(), glm::vec3(1, 1, 1));
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
@@ -297,7 +216,15 @@ void CRocheBinary::Render(const glm::mat4 & view)
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
+	// Bind to the texture, upload it.
 	glBindTexture(GL_TEXTURE_RECTANGLE, mFluxTextureID);
+	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, 12 * n_sides, n_sides, 0, GL_RGBA,
+			GL_FLOAT, &mFluxTexture[0]);
+
+	// Upload the VBO data:
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO);
+	glBufferData(GL_ARRAY_BUFFER, mVBOData.size() * sizeof(vec3), &mVBOData[0],
+			GL_DYNAMIC_DRAW);
 
 	// render
 	glDrawElements(GL_TRIANGLES, mElements.size(), GL_UNSIGNED_INT, 0);
@@ -314,38 +241,43 @@ void CRocheBinary::Render(const glm::mat4 & view)
 void CRocheBinary::GenerateModel(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
 {
+        const double g_pole = mParams["g_pole"].getValue();
+	const double r_pole = mParams["r_pole"].getValue();
+	const double T_eff_pole = mParams["T_eff_pole"].getValue();
+	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
+	const double separation = mParams["separation"].getValue();
+	const double mass_ratio = mParams["mass_ratio"].getValue();
+	const double asynchronism_ratio = mParams["asynchronism_ratio"].getValue();
+
+
 	// Generate a unit Healpix sphere
-	const unsigned int n_sides = mParams["n_side_power"].getValue();
 	GenerateHealpixSphere(n_pixels, n_sides);
 
-	// Compute geometry of the Roche spheroid
+	// recomputing the sphereoid is very expensive. Make use of the dirty flags
+	// to only compute that which is absolutely necessary.
+	ComputeRadii(r_pole, separation, mass_ratio, asynchronism_ratio);
+	ComputeGravity(g_pole, r_pole, separation, mass_ratio, asynchronism_ratio);
+	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
-	// Compute the surface radii for each vertices using the angles and Roche potential equations
-	ComputeRadii(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0], n_pixels);
-	ComputeRadii(&corner_radii[0], &corner_theta[0], &corner_phi[0], 4 * n_pixels);
+	for(auto feature: mFeatures)
+		feature->apply(this);
 
-	// Compute the gravity darkening (based on the center of the Healpix pixel)
-	surface_gravity(&pixel_radii[0], &pixel_theta[0], &pixel_phi[0],
-			&g_x[0], &g_y[0], &g_z[0], &gravity[0], n_pixels);
 
-	double gravity_pole = 1;
-	double g_pole_x, g_pole_y, g_pole_z;
-	triaxial_gravity(radius_pole, 0.0, 0.0, g_pole_x, g_pole_y, g_pole_z, gravity_pole);
-
-	surface_temperature(&mPixelTemperatures[0], &gravity[0], gravity_pole, n_pixels);
-
+	// Find the maximum temperature
 	double max_temperature = 0;
-	for(unsigned int i = 0; i < n_pixels; i++)
+	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
 	{
 		if(mPixelTemperatures[i] > max_temperature)
 			max_temperature = mPixelTemperatures[i];
 	}
 
-	// Convert temperature into fluxes
+	// Convert temperatures to fluxes.
 	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 
 	// Create the lookup indicies.
 	GenerateHealpixVBOIndicies(n_pixels, elements);
+
 }
