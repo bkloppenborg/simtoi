@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <cmath>
 #include <limits>
-//#include <iostream>
 using namespace std;
 
 CParameter::CParameter()
@@ -75,18 +74,10 @@ void CParameter::setValue(double new_value, bool is_normalized)
 		new_value = new_value * (max - min) + min;
 
 	// Check that value is within bounds
-	if( check_bounds && (new_value > max) )
-		{
-		   printf("The new value for %s is %lf, exceeds the set maximum %lf, and thus has been set to %lf\n", human_name.c_str(), new_value, max, max);
-           new_value = max;
-		}
-        //throw range_error("The new value for " + human_name + " exceeds the set maximum.");
-	else if(check_bounds && (new_value < min))
-        {
-           printf("The new value for %s is %lf, is less than the set minimum %lf and thus has been set to %lf.\n", human_name.c_str(), new_value, min, min);
-            new_value = min;
-		//throw range_error("The new value for " + human_name + " is less than the set minimum.");
-        }
+	if(check_bounds && new_value > max)
+		throw range_error("The new value for " + human_name + " exceeds the set maximum.");
+	else if(check_bounds && new_value < min)
+		throw range_error("The new value for " + human_name + " is less than the set minimum.");
 
 	// set the dirty flag, if needed.
 	if(fabs(value - new_value) > precision)
@@ -102,7 +93,7 @@ void CParameter::setValue(double new_value, bool is_normalized)
 /// An range_error exception is thrown if min < max.
 void CParameter::setMin(double new_min)
 {
-  if(check_bounds && (new_min > max))
+	if(check_bounds && new_min > max)
 		throw range_error("New minimum value is less than the specified maximum.");
 
 	min = new_min;
@@ -113,7 +104,7 @@ void CParameter::setMin(double new_min)
 /// An range_error exception is thrown if max < min.
 void CParameter::setMax(double new_max)
 {
-  if(check_bounds && (new_max < min))
+	if(check_bounds && new_max < min)
 		throw range_error("New maximum value is less than the specified minimum.");
 
 	max = new_max;

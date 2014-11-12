@@ -194,7 +194,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	opts[1]= 1E-4;
 	opts[2]= 1E-5;
 	opts[3]= 1E-12;
-	opts[4]= -1E-06;
+	opts[4]= -1;
 
 	// Copy out the initial values for the parameters:
 	CModelListPtr model_list = mWorkerThread->GetModelList();
@@ -207,7 +207,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	{
 		lb[i] = min_max[i].first;
 		ub[i] = min_max[i].second;
-		printf("Parameter %d: min = %f < current = %f < max = %f\n", i, lb[i], mParams[i], ub[i]);
+		printf("Parameter %d: min = %f max = %f\n", i, lb[i], ub[i]);
 	}
 
 	printf("Starting levmar...\n");
