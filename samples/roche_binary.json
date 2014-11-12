@@ -18,7 +18,7 @@
 			"position_angle" : [ 0.0, 0.0, 360.0, false, 0.10 ],
 			"r_pole" : [ 1.0, 1.0, 10.0, false, 1.0 ],
 			"separation" : [ 4.0, 0.10, 100.0, false, 0.010 ],
-			"von_zeipel_beta" : [ 0.0, 0.0, 1.0, false, 0.10 ],
+			"von_zeipel_beta" : [ 0.250, 0.0, 1.0, false, 0.10 ],
 			"z_axis_rotation" : [ 0.0, 0.0, 360.0, false, 1.0 ],
 			"z_axis_rotational_period" : [ 0.0, 0.0, 100.0, false, 1.0 ]
 		},
@@ -29,7 +29,10 @@
 			"N" : [ 0.0, -1.0, 1.0, false, 0.10 ]
 		},
 		"position_id" : "xy",
-		"shader_data" : null,
-		"shader_id" : "default"
+		"shader_data" : 
+		{
+			"alpha" : [ 0.40, 0.10, 1.0, false, 0.090 ]
+		},
+		"shader_id" : "ldl_power_law"
 	}
 }

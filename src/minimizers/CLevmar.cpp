@@ -4,29 +4,29 @@
  *  Created on: Feb 13, 2012
  *      Author: bkloppenborg
  */
- 
- /* 
+
+ /*
  * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
- * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling 
- * Tool for Optical Interferometry" (Version X). 
+ * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling
+ * Tool for Optical Interferometry" (Version X).
  * Available from  <https://github.com/bkloppenborg/simtoi>.
  *
- * This file is part of the SImulation and Modeling Tool for Optical 
+ * This file is part of the SImulation and Modeling Tool for Optical
  * Interferometry (SIMTOI).
- * 
+ *
  * SIMTOI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License 
+ * it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation version 3.
- * 
+ *
  * SIMTOI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
+ *
+ * You should have received a copy of the GNU Lesser General Public
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -70,6 +70,20 @@ void CLevmar::ErrorFunc(double * params, double * output, int nParams, int nOutp
 
 	// Set the parameters (note, they are not scaled to unit magnitude)
 	CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
+
+	// levmar's finite difference method will go out of bounds sometimes. This
+	// causes SIMTOI to throw an exception. Lets check that the parametesr are
+	// in bounds and, if not, back-project them. This will cause some instability
+	// at the edges of the parameter space, but we'll have to live with it.
+	for(unsigned int i = 0; i < nParams; i++)
+	{
+		if(params[i] < minimizer->lb[i])
+			params[i] = minimizer->lb[i];
+
+		if(params[i] > minimizer->ub[i])
+			params[i] = minimizer->ub[i];
+	}
+
 	model_list->SetFreeParameters(params, nParams, false);
 
 	// Now get the residuals and compute the chi values. Store these in the output double.
@@ -158,8 +172,8 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	int max_iterations = 50;
 	unsigned int n_data = mWorkerThread->GetDataSize();
 	valarray<double> x(n_data);
-	valarray<double> lb(mNParams);
-	valarray<double> ub(mNParams);
+	lb = valarray<double>(mNParams);
+	ub = valarray<double>(mNParams);
 	valarray<double> info(LM_INFO_SZ);
 	valarray<double> opts(LM_INFO_SZ);
 	valarray<double> covar(mNParams * mNParams);
@@ -180,7 +194,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	opts[1]= 1E-4;
 	opts[2]= 1E-5;
 	opts[3]= 1E-12;
-	opts[4]= LM_DIFF_DELTA;
+	opts[4]= -1;
 
 	// Copy out the initial values for the parameters:
 	CModelListPtr model_list = mWorkerThread->GetModelList();
