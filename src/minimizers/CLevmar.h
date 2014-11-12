@@ -46,6 +46,9 @@ public:
 	CLevmar();
 	virtual ~CLevmar();
 
+	valarray<double> lb;
+	valarray<double> ub;
+
 	static CMinimizerPtr Create();
 
 	static void ErrorFunc(double * params, double * output, int nParams, int nOutput, void * misc);

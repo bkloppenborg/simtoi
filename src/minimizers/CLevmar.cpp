@@ -70,6 +70,20 @@ void CLevmar::ErrorFunc(double * params, double * output, int nParams, int nOutp
 
 	// Set the parameters (note, they are not scaled to unit magnitude)
 	CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
+
+	// levmar's finite difference method will go out of bounds sometimes. This
+	// causes SIMTOI to throw an exception. Lets check that the parametesr are
+	// in bounds and, if not, back-project them. This will cause some instability
+	// at the edges of the parameter space, but we'll have to live with it.
+	for(unsigned int i = 0; i < nParams; i++)
+	{
+		if(params[i] < minimizer->lb[i])
+			params[i] = minimizer->lb[i];
+
+		if(params[i] > minimizer->ub[i])
+			params[i] = minimizer->ub[i];
+	}
+
 	model_list->SetFreeParameters(params, nParams, false);
 
 	// Now get the residuals and compute the chi values. Store these in the output double.
@@ -158,8 +172,8 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	int max_iterations = 50;
 	unsigned int n_data = mWorkerThread->GetDataSize();
 	valarray<double> x(n_data);
-	valarray<double> lb(mNParams);
-	valarray<double> ub(mNParams);
+	lb = valarray<double>(mNParams);
+	ub = valarray<double>(mNParams);
 	valarray<double> info(LM_INFO_SZ);
 	valarray<double> opts(LM_INFO_SZ);
 	valarray<double> covar(mNParams * mNParams);
@@ -180,7 +194,7 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	opts[1]= 1E-4;
 	opts[2]= 1E-5;
 	opts[3]= 1E-12;
-	opts[4]= LM_DIFF_DELTA;
+	opts[4]= -1E-06;
 
 	// Copy out the initial values for the parameters:
 	CModelListPtr model_list = mWorkerThread->GetModelList();
