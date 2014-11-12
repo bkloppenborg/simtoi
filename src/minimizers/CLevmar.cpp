@@ -207,7 +207,6 @@ int CLevmar::run(void (*error_func)(double *p, double *hx, int m, int n, void *a
 	{
 		lb[i] = min_max[i].first;
 		ub[i] = min_max[i].second;
-		printf("Parameter %d: min = %f max = %f\n", i, lb[i], ub[i]);
 	}
 
 	printf("Starting levmar...\n");
