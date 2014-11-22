@@ -29,7 +29,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O0")
 # Set some CMake properties:
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
-SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
+SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules ${PROJECT_SOURCE_DIR}/lib/liboi/CMakeModules)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # We need to compile the following libraries
