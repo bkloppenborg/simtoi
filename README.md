@@ -1,7 +1,10 @@
-simtoi
+SIMTOI
 ======
 
-The SImulation and Modeling Tool for Optical Interferometry
+The SImulation and Modeling Tool for Optical Interferometry (SIMTOI) is an open 
+source (GPL v3) software package for simulating and modeling optical interferometric
+observations of complex astrophysical sources that are not easily described
+by analytic expressions.
 
 # 1. Installing prerequisites
 
