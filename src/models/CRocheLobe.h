@@ -16,11 +16,11 @@
 
 #include "CHealpixSpheroid.h"
 
-class CRocheBinary: public CHealpixSpheroid
+class CRocheLobe: public CHealpixSpheroid
 {
 public:
-	CRocheBinary();
-	virtual ~CRocheBinary();
+	CRocheLobe();
+	virtual ~CRocheLobe();
 
 private:
 	// Constants
@@ -41,7 +41,7 @@ public:
 
 	virtual string GetID()
 	{
-		return "roche_binary";
+		return "roche_lobe";
 	};
 	void GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements);
 
