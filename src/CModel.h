@@ -93,6 +93,7 @@ class CModel: public CParameterMap
 protected:
 
 	double mTime;		///< The current time for this object.
+	double mZAxisRotationDelta; ///< A delta applied to the rotation about the z-axis, set by SetTime
 
 	CPositionPtr mPosition;	///< A shared pointer to the position object.
 

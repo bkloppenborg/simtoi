@@ -58,6 +58,7 @@ CModel::CModel()
 	mShader = CShaderPtr();
 	mFluxTextureID = 0;
 	mTime = 0;
+	mZAxisRotationDelta = 0;
 
 	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position angle",
 			"Position Angle defined from North rotating East (degrees)");
@@ -417,9 +418,14 @@ void CModel::InitTexture()
 /// of the model is specified relative to the orbital plane.
 glm::mat4 CModel::Rotate()
 {
+	// Collect the model's rotation
 	double Omega = mParams["position_angle"].getValue() * M_PI / 180;
 	double inc = mParams["inclination"].getValue() * M_PI / 180;
-	double omega = mParams["z_axis_rotation"].getValue() * M_PI / 180;
+	// The rotation about the z-axis, omega, is formed by the rotational zero point
+	// and any time-dependent rotation (mZAxisRotationDelta, set in SetTime).
+	// Compute the modulus using Mod (in misc.h) rather than fmod as this function
+	// is more resilient to edge cases than fmod.
+	double omega = 	Mod(mParams["z_axis_rotation"].getValue() + mZAxisRotationDelta, 360.0) * M_PI / 180;
 
 	// If we have a dynamic position, simply add the angles
 	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
@@ -622,17 +628,13 @@ void CModel::SetTime(double time)
 
 	// Get the rotational period (in days)
 	const double rotational_period = mParams["z_axis_rotational_period"].getValue();	// in days
-	const double rotation_zero_point = mParams["z_axis_rotation"].getValue();
 	if(rotational_period > 0)
 	{
 		double omega_dot = 360.0 / rotational_period;
 
 		// Compute current rotation angle and set it.
 		double dt = time - mTime;
-		// Compute the modulus using Mod (in misc.h) rather than fmod as this function
-		// is more resiliant to edge cases than fmod.
-		double rotation = Mod(rotation_zero_point + omega_dot * dt, 360.0d);
-		mParams["z_axis_rotation"].setValue(rotation);
+		mZAxisRotationDelta = mZAxisRotationDelta + omega_dot * dt;
 	}
 
 	// Update the current time.
