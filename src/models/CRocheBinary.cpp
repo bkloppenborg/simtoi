@@ -159,7 +159,6 @@ void CRocheBinary::Render(const glm::mat4 & view)
 
 	const double g_pole = mParams["g_pole"].getValue();
 	const double r_pole = mParams["r_pole"].getValue();
-	const double omega_rot = mParams["omega_rot"].getValue();
 	const double T_eff_pole = mParams["T_eff_pole"].getValue();
 	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
 	const double separation = mParams["separation"].getValue();
