@@ -28,6 +28,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O0")
 
 # Set some CMake properties:
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+    CACHE PATH "Single directory for all executable and dynamic libraries on Windows.")
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules ${PROJECT_SOURCE_DIR}/lib/liboi/CMakeModules)
 include_directories(${CMAKE_SOURCE_DIR}/include)
