@@ -44,5 +44,5 @@ positions/*.cpp tasks/*.cpp)
 add_executable(simtoi ${SOURCE})
 
 target_link_libraries(simtoi simtoi_models simtoi_minimizers simtoi_features
-QT_files jsoncpp levmar oi_static textio_static chealpix 
+QT_files jsoncpp_lib levmar oi_static textio_static chealpix 
 ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
