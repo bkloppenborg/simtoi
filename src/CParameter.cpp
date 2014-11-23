@@ -22,7 +22,7 @@ CParameter::CParameter()
 	dirty = true;
 	free = false;
 	decimal_places = 1;
-	precision = 0.1;
+	precision = 1E-10;
 	id = "invalid_id";
 	human_name = "Text not set by developer.";
 	help_text = "Text not set by developer.";
