@@ -28,9 +28,6 @@ private:
 	const double rsun = 6.955e8; // m
 	const double G = 6.67428e-11; // m3 kg-1 s-2
 	const double parsec = 3.08567758e16; // m
-	const double msun = 1.9891e30; // kg
-	const double gmr = G * msun / rsun;
-	const double gmr2 = gmr / rsun;
 
 	// Main parameters
 	double lambda; // wavelength of observation
