@@ -24,7 +24,7 @@ CRocheRotator::CRocheRotator() :
 	addParameter("von_zeipel_beta", 0.5, 0.01, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
 
 	// TODO: Remove this variable
-	lambda = 1.4e-6; // m, wavelength of observation, used to convert temperatures to fluxes
+	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 }
 
 CRocheRotator::~CRocheRotator()
