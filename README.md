@@ -11,7 +11,7 @@ by analytic expressions.
 The requirements for SIMTOI are:
 
 * Compiler with C++11 support (gcc/g++ v4.6.3 or later)
-* OpenCL 1.1 support
+* A graphics card with OpenCL 1.1 (or later)
 * OpenGL Mathematics Library (glm)
 * cmake 2.8 or higher
 * git
@@ -22,6 +22,9 @@ The requirements for SIMTOI are:
 We detail below how to install each of these for OSX or GNU/Linux.
 
 ## 1.1 Apple/OSX
+
+Prior to installing `SIMTOI` follow the instructions for building and testing
+[liboi](https://github.com/bkloppenborg/liboi) for your platform.
 
 ### 1.1.1 OpenGL and OpenCL
 
@@ -70,6 +73,9 @@ and not clang:
     sudo make install
 
 ## 1.2 Debian-based GNU/Linux (including Ubuntu)
+
+Prior to installing `SIMTOI` follow the instructions for building and testing
+[liboi](https://github.com/bkloppenborg/liboi) for your platform.
 
 ### 1.2.1 OpenGL and OpenCL
 
@@ -173,11 +179,11 @@ SIMTOI includes the following libraries as part of its distribution:
 * [OpenCL Interferometry Library (liboi)](https://github.com/bkloppenborg/liboi)
 * [textio](https://github.com/bkloppenborg/textio)
 * [ccoifits](https://github.com/bkloppenborg/ccoifits).
-* [json-cpp](http://sourceforge.net/projects/jsoncpp/)
+* [json-cpp](https://github.com/open-source-parsers/jsoncpp)
 * [levmar](http://www.ics.forth.gr/~lourakis/levmar/)
 
-SIMTOI supports, but our repositories do not include MultiNest (a Bayesian nested
-sampling minimization engine).
+SIMTOI supports, but our repositories do not include, MultiNest (a Bayesian 
+nested sampling minimization engine).
 * [MultiNest](http://ccpforge.cse.rl.ac.uk/gf/project/multinest/)
 
 SIMTOI is free software, distributed under the 
