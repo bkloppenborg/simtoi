@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi)
 
+INCLUDE("${CMAKE_SOURCE_DIR}/CMakeModules/SetVersion.cmake")
+
 # Compile with C++11 support.
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -78,3 +80,15 @@ file(COPY ${SHADERS_FRAG} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/shaders/)
 
 file(GLOB SHADERS_CONFIG ${CMAKE_SOURCE_DIR}/src/shaders/*.json)
 file(COPY ${SHADERS_CONFIG} DESTINATION ${EXECUTABLE_OUTPUT_PATH}/shaders/)
+
+# Automatic packaging
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_PACKAGE_NAME "simtoi")
+SET(CPACK_PACKAGE_VERSION ${GIT_VERSION_TAG})
+SET(CPACK_PACKAGE_CONTACT "Brian Kloppenborg <bkloppenborg@gmail.com>")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SImulation and Modeling Tool for Optical Interferometry (https://github.com/bkloppenborg/simtoi)")
+
+# Debian-specific packaging options
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "liboi ( >= 1.0.0 )")
+ 
+INCLUDE(CPack)
