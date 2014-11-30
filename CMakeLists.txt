@@ -40,6 +40,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # jsoncpp
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/jsoncpp EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_SOURCE_DIR}/lib/jsoncpp/include)
+SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 
 FIND_PACKAGE(LAPACK)
 if(LAPACK_FOUND)
@@ -89,6 +90,8 @@ SET(CPACK_PACKAGE_CONTACT "Brian Kloppenborg <bkloppenborg@gmail.com>")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SImulation and Modeling Tool for Optical Interferometry (https://github.com/bkloppenborg/simtoi)")
 
 # Debian-specific packaging options
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "liboi ( >= 1.0.0 )")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "liboi ( >= 1.0.0 ), 
+    libqtcore ( >= 4.8.0), libqt4-opengl ( >= 4.8.0 ), libqtgui4 ( >= 4.8.0 ), 
+    libglmdev ( >= 0.9.5 )")
  
 INCLUDE(CPack)
