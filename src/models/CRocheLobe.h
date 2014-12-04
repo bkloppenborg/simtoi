@@ -22,12 +22,12 @@ public:
 	CRocheLobe();
 	virtual ~CRocheLobe();
 
-private:
-	// Constants
-	const double AU = 1.496e11; // meters
-	const double rsun = 6.955e8; // m
-	const double G = 6.67428e-11; // m3 kg-1 s-2
-	const double parsec = 3.08567758e16; // m
+protected:
+	// Constants (initialized in constructor for GCC 4.6 compatability)
+	const double AU;	// meters
+	const double rsun;	// m
+	const double G;		// m3 kg-1 s-2
+	const double parsec;// m
 
 	// Main parameters
 	double lambda; // wavelength of observation
