@@ -12,6 +12,10 @@ EXECUTE_PROCESS(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+MESSAGE(STATUS "Version information for" ${PROJECT_SOURCE_DIR})
+MESSAGE(STATUS "Version tag:" ${GIT_VERSION_TAG})
+MESSAGE(STATUS "Version hash:" ${GIT_VERSION_HASH})
+
 # strip the leading 'v' off of the git version tag:
 string(LENGTH ${GIT_VERSION_TAG} GIT_TAG_LENGTH)
 string(SUBSTRING ${GIT_VERSION_TAG} 1 -1 GIT_VERSION_TAG)
