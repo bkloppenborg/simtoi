@@ -10,7 +10,7 @@ script:
   - make
 
 before_install:
-  - git submodule update --init --recursive
+  - git submodule update --init
   # Fetch tags for SIMTOI and all submodules
   - git fetch --tags --recurse-submodules=yes
   # Install packages
