@@ -12,7 +12,9 @@
 #include "CFeature.h"
 #include "CRocheLobe.h"
 
+
 CRocheLobe::CRocheLobe() :
+	AU(1.496e11), rsun(6.955e8), G(6.67428e-11), parsec(3.08567758e16),
 	CHealpixSpheroid()
 {
 	id = "roche_lobe";
