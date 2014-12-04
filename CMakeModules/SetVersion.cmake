@@ -1,6 +1,6 @@
 # Create a file containing version information
 EXECUTE_PROCESS(
-    COMMAND git describe --tags `git rev-list --tags --max-count=1`
+    COMMAND git describe --abbrev=0 --tags
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_VERSION_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE
