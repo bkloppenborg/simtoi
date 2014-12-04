@@ -11,7 +11,9 @@ script:
 
 before_install:
   - git submodule update --init --recursive
-  - git fetch --tags
+  # Fetch tags for SIMTOI and all submodules
+  - git fetch --tags --recurse-submodules=yes
+  # Install packages
   - sudo apt-get update -qq
   # liboi prerequisites
   - sudo apt-get install -qq libccfits0 libccfits-dev
