@@ -23,7 +23,7 @@ The requirements for SIMTOI are:
 
 We detail below how to install each of these for OSX or GNU/Linux.
 
-## 1.1 Apple/OSX
+## 1.1 Apple/OSX 
 
 Prior to installing `SIMTOI` follow the instructions for building and testing
 [liboi](https://github.com/bkloppenborg/liboi) for your platform.
