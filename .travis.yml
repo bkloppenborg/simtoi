@@ -10,11 +10,7 @@ script:
   - make
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install git
   - git submodule update --init
-  # Fetch tags for SIMTOI and all submodules
-  - git fetch --tags --recurse-submodules=yes
   # Install packages
   - sudo apt-get update -qq
   # liboi prerequisites
