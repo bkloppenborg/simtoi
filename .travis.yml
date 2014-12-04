@@ -1,0 +1,20 @@
+language: cpp
+
+compiler:
+  - gcc
+#  - clang
+  
+script: 
+  - cd build
+  - cmake ..
+  - make
+
+before_install:
+  - git submodule update --init --recursive
+  - sudo apt-get update -qq
+  # liboi prerequisites
+  - sudo apt-get install -qq libccfits0 libccfits-dev
+  - sudo apt-get install -qq libglu1-mesa libglu1-mesa-dev
+  - sudo apt-get install -qq opencl-headers nvidia-current nvidia-opencl-dev
+  # SIMTOI prerequisites
+  - sudo apt-get install -qq libqt4-dev liblapack-dev libblas-dev libglm-dev
