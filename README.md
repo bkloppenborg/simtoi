@@ -13,7 +13,25 @@ Please see the
 [instructions on the wiki](https://github.com/bkloppenborg/simtoi/wiki/Installation)
 for further information.
 
-# Acknowledgements
+## Reporting issues
+
+If you encounter any issues with the code, or have requests for new features, 
+please open a new ticket on the GitHub 
+[issue tracker](https://github.com/bkloppenborg/simtoi/issues)
+You can also send any questions/issues to brian@kloppenborg.net
+
+Please try and resolve installation issues with your system administrator, 
+as they are likely due to issues with dependencies - however, if you think you 
+have encountered a genuine issue in the installation, please do report it.
+
+## Contributing
+
+In addition to reporting issues with the code or the documentation, code and 
+documentation contributions/patches are welcome. Please read the 
+[following page](https://github.com/bkloppenborg/simtoi/blob/master/CONTRIBUTING.md)
+for more details on how to contribute code.
+
+## Acknowledgements
 
 SIMTOI includes the following libraries as part of its distribution:
 * [OpenCL Interferometry Library (liboi)](https://github.com/bkloppenborg/liboi)
@@ -27,7 +45,7 @@ SIMTOI supports, but our repositories do not include,
 * [MultiNest](http://ccpforge.cse.rl.ac.uk/gf/project/multinest/) A bayesian nested
   sampling minimzation engine.
 
-# Licensing
+## Licensing
 
 SIMTOI is free software, distributed under the 
 [GNU Lesser General Public License (Version 3)](<http://www.gnu.org/licenses/lgpl.html). 
