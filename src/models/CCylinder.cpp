@@ -38,9 +38,9 @@ CCylinder::CCylinder()
 	id = "cylinder";
 	name = "Cylinder";
 
-	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
-	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter", "Diameter of the cylinder");
-	addParameter("height", 0.5, 0.1, 2.0, true, 0.1, "Height", "Total height of the cylinder");
+	addParameter("color", 1, 0, 1, false, 0.01, "Normalized brightness", "Brightness of the red channel normalized to unit intensity.");
+	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter (mas)", "Diameter of the cylinder");
+	addParameter("height", 0.5, 0.1, 2.0, true, 0.1, "Height (mas)", "Total height of the cylinder");
 
 	mMidplaneStart = 0;
 	mMidplaneSize = 0;

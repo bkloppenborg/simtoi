@@ -66,7 +66,7 @@ void CParameterItem::setData(const QVariant & value, int role)
 
 	try
 	{
-		if(col == 1)
+		if(col == 1)    // Free parameter
 			parameter.setFree( value.toBool() );
 		if(col == 2)	// Parameter value
 			parameter.setValue( value.toDouble() );
@@ -74,7 +74,7 @@ void CParameterItem::setData(const QVariant & value, int role)
 			parameter.setMin( value.toDouble() );
 		if(col == 4)	// max value
 			parameter.setMax( value.toDouble() );
-		if(col == 5)
+		if(col == 5)    // step size for gridsearch minimizer
 			parameter.setStepSize( value.toDouble() );
 	}
 	catch(range_error & e)

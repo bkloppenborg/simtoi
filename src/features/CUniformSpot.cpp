@@ -23,10 +23,10 @@ CUniformSpot::CUniformSpot():
 	id = "uniform_spot";
 	name = "Uniform Spot";
 
-	addParameter("theta", 0, 0, 180, false, 0.1, "Theta", "Angular position of the spot on the surface (degrees).");
-	addParameter("phi", 0, 0, 180, false, 0.1, "Phi", "Angular position of the spot on the surface (degrees).");
-	addParameter("radius", 1.0, 0, 10, false, 1, "Radius", "Radius of the spot on the surface  (degrees)");
-	addParameter("delta_T", -500, -2000, 2000, false, 100, "Delta T", "Temperature of the spot relative to the surface temperature");
+	addParameter("theta", 0, 0, 180, false, 0.1, "Theta (degs)", "Angular position of the spot on the surface (degrees).");
+	addParameter("phi", 0, -180, 180, false, 0.1, "Phi (degs)", "Angular position of the spot on the surface (degrees).");
+	addParameter("radius", 1.0, 0, 10, false, 1, "Radius (degs)", "Radius of the spot on the surface  (degrees)");
+	addParameter("delta_T", -500, -2000, 2000, false, 100, "Delta T (K)", "Temperature of the spot relative to the surface temperature");
 }
 
 CUniformSpot::~CUniformSpot()

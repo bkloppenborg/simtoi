@@ -18,7 +18,7 @@ CHealpixSpheroid::CHealpixSpheroid() :
 
 	addParameter("n_side_power", 4, 1, 10, false, 1, "Healpix subdivisions",
 			"The square of this number becomes the number of pixels per healpix pixel. A value of 4-6 is often adequate.");
-	addParameter("r_pole", 1, 1, 10, false, 1, "R_pole", "Radius at the pole (unit agnostic)");
+	addParameter("r_pole", 1, 1, 10, false, 1, "Polar radius (agnostic)", "Radius at the pole (unit agnostic)");
 }
 
 CHealpixSpheroid::~CHealpixSpheroid()

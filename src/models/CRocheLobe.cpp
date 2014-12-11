@@ -20,12 +20,12 @@ CRocheLobe::CRocheLobe() :
 	id = "roche_lobe";
 	name = "Roche Lobe";
 
-	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)");
-	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)");
-	addParameter("von_zeipel_beta", 0.25, 0.0, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
-	addParameter("separation", 4.0 , 0.1, 100.0, false, 0.01, "Separation", "Separation between components (mas)");
-	addParameter("mass_ratio", 3.0 , 0.001, 100.0, false, 0.01, "Mass ratio", "Mass ratio M2/M1) (unitless)");
-	addParameter("asynchronism_ratio", 1.0 , 0.01, 2.0, false, 0.01, "Async ratio", "Asynchronous ratio rotation/revolution (unitless)");
+	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar gravity (m/s^2)", "Gravity at the pole (units: m/s^2)");
+	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "Effective polar temperature (K)", "Effective Polar temperature (kelvin)");
+	addParameter("von_zeipel_beta", 0.25, 0.0, 1.0, false, 0.1, "Von Zeipel gravity darkening", "Von Zeipel gravity darkening parameter (unitless)");
+	addParameter("separation", 4.0 , 0.1, 100.0, false, 0.01, "Component separation (mas)", "Separation between components (mas)");
+	addParameter("mass_ratio", 3.0 , 0.001, 100.0, false, 0.01, "M2/M1", "Mass ratio M2/M1) (unitless)");
+	addParameter("asynchronism_ratio", 1.0 , 0.01, 2.0, false, 0.01, "Rotation/revolution period ratio", "Asynchronous ratio rotation/revolution (unitless)");
 
 	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 	//	omega_rot = 2.0 * PI / (orbital_period * 3600. * 24.); // in Hz

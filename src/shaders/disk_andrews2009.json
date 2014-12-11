@@ -7,7 +7,7 @@
     {
         "help_text": "Characteristic density",
         "id" : "rho0",
-        "name" : "rho0",
+        "name" : "Characteristic density",
         "min" : 0.1,
         "max" : 100,
         "value" : 1
@@ -16,7 +16,7 @@
     {
         "help_text": "Opacity",
         "id" : "kappa",
-        "name" : "kappa",
+        "name" : "Opacity",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
@@ -25,7 +25,7 @@
     {
         "help_text": "Scale radius (in native model units, normally mas)",
         "id" : "r0",
-        "name" : "r0",
+        "name" : "Scale radius (mas)",
         "min" : 0.1,
         "max" : 6,
         "value" : 1
@@ -34,7 +34,7 @@
     {
         "help_text": "Scale height (in native model units, normally mas)",
         "id" : "h0",
-        "name" : "h0",
+        "name" : "Scale height (mas)",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
@@ -43,7 +43,7 @@
     {
         "help_text": "Value for the radial power law / exponential decay found in equation 4.",
         "id" : "gamma",
-        "name" : "gamma",
+        "name" : "Power law/exponential decay value",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
@@ -52,7 +52,7 @@
     {
         "help_text": "Value for height-dependent power law found in equation 2.",
         "id" : "beta",
-        "name" : "beta",
+        "name" : "Height-dependent power law value",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
