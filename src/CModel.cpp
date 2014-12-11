@@ -60,13 +60,13 @@ CModel::CModel()
 	mTime = 0;
 	mZAxisRotationDelta = 0;
 
-	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position angle",
+	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position angle from N rotating E (degs)",
 			"Position Angle defined from North rotating East (degrees)");
-	addParameter("inclination", 0, -180, 180, false, 1.0, "Inclination",
+	addParameter("inclination", 0, -180, 180, false, 1.0, "Inclination (degs)",
 			"Inclination defined from the plane of the sky (degrees)");
-	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation zero point",
+	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation zero point about z-axis (degs)",
 			"Initial rotation angle about model's internal z-axis (degrees). Unless you have a specific reason, this should be zero.");
-	addParameter("z_axis_rotational_period", 0, 0, 100, false, 1, "Rotational period",
+	addParameter("z_axis_rotational_period", 0, 0, 100, false, 1, "Rotational period (days)",
 			"Rotational period about the model'z z-axis (days)");
 }
 

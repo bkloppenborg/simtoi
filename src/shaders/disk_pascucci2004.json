@@ -7,7 +7,7 @@
     {
         "help" : "Characteristic density",
         "id" : "rho0",
-        "name": "rho0",
+        "name": "Characteristic density",
         "min" : 0.1,
         "max" : 100,
         "value" : 1
@@ -16,7 +16,7 @@
     {
         "help" : "Opacity",
         "id" : "kappa",
-        "name": "kappa",
+        "name": "Opacity",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
@@ -25,7 +25,7 @@
     {
         "help" : "Scale radius (in native model units, normally mas)",
         "id" : "r0",
-        "name": "r0",
+        "name": "Scale radius (mas)",
         "min" : 0.1,
         "max" : 6,
         "value" : 1
@@ -34,7 +34,7 @@
     {
         "help" : "Scale height (in native model units, normally mas)",
         "id" : "h0",
-        "name": "h0",
+        "name": "Scale height (mas)",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
@@ -43,7 +43,7 @@
     {
         "help" : "Value for the radial power",
         "id" : "alpha",
-        "name": "alpha",
+        "name": "Radial power value",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
@@ -52,7 +52,7 @@
     {
         "help" : "Value for the height-dependent power",
         "id" : "beta",
-        "name": "beta",
+        "name": "Height-dependent power",
         "min" : 0.1,
         "max" : 10,
         "value" : 1

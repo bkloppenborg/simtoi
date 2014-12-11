@@ -153,8 +153,8 @@ void gui_main::ButtonCheck()
 	this->btnAddModel->setEnabled(true);
 	if(widget->GetTreeModel()->rowCount() > 0)
 	{
-		this->btnEditModel->setEnabled(true);
-		this->btnDeleteModel->setEnabled(true);
+		this->btnEditModel->setEnabled(false);
+		this->btnDeleteModel->setEnabled(false);
 	}
 
 	// Buttons for minimizer area
@@ -257,6 +257,7 @@ void gui_main::Init(void)
 
 	// Setup the text boxes
 	this->textSaveFolder->setText(mDefaultSaveDir.c_str());
+	
 }
 
 void gui_main::MinimizerRun(string MinimizerID, QMdiSubWindow * sw)
@@ -387,6 +388,7 @@ void gui_main::on_actionOpen_triggered()
 		filenames = dialog.selectedFiles();
 		Open(filenames);
 	}
+	
 }
 
 void gui_main::on_actionSave_triggered()
@@ -587,7 +589,7 @@ void gui_main::on_btnStepForward2_clicked()
 }
 
 void gui_main::on_mdiArea_subWindowActivated()
-{
+{  
 	ButtonCheck();
 
 	CGLWidget * widget = GetCurrentGLWidget();
@@ -606,6 +608,7 @@ void gui_main::on_mdiArea_subWindowActivated()
 	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
 	// expand the tree fully
 	this->treeModels->expandAll();
+	
 }
 
 void gui_main::on_btnNewModelArea_clicked()

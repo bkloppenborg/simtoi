@@ -18,11 +18,12 @@ CRocheRotator::CRocheRotator() :
 	name = "Roche Rotator";
 
 	// Tesselation parameter for healpix, 4-6 is adequate for our uses.
-	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)");
-	addParameter("omega_rot", 0.5, 0, 1, false, 0.1, "omega", "Fraction of critical rotational velocity [range: 0...1]");
-	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)");
-	addParameter("von_zeipel_beta", 0.5, 0.01, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
+	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Gravity at the pole (m/s^2)", "Gravity at the pole (units: m/s^2)");
+	addParameter("omega_rot", 0.5, 0, 1, false, 0.1, "Critial rotational velocity fraction", "Fraction of critical rotational velocity [range: 0...1]");
+	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "Effective polar temperature (K)", "Effective Polar temperature (kelvin)");
+	addParameter("von_zeipel_beta", 0.5, 0.01, 1.0, false, 0.1, "Von Zeipel gravity darkening", "Von Zeipel gravity darkening parameter (unitless)");
 
+	
 	// TODO: Remove this variable
 	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 }

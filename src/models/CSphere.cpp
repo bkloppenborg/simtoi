@@ -48,8 +48,8 @@ CSphere::CSphere()
 	id = "sphere";
 	name = "Sphere";
 
-	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
-	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere");
+	addParameter("color", 1, 0, 1, false, 0.01, "Normalized brightness", "Brightness of the red channel normalized to unit intensity.");
+	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter (mas)", "Diameter of the sphere");
 
 	mNumElements = 0;
 
