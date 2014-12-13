@@ -462,36 +462,40 @@ void gui_main::on_btnAddModel_clicked(void)
 
     if(tmp.exec())
     {
-    	widget->AddModel(tmp.getModel());
+    	widget->addModel(tmp.getModel());
     }
 }
 
 /// Deletes the selected model from the model list
 void gui_main::on_btnRemoveModel_clicked(void)
 {
-//	unsigned int index = 0;
-//
-//	widget->removeModel(index);
-//
-//	WorkPtr op = make_shared<WorkItem>(RENDER_TO_SCREEN);
-//	mQueue->push(op);
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
+
+	unsigned int index = 0;
+	widget->removeModel(index);
+	widget->Render();
 }
 
 /// Opens up an editing dialog for the currently selected model.
 void gui_main::on_btnEditModel_clicked()
 {
-//	unsigned int old_model_index = 0;
-//	CModelPtr old_model = mGLWidgetList[0]->getModel(old_model_index);
-//
-//	guiModel dialog(old_model);
-//	if(dialog.exec())
-//	{
-//		CModelPtr new_model = dialog.getModel();
-//		widget->replaceModel(old_model_index, new_model);
-//	}
-//
-//	WorkPtr op = make_shared<WorkItem>(RENDER_TO_SCREEN);
-//	mQueue->push(op);
+	CGLWidget * widget = GetCurrentGLWidget();
+	if(widget == NULL)
+		return;
+
+	unsigned int old_model_index = 0;
+	CModelPtr old_model = widget->getModel(old_model_index);
+
+	guiModel dialog(old_model);
+	if(dialog.exec())
+	{
+		CModelPtr new_model = dialog.getModel();
+		widget->replaceModel(old_model_index, new_model);
+	}
+
+	widget->Render();
 }
 
 /// Starts the minimizer

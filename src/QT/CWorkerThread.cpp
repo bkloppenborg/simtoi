@@ -76,14 +76,35 @@ CWorkerThread::~CWorkerThread()
 	if(mFBO_render) delete mFBO_render;
 }
 
-/// Appends a model to the list of models.
-void CWorkerThread::AddModel(CModelPtr model)
-{
-	// Get exclusive access to the worker
-	QMutexLocker lock(&mWorkerMutex);
 
-	// Modify the list of models:
+/// Appends a model to the list of models.
+void CWorkerThread::addModel(CModelPtr model)
+{
+	QMutexLocker lock(&mWorkerMutex);
 	mModelList->AddModel(model);
+	Enqueue(RENDER);
+}
+
+/// Returns a shared pointer to the requested model.
+CModelPtr CWorkerThread::getModel(unsigned int model_index)
+{
+	QMutexLocker lock(&mWorkerMutex);
+	return mModelList->GetModel(model_index);
+}
+
+/// Replaces the model at `model_index` with `new_model`
+void CWorkerThread::replaceModel(unsigned int model_index, CModelPtr new_model)
+{
+	QMutexLocker lock(&mWorkerMutex);
+	mModelList->ReplaceModel(model_index, new_model);
+	Enqueue(RENDER);
+}
+
+/// Removes the model at the specified index
+void CWorkerThread::removeModel(unsigned int model_index)
+{
+	QMutexLocker lock(&mWorkerMutex);
+	mModelList->RemoveModel(model_index);
 	Enqueue(RENDER);
 }
 

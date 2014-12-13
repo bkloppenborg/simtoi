@@ -144,7 +144,11 @@ public:
     virtual ~CWorkerThread();
 
 public:
-    void AddModel(CModelPtr model);
+	void addModel(CModelPtr model);
+	CModelPtr getModel(unsigned int model_index);
+	void replaceModel(unsigned int model_index, CModelPtr new_model);
+	void removeModel(unsigned int model_index);
+
     void AllocateBuffer();
 
 public:

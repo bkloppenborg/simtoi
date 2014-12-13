@@ -69,7 +69,11 @@ public:
     CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);
     virtual ~CGLWidget();
 
-    void AddModel(shared_ptr<CModel> model);
+    void addModel(shared_ptr<CModel> model);
+	CModelPtr getModel(unsigned int model_index);
+	void replaceModel(unsigned int model_index, CModelPtr new_model);
+	void removeModel(unsigned int model_index);
+
 protected:
     void closeEvent(QCloseEvent *evt);
 

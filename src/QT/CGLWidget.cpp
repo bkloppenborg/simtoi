@@ -84,11 +84,26 @@ CGLWidget::~CGLWidget()
 	stopRendering();
 }
 
-void CGLWidget::AddModel(shared_ptr<CModel> model)
+void CGLWidget::addModel(CModelPtr model)
 {
-	// Instruct the thread to add the model to it's list:
-	mWorker->AddModel(model);
+	mWorker->addModel(model);
+	RebuildTree();
+}
 
+CModelPtr CGLWidget::getModel(unsigned int model_index)
+{
+	return mWorker->getModel(model_index);
+}
+
+void CGLWidget::replaceModel(unsigned int model_index, CModelPtr new_model)
+{
+	mWorker->replaceModel(model_index, new_model);
+	RebuildTree();
+}
+
+void CGLWidget::removeModel(unsigned int model_index)
+{
+	mWorker->removeModel(model_index);
 	RebuildTree();
 }
 

@@ -81,6 +81,8 @@ public:
 	static vector<string> GetTypes(void);
 
 	void Render(const glm::mat4 & view);
+	void ReplaceModel(unsigned int model_index, CModelPtr model);
+	void RemoveModel(unsigned int model_index);
 	void Restore(Json::Value input);
 
 	Json::Value Serialize();
