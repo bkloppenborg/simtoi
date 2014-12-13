@@ -28,7 +28,6 @@
 #define GUI_ADDMODEL_H
 
 #include "ui_gui_model.h"
-#include "gui_common.h"
 
 #include <QtGui/QWidget>
 #include <QDialog>

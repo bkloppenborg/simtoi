@@ -27,7 +27,6 @@
 #define CMAINGUI_H
 
 #include "ui_gui_main.h"
-#include "gui_common.h"
 
 #include <QtGui/QMainWindow>
 #include <QStandardItem>

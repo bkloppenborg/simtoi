@@ -45,7 +45,7 @@
 #include "CPosition.h"
 #include "CMinimizerThread.h"
 #include "CTreeModel.h"
-#include "gui_common.h"
+#include "guiCommon.h"
 #include "gui_model.h"
 #include "CMinimizerFactory.h"
 
@@ -253,7 +253,7 @@ void gui_main::Init(void)
 
 	// Setup the combo boxes.
 	auto minimizers = CMinimizerFactory::Instance();
-	gui_common::SetupOptions(this->cboMinimizers, minimizers.GetMinimizerList());
+	guiCommon::setOptions(this->cboMinimizers, minimizers.GetMinimizerList());
 
 	// Setup the text boxes
 	this->textSaveFolder->setText(mDefaultSaveDir.c_str());

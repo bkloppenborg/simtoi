@@ -24,7 +24,7 @@
  */
 
 #include "gui_model.h"
-#include "gui_common.h"
+#include "guiCommon.h"
 #include "CModel.h"
 #include "CModelFactory.h"
 #include "CPositionFactory.h"
@@ -94,10 +94,10 @@ void gui_model::SetupUI()
 	auto shaders = CShaderFactory::Instance();
 	auto features = CFeatureFactory::Instance();
 
-	gui_common::SetupOptions(ui.cboModels, models.GetModelList());
-	gui_common::SetupOptions(ui.cboPositions, positions.GetPositionList());
-	gui_common::SetupOptions(ui.cboShaders, shaders.GetShaderList());
-	gui_common::SetupOptions(ui.cboFeatures, features.GetFeatureList());
+	guiCommon::setOptions(ui.cboModels, models.GetModelList());
+	guiCommon::setOptions(ui.cboPositions, positions.GetPositionList());
+	guiCommon::setOptions(ui.cboShaders, shaders.GetShaderList());
+	guiCommon::setOptions(ui.cboFeatures, features.GetFeatureList());
 
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(ui.buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
