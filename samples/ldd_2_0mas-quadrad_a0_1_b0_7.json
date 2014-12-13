@@ -1,0 +1,37 @@
+
+{
+	"_file_info" : "Save file from the SImulation and Modeling Tool for Optical Interferometry (SIMTOI). See https://github.com/bkloppenborg/simtoi for information about this format.",
+	"area_height" : 128,
+	"area_scale" : 0.025,
+	"area_width" : 128,
+	"model_0" : 
+	{
+		"base_data" : 
+		{
+			"color" : [ 1, 0, 1, false, 0.01 ],
+			"diameter" : [ 1, 1, 3, true, 0.05 ],
+			"inclination" : [ 0, -180, 180, false, 1 ],
+			"position_angle" : [ 0, 0, 360, false, 0.1 ],
+			"z_axis_rotation" : [ 0, 0, 360, false, 1 ],
+			"z_axis_rotational_period" : [ 0, 0, 100, false, 1 ]
+		},
+		"base_id" : "sphere",
+		"position_data" : 
+		{
+			"Omega" : [ 0, 0, 360, false, 1 ],
+			"P" : [ 1, 0, 360, false, 1 ],
+			"T" : [ 0, 0, 1000, false, 10 ],
+			"alpha" : [ 0, 0, 10, false, 1 ],
+			"e" : [ 0, 0, 1, false, 0.1 ],
+			"inclination" : [ 0, -180, 180, false, 1 ],
+			"omega" : [ 0, 0, 360, false, 1 ]
+		},
+		"position_id" : "orbit_bound",
+		"shader_data" : 
+		{
+			"a1" : [ 0.1, 0, 1, true, 0.0999 ],
+			"a2" : [ 0.1, 0.001, 1, true, 0.0999 ]
+		},
+		"shader_id" : "ldl_quadratic"
+	}
+}

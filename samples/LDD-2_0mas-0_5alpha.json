@@ -1,29 +1,30 @@
-// Model save file from SIMTOI in JSON format.
 
 {
+	"_file_info" : "Save file from the SImulation and Modeling Tool for Optical Interferometry (SIMTOI). See https://github.com/bkloppenborg/simtoi for information about this format.",
 	"area_height" : 128,
-	"area_scale" : 0.0250,
+	"area_scale" : 0.025,
 	"area_width" : 128,
 	"model_0" : 
 	{
 		"base_data" : 
 		{
-			"color" : [ 1.0, 0.0, 0.0, false ],
-			"diameter" : [ 2.5, 1.0, 3.0, true ],
-			"inclination" : [ 0.0, 0.0, 0.0, false ],
-			"position_angle" : [ 0.0, 0.0, 0.0, false ],
-			"z_axis_rotation" : [ 0.0, 0.0, 0.0, false ]
+			"color" : [ 1, 0, 0, false, 0 ],
+			"diameter" : [ 2.5, 1, 3, true, 0 ],
+			"inclination" : [ 0, 0, 0, false, 0 ],
+			"position_angle" : [ 0, 0, 0, false, 0 ],
+			"z_axis_rotation" : [ 0, 0, 0, false, 0 ],
+			"z_axis_rotational_period" : [ 0, 0, 100, false, 1 ]
 		},
 		"base_id" : "sphere",
 		"position_data" : 
 		{
-            "X" : [ 0.0, 0.0, 0.0, false ],
-            "Y" : [ 0.0, 0.0, 0.0, false ]
+			"E" : [ 0, -1, 1, false, 0.1 ],
+			"N" : [ 0, -1, 1, false, 0.1 ]
 		},
 		"position_id" : "xy",
 		"shader_data" : 
 		{
-			"alpha" : [ 0.50, 0.1, 1.0, true ]
+			"alpha" : [ 0.5, 0.1, 1, true, 0 ]
 		},
 		"shader_id" : "ldl_power_law"
 	}
