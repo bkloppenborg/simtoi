@@ -46,7 +46,7 @@
 #include "CMinimizerThread.h"
 #include "CTreeModel.h"
 #include "guiCommon.h"
-#include "gui_model.h"
+#include "guiModel.h"
 #include "CMinimizerFactory.h"
 
 gui_main::gui_main(QWidget *parent_widget)
@@ -136,7 +136,7 @@ void gui_main::ButtonCheck()
 	this->btnAddData->setEnabled(false);
 	this->btnAddModel->setEnabled(false);
 	this->btnEditModel->setEnabled(false);
-	this->btnDeleteModel->setEnabled(false);
+	this->btnRemoveModel->setEnabled(false);
 	this->btnRemoveData->setEnabled(false);
 	this->btnMinimizerStartStop->setEnabled(true);
 
@@ -154,7 +154,7 @@ void gui_main::ButtonCheck()
 	if(widget->GetTreeModel()->rowCount() > 0)
 	{
 		this->btnEditModel->setEnabled(true);
-		this->btnDeleteModel->setEnabled(true);
+		this->btnRemoveModel->setEnabled(true);
 	}
 
 	// Buttons for minimizer area
@@ -457,25 +457,41 @@ void gui_main::on_btnAddModel_clicked(void)
     int id = 0;
     int n_features;
 
-    gui_model tmp;
+    guiModel tmp;
     tmp.show();
 
     if(tmp.exec())
     {
-    	widget->AddModel(tmp.GetModel());
+    	widget->AddModel(tmp.getModel());
     }
 }
 
 /// Deletes the selected model from the model list
-void gui_main::on_btnDeleteModel_clicked()
+void gui_main::on_btnRemoveModel_clicked(void)
 {
-	// TODO: write this function
+//	unsigned int index = 0;
+//
+//	widget->removeModel(index);
+//
+//	WorkPtr op = make_shared<WorkItem>(RENDER_TO_SCREEN);
+//	mQueue->push(op);
 }
 
 /// Opens up an editing dialog for the currently selected model.
 void gui_main::on_btnEditModel_clicked()
 {
-	// TODO: write this function
+//	unsigned int old_model_index = 0;
+//	CModelPtr old_model = mGLWidgetList[0]->getModel(old_model_index);
+//
+//	guiModel dialog(old_model);
+//	if(dialog.exec())
+//	{
+//		CModelPtr new_model = dialog.getModel();
+//		widget->replaceModel(old_model_index, new_model);
+//	}
+//
+//	WorkPtr op = make_shared<WorkItem>(RENDER_TO_SCREEN);
+//	mQueue->push(op);
 }
 
 /// Starts the minimizer

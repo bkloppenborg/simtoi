@@ -574,6 +574,12 @@ Json::Value CModel::Serialize()
 	return output;
 }
 
+/// Sets the features used in this model.
+void CModel::SetFeatures(vector<CFeaturePtr> & features)
+{
+	mFeatures = features;
+}
+
 /// \brief Sets the free parameters for the model, position, and shader objects.
 ///
 /// Iteratively sets the free parameters for the model, position, and shader

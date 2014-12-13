@@ -156,11 +156,13 @@ public:
 
 public:
 	Json::Value Serialize();
+
+	virtual void SetFeatures(vector<CFeaturePtr> & features);
 	void SetPositionModel(string position_id);
 	void SetPositionModel(CPositionPtr position);
-
 	virtual void SetShader(string shader_id);
 	virtual void SetShader(CShaderPtr shader);
+
 	virtual void SetTime(double time);
 protected:
 	void SetupMatrix();
