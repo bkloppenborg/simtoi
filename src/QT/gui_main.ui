@@ -136,9 +136,6 @@
       </attribute>
      </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="QMdiArea" name="mdiArea"/>
-    </item>
     <item row="3" column="1" rowspan="2">
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
@@ -425,12 +422,10 @@
       </item>
      </layout>
     </item>
+    <item row="2" column="1">
+     <widget class="QWidget" name="widget" native="true"/>
+    </item>
    </layout>
-   <zorder>mdiArea</zorder>
-   <zorder>treeModels</zorder>
-   <zorder>tabWidget</zorder>
-   <zorder>treeOpenFiles</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">

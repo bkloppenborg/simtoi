@@ -70,7 +70,7 @@ void gui_main::AddData(QStringList & filenames)
 	time_str.setf(ios::fixed,ios::floatfield);
 
     // Get access to the current widget and QStandardItemModel:
-    CGLWidget *widget = GetCurrentGLWidget();
+    CGLWidget * widget = GetCurrentGLWidget();
     QStandardItemModel * model = widget->GetOpenFileModel();
 	QList<QStandardItem *> items;
 
@@ -100,7 +100,7 @@ void gui_main::AddData(QStringList & filenames)
 	ButtonCheck();
 }
 
-QMdiSubWindow * gui_main::AddGLArea(CGLWidget * gl_widget)
+void gui_main::AddGLArea(CGLWidget * gl_widget)
 {
 	if(mGLWidget != NULL)
 	{
@@ -122,8 +122,6 @@ QMdiSubWindow * gui_main::AddGLArea(CGLWidget * gl_widget)
 
 	// If the load data button isn't enabled, turn it on
 	ButtonCheck();
-
-	return NULL;
 }
 
 /// Checks to see which buttons can be enabled/disabled.
@@ -169,21 +167,7 @@ void gui_main::ButtonCheck()
 
 void gui_main::close()
 {
-	CGLWidget * widget = NULL;
-	QMdiSubWindow * sw = NULL;
-
-	QList<QMdiSubWindow *> windows = this->mdiArea->subWindowList();
-    for (int i = int(windows.count()) - 1; i > 0; i--)
-    {
-    	QMdiSubWindow * sw = windows.at(i);
-//    	CGLWidget * widget = dynamic_cast<CGLWidget *>(sw->widget());
-//    	widget->stopRendering();
-    	sw->close();
-    }
-
     mGLWidget->stopRendering();
-
-    // Now call the base-class close method.
     QMainWindow::close();
 }
 
@@ -200,31 +184,14 @@ void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, 
 	// First open the model area and configure the UI.
 	Open(model_files);
 
-//	// Get a pointer to the active model area.
-//    QMdiSubWindow * sw = GetCurrentSubwindow();
-//    if(!sw)
-//    	return;
-
     // Now open data, run the minimizer and close (if needed)
 	AddData(data_files);
 	MinimizerRun(minimizer);
 	mAutoClose = close_simtoi;
 }
 
-QMdiSubWindow * gui_main::GetCurrentSubwindow()
-{
-    return this->mdiArea->activeSubWindow();
-}
-
 CGLWidget * gui_main::GetCurrentGLWidget()
 {
-//    QMdiSubWindow * sw = GetCurrentSubwindow();
-//    if(!sw)
-//    	return NULL;
-//
-//	// We have a valid subwindow, so cast it into a CGLWidget
-//	return dynamic_cast<CGLWidget*>(sw->widget());
-
 	return mGLWidget;
 }
 
@@ -330,28 +297,18 @@ void gui_main::SetOutputDir(string folder_name)
 
 void gui_main::minimizerFinished()
 {
-	QMdiSubWindow * sw = GetCurrentSubwindow();
-
 	// Update the buttons
 	ButtonCheck();
 
 	// Close the subwindow if automatic closing is enabled.
 	if(mAutoClose)
-	{
-		// Close the calling subwindow
-		sw->close();
-
-		// If there are no more open subwindows, close SIMTOI
-		if(this->mdiArea->subWindowList().size() == 0)
-			close();
-	}
-
+		close();
 }
 
 void gui_main::on_actionExport_triggered()
 {
-	QMdiSubWindow * sw = GetCurrentSubwindow();
-    if(!sw)
+	CGLWidget * widget = GetCurrentGLWidget();
+    if(!widget)
     	return;
 
     // Open a dialog, get a list of file that the user selected:
@@ -367,7 +324,6 @@ void gui_main::on_actionExport_triggered()
 		if(!QDir(filenames[0]).exists())
 			QDir().mkdir(filenames[0]);
 
-		CGLWidget *widget = GetCurrentGLWidget();
 		widget->Export(filenames[0]);
 	}
 }
@@ -391,8 +347,8 @@ void gui_main::on_actionOpen_triggered()
 
 void gui_main::on_actionSave_triggered()
 {
-	QMdiSubWindow * sw = GetCurrentSubwindow();
-    if(!sw)
+	CGLWidget * widget = GetCurrentGLWidget();
+    if(!widget)
     	return;
 
     string filename;
@@ -411,7 +367,6 @@ void gui_main::on_actionSave_triggered()
 		if(filename.substr(filename.size() - 5, 5) != ".json")
 			filename += ".json";
 
-		CGLWidget *widget = GetCurrentGLWidget();
 		widget->Save(filename);
 	}
 
@@ -420,8 +375,8 @@ void gui_main::on_actionSave_triggered()
 void gui_main::on_btnAddData_clicked(void)
 {
 	// Ensure there is a selected widget, if not immediately return.
-	QMdiSubWindow * sw = GetCurrentSubwindow();
-    if(!sw)
+	CGLWidget * widget = GetCurrentGLWidget();
+    if(!widget)
     {
 		QMessageBox msgBox;
 		msgBox.setText("You must have an active model region before you can load data.");
@@ -435,7 +390,6 @@ void gui_main::on_btnAddData_clicked(void)
     dialog.setFileMode(QFileDialog::ExistingFiles);
 
     // Now add in valid file types:
-    CGLWidget * widget = GetCurrentGLWidget();
     QStringList filters = widget->GetFileFilters();
     dialog.setNameFilters(filters);
 
@@ -511,7 +465,6 @@ void gui_main::on_btnEditModel_clicked()
 void gui_main::on_btnMinimizerStartStop_clicked()
 {
 	/// TODO: Handle thread-execution exceptions that might be thrown.
-	QMdiSubWindow * sw = GetCurrentSubwindow();
 	CGLWidget * widget = GetCurrentGLWidget();
 	if(widget == NULL)
 		return;
@@ -615,33 +568,6 @@ void gui_main::on_btnStepForward2_clicked()
 	doubleSpinBoxJD->setValue(time + 10 * dt);
 }
 
-//void gui_main::on_mdiArea_subWindowActivated()
-//{
-//	ButtonCheck();
-//
-//	CGLWidget * widget = GetCurrentGLWidget();
-//	if(widget == NULL)
-//		return;
-//
-
-void gui_main::TreeCheck()
-{
-	CGLWidget * widget = GetCurrentGLWidget();
-
-	// Configure the open file widget:
-	this->treeOpenFiles->setHeaderHidden(false);
-    this->treeOpenFiles->setModel(widget->GetOpenFileModel());
-	this->treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
-
-	// Configure the model tree
-    CTreeModel * model = widget->GetTreeModel();
-	this->treeModels->setHeaderHidden(false);
-	this->treeModels->setModel(widget->GetTreeModel());
-	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
-	// expand the tree fully
-	this->treeModels->expandAll();
-}
-
 
 void gui_main::on_btnNewModelArea_clicked()
 {
@@ -679,4 +605,22 @@ void gui_main::on_btnRemoveData_clicked()
 void gui_main::on_doubleSpinBoxJD_valueChanged(double jd)
 {
 	render_at_time(jd);
+}
+
+void gui_main::TreeCheck()
+{
+	CGLWidget * widget = GetCurrentGLWidget();
+
+	// Configure the open file widget:
+	this->treeOpenFiles->setHeaderHidden(false);
+    this->treeOpenFiles->setModel(widget->GetOpenFileModel());
+	this->treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
+
+	// Configure the model tree
+    CTreeModel * model = widget->GetTreeModel();
+	this->treeModels->setHeaderHidden(false);
+	this->treeModels->setModel(widget->GetTreeModel());
+	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
+	// expand the tree fully
+	this->treeModels->expandAll();
 }

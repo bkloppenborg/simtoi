@@ -60,10 +60,10 @@ public:
     virtual ~gui_main();
 
 protected:
-    QMdiSubWindow * AddGLArea(CGLWidget * widget);
+    void AddGLArea(CGLWidget * widget);
     void AddData(QStringList & filenames);
 public:
-    void AutoClose(bool auto_close, QMdiSubWindow * sw);
+    void AutoClose(bool auto_close);
 
 protected:
     void ButtonCheck();
@@ -73,7 +73,6 @@ protected:
 public:
     void CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, bool close_simtoi);
 
-    QMdiSubWindow * GetCurrentSubwindow();
     CGLWidget * GetCurrentGLWidget();
 
 protected:
@@ -110,7 +109,6 @@ private slots:
     void on_btnRemoveData_clicked();
     void on_btnMinimizerStartStop_clicked();
     void on_btnNewModelArea_clicked();
-//    void on_mdiArea_subWindowActivated();
 
     void on_btnPlayPause_clicked();
     void on_btnStepBackward_clicked();
