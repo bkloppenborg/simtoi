@@ -41,15 +41,17 @@
 #include <cmath>
 #include <stdexcept>
 
+// QT or GUI elements
 #include "wAnimation.h"
+#include "wModels.h"
 #include "CGLWidget.h"
-
+#include "guiCommon.h"
+#include "guiRegion.h"
+#include "CTreeModel.h"
+#include "CMinimizerThread.h"
 
 #include "CPosition.h"
-#include "CMinimizerThread.h"
-#include "CTreeModel.h"
-#include "guiCommon.h"
-#include "guiModel.h"
+
 #include "CMinimizerFactory.h"
 
 gui_main::gui_main(QWidget *parent_widget)
@@ -119,6 +121,9 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
     mGLWidget->startRendering();
 
     // TODO: Rework once GLWidgets are persistent.
+	// populate the left layout
+    this->wModelParameterEditor->setGLWidget(mGLWidget);
+
     // Create a new animation widget, init the tab region
     wAnimationWidget = new wAnimation(mGLWidget);
 	this->tabBottom->addTab(wAnimationWidget, QString("Animation"));
@@ -140,9 +145,6 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 void gui_main::ButtonCheck()
 {
 	this->btnAddData->setEnabled(false);
-	this->btnAddModel->setEnabled(false);
-	this->btnEditModel->setEnabled(false);
-	this->btnRemoveModel->setEnabled(false);
 	this->btnRemoveData->setEnabled(false);
 	this->btnMinimizerStartStop->setEnabled(true);
 
@@ -153,14 +155,6 @@ void gui_main::ButtonCheck()
 	this->btnAddData->setEnabled(true);
 	if(mGLWidget->GetOpenFileModel()->rowCount() > 0)
 		this->btnRemoveData->setEnabled(true);
-
-	// Buttons for add/edit/delete model
-	this->btnAddModel->setEnabled(true);
-	if(mGLWidget->GetTreeModel()->rowCount() > 0)
-	{
-		this->btnEditModel->setEnabled(true);
-		this->btnRemoveModel->setEnabled(true);
-	}
 
 	// Buttons for minimizer area
 	// Look up the minimizer's ID in the combo box, select it.
@@ -343,6 +337,23 @@ void gui_main::on_actionOpen_triggered()
 	}
 }
 
+/// Opens up a dialog for creating a new model region
+void gui_main::on_actionNew_triggered(void)
+{
+	guiRegion dialog;
+	if(dialog.exec())
+	{
+		unsigned int width = dialog.spinWidth->value();
+		unsigned int height = dialog.spinHeight->value();
+		double scale = dialog.spinScale->value();
+
+		CGLWidgetPtr widget = CGLWidgetPtr(new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir));
+		widget->SetSize(width, height);
+		widget->SetScale(scale);
+		AddGLArea(widget);
+	}
+}
+
 void gui_main::on_actionSave_triggered()
 {
     if(!mGLWidget)
@@ -398,62 +409,6 @@ void gui_main::on_btnAddData_clicked(void)
 	}
 }
 
-void gui_main::on_btnAddModel_clicked(void)
-{
-	if(!mGLWidget)
-		return;
-
-    int id = 0;
-    int n_features;
-
-    guiModel tmp;
-    tmp.show();
-
-    if(tmp.exec())
-    {
-    	mGLWidget->addModel(tmp.getModel());
-    }
-
-    ButtonCheck();
-    TreeCheck();
-}
-
-/// Deletes the selected model from the model list
-void gui_main::on_btnRemoveModel_clicked(void)
-{
-	if(!mGLWidget)
-		return;
-
-	unsigned int index = 0;
-	mGLWidget->removeModel(index);
-	mGLWidget->Render();
-
-	ButtonCheck();
-    TreeCheck();
-}
-
-/// Opens up an editing dialog for the currently selected model.
-void gui_main::on_btnEditModel_clicked()
-{
-	if(!mGLWidget)
-		return;
-
-	unsigned int old_model_index = 0;
-	CModelPtr old_model = mGLWidget->getModel(old_model_index);
-
-	guiModel dialog(old_model);
-	if(dialog.exec())
-	{
-		CModelPtr new_model = dialog.getModel();
-		mGLWidget->replaceModel(old_model_index, new_model);
-	}
-
-	mGLWidget->Render();
-
-	ButtonCheck();
-    TreeCheck();
-}
-
 /// Starts the minimizer
 void gui_main::on_btnMinimizerStartStop_clicked()
 {
@@ -468,11 +423,11 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 	{
 		string id = this->cboMinimizers->currentText().toStdString();
 
-		QAbstractItemModel *model;
+		QAbstractItemModel * model;
 
 		// Ensure that a model exists before starting the minimizer
-		model = this->treeModels->model();
-		if(model->rowCount() == 0)
+		CModelPtr model_ptr = mGLWidget->getModel(0);
+		if(!model)
 		{
 			QMessageBox msgBox;
 			msgBox.setWindowTitle("Error");
@@ -500,18 +455,6 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 	ButtonCheck();
 }
 
-void gui_main::on_btnNewModelArea_clicked()
-{
-	int width = this->spinModelSize->value();
-    int height = this->spinModelSize->value();
-    double scale = this->spinModelScale->value();
-
-	CGLWidgetPtr widget = CGLWidgetPtr(new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir));
-	widget->SetSize(width, height);
-	widget->SetScale(scale);
-	AddGLArea(widget);
-}
-
 /// Removes the current selected data set.
 void gui_main::on_btnRemoveData_clicked()
 {
@@ -536,14 +479,6 @@ void gui_main::TreeCheck()
 {
 	// Configure the open file widget:
 	this->treeOpenFiles->setHeaderHidden(false);
-    this->treeOpenFiles->setModel(mGLWidget->GetOpenFileModel());
+	this->treeOpenFiles->setModel(mGLWidget->GetOpenFileModel());
 	this->treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
-
-	// Configure the model tree
-    CTreeModel * model = mGLWidget->GetTreeModel();
-	this->treeModels->setHeaderHidden(false);
-	this->treeModels->setModel(mGLWidget->GetTreeModel());
-	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
-	// expand the tree fully
-	this->treeModels->expandAll();
 }

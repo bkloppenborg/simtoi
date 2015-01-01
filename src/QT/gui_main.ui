@@ -6,76 +6,32 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1026</width>
-    <height>805</height>
+    <width>930</width>
+    <height>757</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="3">
-       <widget class="QDoubleSpinBox" name="spinModelScale">
-        <property name="decimals">
-         <number>4</number>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.050000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QPushButton" name="btnNewModelArea">
-        <property name="text">
-         <string>New Region</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Size:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="spinModelSize">
-        <property name="minimum">
-         <number>64</number>
-        </property>
-        <property name="maximum">
-         <number>2048</number>
-        </property>
-        <property name="singleStep">
-         <number>64</number>
-        </property>
-        <property name="value">
-         <number>128</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Scale:</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0" rowspan="3">
+     <widget class="wModels" name="wModelParameterEditor" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>500</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
     </item>
-    <item row="0" column="1" rowspan="2">
+    <item row="0" column="1">
      <layout class="QHBoxLayout" name="topRightLayout">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -117,66 +73,17 @@
       </item>
      </layout>
     </item>
-    <item row="1" column="0" rowspan="3">
-     <widget class="QTreeView" name="treeModels">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+    <item row="1" column="1">
+     <widget class="QWidget" name="widget" native="true">
       <property name="minimumSize">
        <size>
-        <width>550</width>
-        <height>0</height>
+        <width>0</width>
+        <height>300</height>
        </size>
       </property>
-      <attribute name="headerMinimumSectionSize">
-       <number>1</number>
-      </attribute>
      </widget>
     </item>
-    <item row="4" column="0">
-     <layout class="QGridLayout" name="gridLayout_2">
-      <property name="verticalSpacing">
-       <number>2</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="btnAddModel">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Add Model</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="btnRemoveModel">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="btnEditModel">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Edit</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item row="2" column="1">
-     <widget class="QWidget" name="widget" native="true"/>
-    </item>
-    <item row="3" column="1" rowspan="2">
      <widget class="QTabWidget" name="tabBottom">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -241,6 +148,10 @@
      </widget>
     </item>
    </layout>
+   <zorder>widget</zorder>
+   <zorder>tabBottom</zorder>
+   <zorder>wModelParameterEditor</zorder>
+   <zorder></zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
@@ -248,7 +159,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1026</width>
+     <width>930</width>
      <height>23</height>
     </rect>
    </property>
@@ -284,6 +195,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>wModels</class>
+   <extends>QWidget</extends>
+   <header>wModels.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

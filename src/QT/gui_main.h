@@ -100,18 +100,16 @@ public:
 private slots:
     void minimizerFinished();
 
-    void on_btnAddModel_clicked();
-    void on_btnEditModel_clicked();
-    void on_btnRemoveModel_clicked();
-
+	void on_actionNew_triggered(void);
     void on_actionExport_triggered();
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
-    void on_btnAddData_clicked();
 
+    void on_btnAddData_clicked();
     void on_btnRemoveData_clicked();
+
     void on_btnMinimizerStartStop_clicked();
-    void on_btnNewModelArea_clicked();
+//    void on_btnNewModelArea_clicked();
 
 };
 
