@@ -284,6 +284,7 @@ void gui_main::minimizerFinished()
 {
 	// Update the buttons
 	ButtonCheck();
+	TreeCheck();
 
 	// Close the subwindow if automatic closing is enabled.
 	if(mAutoClose)

@@ -227,8 +227,8 @@ void CGLWidget::on_mTreeModel_parameterUpdated()
 
 void CGLWidget::on_minimizer_finished(void)
 {
-	emit minimizerFinished();
 	RebuildTree();
+	emit minimizerFinished();
 }
 
 void CGLWidget::Open(string filename)
