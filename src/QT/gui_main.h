@@ -32,12 +32,15 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <string>
+#include <memory>
 
 using namespace std;
 
 class CParameters;
 class CParameterItem;
 class CGLWidget;
+
+typedef shared_ptr<CGLWidget> CGLWidgetPtr;
 
 class gui_main : public QMainWindow, private Ui::cmainguiClass
 {
@@ -53,14 +56,14 @@ class gui_main : public QMainWindow, private Ui::cmainguiClass
     string mOpenDataDir;	// Stores the previously opened directory for data files
     string mOpenModelDir; 	// Stores the previously opened directory for models
 
-    CGLWidget * mGLWidget;
+    CGLWidgetPtr mGLWidget;
 
 public:
     gui_main(QWidget *parent = 0);
     virtual ~gui_main();
 
 protected:
-    void AddGLArea(CGLWidget * widget);
+    void AddGLArea(CGLWidgetPtr widget);
     void AddData(QStringList & filenames);
 public:
     void AutoClose(bool auto_close);
@@ -71,16 +74,14 @@ protected:
     void close();
     void closeEvent(QCloseEvent *evt);
 public:
-    void CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, bool close_simtoi);
-
-    CGLWidget * GetCurrentGLWidget();
+    void CommandLine(QStringList & data_files, QString & model_file, string minimizer, bool close_simtoi);
 
 protected:
     void MinimizerRun(string MinimizerID);
     void ModelOpen(QStringList & fileNames);
 
 public:
-    void Open(QStringList & filenames);
+    void Open(QString & filename);
 
 protected:
     void Init();

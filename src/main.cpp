@@ -105,8 +105,15 @@ int main(int argc, char *argv[])
 
     main_window.SetOutputDir(output_dir);
 
+    if(model_files.size() > 1)
+    {
+    	cout << "SIMTOI can only open one model file per invocation." << endl;
+    	return 1;
+    }
+
+
     if(data_files.size() > 0 || model_files.size() > 0)
-    	main_window.CommandLine(data_files, model_files, minimizer, close_simtoi);
+    	main_window.CommandLine(data_files, model_files[0], minimizer, close_simtoi);
 
     return app.exec();
 }

@@ -70,8 +70,7 @@ void gui_main::AddData(QStringList & filenames)
 	time_str.setf(ios::fixed,ios::floatfield);
 
     // Get access to the current widget and QStandardItemModel:
-    CGLWidget * widget = GetCurrentGLWidget();
-    QStandardItemModel * model = widget->GetOpenFileModel();
+    QStandardItemModel * model = mGLWidget->GetOpenFileModel();
 	QList<QStandardItem *> items;
 
 	// Now pull out the data directory (to make file display cleaner)
@@ -84,7 +83,7 @@ void gui_main::AddData(QStringList & filenames)
 		// Tell the widget to load the data file and append a row to its file list:
 		tmp = filenames[i].toStdString();
 		dir_size = tmp.size() - mOpenDataDir.size();
-		widget->OpenData(tmp);
+		mGLWidget->OpenData(tmp);
 
 		// Filename
 		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
@@ -100,16 +99,15 @@ void gui_main::AddData(QStringList & filenames)
 	ButtonCheck();
 }
 
-void gui_main::AddGLArea(CGLWidget * gl_widget)
+void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 {
 	if(mGLWidget != NULL)
 	{
-		this->topRightLayout->removeWidget(mGLWidget);
-		delete mGLWidget;
+		this->topRightLayout->removeWidget(mGLWidget.get());
 	}
 
 	mGLWidget = gl_widget;
-	this->topRightLayout->addWidget(mGLWidget);
+	this->topRightLayout->addWidget(mGLWidget.get());
 	mGLWidget->setFixedSize(mGLWidget->GetImageWidth(), gl_widget->GetImageHeight());
 	mGLWidget->show();
 
@@ -118,7 +116,7 @@ void gui_main::AddGLArea(CGLWidget * gl_widget)
 
     // Connect signals/slots
 	// Now connect signals and slots
-	connect(mGLWidget, SIGNAL(minimizerFinished(void)), this, SLOT(minimizerFinished(void)));
+	connect(mGLWidget.get(), SIGNAL(minimizerFinished(void)), this, SLOT(minimizerFinished(void)));
 
 	// If the load data button isn't enabled, turn it on
 	ButtonCheck();
@@ -134,18 +132,17 @@ void gui_main::ButtonCheck()
 	this->btnRemoveData->setEnabled(false);
 	this->btnMinimizerStartStop->setEnabled(true);
 
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
 	// Buttons for add/delete data
 	this->btnAddData->setEnabled(true);
-	if(widget->GetOpenFileModel()->rowCount() > 0)
+	if(mGLWidget->GetOpenFileModel()->rowCount() > 0)
 		this->btnRemoveData->setEnabled(true);
 
 	// Buttons for add/edit/delete model
 	this->btnAddModel->setEnabled(true);
-	if(widget->GetTreeModel()->rowCount() > 0)
+	if(mGLWidget->GetTreeModel()->rowCount() > 0)
 	{
 		this->btnEditModel->setEnabled(true);
 		this->btnRemoveModel->setEnabled(true);
@@ -153,12 +150,12 @@ void gui_main::ButtonCheck()
 
 	// Buttons for minimizer area
 	// Look up the minimizer's ID in the combo box, select it.
-	int id = this->cboMinimizers->findText(QString::fromStdString(widget->GetMinimizerID()));
+	int id = this->cboMinimizers->findText(QString::fromStdString(mGLWidget->GetMinimizerID()));
 	if(id > -1)
 		this->cboMinimizers->setCurrentIndex(id);
 
 	// Toggle minimizer start/stop button
-	if(widget->GetMinimizerRunning())
+	if(mGLWidget->GetMinimizerRunning())
 		this->btnMinimizerStartStop->setText("Stop");
 	else
 		this->btnMinimizerStartStop->setText("Start");
@@ -179,20 +176,15 @@ void gui_main::closeEvent(QCloseEvent *evt)
 
 /// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
 /// SIMTOI will automatically exit when all minimization engines have completed execution.
-void gui_main::CommandLine(QStringList & data_files, QStringList & model_files, string minimizer, bool close_simtoi)
+void gui_main::CommandLine(QStringList & data_files, QString & model_file, string minimizer, bool close_simtoi)
 {
 	// First open the model area and configure the UI.
-	Open(model_files);
+	Open(model_file);
 
     // Now open data, run the minimizer and close (if needed)
 	AddData(data_files);
 	MinimizerRun(minimizer);
 	mAutoClose = close_simtoi;
-}
-
-CGLWidget * gui_main::GetCurrentGLWidget()
-{
-	return mGLWidget;
 }
 
 /// Runs initialization routines for the main this->
@@ -228,9 +220,6 @@ void gui_main::Init(void)
 
 void gui_main::MinimizerRun(string MinimizerID)
 {
-	// We have a valid subwindow, so cast it into a CGLWidget
-	CGLWidget *widget = GetCurrentGLWidget();
-
 	// Look up the minimizer
 	auto minimizers = CMinimizerFactory::Instance();
 
@@ -240,13 +229,13 @@ void gui_main::MinimizerRun(string MinimizerID)
 	if(!QDir(save_dir).exists())
 		QDir().mkdir(save_dir);
 	// set the path in the widget.
-	widget->SetSaveDirectory(save_dir.toStdString());
+	mGLWidget->SetSaveDirectory(save_dir.toStdString());
 
 	try
 	{
 		CMinimizerPtr minimizer = minimizers.CreateMinimizer(MinimizerID);
-		widget->SetMinimizer(minimizer);
-		widget->startMinimizer();
+		mGLWidget->SetMinimizer(minimizer);
+		mGLWidget->startMinimizer();
 	}
 	catch(runtime_error & e)
 	{
@@ -258,34 +247,30 @@ void gui_main::MinimizerRun(string MinimizerID)
 	ButtonCheck();
 }
 
-/// Opens one or more saved model files.
-void gui_main::Open(QStringList & filenames)
+/// Opens one saved model file.
+void gui_main::Open(QString & filename)
 {
-	for(auto filename : filenames)
+	CGLWidgetPtr widget = CGLWidgetPtr(new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir));
+
+	// Attempt to open the file.
+	try
 	{
-		CGLWidget * widget = new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir);
-
-		// Attempt to open the file.
-		try
-		{
-			widget->Open(filename.toStdString());
-		}
-		catch(runtime_error e)
-		{
-			// An error was thrown. Display a message to the user
-			QMessageBox msgBox;
-			msgBox.setWindowTitle("SIMTOI Error");
-			msgBox.setText(e.what());
-			msgBox.exec();
-
-			// Delete the widget and continue to the next file.
-			delete widget;
-			continue;
-		}
-
-		// If we opened the file successfully,
-		AddGLArea(widget);
+		widget->Open(filename.toStdString());
 	}
+	catch(runtime_error e)
+	{
+		// An error was thrown. Display a message to the user
+		QMessageBox msgBox;
+		msgBox.setWindowTitle("SIMTOI Error");
+		msgBox.setText(e.what());
+		msgBox.exec();
+
+		// Delete the widget and continue to the next file.
+		return;
+	}
+
+	// If we opened the file successfully,
+	AddGLArea(widget);
 }
 
 void gui_main::SetOutputDir(string folder_name)
@@ -307,8 +292,7 @@ void gui_main::minimizerFinished()
 
 void gui_main::on_actionExport_triggered()
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-    if(!widget)
+    if(!mGLWidget)
     	return;
 
     // Open a dialog, get a list of file that the user selected:
@@ -324,7 +308,7 @@ void gui_main::on_actionExport_triggered()
 		if(!QDir(filenames[0]).exists())
 			QDir().mkdir(filenames[0]);
 
-		widget->Export(filenames[0]);
+		mGLWidget->Export(filenames[0]);
 	}
 }
 
@@ -334,21 +318,19 @@ void gui_main::on_actionOpen_triggered()
 	QFileDialog dialog(this);
 	dialog.setDirectory(QString::fromStdString(mOpenDataDir));
 	dialog.setNameFilter(tr("SIMTOI Model Files (*.json)"));
-	dialog.setFileMode(QFileDialog::ExistingFiles);
+	dialog.setFileMode(QFileDialog::ExistingFile);
 
-    QStringList filenames;
     QString dir = "";
 	if (dialog.exec())
 	{
-		filenames = dialog.selectedFiles();
-		Open(filenames);
+	    QStringList filenames = dialog.selectedFiles();
+		Open(filenames[0]);
 	}
 }
 
 void gui_main::on_actionSave_triggered()
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-    if(!widget)
+    if(!mGLWidget)
     	return;
 
     string filename;
@@ -367,7 +349,7 @@ void gui_main::on_actionSave_triggered()
 		if(filename.substr(filename.size() - 5, 5) != ".json")
 			filename += ".json";
 
-		widget->Save(filename);
+		mGLWidget->Save(filename);
 	}
 
 }
@@ -375,8 +357,7 @@ void gui_main::on_actionSave_triggered()
 void gui_main::on_btnAddData_clicked(void)
 {
 	// Ensure there is a selected widget, if not immediately return.
-	CGLWidget * widget = GetCurrentGLWidget();
-    if(!widget)
+    if(!mGLWidget)
     {
 		QMessageBox msgBox;
 		msgBox.setText("You must have an active model region before you can load data.");
@@ -390,7 +371,7 @@ void gui_main::on_btnAddData_clicked(void)
     dialog.setFileMode(QFileDialog::ExistingFiles);
 
     // Now add in valid file types:
-    QStringList filters = widget->GetFileFilters();
+    QStringList filters = mGLWidget->GetFileFilters();
     dialog.setNameFilters(filters);
 
     QStringList filenames;
@@ -404,8 +385,7 @@ void gui_main::on_btnAddData_clicked(void)
 
 void gui_main::on_btnAddModel_clicked(void)
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
     int id = 0;
@@ -416,7 +396,7 @@ void gui_main::on_btnAddModel_clicked(void)
 
     if(tmp.exec())
     {
-    	widget->addModel(tmp.getModel());
+    	mGLWidget->addModel(tmp.getModel());
     }
 
     ButtonCheck();
@@ -426,13 +406,12 @@ void gui_main::on_btnAddModel_clicked(void)
 /// Deletes the selected model from the model list
 void gui_main::on_btnRemoveModel_clicked(void)
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
 	unsigned int index = 0;
-	widget->removeModel(index);
-	widget->Render();
+	mGLWidget->removeModel(index);
+	mGLWidget->Render();
 
 	ButtonCheck();
     TreeCheck();
@@ -441,21 +420,20 @@ void gui_main::on_btnRemoveModel_clicked(void)
 /// Opens up an editing dialog for the currently selected model.
 void gui_main::on_btnEditModel_clicked()
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
 	unsigned int old_model_index = 0;
-	CModelPtr old_model = widget->getModel(old_model_index);
+	CModelPtr old_model = mGLWidget->getModel(old_model_index);
 
 	guiModel dialog(old_model);
 	if(dialog.exec())
 	{
 		CModelPtr new_model = dialog.getModel();
-		widget->replaceModel(old_model_index, new_model);
+		mGLWidget->replaceModel(old_model_index, new_model);
 	}
 
-	widget->Render();
+	mGLWidget->Render();
 
 	ButtonCheck();
     TreeCheck();
@@ -465,13 +443,12 @@ void gui_main::on_btnEditModel_clicked()
 void gui_main::on_btnMinimizerStartStop_clicked()
 {
 	/// TODO: Handle thread-execution exceptions that might be thrown.
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
 	// If the minimizer is running, stop it.
-	if(widget->GetMinimizerRunning())
-		widget->stopMinimizer();
+	if(mGLWidget->GetMinimizerRunning())
+		mGLWidget->stopMinimizer();
 	else // start a new minimizer.
 	{
 		string id = this->cboMinimizers->currentText().toStdString();
@@ -510,21 +487,20 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 
 void gui_main::on_btnPlayPause_clicked()
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
-	if(widget->IsAnimating())
+	if(mGLWidget->IsAnimating())
 	{
-		widget->StopAnimation();
+		mGLWidget->StopAnimation();
 		btnPlayPause->setText("P");
-		doubleSpinBoxJD->setValue(widget->GetTime());
+		doubleSpinBoxJD->setValue(mGLWidget->GetTime());
 	}
 	else
 	{
 		double time = doubleSpinBoxJD->value();
 		double step = doubleSpinBoxRate->value();
-		widget->StartAnimation(time, step);
+		mGLWidget->StartAnimation(time, step);
 		btnPlayPause->setText("||");
 	}
 
@@ -532,12 +508,11 @@ void gui_main::on_btnPlayPause_clicked()
 
 void gui_main::render_at_time(double time)
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
-	widget->SetTime(time);
-	widget->Render();
+	mGLWidget->SetTime(time);
+	mGLWidget->Render();
 }
 
 void gui_main::on_btnStepBackward_clicked()
@@ -575,7 +550,7 @@ void gui_main::on_btnNewModelArea_clicked()
     int height = this->spinModelSize->value();
     double scale = this->spinModelScale->value();
 
-	CGLWidget * widget = new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir);
+	CGLWidgetPtr widget = CGLWidgetPtr(new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir));
 	widget->SetSize(width, height);
 	widget->SetScale(scale);
 	AddGLArea(widget);
@@ -584,20 +559,19 @@ void gui_main::on_btnNewModelArea_clicked()
 /// Removes the current selected data set.
 void gui_main::on_btnRemoveData_clicked()
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-	if(widget == NULL)
+	if(!mGLWidget)
 		return;
 
     // Get the selected indicies:
     QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedIndexes();
-    QStandardItemModel * model = widget->GetOpenFileModel();
+    QStandardItemModel * model = mGLWidget->GetOpenFileModel();
 
     QList<QModelIndex>::iterator it;
     int id = 0;
     for(it = --list.end(); it > list.begin(); it--)
     {
     	id = (*it).row();
-//    	widget->RemoveData(id);
+//    	mGLWidget->RemoveData(id);
     	model->removeRow(id, QModelIndex());
     }
 }
@@ -609,17 +583,15 @@ void gui_main::on_doubleSpinBoxJD_valueChanged(double jd)
 
 void gui_main::TreeCheck()
 {
-	CGLWidget * widget = GetCurrentGLWidget();
-
 	// Configure the open file widget:
 	this->treeOpenFiles->setHeaderHidden(false);
-    this->treeOpenFiles->setModel(widget->GetOpenFileModel());
+    this->treeOpenFiles->setModel(mGLWidget->GetOpenFileModel());
 	this->treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
 
 	// Configure the model tree
-    CTreeModel * model = widget->GetTreeModel();
+    CTreeModel * model = mGLWidget->GetTreeModel();
 	this->treeModels->setHeaderHidden(false);
-	this->treeModels->setModel(widget->GetTreeModel());
+	this->treeModels->setModel(mGLWidget->GetTreeModel());
 	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
 	// expand the tree fully
 	this->treeModels->expandAll();
