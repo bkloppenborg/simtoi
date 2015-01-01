@@ -53,13 +53,15 @@ class gui_main : public QMainWindow, private Ui::cmainguiClass
     string mOpenDataDir;	// Stores the previously opened directory for data files
     string mOpenModelDir; 	// Stores the previously opened directory for models
 
+    CGLWidget * mGLWidget;
+
 public:
     gui_main(QWidget *parent = 0);
     virtual ~gui_main();
 
 protected:
     QMdiSubWindow * AddGLArea(CGLWidget * widget);
-    void AddData(QStringList & filenames, QMdiSubWindow * sw);
+    void AddData(QStringList & filenames);
 public:
     void AutoClose(bool auto_close, QMdiSubWindow * sw);
 
@@ -75,8 +77,8 @@ public:
     CGLWidget * GetCurrentGLWidget();
 
 protected:
-    void MinimizerRun(string MinimizerID, QMdiSubWindow * sw);
-    void ModelOpen(QStringList & fileNames, QMdiSubWindow * sw);
+    void MinimizerRun(string MinimizerID);
+    void ModelOpen(QStringList & fileNames);
 
 public:
     void Open(QStringList & filenames);
@@ -89,6 +91,7 @@ public:
 
 public:
     void SetOutputDir(string folder_name);
+    void TreeCheck();
 
 private slots:
     void minimizerFinished();
@@ -107,7 +110,7 @@ private slots:
     void on_btnRemoveData_clicked();
     void on_btnMinimizerStartStop_clicked();
     void on_btnNewModelArea_clicked();
-    void on_mdiArea_subWindowActivated();
+//    void on_mdiArea_subWindowActivated();
 
     void on_btnPlayPause_clicked();
     void on_btnStepBackward_clicked();
