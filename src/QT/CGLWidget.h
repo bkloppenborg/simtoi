@@ -37,7 +37,7 @@
 
 #include "liboi.hpp"
 #include "CModelList.h"
-#include "CAnimator.h"
+//#include "CAnimator.h"
 #include "CMinimizerThread.h"
 #include "CWorkerThread.h"
 #include "CTreeModel.h"
@@ -56,8 +56,8 @@ protected:
     // Worker thread
     shared_ptr<CWorkerThread> mWorker;
     // Animation thread
-    QThread mAnimationThread;
-    shared_ptr<CAnimator> mAnimator;
+//    QThread mAnimationThread;
+//    shared_ptr<CAnimator> mAnimator;
 
     // Minimizer
     CMinimizerPtr mMinimizer;
@@ -97,7 +97,7 @@ public:
     unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
     string GetSaveFolder() { return mSaveDirectory; };
 
-    bool IsAnimating();
+//    bool IsAnimating();
 
 protected:
     void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);
@@ -126,8 +126,8 @@ public:
     void stopMinimizer();
     void stopRendering();
 
-    void StartAnimation(double start_time, double time_step);
-    void StopAnimation();
+//    void StartAnimation(double start_time, double time_step);
+//    void StopAnimation();
 
 private slots:
 
@@ -137,8 +137,8 @@ private slots:
 
 signals:
 	void minimizerFinished();
-	void startAnimation(double start_time, double timestep);
-	void stopAnimation(void);
+//	void startAnimation(double start_time, double timestep);
+//	void stopAnimation(void);
 
 
 };

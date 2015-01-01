@@ -39,12 +39,18 @@ using namespace std;
 class CParameters;
 class CParameterItem;
 class CGLWidget;
+class wAnimation;
 
 typedef shared_ptr<CGLWidget> CGLWidgetPtr;
 
 class gui_main : public QMainWindow, private Ui::cmainguiClass
 {
     Q_OBJECT
+
+protected:
+    CGLWidgetPtr mGLWidget;
+
+	wAnimation * wAnimationWidget; // pointer to animiation widget. Re-parented once created, don't delete.
 
     string mShaderSourceDir;
     string mKernelSourceDir;
@@ -55,8 +61,6 @@ class gui_main : public QMainWindow, private Ui::cmainguiClass
     int mNumMinimizations; // The number of minimization runs (used for automatic savefile naming).
     string mOpenDataDir;	// Stores the previously opened directory for data files
     string mOpenModelDir; 	// Stores the previously opened directory for models
-
-    CGLWidgetPtr mGLWidget;
 
 public:
     gui_main(QWidget *parent = 0);
@@ -96,8 +100,6 @@ public:
 private slots:
     void minimizerFinished();
 
-    void on_doubleSpinBoxJD_valueChanged(double jd);
-
     void on_btnAddModel_clicked();
     void on_btnEditModel_clicked();
     void on_btnRemoveModel_clicked();
@@ -110,12 +112,6 @@ private slots:
     void on_btnRemoveData_clicked();
     void on_btnMinimizerStartStop_clicked();
     void on_btnNewModelArea_clicked();
-
-    void on_btnPlayPause_clicked();
-    void on_btnStepBackward_clicked();
-    void on_btnStepBackward2_clicked();
-    void on_btnStepForward_clicked();
-    void on_btnStepForward2_clicked();
 
 };
 

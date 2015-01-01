@@ -55,11 +55,11 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
 
 	// Create the animation thread:
-	mAnimator.reset(new CAnimator(this));
-	mAnimator->moveToThread(&mAnimationThread);
-	connect(this, SIGNAL(startAnimation(double, double)), mAnimator.get(), SLOT(start_animation(double, double)));
-//	connect(this, SIGNAL(stopAnimation(void)), mAnimator.get(), SLOT(stop_animation(void)));
-	mAnimationThread.start();
+//	mAnimator.reset(new CAnimator(this));
+//	mAnimator->moveToThread(&mAnimationThread);
+//	connect(this, SIGNAL(startAnimation(double, double)), mAnimator.get(), SLOT(start_animation(double, double)));
+////	connect(this, SIGNAL(stopAnimation(void)), mAnimator.get(), SLOT(stop_animation(void)));
+//	mAnimationThread.start();
 
 	QStringList labels = QStringList();
 	labels << "File" << "Mean JD";
@@ -76,9 +76,9 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 CGLWidget::~CGLWidget()
 {
 	// Stop any running threads
-	StopAnimation();
-	mAnimationThread.quit();
-	mAnimationThread.wait();
+//	StopAnimation();
+//	mAnimationThread.quit();
+//	mAnimationThread.wait();
 
 	stopMinimizer();
 	stopRendering();
@@ -215,10 +215,10 @@ double CGLWidget::GetTime()
 	return mWorker->GetTime();
 }
 
-bool CGLWidget::IsAnimating()
-{
-	return mAnimator->IsRunning();
-}
+//bool CGLWidget::IsAnimating()
+//{
+//	return mAnimator->IsRunning();
+//}
 
 void CGLWidget::on_mTreeModel_parameterUpdated()
 {
@@ -392,15 +392,15 @@ void CGLWidget::SetTime(double time)
 	mWorker->SetTime(time);
 }
 
-void CGLWidget::StartAnimation(double start_time, double time_step)
-{
-	emit(startAnimation(start_time, time_step));
-}
+//void CGLWidget::StartAnimation(double start_time, double time_step)
+//{
+//	emit(startAnimation(start_time, time_step));
+//}
 
-void CGLWidget::StopAnimation()
-{
-	mAnimator->mRun = false;
-}
+//void CGLWidget::StopAnimation()
+//{
+//	mAnimator->mRun = false;
+//}
 
 void CGLWidget::startMinimizer()
 {
@@ -408,7 +408,7 @@ void CGLWidget::startMinimizer()
 		return;
 
 	// Stop the animation, if it is running
-	StopAnimation();
+//	StopAnimation();
 
 	mMinimizer->start();
 	connect(mMinimizer.get(), SIGNAL(finished()), this, SLOT(on_minimizer_finished(void)));

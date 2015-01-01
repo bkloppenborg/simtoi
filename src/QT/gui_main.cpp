@@ -41,7 +41,10 @@
 #include <cmath>
 #include <stdexcept>
 
+#include "wAnimation.h"
 #include "CGLWidget.h"
+
+
 #include "CPosition.h"
 #include "CMinimizerThread.h"
 #include "CTreeModel.h"
@@ -52,7 +55,6 @@
 gui_main::gui_main(QWidget *parent_widget)
     : QMainWindow(parent_widget)
 {
-	mGLWidget = NULL;
 	Init();
 }
 
@@ -101,18 +103,25 @@ void gui_main::AddData(QStringList & filenames)
 
 void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 {
+	// TODO: Rework once GLWidgets are persistent.
 	if(mGLWidget != NULL)
 	{
 		this->topRightLayout->removeWidget(mGLWidget.get());
+		// TODO: Delete animation widget
+//		this->tabBottom->removeWidget(mAnimationWidget);
 	}
 
+	// Create a new GLWidget and start it rendering
 	mGLWidget = gl_widget;
 	this->topRightLayout->addWidget(mGLWidget.get());
 	mGLWidget->setFixedSize(mGLWidget->GetImageWidth(), gl_widget->GetImageHeight());
 	mGLWidget->show();
-
-    // Start the widget rendering:
     mGLWidget->startRendering();
+
+    // TODO: Rework once GLWidgets are persistent.
+    // Create a new animation widget, init the tab region
+    wAnimationWidget = new wAnimation(mGLWidget);
+	this->tabBottom->addTab(wAnimationWidget, QString("Animation"));
 
     // Connect signals/slots
 	// Now connect signals and slots
@@ -120,6 +129,11 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 
 	// If the load data button isn't enabled, turn it on
 	ButtonCheck();
+
+	// enable all of the tabs in the bottom
+	for(unsigned int i = 0; i < tabBottom->count(); i++)
+		tabBottom->setTabEnabled(i, true);
+
 }
 
 /// Checks to see which buttons can be enabled/disabled.
@@ -486,65 +500,6 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 	ButtonCheck();
 }
 
-void gui_main::on_btnPlayPause_clicked()
-{
-	if(!mGLWidget)
-		return;
-
-	if(mGLWidget->IsAnimating())
-	{
-		mGLWidget->StopAnimation();
-		btnPlayPause->setText("P");
-		doubleSpinBoxJD->setValue(mGLWidget->GetTime());
-	}
-	else
-	{
-		double time = doubleSpinBoxJD->value();
-		double step = doubleSpinBoxRate->value();
-		mGLWidget->StartAnimation(time, step);
-		btnPlayPause->setText("||");
-	}
-
-}
-
-void gui_main::render_at_time(double time)
-{
-	if(!mGLWidget)
-		return;
-
-	mGLWidget->SetTime(time);
-	mGLWidget->Render();
-}
-
-void gui_main::on_btnStepBackward_clicked()
-{
-	double time = doubleSpinBoxJD->value();
-	double dt = doubleSpinBoxRate->value();
-	doubleSpinBoxJD->setValue(time - dt);
-}
-
-void gui_main::on_btnStepBackward2_clicked()
-{
-	double time = doubleSpinBoxJD->value();
-	double dt = doubleSpinBoxRate->value();
-	doubleSpinBoxJD->setValue(time - 10 * dt);
-}
-
-void gui_main::on_btnStepForward_clicked()
-{
-	double time = doubleSpinBoxJD->value();
-	double dt = doubleSpinBoxRate->value();
-	doubleSpinBoxJD->setValue(time + dt);
-}
-
-void gui_main::on_btnStepForward2_clicked()
-{
-	double time = doubleSpinBoxJD->value();
-	double dt = doubleSpinBoxRate->value();
-	doubleSpinBoxJD->setValue(time + 10 * dt);
-}
-
-
 void gui_main::on_btnNewModelArea_clicked()
 {
 	int width = this->spinModelSize->value();
@@ -575,11 +530,6 @@ void gui_main::on_btnRemoveData_clicked()
 //    	mGLWidget->RemoveData(id);
     	model->removeRow(id, QModelIndex());
     }
-}
-
-void gui_main::on_doubleSpinBoxJD_valueChanged(double jd)
-{
-	render_at_time(jd);
 }
 
 void gui_main::TreeCheck()
