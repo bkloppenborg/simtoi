@@ -45,7 +45,6 @@ protected:
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
 
 public:
 	CSphere();

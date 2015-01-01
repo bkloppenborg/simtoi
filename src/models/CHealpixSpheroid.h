@@ -21,8 +21,6 @@ protected:
 	vector<vec3> mVBOData;
 	vector<unsigned int> mElements;
 
-	bool mModelReady;
-
 	// Quantities related to the pixel centroid and corners:
 	vector<double> pixel_theta;
 	vector<double> pixel_phi;

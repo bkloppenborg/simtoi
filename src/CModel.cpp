@@ -59,6 +59,7 @@ CModel::CModel()
 	mFluxTextureID = 0;
 	mTime = 0;
 	mZAxisRotationDelta = 0;
+	mModelReady = false;
 
 	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position angle",
 			"Position Angle defined from North rotating East (degrees)");
@@ -652,6 +653,7 @@ void CModel::SetShader(string shader_id)
 {
 	auto shaders = CShaderFactory::Instance();
 	SetShader(shaders.CreateShader(shader_id));
+	mModelReady = false;
 }
 
 /// \brief Replaces the loaded shader with the specified shader

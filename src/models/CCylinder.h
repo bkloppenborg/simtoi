@@ -57,8 +57,6 @@ protected:
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
-
 public:
 	CCylinder();
 	virtual ~CCylinder();

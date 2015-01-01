@@ -23,8 +23,6 @@ protected:
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
-
 public:
 	CVoronoi();
 	virtual ~CVoronoi();

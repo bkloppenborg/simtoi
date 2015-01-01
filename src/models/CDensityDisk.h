@@ -41,8 +41,6 @@ class CDensityDisk: public CModel
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
-
 public:
 	CDensityDisk();
 	virtual ~CDensityDisk();

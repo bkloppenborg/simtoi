@@ -24,8 +24,6 @@ class CDisk_ConcentricRings: public CModel
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
-
 public:
 	CDisk_ConcentricRings();
 	virtual ~CDisk_ConcentricRings();

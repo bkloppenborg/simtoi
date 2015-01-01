@@ -106,6 +106,8 @@ protected:
 
 	vector<CFeaturePtr> mFeatures;
 
+	bool mModelReady;
+
 protected:
 	glm::mat4 Rotate();
 	glm::mat4 Translate();
