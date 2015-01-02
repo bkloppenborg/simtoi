@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>930</width>
-    <height>757</height>
+    <height>753</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -148,10 +148,6 @@
      </widget>
     </item>
    </layout>
-   <zorder>widget</zorder>
-   <zorder>tabBottom</zorder>
-   <zorder>wModelParameterEditor</zorder>
-   <zorder></zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
