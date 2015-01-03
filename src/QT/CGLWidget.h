@@ -106,8 +106,6 @@ public:
     void Open(string filename);
     void OpenData(string filename);
 
-protected:
-    void RebuildTree();
 public:
     void Render();
 
@@ -123,19 +121,14 @@ public:
     void stopMinimizer();
     void stopRendering();
 
-//    void StartAnimation(double start_time, double time_step);
-//    void StopAnimation();
-
 private slots:
 
 	void on_minimizer_finished();
-	void on_mTreeModel_parameterUpdated();
+	void parameterUpdated();
 
 signals:
 	void minimizerFinished();
 	void modelUpdated();
-//	void startAnimation(double start_time, double timestep);
-//	void stopAnimation(void);
 
 
 };
