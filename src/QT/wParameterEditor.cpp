@@ -25,107 +25,81 @@ wParameterEditor::~wParameterEditor()
 
 }
 
-void wParameterEditor::setGLWidget(CGLWidgetPtr gl_widget)
-{
-	mGLWidget = gl_widget;
-
-	// connect any non-automatic signal/slots
-	connect(&mTreeModel, SIGNAL(parameterUpdated()), mGLWidget.get(), SLOT(on_mTreeModel_parameterUpdated()));
-	connect(mGLWidget.get(), SIGNAL(modelUpdated()), this, SLOT(on_modelUpdated()));
-
-	ButtonCheck();
-	TreeCheck();
-}
-
-void wParameterEditor::on_btnAddModel_clicked(void)
+/// Builds the tree model used to display the parameters in the GUI.
+void wParameterEditor::buildTree()
 {
 	if(!mGLWidget)
 		return;
 
-    int id = 0;
-    int n_features;
+	QStringList labels = QStringList();
+	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
+	mTreeModel.clear();
+	mTreeModel.setColumnCount(5);
+	mTreeModel.setHorizontalHeaderLabels(labels);
+	CModelListPtr model_list = mGLWidget->getModels();
 
-    guiModelEditor tmp;
-    tmp.show();
+	QList<QStandardItem *> items;
+	QStandardItem * item;
+	QStandardItem * item_parent;
+	shared_ptr<CModel> model;
+	shared_ptr<CPosition> position;
+	CShader * shader;
 
-    if(tmp.exec())
-    {
-    	mGLWidget->addModel(tmp.getModel());
-    }
-
-    ButtonCheck();
-    TreeCheck();
-}
-
-/// Deletes the selected model from the model list
-void wParameterEditor::on_btnRemoveModel_clicked(void)
-{
-	if(!mGLWidget)
-		return;
-
-	unsigned int index = 0;
-	mGLWidget->removeModel(index);
-	mGLWidget->Render();
-
-	ButtonCheck();
-    TreeCheck();
-}
-
-/// Opens up an editing dialog for the currently selected model.
-void wParameterEditor::on_btnEditModel_clicked()
-{
-	if(!mGLWidget)
-		return;
-
-	unsigned int old_model_index = 0;
-	CModelPtr old_model = mGLWidget->getModel(old_model_index);
-
-	guiModelEditor dialog(old_model);
-	if(dialog.exec())
+	// Now pull out the pertinent information
+	// NOTE: We drop the shared_ptrs here
+	// TODO: Propigate shared pointers
+	for(int i = 0; i < model_list->size(); i++)
 	{
-		CModelPtr new_model = dialog.getModel();
-		mGLWidget->replaceModel(old_model_index, new_model);
-	}
+		// First pull out the model parameters
+		model = model_list->GetModel(i);
 
-	mGLWidget->Render();
+		items = wParameterEditor::LoadParametersHeader(QString("Model"), model.get());
+		item_parent = items[0];
+		mTreeModel.appendRow(items);
+		wParameterEditor::LoadParameters(item_parent, model.get());
 
-	ButtonCheck();
-    TreeCheck();
-}
+		// Now for the Position Parameters
+		position = model->GetPosition();
+		items = wParameterEditor::LoadParametersHeader(QString("Position"), position.get());
+		item = items[0];
+		item_parent->appendRow(items);
+		wParameterEditor::LoadParameters(item, position.get());
 
-void wParameterEditor::on_modelUpdated()
-{
-	RebuildTree();
-	TreeCheck();
-}
+		// Lastly for the shader:
+		shader = model->GetShader().get();
+		items = wParameterEditor::LoadParametersHeader(QString("Shader"), shader);
+		item = items[0];
+		item_parent->appendRow(items);
+		wParameterEditor::LoadParameters(item, shader);
 
-void wParameterEditor::ButtonCheck()
-{
-	if(!mGLWidget)
-		return;
-
-	this->btnAddModel->setEnabled(false);
-	this->btnEditModel->setEnabled(false);
-	this->btnRemoveModel->setEnabled(false);
-
-	// Buttons for add/edit/delete model
-	this->btnAddModel->setEnabled(true);
-	if(mTreeModel.rowCount() > 0)
-	{
-		this->btnEditModel->setEnabled(true);
-		this->btnRemoveModel->setEnabled(true);
+		auto features = model->GetFeatures();
+		for(auto feature: features)
+		{
+			items = wParameterEditor::LoadParametersHeader(QString("Feature"), feature.get());
+			item = items[0];
+			item_parent->appendRow(items);
+			wParameterEditor::LoadParameters(item, feature.get());
+		}
 	}
 }
 
-void wParameterEditor::TreeCheck()
+/// Determines the index of the current selected model in the GUI.
+unsigned int wParameterEditor::getSelectedModelIndex()
 {
-	this->treeModels->setHeaderHidden(false);
-	this->treeModels->setModel(&mTreeModel);
-	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
-	// expand the tree fully
-	this->treeModels->expandAll();
+	// Get the current selected item index
+	QModelIndex index = this->treeModels->currentIndex();
+	// Because the user can click anywhere within the UI, we need to work our
+	// way up the first items below the root. This will be the header row for
+	// a given model
+	while(index.parent() != this->treeModels->rootIndex())
+		index = index.parent();
+
+	// Use the row number as a proxy for the model ID.
+	return index.row();
 }
 
+/// Parses the CParameterMap to create several rows corresponding to parameters
+/// within a SIMTOI model.
 void wParameterEditor::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
 {
 	// Get a reference to the map.
@@ -181,6 +155,7 @@ void wParameterEditor::LoadParameters(QStandardItem * parent_widget, CParameterM
 	}
 }
 
+/// Parses the CParameter map to create a header row for a SIMTOI model.
 QList<QStandardItem *> wParameterEditor::LoadParametersHeader(QString name, CParameterMap * param_map)
 {
 	QList<QStandardItem *> items;
@@ -195,57 +170,111 @@ QList<QStandardItem *> wParameterEditor::LoadParametersHeader(QString name, CPar
 	return items;
 }
 
-/// Reconstruct the
-void wParameterEditor::RebuildTree()
+/// Slot which instantiates a model editor for adding a new SIMTOI model.
+void wParameterEditor::on_btnAddModel_clicked(void)
 {
-	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
-	mTreeModel.clear();
-	mTreeModel.setColumnCount(5);
-	mTreeModel.setHorizontalHeaderLabels(labels);
-	CModelListPtr model_list = mGLWidget->getModels();
+	if(!mGLWidget)
+		return;
 
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	QStandardItem * item_parent;
-	shared_ptr<CModel> model;
-	shared_ptr<CPosition> position;
-	CShader * shader;
+    int id = 0;
+    int n_features;
 
-	// Now pull out the pertinent information
-	// NOTE: We drop the shared_ptrs here
-	// TODO: Propigate shared pointers
-	for(int i = 0; i < model_list->size(); i++)
+    guiModelEditor tmp;
+    tmp.show();
+
+    if(tmp.exec())
+    {
+    	mGLWidget->addModel(tmp.getModel());
+    }
+
+    toggleButtons();
+    refreshTree();
+}
+
+/// Deletes the selected model from the model list
+void wParameterEditor::on_btnRemoveModel_clicked(void)
+{
+	if(!mGLWidget)
+		return;
+
+	unsigned int index = getSelectedModelIndex();
+	mGLWidget->removeModel(index);
+	mGLWidget->Render();
+
+	toggleButtons();
+    refreshTree();
+}
+
+/// Opens up an editing dialog for the currently selected model.
+void wParameterEditor::on_btnEditModel_clicked()
+{
+	if(!mGLWidget)
+		return;
+
+	unsigned int old_model_index = getSelectedModelIndex();
+	CModelPtr old_model = mGLWidget->getModel(old_model_index);
+
+	guiModelEditor dialog(old_model);
+	if(dialog.exec())
 	{
-		// First pull out the model parameters
-		model = model_list->GetModel(i);
+		CModelPtr new_model = dialog.getModel();
+		mGLWidget->replaceModel(old_model_index, new_model);
+	}
 
-		items = wParameterEditor::LoadParametersHeader(QString("Model"), model.get());
-		item_parent = items[0];
-		mTreeModel.appendRow(items);
-		wParameterEditor::LoadParameters(item_parent, model.get());
+	mGLWidget->Render();
 
-		// Now for the Position Parameters
-		position = model->GetPosition();
-		items = wParameterEditor::LoadParametersHeader(QString("Position"), position.get());
-		item = items[0];
-		item_parent->appendRow(items);
-		wParameterEditor::LoadParameters(item, position.get());
+	toggleButtons();
+    refreshTree();
+}
 
-		// Lastly for the shader:
-		shader = model->GetShader().get();
-		items = wParameterEditor::LoadParametersHeader(QString("Shader"), shader);
-		item = items[0];
-		item_parent->appendRow(items);
-		wParameterEditor::LoadParameters(item, shader);
+/// Slot which receives notifications when a SIMTOI model is updated elsewhere
+/// within this software.
+void wParameterEditor::on_modelUpdated()
+{
+	buildTree();
+	refreshTree();
+}
 
-		auto features = model->GetFeatures();
-		for(auto feature: features)
-		{
-			items = wParameterEditor::LoadParametersHeader(QString("Feature"), feature.get());
-			item = items[0];
-			item_parent->appendRow(items);
-			wParameterEditor::LoadParameters(item, feature.get());
-		}
+/// Sets the current widget. Connects necessary signals and slots.
+void wParameterEditor::setGLWidget(CGLWidgetPtr gl_widget)
+{
+	mGLWidget = gl_widget;
+
+	// connect any non-automatic signal/slots
+	connect(&mTreeModel, SIGNAL(parameterUpdated()), mGLWidget.get(), SLOT(on_mTreeModel_parameterUpdated()));
+	connect(mGLWidget.get(), SIGNAL(modelUpdated()), this, SLOT(on_modelUpdated()));
+
+	toggleButtons();
+	refreshTree();
+}
+
+/// Automatically activate/deactivate the buttons based upon the status
+/// of elements in the GUI.
+void wParameterEditor::toggleButtons()
+{
+	if(!mGLWidget)
+		return;
+
+	this->btnAddModel->setEnabled(false);
+	this->btnEditModel->setEnabled(false);
+	this->btnRemoveModel->setEnabled(false);
+
+	// Buttons for add/edit/delete model
+	this->btnAddModel->setEnabled(true);
+	if(mTreeModel.rowCount() > 0)
+	{
+		this->btnEditModel->setEnabled(true);
+		this->btnRemoveModel->setEnabled(true);
 	}
 }
+
+/// Refreshes the tree with newly generated data.
+void wParameterEditor::refreshTree()
+{
+	this->treeModels->setHeaderHidden(false);
+	this->treeModels->setModel(&mTreeModel);
+	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
+	// expand the tree fully
+	this->treeModels->expandAll();
+}
+

@@ -39,9 +39,10 @@ public:
 	void setGLWidget(CGLWidgetPtr gl_widget);
 
 public:
-	void ButtonCheck();
-	void TreeCheck();
-	void RebuildTree();
+	void buildTree();
+	void toggleButtons();
+	unsigned int getSelectedModelIndex();
+	void refreshTree();
 
     static void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);
     static QList<QStandardItem *> LoadParametersHeader(QString name, CParameterMap * param_map);
