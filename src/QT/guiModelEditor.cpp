@@ -5,7 +5,6 @@
  *      Author: bkloppenborg
  */
 
-#include "guiModel.h"
 #include "guiCommon.h"
 
 #include "CModel.h"
@@ -14,15 +13,16 @@
 #include "CShaderFactory.h"
 #include "CFeature.h"
 #include "CFeatureFactory.h"
+#include "guiModelEditor.h"
 
-guiModel::guiModel()
+guiModelEditor::guiModelEditor()
 {
 	this->setupUi(this);
 	initUi();
 }
 
 /// Creates a model gui with properties populated to match the input model
-guiModel::guiModel(CModelPtr model)
+guiModelEditor::guiModelEditor(CModelPtr model)
 {
 	this->setupUi(this);
 	initUi();
@@ -48,12 +48,12 @@ guiModel::guiModel(CModelPtr model)
 	}
 }
 
-guiModel::~guiModel() {
+guiModelEditor::~guiModelEditor() {
 	// TODO Auto-generated destructor stub
 }
 
 /// Returns an instance of a CModelPtr as defined by the properties set on the GUI.
-CModelPtr guiModel::getModel()
+CModelPtr guiModelEditor::getModel()
 {
 	auto factory = CModelFactory::Instance();
 
@@ -105,7 +105,7 @@ CModelPtr guiModel::getModel()
 	return mModel;
 }
 
-void guiModel::initUi()
+void guiModelEditor::initUi()
 {
 	auto models = CModelFactory::Instance();
 	auto positions = CPositionFactory::Instance();
@@ -118,13 +118,13 @@ void guiModel::initUi()
 	guiCommon::setOptions(cboFeatures, features.GetFeatureList());
 }
 
-void guiModel::on_btnFeatureAdd_clicked()
+void guiModelEditor::on_btnFeatureAdd_clicked()
 {
 	QString feature_id = cboFeatures->currentText();
 	listFeatures->addItem(feature_id);
 }
 
-void guiModel::on_btnFeatureRemove_clicked()
+void guiModelEditor::on_btnFeatureRemove_clicked()
 {
 	qDeleteAll(listFeatures->selectedItems());
 }

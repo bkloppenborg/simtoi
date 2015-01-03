@@ -43,7 +43,6 @@
 
 // QT or GUI elements
 #include "wAnimation.h"
-#include "wModels.h"
 #include "CGLWidget.h"
 #include "guiCommon.h"
 #include "guiRegion.h"
@@ -53,6 +52,7 @@
 #include "CPosition.h"
 
 #include "CMinimizerFactory.h"
+#include "wParameterEditor.h"
 
 gui_main::gui_main(QWidget *parent_widget)
     : QMainWindow(parent_widget)

@@ -1,33 +1,31 @@
 /*
- * wAnimation.cpp
+ * wParameterEditor.cpp
  *
- *  Created on: Aug 26, 2014
+ *  Created on: Jan 1, 2015
  *      Author: bkloppenborg
  */
 
-#include "wModels.h"
-
+#include "wParameterEditor.h"
 #include "CGLWidget.h"
-#include "guiModel.h"
-
 #include "CTreeModel.h"
 #include "CParameterItem.h"
 #include "CModel.h"
 #include "CModelList.h"
 #include "CFeature.h"
+#include "guiModelEditor.h"
 
-wModels::wModels(QWidget * parent)
+wParameterEditor::wParameterEditor(QWidget * parent)
 	: QWidget(parent)
 {
 	this->setupUi(this);
 }
 
-wModels::~wModels()
+wParameterEditor::~wParameterEditor()
 {
 
 }
 
-void wModels::setGLWidget(CGLWidgetPtr gl_widget)
+void wParameterEditor::setGLWidget(CGLWidgetPtr gl_widget)
 {
 	mGLWidget = gl_widget;
 
@@ -39,7 +37,7 @@ void wModels::setGLWidget(CGLWidgetPtr gl_widget)
 	TreeCheck();
 }
 
-void wModels::on_btnAddModel_clicked(void)
+void wParameterEditor::on_btnAddModel_clicked(void)
 {
 	if(!mGLWidget)
 		return;
@@ -47,7 +45,7 @@ void wModels::on_btnAddModel_clicked(void)
     int id = 0;
     int n_features;
 
-    guiModel tmp;
+    guiModelEditor tmp;
     tmp.show();
 
     if(tmp.exec())
@@ -60,7 +58,7 @@ void wModels::on_btnAddModel_clicked(void)
 }
 
 /// Deletes the selected model from the model list
-void wModels::on_btnRemoveModel_clicked(void)
+void wParameterEditor::on_btnRemoveModel_clicked(void)
 {
 	if(!mGLWidget)
 		return;
@@ -74,7 +72,7 @@ void wModels::on_btnRemoveModel_clicked(void)
 }
 
 /// Opens up an editing dialog for the currently selected model.
-void wModels::on_btnEditModel_clicked()
+void wParameterEditor::on_btnEditModel_clicked()
 {
 	if(!mGLWidget)
 		return;
@@ -82,7 +80,7 @@ void wModels::on_btnEditModel_clicked()
 	unsigned int old_model_index = 0;
 	CModelPtr old_model = mGLWidget->getModel(old_model_index);
 
-	guiModel dialog(old_model);
+	guiModelEditor dialog(old_model);
 	if(dialog.exec())
 	{
 		CModelPtr new_model = dialog.getModel();
@@ -95,13 +93,13 @@ void wModels::on_btnEditModel_clicked()
     TreeCheck();
 }
 
-void wModels::on_modelUpdated()
+void wParameterEditor::on_modelUpdated()
 {
 	RebuildTree();
 	TreeCheck();
 }
 
-void wModels::ButtonCheck()
+void wParameterEditor::ButtonCheck()
 {
 	if(!mGLWidget)
 		return;
@@ -119,7 +117,7 @@ void wModels::ButtonCheck()
 	}
 }
 
-void wModels::TreeCheck()
+void wParameterEditor::TreeCheck()
 {
 	this->treeModels->setHeaderHidden(false);
 	this->treeModels->setModel(&mTreeModel);
@@ -128,7 +126,7 @@ void wModels::TreeCheck()
 	this->treeModels->expandAll();
 }
 
-void wModels::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
+void wParameterEditor::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
 {
 	// Get a reference to the map.
 	const map<string, CParameter> parameter_map = param_map->getParameterMap();
@@ -183,7 +181,7 @@ void wModels::LoadParameters(QStandardItem * parent_widget, CParameterMap * para
 	}
 }
 
-QList<QStandardItem *> wModels::LoadParametersHeader(QString name, CParameterMap * param_map)
+QList<QStandardItem *> wParameterEditor::LoadParametersHeader(QString name, CParameterMap * param_map)
 {
 	QList<QStandardItem *> items;
 	QStandardItem * item;
@@ -197,7 +195,8 @@ QList<QStandardItem *> wModels::LoadParametersHeader(QString name, CParameterMap
 	return items;
 }
 
-void wModels::RebuildTree()
+/// Reconstruct the
+void wParameterEditor::RebuildTree()
 {
 	QStringList labels = QStringList();
 	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
@@ -221,32 +220,32 @@ void wModels::RebuildTree()
 		// First pull out the model parameters
 		model = model_list->GetModel(i);
 
-		items = wModels::LoadParametersHeader(QString("Model"), model.get());
+		items = wParameterEditor::LoadParametersHeader(QString("Model"), model.get());
 		item_parent = items[0];
 		mTreeModel.appendRow(items);
-		wModels::LoadParameters(item_parent, model.get());
+		wParameterEditor::LoadParameters(item_parent, model.get());
 
 		// Now for the Position Parameters
 		position = model->GetPosition();
-		items = wModels::LoadParametersHeader(QString("Position"), position.get());
+		items = wParameterEditor::LoadParametersHeader(QString("Position"), position.get());
 		item = items[0];
 		item_parent->appendRow(items);
-		wModels::LoadParameters(item, position.get());
+		wParameterEditor::LoadParameters(item, position.get());
 
 		// Lastly for the shader:
 		shader = model->GetShader().get();
-		items = wModels::LoadParametersHeader(QString("Shader"), shader);
+		items = wParameterEditor::LoadParametersHeader(QString("Shader"), shader);
 		item = items[0];
 		item_parent->appendRow(items);
-		wModels::LoadParameters(item, shader);
+		wParameterEditor::LoadParameters(item, shader);
 
 		auto features = model->GetFeatures();
 		for(auto feature: features)
 		{
-			items = wModels::LoadParametersHeader(QString("Feature"), feature.get());
+			items = wParameterEditor::LoadParametersHeader(QString("Feature"), feature.get());
 			item = items[0];
 			item_parent->appendRow(items);
-			wModels::LoadParameters(item, feature.get());
+			wParameterEditor::LoadParameters(item, feature.get());
 		}
 	}
 }

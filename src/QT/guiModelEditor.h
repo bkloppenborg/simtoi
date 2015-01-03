@@ -11,23 +11,23 @@
 #include <QDialog>
 #include <memory>
 
-#include "ui_guiModel.h"
+#include "ui_guiModelEditor.h"
 
 using namespace std;
 
 class CModel;
 typedef shared_ptr<CModel> CModelPtr;
 
-class guiModel : public QDialog, public Ui::guiModel {
+class guiModelEditor : public QDialog, public Ui::guiModelEditor {
 	Q_OBJECT
 
 protected:
 	CModelPtr mModel;
 
 public:
-	guiModel();
-	guiModel(CModelPtr model);
-	virtual ~guiModel();
+	guiModelEditor();
+	guiModelEditor(CModelPtr model);
+	virtual ~guiModelEditor();
 
 	CModelPtr getModel();
 

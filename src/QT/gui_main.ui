@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0" rowspan="3">
-     <widget class="wModels" name="wModelParameterEditor" native="true">
+     <widget class="wParameterEditor" name="wModelParameterEditor" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -193,9 +193,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>wModels</class>
+   <class>wParameterEditor</class>
    <extends>QWidget</extends>
-   <header>wModels.h</header>
+   <header>wParameterEditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>wModels</class>
- <widget class="QWidget" name="wModels">
+ <class>wParameterEditor</class>
+ <widget class="QWidget" name="wParameterEditor">
   <property name="geometry">
    <rect>
     <x>0</x>

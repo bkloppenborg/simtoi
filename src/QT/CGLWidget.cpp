@@ -43,7 +43,7 @@ using namespace std;
 #include "CFeature.h"
 
 // Temporary includes while migrating code to wModels
-#include "wModels.h"
+#include "wParameterEditor.h"
 
 extern string EXE_FOLDER;
 

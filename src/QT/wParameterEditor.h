@@ -12,18 +12,20 @@
 #include <memory>
 #include <QList>
 #include <QStandardItem>
+
+#include "ui_wParameterEditor.h"
+
 #include "CParameterItem.h"
 #include "CParameterMap.h"
 #include "CTreeModel.h"
 
-#include "ui_wModels.h"
 
 using namespace std;
 
 class CGLWidget;
 typedef shared_ptr<CGLWidget> CGLWidgetPtr;
 
-class wModels : public QWidget, public Ui::wModels {
+class wParameterEditor : public QWidget, public Ui::wParameterEditor {
 	Q_OBJECT
 
 protected:
@@ -31,8 +33,8 @@ protected:
     CTreeModel mTreeModel;
 
 public:
-    wModels(QWidget * parent = 0);
-	virtual ~wModels();
+    wParameterEditor(QWidget * parent = 0);
+	virtual ~wParameterEditor();
 
 	void setGLWidget(CGLWidgetPtr gl_widget);
 
