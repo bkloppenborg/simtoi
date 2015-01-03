@@ -14,6 +14,7 @@
 #include <QStandardItem>
 #include "CParameterItem.h"
 #include "CParameterMap.h"
+#include "CTreeModel.h"
 
 #include "ui_wModels.h"
 
@@ -27,10 +28,10 @@ class wModels : public QWidget, public Ui::wModels {
 
 protected:
 	CGLWidgetPtr mGLWidget;
+    CTreeModel mTreeModel;
 
 public:
     wModels(QWidget * parent = 0);
-    wModels(CGLWidgetPtr gl_widget, QWidget * parent = 0);
 	virtual ~wModels();
 
 	void setGLWidget(CGLWidgetPtr gl_widget);
@@ -38,6 +39,7 @@ public:
 public:
 	void ButtonCheck();
 	void TreeCheck();
+	void RebuildTree();
 
     static void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);
     static QList<QStandardItem *> LoadParametersHeader(QString name, CParameterMap * param_map);
@@ -47,7 +49,7 @@ private slots:
     void on_btnEditModel_clicked();
     void on_btnRemoveModel_clicked();
 
-
+    void on_modelUpdated();
 };
 
 #endif /* WMODELS_H_ */

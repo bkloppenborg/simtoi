@@ -45,6 +45,9 @@
 class CParameterMap;
 class CParameters;
 
+class CModelList;
+typedef shared_ptr<CModelList> CModelListPtr;
+
 class CGLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -62,7 +65,6 @@ protected:
     // Minimizer
     CMinimizerPtr mMinimizer;
     QStandardItemModel mOpenFileModel;
-    CTreeModel mTreeModel;
     static QGLFormat mFormat;
 
 public:
@@ -71,6 +73,7 @@ public:
 
     void addModel(shared_ptr<CModel> model);
 	CModelPtr getModel(unsigned int model_index);
+	CModelListPtr getModels() { return mWorker->GetModelList(); };
 	void replaceModel(unsigned int model_index, CModelPtr new_model);
 	void removeModel(unsigned int model_index);
 
@@ -92,7 +95,7 @@ public:
     double GetTime();
 
     QStandardItemModel * GetOpenFileModel() { return &mOpenFileModel; };
-    CTreeModel * GetTreeModel() { return &mTreeModel; };
+//    CTreeModel * GetTreeModel() { return &mTreeModel; };
     unsigned int GetImageWidth() { return mWorker->GetImageWidth(); };
     unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
     string GetSaveFolder() { return mSaveDirectory; };
@@ -125,12 +128,12 @@ public:
 
 private slots:
 
-	void on_mTreeModel_parameterUpdated();
-
 	void on_minimizer_finished();
+	void on_mTreeModel_parameterUpdated();
 
 signals:
 	void minimizerFinished();
+	void modelUpdated();
 //	void startAnimation(double start_time, double timestep);
 //	void stopAnimation(void);
 

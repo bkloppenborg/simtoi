@@ -70,9 +70,6 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 	mOpenFileModel.setColumnCount(2);
 	mOpenFileModel.setHorizontalHeaderLabels(labels);
 
-	// This signal-slot would not connect automatically, so we do it explicitly here.
-	connect(&mTreeModel, SIGNAL(parameterUpdated()), this, SLOT(on_mTreeModel_parameterUpdated()));
-
 	mSaveDirectory = "";
 }
 
@@ -90,7 +87,7 @@ CGLWidget::~CGLWidget()
 void CGLWidget::addModel(CModelPtr model)
 {
 	mWorker->addModel(model);
-	RebuildTree();
+	emit modelUpdated();
 }
 
 CModelPtr CGLWidget::getModel(unsigned int model_index)
@@ -101,13 +98,13 @@ CModelPtr CGLWidget::getModel(unsigned int model_index)
 void CGLWidget::replaceModel(unsigned int model_index, CModelPtr new_model)
 {
 	mWorker->replaceModel(model_index, new_model);
-	RebuildTree();
+	emit modelUpdated();
 }
 
 void CGLWidget::removeModel(unsigned int model_index)
 {
 	mWorker->removeModel(model_index);
-	RebuildTree();
+	emit modelUpdated();
 }
 
 void CGLWidget::closeEvent(QCloseEvent *evt)
@@ -162,7 +159,7 @@ void CGLWidget::on_mTreeModel_parameterUpdated()
 
 void CGLWidget::on_minimizer_finished(void)
 {
-	RebuildTree();
+	emit modelUpdated();
 	emit minimizerFinished();
 }
 
@@ -200,7 +197,7 @@ void CGLWidget::Open(string filename)
 	// Now have the Worker thread open the remainder of the file.
 	mWorker->Restore(input);
 
-	RebuildTree();
+	emit modelUpdated();
 }
 
 void CGLWidget::OpenData(string filename)
@@ -211,60 +208,6 @@ void CGLWidget::OpenData(string filename)
 void CGLWidget::paintEvent(QPaintEvent *)
 {
     mWorker->Render();
-}
-
-void CGLWidget::RebuildTree()
-{
-	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
-	mTreeModel.clear();
-	mTreeModel.setColumnCount(5);
-	mTreeModel.setHorizontalHeaderLabels(labels);
-	CModelListPtr model_list = mWorker->GetModelList();
-
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	QStandardItem * item_parent;
-	shared_ptr<CModel> model;
-	shared_ptr<CPosition> position;
-	CShader * shader;
-
-	// Now pull out the pertinent information
-	// NOTE: We drop the shared_ptrs here
-	// TODO: Propigate shared pointers
-	for(int i = 0; i < model_list->size(); i++)
-	{
-		// First pull out the model parameters
-		model = model_list->GetModel(i);
-
-		items = wModels::LoadParametersHeader(QString("Model"), model.get());
-		item_parent = items[0];
-		mTreeModel.appendRow(items);
-		wModels::LoadParameters(item_parent, model.get());
-
-		// Now for the Position Parameters
-		position = model->GetPosition();
-		items = wModels::LoadParametersHeader(QString("Position"), position.get());
-		item = items[0];
-		item_parent->appendRow(items);
-		wModels::LoadParameters(item, position.get());
-
-		// Lastly for the shader:
-		shader = model->GetShader().get();
-		items = wModels::LoadParametersHeader(QString("Shader"), shader);
-		item = items[0];
-		item_parent->appendRow(items);
-		wModels::LoadParameters(item, shader);
-
-		auto features = model->GetFeatures();
-		for(auto feature: features)
-		{
-			items = wModels::LoadParametersHeader(QString("Feature"), feature.get());
-			item = items[0];
-			item_parent->appendRow(items);
-			wModels::LoadParameters(item, feature.get());
-		}
-	}
 }
 
 void CGLWidget::Render()

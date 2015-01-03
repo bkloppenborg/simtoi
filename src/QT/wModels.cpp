@@ -10,16 +10,15 @@
 #include "CGLWidget.h"
 #include "guiModel.h"
 
+#include "CTreeModel.h"
+#include "CParameterItem.h"
+#include "CModel.h"
+#include "CModelList.h"
+#include "CFeature.h"
+
 wModels::wModels(QWidget * parent)
 	: QWidget(parent)
 {
-	this->setupUi(this);
-}
-
-wModels::wModels(CGLWidgetPtr gl_widget, QWidget * parent)
-	: QWidget(parent)
-{
-	mGLWidget = gl_widget;
 	this->setupUi(this);
 }
 
@@ -31,6 +30,11 @@ wModels::~wModels()
 void wModels::setGLWidget(CGLWidgetPtr gl_widget)
 {
 	mGLWidget = gl_widget;
+
+	// connect any non-automatic signal/slots
+	connect(&mTreeModel, SIGNAL(parameterUpdated()), mGLWidget.get(), SLOT(on_mTreeModel_parameterUpdated()));
+	connect(mGLWidget.get(), SIGNAL(modelUpdated()), this, SLOT(on_modelUpdated()));
+
 	ButtonCheck();
 	TreeCheck();
 }
@@ -91,6 +95,12 @@ void wModels::on_btnEditModel_clicked()
     TreeCheck();
 }
 
+void wModels::on_modelUpdated()
+{
+	RebuildTree();
+	TreeCheck();
+}
+
 void wModels::ButtonCheck()
 {
 	if(!mGLWidget)
@@ -102,7 +112,7 @@ void wModels::ButtonCheck()
 
 	// Buttons for add/edit/delete model
 	this->btnAddModel->setEnabled(true);
-	if(mGLWidget->GetTreeModel()->rowCount() > 0)
+	if(mTreeModel.rowCount() > 0)
 	{
 		this->btnEditModel->setEnabled(true);
 		this->btnRemoveModel->setEnabled(true);
@@ -111,13 +121,8 @@ void wModels::ButtonCheck()
 
 void wModels::TreeCheck()
 {
-	if(!mGLWidget)
-		return;
-
-	// Configure the model tree
-    CTreeModel * model = mGLWidget->GetTreeModel();
 	this->treeModels->setHeaderHidden(false);
-	this->treeModels->setModel(mGLWidget->GetTreeModel());
+	this->treeModels->setModel(&mTreeModel);
 	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
 	// expand the tree fully
 	this->treeModels->expandAll();
@@ -190,4 +195,58 @@ QList<QStandardItem *> wModels::LoadParametersHeader(QString name, CParameterMap
 	items << item;
 
 	return items;
+}
+
+void wModels::RebuildTree()
+{
+	QStringList labels = QStringList();
+	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
+	mTreeModel.clear();
+	mTreeModel.setColumnCount(5);
+	mTreeModel.setHorizontalHeaderLabels(labels);
+	CModelListPtr model_list = mGLWidget->getModels();
+
+	QList<QStandardItem *> items;
+	QStandardItem * item;
+	QStandardItem * item_parent;
+	shared_ptr<CModel> model;
+	shared_ptr<CPosition> position;
+	CShader * shader;
+
+	// Now pull out the pertinent information
+	// NOTE: We drop the shared_ptrs here
+	// TODO: Propigate shared pointers
+	for(int i = 0; i < model_list->size(); i++)
+	{
+		// First pull out the model parameters
+		model = model_list->GetModel(i);
+
+		items = wModels::LoadParametersHeader(QString("Model"), model.get());
+		item_parent = items[0];
+		mTreeModel.appendRow(items);
+		wModels::LoadParameters(item_parent, model.get());
+
+		// Now for the Position Parameters
+		position = model->GetPosition();
+		items = wModels::LoadParametersHeader(QString("Position"), position.get());
+		item = items[0];
+		item_parent->appendRow(items);
+		wModels::LoadParameters(item, position.get());
+
+		// Lastly for the shader:
+		shader = model->GetShader().get();
+		items = wModels::LoadParametersHeader(QString("Shader"), shader);
+		item = items[0];
+		item_parent->appendRow(items);
+		wModels::LoadParameters(item, shader);
+
+		auto features = model->GetFeatures();
+		for(auto feature: features)
+		{
+			items = wModels::LoadParametersHeader(QString("Feature"), feature.get());
+			item = items[0];
+			item_parent->appendRow(items);
+			wModels::LoadParameters(item, feature.get());
+		}
+	}
 }
