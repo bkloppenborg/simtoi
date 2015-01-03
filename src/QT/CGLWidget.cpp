@@ -42,6 +42,9 @@ using namespace std;
 #include "CParameterItem.h"
 #include "CFeature.h"
 
+// Temporary includes while migrating code to wModels
+#include "wModels.h"
+
 extern string EXE_FOLDER;
 
 CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
@@ -118,74 +121,6 @@ void CGLWidget::Export(QString save_folder)
 	mWorker->ExportResults(save_folder);
 }
 
-void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
-{
-	// Get a reference to the map.
-	const map<string, CParameter> parameter_map = param_map->getParameterMap();
-
-	for(auto id_parameter: parameter_map)
-	{
-		const string parameter_id = id_parameter.first;
-		const CParameter parameter = id_parameter.second;
-
-		QList<QStandardItem *> items;
-		QStandardItem * item;
-
-		// First the name
-		item = new QStandardItem(QString::fromStdString( parameter.getHumanName() ));
-		items << item;
-
-		// Now the checkbox
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setCheckable(true);
-		if(parameter.isFree())
-			item->setCheckState(Qt::Checked);
-		else
-			item->setCheckState(Qt::Unchecked);
-		items << item;
-
-		// The Value
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getValue() ), Qt::DisplayRole);
-		items << item;
-
-		// Minimum parameter value
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getMin() ), Qt::DisplayRole);
-		items << item;
-
-		// Maximum parameter value
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getMax() ), Qt::DisplayRole);
-		items << item;
-
-		// Maximum step size
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getStepSize()), Qt::DisplayRole);
-		items << item;
-
-		parent_widget->appendRow(items);
-	}
-}
-
-QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameterMap * param_map)
-{
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	item = new QStandardItem(name);
-	items << item;
-	item = new QStandardItem(QString(""));
-	items << item;
-	item = new QStandardItem(QString::fromStdString(param_map->getName()));
-	items << item;
-
-	return items;
-}
 
 /// Returns a list of file filters for use in QFileDialog
 QStringList CGLWidget::GetFileFilters()
@@ -302,32 +237,32 @@ void CGLWidget::RebuildTree()
 		// First pull out the model parameters
 		model = model_list->GetModel(i);
 
-		items = LoadParametersHeader(QString("Model"), model.get());
+		items = wModels::LoadParametersHeader(QString("Model"), model.get());
 		item_parent = items[0];
 		mTreeModel.appendRow(items);
-		LoadParameters(item_parent, model.get());
+		wModels::LoadParameters(item_parent, model.get());
 
 		// Now for the Position Parameters
 		position = model->GetPosition();
-		items = LoadParametersHeader(QString("Position"), position.get());
+		items = wModels::LoadParametersHeader(QString("Position"), position.get());
 		item = items[0];
 		item_parent->appendRow(items);
-		LoadParameters(item, position.get());
+		wModels::LoadParameters(item, position.get());
 
 		// Lastly for the shader:
 		shader = model->GetShader().get();
-		items = LoadParametersHeader(QString("Shader"), shader);
+		items = wModels::LoadParametersHeader(QString("Shader"), shader);
 		item = items[0];
 		item_parent->appendRow(items);
-		LoadParameters(item, shader);
+		wModels::LoadParameters(item, shader);
 
 		auto features = model->GetFeatures();
 		for(auto feature: features)
 		{
-			items = LoadParametersHeader(QString("Feature"), feature.get());
+			items = wModels::LoadParametersHeader(QString("Feature"), feature.get());
 			item = items[0];
 			item_parent->appendRow(items);
-			LoadParameters(item, feature.get());
+			wModels::LoadParameters(item, feature.get());
 		}
 	}
 }

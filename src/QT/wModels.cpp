@@ -122,3 +122,72 @@ void wModels::TreeCheck()
 	// expand the tree fully
 	this->treeModels->expandAll();
 }
+
+void wModels::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
+{
+	// Get a reference to the map.
+	const map<string, CParameter> parameter_map = param_map->getParameterMap();
+
+	for(auto id_parameter: parameter_map)
+	{
+		const string parameter_id = id_parameter.first;
+		const CParameter parameter = id_parameter.second;
+
+		QList<QStandardItem *> items;
+		QStandardItem * item;
+
+		// First the name
+		item = new QStandardItem(QString::fromStdString( parameter.getHumanName() ));
+		items << item;
+
+		// Now the checkbox
+		item = new CParameterItem(param_map, parameter_id);
+		item->setEditable(true);
+		item->setCheckable(true);
+		if(parameter.isFree())
+			item->setCheckState(Qt::Checked);
+		else
+			item->setCheckState(Qt::Unchecked);
+		items << item;
+
+		// The Value
+		item = new CParameterItem(param_map, parameter_id);
+		item->setEditable(true);
+		item->setData(QVariant( parameter.getValue() ), Qt::DisplayRole);
+		items << item;
+
+		// Minimum parameter value
+		item = new CParameterItem(param_map, parameter_id);
+		item->setEditable(true);
+		item->setData(QVariant( parameter.getMin() ), Qt::DisplayRole);
+		items << item;
+
+		// Maximum parameter value
+		item = new CParameterItem(param_map, parameter_id);
+		item->setEditable(true);
+		item->setData(QVariant( parameter.getMax() ), Qt::DisplayRole);
+		items << item;
+
+		// Maximum step size
+		item = new CParameterItem(param_map, parameter_id);
+		item->setEditable(true);
+		item->setData(QVariant( parameter.getStepSize()), Qt::DisplayRole);
+		items << item;
+
+		parent_widget->appendRow(items);
+	}
+}
+
+QList<QStandardItem *> wModels::LoadParametersHeader(QString name, CParameterMap * param_map)
+{
+	QList<QStandardItem *> items;
+	QStandardItem * item;
+	item = new QStandardItem(name);
+	items << item;
+	item = new QStandardItem(QString(""));
+	items << item;
+	item = new QStandardItem(QString::fromStdString(param_map->getName()));
+	items << item;
+
+	return items;
+}

@@ -10,6 +10,10 @@
 
 #include <QWidget>
 #include <memory>
+#include <QList>
+#include <QStandardItem>
+#include "CParameterItem.h"
+#include "CParameterMap.h"
 
 #include "ui_wModels.h"
 
@@ -34,6 +38,9 @@ public:
 public:
 	void ButtonCheck();
 	void TreeCheck();
+
+    static void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);
+    static QList<QStandardItem *> LoadParametersHeader(QString name, CParameterMap * param_map);
 
 private slots:
     void on_btnAddModel_clicked();
