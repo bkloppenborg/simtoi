@@ -425,29 +425,28 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 
 		QAbstractItemModel * model;
 
-		// Ensure that a model exists before starting the minimizer
-		CModelPtr model_ptr = mGLWidget->getModel(0);
-		if(!model)
-		{
-			QMessageBox msgBox;
-			msgBox.setWindowTitle("Error");
-			msgBox.setText("Please add a model before starting the minimization engine");
-			msgBox.exec();
+//		// Ensure that a model exists before starting the minimizer
+//		CModelPtr model_ptr = mGLWidget->getModel(0);
+//		if(!model_ptr)
+//		{
+//			QMessageBox msgBox;
+//			msgBox.setWindowTitle("Error");
+//			msgBox.setText("Please add a model before starting the minimization engine");
+//			msgBox.exec();
+//
+//			return;
+//		}
 
-			return;
-		}
-
-		// Ensure that some data is loaded before starting the minimizer.
-		model = this->treeOpenFiles->model();
-		if(model->rowCount() == 0)
-		{
-			QMessageBox msgBox;
-			msgBox.setWindowTitle("Error");
-			msgBox.setText("Please load data before starting the minimization engine");
-			msgBox.exec();
-
-			return;
-		}
+//		// Ensure that some data is loaded before starting the minimizer.
+//		if(mGLWidget->GetOpenFileModel()->rowCount() > 0)
+//		{
+//			QMessageBox msgBox;
+//			msgBox.setWindowTitle("Error");
+//			msgBox.setText("Please load data before starting the minimization engine");
+//			msgBox.exec();
+//
+//			return;
+//		}
 
 		MinimizerRun(id);
 	}
