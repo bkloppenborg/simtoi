@@ -52,7 +52,7 @@ private slots:
     void on_btnEditModel_clicked();
     void on_btnRemoveModel_clicked();
 
-    void on_modelUpdated();
+    void modelUpdated();
 };
 
 #endif /* WMODELS_H_ */

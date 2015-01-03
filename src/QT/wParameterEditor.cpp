@@ -229,7 +229,7 @@ void wParameterEditor::on_btnEditModel_clicked()
 
 /// Slot which receives notifications when a SIMTOI model is updated elsewhere
 /// within this software.
-void wParameterEditor::on_modelUpdated()
+void wParameterEditor::modelUpdated()
 {
 	buildTree();
 	refreshTree();
@@ -242,7 +242,7 @@ void wParameterEditor::setGLWidget(CGLWidgetPtr gl_widget)
 
 	// connect any non-automatic signal/slots
 	connect(&mTreeModel, SIGNAL(parameterUpdated()), mGLWidget.get(), SLOT(on_mTreeModel_parameterUpdated()));
-	connect(mGLWidget.get(), SIGNAL(modelUpdated()), this, SLOT(on_modelUpdated()));
+	connect(mGLWidget.get(), SIGNAL(modelUpdated()), this, SLOT(modelUpdated()));
 
 	toggleButtons();
 	refreshTree();
