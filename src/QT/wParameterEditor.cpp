@@ -113,8 +113,9 @@ void wParameterEditor::LoadParameters(QStandardItem * parent_widget, CParameterM
 		QList<QStandardItem *> items;
 		QStandardItem * item;
 
-		// First the name
+		// First the name and the tooltip
 		item = new QStandardItem(QString::fromStdString( parameter.getHumanName() ));
+		item->setToolTip(QString::fromUtf8(parameter.getHelpText().c_str()));
 		items << item;
 
 		// Now the checkbox
