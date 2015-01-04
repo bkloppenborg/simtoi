@@ -53,8 +53,8 @@ CPositionOrbit::CPositionOrbit()
 	addParameter("omega", 0, 0, 360, false, 1, "omega", "Argument of periapsis (degrees).");
 	addParameter("alpha", 0, 0, 10, false, 1, "alpha", "Orbital semi-major axis");
 	addParameter("e", 0, 0, 1, false, 0.1, "e", "Eccentricy");
-	addParameter("T", 0, 0, 1000, false, 10, "T", "Time of periastron.");
-	addParameter("P", 1, 0, 360, false, 1, "P", "Orbital period.");
+	addParameter("T", 0, 0, 1000, false, 10, "T", "Time of periastron (JD)");
+	addParameter("P", 1, 0, 360, false, 1, "P", "Orbital period (days)");
 }
 
 CPositionOrbit::~CPositionOrbit()
