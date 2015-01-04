@@ -1,12 +1,12 @@
 /*
- * wAnimation.h
+ * wParameterEditor.h
  *
- *  Created on: Aug 26, 2014
+ *  Created on: Jan, 1, 2015
  *      Author: bkloppenborg
  */
 
-#ifndef WMODELS_H_
-#define WMODELS_H_
+#ifndef WPARAMETER_EDITOR_H_
+#define WPARAMETER_EDITOR_H_
 
 #include <QWidget>
 #include <memory>
@@ -55,4 +55,4 @@ private slots:
     void modelUpdated();
 };
 
-#endif /* WMODELS_H_ */
+#endif /* WPARAMETER_EDITOR_H_ */
