@@ -58,13 +58,10 @@ protected:
 
     // Worker thread
     shared_ptr<CWorkerThread> mWorker;
-    // Animation thread
-//    QThread mAnimationThread;
-//    shared_ptr<CAnimator> mAnimator;
 
     // Minimizer
     CMinimizerPtr mMinimizer;
-    QStandardItemModel mOpenFileModel;
+
     static QGLFormat mFormat;
 
 public:
@@ -76,6 +73,11 @@ public:
 	CModelListPtr getModels() { return mWorker->GetModelList(); };
 	void replaceModel(unsigned int model_index, CModelPtr new_model);
 	void removeModel(unsigned int model_index);
+
+	void addData(string filename);
+	void removeData(unsigned int data_index);
+//	CDataPtr getData(unsigned int data_index);
+//	CDataListPtr getData() { return mWorker->
 
 protected:
     void closeEvent(QCloseEvent *evt);
@@ -94,8 +96,6 @@ public:
     bool GetMinimizerRunning();
     double GetTime();
 
-    QStandardItemModel * GetOpenFileModel() { return &mOpenFileModel; };
-//    CTreeModel * GetTreeModel() { return &mTreeModel; };
     unsigned int GetImageWidth() { return mWorker->GetImageWidth(); };
     unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
     string GetSaveFolder() { return mSaveDirectory; };
@@ -104,7 +104,7 @@ public:
 
 public:
     void Open(string filename);
-    void OpenData(string filename);
+//    void OpenData(string filename);
 
 public:
     void Render();
@@ -124,12 +124,14 @@ public:
 private slots:
 
 	void on_minimizer_finished();
-	void parameterUpdated();
+	void updateParameters();
 
 signals:
 	void minimizerFinished();
 	void modelUpdated();
-
+//	void dataUpdated();
+	void dataAdded(CDataInfo info);
+	void dataRemoved(unsigned int index);
 
 };
 

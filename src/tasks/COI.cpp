@@ -48,6 +48,9 @@ extern string EXE_FOLDER;
 COI::COI(CWorkerThread * WorkerThread)
 	: CTask(WorkerThread)
 {
+	mNV2 = 0;
+	mNT3 = 0;
+
 	mFBO_render = NULL;
 	mFBO_storage = NULL;
 
@@ -265,6 +268,24 @@ void COI::GetChi(double * chis, unsigned int size)
 	}
 }
 
+/// Kludge implementation of getDataInfo. Always reports on the last opened file.
+CDataInfo COI::getDataInfo()
+{
+	stringstream temp;
+
+	CDataInfo info;
+	info.mFilename = mFilenameShort;
+
+	temp << "V2: " << mNV2 << " T3: " << mNT3;
+	info.mQuantityDescription = temp.str();
+
+	info.mJDStart = mJDStart;
+	info.mJDEnd = mJDEnd;
+	info.mJDMean = mJDMean;
+
+	return info;
+}
+
 unsigned int COI::GetNData()
 {
 	mLibOI->GetNData();
@@ -341,9 +362,18 @@ void COI::InitCL()
 	mLibOI = new CLibOI(mWorkerThread->GetOpenCL());
 }
 
-void COI::OpenData(string filename)
+CDataInfo COI::OpenData(string filename)
 {
-	mLibOI->LoadData(filename);
+	mFilename = filename;
+	mFilenameShort = StripPath(filename);
+//	mFilenameNoExtension = StripExtension(mFilenameShort, mExtensions);
+
+	unsigned int data_id = mLibOI->LoadData(filename);
+	mNV2 = mLibOI->GetNV2(data_id);
+	mNT3 = mLibOI->GetNT3(data_id);
+	mJDMean = mLibOI->GetDataAveJD(data_id);
+
+	return getDataInfo();
 }
 
 double COI::sum(vector<float> & values, unsigned int start, unsigned int end)

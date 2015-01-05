@@ -132,7 +132,7 @@ void CTaskList::GetUncertainties(double * uncertainties, unsigned int size)
 	}
 }
 
-void CTaskList::OpenData(string filename)
+CDataInfo CTaskList::OpenData(string filename)
 {
 	// TODO: Right now we identify the task object from the file extension.
 	// There is probably a better way of doing this.
@@ -148,8 +148,7 @@ void CTaskList::OpenData(string filename)
 		{
 			if(extension == datatype)
 			{
-				task->OpenData(filename);
-				return;
+				return task->OpenData(filename);
 			}
 		}
 	}

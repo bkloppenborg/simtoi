@@ -52,6 +52,8 @@
 #include <memory>
 #include <queue>
 #include "json/json.h"
+#include "CDataInfo.h"
+#include "CTask.h"
 
 #include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
@@ -138,6 +140,7 @@ protected:
 	string mTempString;
 	double mTempDouble;
 	unsigned int mTempUint;
+	CDataInfo mTempDataInfo;
 
 public:
     CWorkerThread(CGLWidget * glWidget, QString exe_folder);
@@ -148,6 +151,9 @@ public:
 	CModelPtr getModel(unsigned int model_index);
 	void replaceModel(unsigned int model_index, CModelPtr new_model);
 	void removeModel(unsigned int model_index);
+
+	CDataInfo addData(string filename);
+	void removeData(unsigned int data_id);
 
     void AllocateBuffer();
 
@@ -192,7 +198,7 @@ public:
     COpenCLPtr GetOpenCL() { return mOpenCL; };
     glm::mat4 GetView() { return mView; };
 
-    void OpenData(string filename);
+//    void OpenData(string filename);
 
     void Render();
 public:
@@ -206,6 +212,10 @@ public:
     void stop();
 protected:
     void SwapBuffers();
+
+// Signals and slots
+signals:
+	void dataAdded(CDataInfo info);
 };
     
 #endif // C_WORKER_THREAD

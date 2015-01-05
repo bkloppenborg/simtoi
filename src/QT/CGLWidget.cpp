@@ -41,6 +41,7 @@ using namespace std;
 #include "CTreeModel.h"
 #include "CParameterItem.h"
 #include "CFeature.h"
+#include "CDataInfo.h"
 
 // Temporary includes while migrating code to wModels
 #include "wParameterEditor.h"
@@ -57,12 +58,6 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
     // Immediately initialize the worker thread. This will claim the OPenGL context.
 	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
 
-	QStringList labels = QStringList();
-	labels << "File" << "Mean JD";
-	mOpenFileModel.clear();
-	mOpenFileModel.setColumnCount(2);
-	mOpenFileModel.setHorizontalHeaderLabels(labels);
-
 	mSaveDirectory = "";
 }
 
@@ -70,6 +65,12 @@ CGLWidget::~CGLWidget()
 {
 	stopMinimizer();
 	stopRendering();
+}
+
+void CGLWidget::addData(string filename)
+{
+	CDataInfo temp = mWorker->addData(filename);
+	emit dataAdded(temp);
 }
 
 void CGLWidget::addModel(CModelPtr model)
@@ -87,6 +88,12 @@ void CGLWidget::replaceModel(unsigned int model_index, CModelPtr new_model)
 {
 	mWorker->replaceModel(model_index, new_model);
 	emit modelUpdated();
+}
+
+void CGLWidget::removeData(unsigned int data_index)
+{
+//	mWorker->removeData(data_index);
+//	emit dataRemoved(data_index);
 }
 
 void CGLWidget::removeModel(unsigned int model_index)
@@ -178,19 +185,9 @@ void CGLWidget::Open(string filename)
 	emit modelUpdated();
 }
 
-void CGLWidget::OpenData(string filename)
-{
-	mWorker->OpenData(filename);
-}
-
 void CGLWidget::paintEvent(QPaintEvent *)
 {
     mWorker->Render();
-}
-
-void CGLWidget::parameterUpdated()
-{
-	mWorker->Render();
 }
 
 void CGLWidget::Render()
@@ -282,3 +279,13 @@ void CGLWidget::stopRendering()
     mWorker->stop();
 }
 
+
+//void CGLWidget::updateData(void)
+//{
+//	emit dataUpdated();
+//}
+
+void CGLWidget::updateParameters()
+{
+	mWorker->Render();
+}

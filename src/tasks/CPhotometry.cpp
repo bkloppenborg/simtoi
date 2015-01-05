@@ -95,7 +95,7 @@ void CPhotometry::Export(string folder_name)
 		vector<double> chi_values;
 
 		// Open the real data file:
-		real_data.open(folder_name + data_file->base_filename + ".phot");
+		real_data.open(folder_name + mFilenameNoExtension + ".phot");
 		real_data.width(15);
 		real_data.precision(8);
 
@@ -104,7 +104,7 @@ void CPhotometry::Export(string folder_name)
 
 		// Open the synthetic data file:
 		first_point = true;
-		sim_data.open(folder_name + data_file->base_filename + "_model.phot");
+		sim_data.open(folder_name + mFilenameNoExtension + "_model.phot");
 		sim_data.width(15);
 		sim_data.precision(8);
 		// Provide some information about the format
@@ -148,7 +148,7 @@ void CPhotometry::Export(string folder_name)
 		chi2r /= chi_values.size();
 
 		// Write out the chi2r for this file:
-		summary << data_file->base_filename << ".phot," << mDataDescription << "," << chi2r << endl;
+		summary << mFilenameNoExtension << ".phot," << mDataDescription << "," << chi2r << endl;
 	}
 
 	// Close the statistics file.
@@ -194,6 +194,23 @@ void CPhotometry::GetChi(double * chi, unsigned int size)
 //	int total_time = CBenchmark::GetMilliSpan(total_start);
 //	cout << "Photometric loop completed! It took: " << total_time << " ms." << endl;
 //	cout << " Framerate (fps): " << double(size * 1000) / double(total_time) << endl;
+}
+
+CDataInfo CPhotometry::getDataInfo()
+{
+	stringstream temp;
+
+	CDataInfo info;
+	info.mFilename = mFilenameShort;
+
+	temp << "N: " << GetNData();
+	info.mQuantityDescription = temp.str();
+
+	info.mJDStart = mJDStart;
+	info.mJDEnd = mJDEnd;
+	info.mJDMean = mJDMean;
+
+	return info;
 }
 
 unsigned int CPhotometry::GetNData()
@@ -270,7 +287,7 @@ void CPhotometry::InitCL()
 	mLibOI = new CLibOI(mWorkerThread->GetOpenCL());
 }
 
-void CPhotometry::OpenData(string filename)
+CDataInfo CPhotometry::OpenData(string filename)
 {
 	// The photometric data files must conform to a very specific format
 	// foremost they MUST have the same extension as returned from
@@ -280,12 +297,15 @@ void CPhotometry::OpenData(string filename)
 	//	JD,mag,sig_mag,ANYTHING_ELSE
 
 	string line;
+	mJDStart = std::numeric_limits<double>::max();
+	mJDEnd = 0;
+	mJDMean = 0;
 
 	// Create a new data file for storing input data.
 	CPhotometricDataFilePtr data_file = CPhotometricDataFilePtr(new CPhotometricDataFile());
-	string base_filename = StripPath(filename);
-	base_filename = StripExtension(base_filename, mExtensions);
-	data_file->base_filename = base_filename;
+	mFilename = filename;
+	mFilenameShort = StripPath(filename);
+	mFilenameNoExtension = StripExtension(mFilenameShort, mExtensions);
 
 	// Get a vector of the non-comment lines in the text file:
 	vector<string> lines = ReadFile(filename, "#/;!", "Could not read photometric data file " + filename + ".");
@@ -310,6 +330,14 @@ void CPhotometry::OpenData(string filename)
 			t_data->mag_err = atof(t_line[2].c_str());
 
 			data_file->data.push_back(t_data);
+
+			// find the start, end, and mean Julian dates.
+			if(t_data->jd < mJDStart)
+				mJDStart = t_data->jd;
+			if(t_data->jd > mJDEnd)
+				mJDEnd = t_data->jd;
+
+			mJDMean += t_data->jd;
 		}
 		catch(...)
 		{
@@ -317,8 +345,12 @@ void CPhotometry::OpenData(string filename)
 		}
 	}
 
+	mJDMean /= data_file->data.size();
+
 	// The data was imported correctly, push it onto our data list
 	mData.push_back(data_file);
+
+	return getDataInfo();
 }
 
 double CPhotometry::SimulatePhotometry(CModelListPtr model_list, double jd)

@@ -41,6 +41,8 @@ using namespace std;
 #include "CGLWidget.h"
 #include "CTaskList.h"
 #include "CModelList.h"
+#include "CDataInfo.h"
+#include "CTask.h"
 
 // X11 "Status" definition causes namespace issues. Include after any QT headers (https://bugreports.qt-project.org/browse/QTBUG-54)
 #include "COpenCL.hpp"
@@ -85,6 +87,20 @@ void CWorkerThread::addModel(CModelPtr model)
 	Enqueue(RENDER);
 }
 
+CDataInfo CWorkerThread::addData(string filename)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mTempString = filename;
+	Enqueue(OPEN_DATA);
+
+	// Wait for the operation to complete.
+	mWorkerSemaphore.acquire(1);
+
+	return mTempDataInfo;
+}
+
 /// Returns a shared pointer to the requested model.
 CModelPtr CWorkerThread::getModel(unsigned int model_index)
 {
@@ -106,6 +122,11 @@ void CWorkerThread::removeModel(unsigned int model_index)
 	QMutexLocker lock(&mWorkerMutex);
 	mModelList->RemoveModel(model_index);
 	Enqueue(RENDER);
+}
+
+void CWorkerThread::removeData(unsigned int data_id)
+{
+
 }
 
 /// Blits the contents of the input buffer to the output buffer
@@ -433,18 +454,6 @@ void CWorkerThread::GetUncertainties(double * uncertainties, unsigned int size)
 	mWorkerSemaphore.acquire(1);
 }
 
-void CWorkerThread::OpenData(string filename)
-{
-	// Get exclusive access to the worker
-	QMutexLocker lock(&mWorkerMutex);
-
-	mTempString = filename;
-	Enqueue(OPEN_DATA);
-
-	// Wait for the operation to complete.
-	mWorkerSemaphore.acquire(1);
-}
-
 /// Instructs the thread to render to the default framebuffer.
 void CWorkerThread::Render()
 {
@@ -561,7 +570,7 @@ void CWorkerThread::run()
 
 		case OPEN_DATA:
 			// Instruct the task list to open the file.
-			mTaskList->OpenData(mTempString);
+			mTempDataInfo = mTaskList->OpenData(mTempString);
 			mWorkerSemaphore.release(1);
 			break;
 

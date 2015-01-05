@@ -105,9 +105,6 @@ private slots:
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
 
-    void on_btnAddData_clicked();
-    void on_btnRemoveData_clicked();
-
     void on_btnMinimizerStartStop_clicked();
 //    void on_btnNewModelArea_clicked();
 

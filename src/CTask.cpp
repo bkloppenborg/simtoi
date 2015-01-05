@@ -35,6 +35,13 @@
 CTask::CTask(CWorkerThread * WorkerThread)
 {
 	mWorkerThread = WorkerThread;
+
+	mJDStart = -1;
+	mJDEnd = -1;
+	mJDMean = -1;
+
+	mFilename = "";
+	mFilenameShort = "";
 }
 
 CTask::~CTask() {

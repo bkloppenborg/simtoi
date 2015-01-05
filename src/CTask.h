@@ -40,6 +40,7 @@
 #include <valarray>
 
 #include "CWorkerThread.h"
+#include "CDataInfo.h"
 
 class CTask;
 typedef shared_ptr<CTask> CTaskPtr;
@@ -50,6 +51,14 @@ using namespace std;
 
 class CTask
 {
+protected:
+	double mJDStart;
+	double mJDEnd;
+	double mJDMean;
+
+	string mFilename;		///< The full filename including path and extension
+	string mFilenameShort;	///< The filename less the path and extension.
+
 protected:
 	string mExeFolder;
 	CWorkerThread * mWorkerThread;
@@ -65,6 +74,8 @@ public:
 
 	virtual void Export(string folder_name) = 0;
 
+	virtual CDataInfo getDataInfo() = 0;
+
 	virtual void GetChi(double * chis, unsigned int size) = 0;
 	virtual string GetDataDescription();
 	virtual vector<string> GetExtensions();
@@ -74,7 +85,7 @@ public:
 	virtual void InitGL() {};
 	virtual void InitCL() {};
 
-	virtual void OpenData(string filename) = 0;
+	virtual CDataInfo OpenData(string filename) = 0;
 
 	static string StripPath(string filename);
 	static string StripExtension(string filename, vector<string> & valid_extensions);

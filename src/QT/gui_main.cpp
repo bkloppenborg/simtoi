@@ -67,40 +67,39 @@ gui_main::~gui_main()
 
 void gui_main::AddData(QStringList & filenames)
 {
-	string tmp;
-	int dir_size = 0;
-	stringstream time_str;
-	time_str.precision(4);
-	time_str.setf(ios::fixed,ios::floatfield);
-
-    // Get access to the current widget and QStandardItemModel:
-    QStandardItemModel * model = mGLWidget->GetOpenFileModel();
-	QList<QStandardItem *> items;
-
-	// Now pull out the data directory (to make file display cleaner)
-	if(filenames.size() > 0)
-		mOpenDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
-
-	for(int i = 0; i < filenames.size(); i++)
-	{
-		items.clear();
-		// Tell the widget to load the data file and append a row to its file list:
-		tmp = filenames[i].toStdString();
-		dir_size = tmp.size() - mOpenDataDir.size();
-		mGLWidget->OpenData(tmp);
-
-		// Filename
-		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
-		// Mean JD
-		time_str.str("");
-		// TODO: Re-enable this (or something like it).
-//		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
-		items.append( new QStandardItem(QString::fromStdString( time_str.str() )));
-
-		model->appendRow(items);
-	}
-
-	ButtonCheck();
+//	string tmp;
+//	int dir_size = 0;
+//	stringstream time_str;
+//	time_str.precision(4);
+//	time_str.setf(ios::fixed,ios::floatfield);
+//
+//    // Get access to the current widget and QStandardItemModel:
+//	QList<QStandardItem *> items;
+//
+//	// Now pull out the data directory (to make file display cleaner)
+//	if(filenames.size() > 0)
+//		mOpenDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
+//
+//	for(int i = 0; i < filenames.size(); i++)
+//	{
+//		items.clear();
+//		// Tell the widget to load the data file and append a row to its file list:
+//		tmp = filenames[i].toStdString();
+//		dir_size = tmp.size() - mOpenDataDir.size();
+//		mGLWidget->OpenData(tmp);
+//
+//		// Filename
+//		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
+//		// Mean JD
+//		time_str.str("");
+//		// TODO: Re-enable this (or something like it).
+////		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
+//		items.append( new QStandardItem(QString::fromStdString( time_str.str() )));
+//
+//		mOpenFileModel->appendRow(items);
+//	}
+//
+//	ButtonCheck();
 }
 
 void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
@@ -120,9 +119,9 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 	mGLWidget->show();
     mGLWidget->startRendering();
 
-    // TODO: Rework once GLWidgets are persistent.
-	// populate the left layout
+    // Set the GL widgets
     this->wModelParameterEditor->setGLWidget(mGLWidget);
+    this->wOpenDataEditor->setGLWidget(mGLWidget);
 
     // Create a new animation widget, init the tab region
     wAnimationWidget = new wAnimation(mGLWidget);
@@ -144,17 +143,10 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 /// Checks to see which buttons can be enabled/disabled.
 void gui_main::ButtonCheck()
 {
-	this->btnAddData->setEnabled(false);
-	this->btnRemoveData->setEnabled(false);
 	this->btnMinimizerStartStop->setEnabled(true);
 
 	if(!mGLWidget)
 		return;
-
-	// Buttons for add/delete data
-	this->btnAddData->setEnabled(true);
-	if(mGLWidget->GetOpenFileModel()->rowCount() > 0)
-		this->btnRemoveData->setEnabled(true);
 
 	// Buttons for minimizer area
 	// Look up the minimizer's ID in the combo box, select it.
@@ -380,35 +372,6 @@ void gui_main::on_actionSave_triggered()
 
 }
 
-void gui_main::on_btnAddData_clicked(void)
-{
-	// Ensure there is a selected widget, if not immediately return.
-    if(!mGLWidget)
-    {
-		QMessageBox msgBox;
-		msgBox.setText("You must have an active model region before you can load data.");
-		msgBox.exec();
-    	return;
-    }
-
-    // Open a dialog, get a list of file that the user selected:
-    QFileDialog dialog(this);
-    dialog.setDirectory(QString::fromStdString(mOpenDataDir));
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-
-    // Now add in valid file types:
-    QStringList filters = mGLWidget->GetFileFilters();
-    dialog.setNameFilters(filters);
-
-    QStringList filenames;
-    QString dir = "";
-	if (dialog.exec())
-	{
-		filenames = dialog.selectedFiles();
-		AddData(filenames);
-	}
-}
-
 /// Starts the minimizer
 void gui_main::on_btnMinimizerStartStop_clicked()
 {
@@ -454,30 +417,7 @@ void gui_main::on_btnMinimizerStartStop_clicked()
 	ButtonCheck();
 }
 
-/// Removes the current selected data set.
-void gui_main::on_btnRemoveData_clicked()
-{
-	if(!mGLWidget)
-		return;
-
-    // Get the selected indicies:
-    QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedIndexes();
-    QStandardItemModel * model = mGLWidget->GetOpenFileModel();
-
-    QList<QModelIndex>::iterator it;
-    int id = 0;
-    for(it = --list.end(); it > list.begin(); it--)
-    {
-    	id = (*it).row();
-//    	mGLWidget->RemoveData(id);
-    	model->removeRow(id, QModelIndex());
-    }
-}
-
 void gui_main::TreeCheck()
 {
-	// Configure the open file widget:
-	this->treeOpenFiles->setHeaderHidden(false);
-	this->treeOpenFiles->setModel(mGLWidget->GetOpenFileModel());
-	this->treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
+
 }

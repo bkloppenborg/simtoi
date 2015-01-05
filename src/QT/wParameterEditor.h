@@ -51,8 +51,7 @@ private slots:
     void on_btnAddModel_clicked();
     void on_btnEditModel_clicked();
     void on_btnRemoveModel_clicked();
-
-    void modelUpdated();
+    void updateModels();
 };
 
 #endif /* WPARAMETER_EDITOR_H_ */

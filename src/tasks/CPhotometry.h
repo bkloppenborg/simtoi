@@ -53,7 +53,6 @@ typedef shared_ptr<CPhotometricDataPoint> CPhotometricDataPointPtr;
 class CPhotometricDataFile
 {
 public:
-	string base_filename; ///< The filename less the path and extension.
 	double wavelength;
 	vector<CPhotometricDataPointPtr> data;
 
@@ -63,6 +62,9 @@ typedef shared_ptr<CPhotometricDataFile> CPhotometricDataFilePtr;
 
 class CPhotometry: public CTask
 {
+protected:
+	string mFilenameNoExtension;
+
 protected:
 	QGLFramebufferObject * mFBO_render;
 	QGLFramebufferObject * mFBO_storage;
@@ -83,6 +85,7 @@ public:
 	virtual void Export(string folder_name);
 
 	virtual void GetChi(double * residuals, unsigned int size);
+	virtual CDataInfo getDataInfo();
 	virtual unsigned int GetNData();
 	virtual void GetUncertainties(double * residuals, unsigned int size);
 
@@ -90,7 +93,7 @@ public:
 	virtual void InitGL();
 	virtual void InitCL();
 
-	virtual void OpenData(string filename);
+	CDataInfo OpenData(string filename);
 
 	double SimulatePhotometry(CModelListPtr, double jd);
 };

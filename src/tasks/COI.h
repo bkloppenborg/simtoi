@@ -44,6 +44,10 @@ using namespace liboi;
 class COI: public CTask
 {
 protected:
+	unsigned int mNV2;
+	unsigned int mNT3;
+
+protected:
 	QGLFramebufferObject * mFBO_render;
 	QGLFramebufferObject * mFBO_storage;
 
@@ -65,6 +69,7 @@ public:
 	void Export(string folder_name);
 
 	virtual void GetChi(double * residuals, unsigned int size);
+	virtual CDataInfo getDataInfo();
 	virtual unsigned int GetNData();
 	virtual void GetUncertainties(double * residuals, unsigned int size);
 
@@ -72,7 +77,7 @@ public:
 	virtual void InitGL();
 	virtual void InitCL();
 
-	void OpenData(string filename);
+	CDataInfo OpenData(string filename);
 
 	double sum(vector<float> & values, unsigned int start, unsigned int end);
 };

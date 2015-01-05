@@ -34,42 +34,14 @@
     <item row="0" column="1">
      <layout class="QHBoxLayout" name="topRightLayout">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QTreeView" name="treeOpenFiles">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>100</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QPushButton" name="btnAddData">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Add Data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btnRemoveData">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Remove Data</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
+       <widget class="wDataEditor" name="wOpenDataEditor" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>256</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -196,6 +168,12 @@
    <class>wParameterEditor</class>
    <extends>QWidget</extends>
    <header>wParameterEditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>wDataEditor</class>
+   <extends>QWidget</extends>
+   <header>wDataEditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
