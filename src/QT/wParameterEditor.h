@@ -41,7 +41,7 @@ public:
 public:
 	void buildTree();
 	void toggleButtons();
-	unsigned int getSelectedModelIndex();
+	int getSelectedModelIndex();
 	void refreshTree();
 
     static void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);

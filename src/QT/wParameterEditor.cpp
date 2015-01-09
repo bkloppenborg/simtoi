@@ -6,6 +6,9 @@
  */
 
 #include "wParameterEditor.h"
+
+#include <QMessageBox>
+
 #include "CGLWidget.h"
 #include "CTreeModel.h"
 #include "CParameterItem.h"
@@ -84,7 +87,7 @@ void wParameterEditor::buildTree()
 }
 
 /// Determines the index of the current selected model in the GUI.
-unsigned int wParameterEditor::getSelectedModelIndex()
+int wParameterEditor::getSelectedModelIndex()
 {
 	// Get the current selected item index
 	QModelIndex index = this->treeModels->currentIndex();
@@ -198,7 +201,18 @@ void wParameterEditor::on_btnRemoveModel_clicked(void)
 	if(!mGLWidget)
 		return;
 
-	unsigned int index = getSelectedModelIndex();
+	int index = getSelectedModelIndex();
+	if(index < 0)
+	{
+		// An error was thrown. Display a message to the user
+		QMessageBox msgBox;
+		msgBox.setWindowTitle("SIMTOI Error");
+		msgBox.setText("Please select a model to delete.");
+		msgBox.exec();
+
+		return;
+	}
+
 	mGLWidget->removeModel(index);
 	mGLWidget->Render();
 
@@ -212,7 +226,19 @@ void wParameterEditor::on_btnEditModel_clicked()
 	if(!mGLWidget)
 		return;
 
-	unsigned int old_model_index = getSelectedModelIndex();
+	int old_model_index = getSelectedModelIndex();
+	if(old_model_index < 0)
+	{
+		// An error was thrown. Display a message to the user
+		QMessageBox msgBox;
+		msgBox.setWindowTitle("SIMTOI Error");
+		msgBox.setText("Please select a model to edit.");
+		msgBox.exec();
+
+		return;
+	}
+
+
 	CModelPtr old_model = mGLWidget->getModel(old_model_index);
 
 	guiModelEditor dialog(old_model);
