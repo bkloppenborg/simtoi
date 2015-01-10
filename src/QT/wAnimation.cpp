@@ -111,6 +111,7 @@ void wAnimation::setGLWidget(CGLWidgetPtr gl_widget)
 {
 	mGLWidget = gl_widget;
 
+	mAnimator.stop();
 	mAnimator.setGLWidget(gl_widget);
 
 	toggleButtons();
