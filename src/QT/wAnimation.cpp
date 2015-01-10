@@ -31,22 +31,6 @@ wAnimation::~wAnimation()
 	mAnimator.wait();
 }
 
-void wAnimation::changeEvent ( QEvent * event )
-{
-	if(event->type() == QEvent::EnabledChange)
-	{
-		bool is_enabled = isEnabled();
-		btnStepBackward2->setEnabled(is_enabled);
-		btnStepBackward->setEnabled(is_enabled);
-		btnPlayPause->setEnabled(is_enabled);
-		btnStepForward->setEnabled(is_enabled);
-		btnStepForward2->setEnabled(is_enabled);
-		doubleSpinBoxJD->setEnabled(is_enabled);
-		doubleSpinBoxRate->setEnabled(is_enabled);
-		slideWavelength->setEnabled(is_enabled);
-	}
-}
-
 void wAnimation::enqueueRender(double time)
 {
 	mGLWidget->SetTime(time);

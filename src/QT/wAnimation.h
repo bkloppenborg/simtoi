@@ -37,8 +37,6 @@ public:
 
 protected:
 	void enqueueRender(double time);
-	void changeEvent ( QEvent * event );
-
 
 signals:
 	void timestep_updated(double new_step_size);
