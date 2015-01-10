@@ -13,11 +13,12 @@
 //class CWorkQueue;
 //typedef shared_ptr<CWorkQueue> CQueuePtr;
 
-wAnimation::wAnimation(CGLWidgetPtr gl_widget, QWidget * parent)
-	: QWidget(parent), mGLWidget(gl_widget), mAnimator(gl_widget)
+wAnimation::wAnimation(QWidget * parent)
+	: QWidget(parent)
 {
 	this->setupUi(this);
 
+	// connect any non-automatic signal/slots
 	connect(&mAnimator, SIGNAL(update_time(double)), this, SLOT(update_time(double)));
 	connect(this, SIGNAL(timestep_updated(double)), &mAnimator, SLOT(setStep(double)));
 
@@ -28,6 +29,22 @@ wAnimation::~wAnimation()
 {
 	mAnimator.stop();
 	mAnimator.wait();
+}
+
+void wAnimation::changeEvent ( QEvent * event )
+{
+	if(event->type() == QEvent::EnabledChange)
+	{
+		bool is_enabled = isEnabled();
+		btnStepBackward2->setEnabled(is_enabled);
+		btnStepBackward->setEnabled(is_enabled);
+		btnPlayPause->setEnabled(is_enabled);
+		btnStepForward->setEnabled(is_enabled);
+		btnStepForward2->setEnabled(is_enabled);
+		doubleSpinBoxJD->setEnabled(is_enabled);
+		doubleSpinBoxRate->setEnabled(is_enabled);
+		slideWavelength->setEnabled(is_enabled);
+	}
 }
 
 void wAnimation::enqueueRender(double time)
@@ -105,20 +122,24 @@ void wAnimation::on_doubleSpinBoxRate_valueChanged(double value)
 	emit(timestep_updated(value));
 }
 
-void wAnimation::changeEvent ( QEvent * event )
+/// Sets the current widget. Connects necessary signals and slots.
+void wAnimation::setGLWidget(CGLWidgetPtr gl_widget)
 {
-	if(event->type() == QEvent::EnabledChange)
-	{
-		bool is_enabled = isEnabled();
-		btnStepBackward2->setEnabled(is_enabled);
-		btnStepBackward->setEnabled(is_enabled);
-		btnPlayPause->setEnabled(is_enabled);
-		btnStepForward->setEnabled(is_enabled);
-		btnStepForward2->setEnabled(is_enabled);
-		doubleSpinBoxJD->setEnabled(is_enabled);
-		doubleSpinBoxRate->setEnabled(is_enabled);
-		slideWavelength->setEnabled(is_enabled);
-	}
+	mGLWidget = gl_widget;
+
+	mAnimator.setGLWidget(gl_widget);
+
+	toggleButtons();
+}
+
+/// Automatically (de)acitvate buttons depending on the status of various properties
+/// of this widget.
+void wAnimation::toggleButtons()
+{
+	this->setEnabled(false);
+
+	if(mGLWidget)
+		this->setEnabled(true);
 }
 
 void wAnimation::update_time(double value)

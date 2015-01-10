@@ -12,14 +12,12 @@ using namespace std;
 #include "CAnimator.h"
 #include "CGLWidget.h"
 
-CAnimator::CAnimator(CGLWidgetPtr gl_widget, QObject * parent)
+CAnimator::CAnimator(QObject * parent)
 	: QThread(parent)
 {
 	mRun = false;
 	mTime = 0;
 	mStep = 0;
-
-	mGLWidget = gl_widget;
 }
 
 CAnimator::~CAnimator()
@@ -32,6 +30,9 @@ void CAnimator::run()
 {
 	mRun = true;
 
+	if(!mGLWidget)
+		return;
+
 	while(mRun)
 	{
 		mGLWidget->SetTime(mTime);
@@ -42,6 +43,12 @@ void CAnimator::run()
 
 		emit(update_time(mTime));
 	}
+}
+
+/// Sets the current widget. Connects necessary signals and slots.
+void CAnimator::setGLWidget(CGLWidgetPtr gl_widget)
+{
+	mGLWidget = gl_widget;
 }
 
 void CAnimator::setTime(double time)

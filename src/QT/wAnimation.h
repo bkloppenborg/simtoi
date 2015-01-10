@@ -28,8 +28,12 @@ protected:
     CAnimator mAnimator;
 
 public:
-    wAnimation(CGLWidgetPtr gl_widget, QWidget * parent = 0);
+    wAnimation(QWidget * parent = 0);
 	virtual ~wAnimation();
+
+	void setGLWidget(CGLWidgetPtr gl_widget);
+
+	void toggleButtons();
 
 protected:
 	void enqueueRender(double time);

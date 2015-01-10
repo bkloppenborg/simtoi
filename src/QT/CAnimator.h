@@ -34,9 +34,10 @@ protected:
 	double mStep;
 
 public:
-	CAnimator(CGLWidgetPtr gl_widget, QObject * parent = 0);
+	CAnimator(QObject * parent = 0);
 	~CAnimator();
 
+	void setGLWidget(CGLWidgetPtr gl_widget);
 	void stop();
 
 	void run();

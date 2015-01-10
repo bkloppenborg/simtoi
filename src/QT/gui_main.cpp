@@ -58,6 +58,10 @@ gui_main::gui_main(QWidget *parent_widget)
     : QMainWindow(parent_widget)
 {
 	Init();
+
+    // Create a new animation widget, init the tab region
+    wAnimationWidget = new wAnimation();
+	this->tabBottom->addTab(wAnimationWidget, QString("Animation"));
 }
 
 gui_main::~gui_main()
@@ -122,10 +126,7 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
     // Set the GL widgets
     this->wModelParameterEditor->setGLWidget(mGLWidget);
     this->wOpenDataEditor->setGLWidget(mGLWidget);
-
-    // Create a new animation widget, init the tab region
-    wAnimationWidget = new wAnimation(mGLWidget);
-	this->tabBottom->addTab(wAnimationWidget, QString("Animation"));
+    this->wAnimationWidget->setGLWidget(mGLWidget);
 
     // Connect signals/slots
 	// Now connect signals and slots
