@@ -70,37 +70,15 @@ public:
 
 protected:
     void AddGLArea(CGLWidgetPtr widget);
-    void AddData(QStringList & filenames);
-public:
-    void AutoClose(bool auto_close);
-
-protected:
-    void ButtonCheck();
-
-    void close();
-    void closeEvent(QCloseEvent *evt);
-
-public:
-    void run_command_line(QStringList & data_files, QString & model_file, string minimizer_id, string save_directory, bool close_simtoi);
-
-protected:
-    void ModelOpen(QStringList & fileNames);
-
-public:
-    void Open(QString & filename);
 
 protected:
     void Init();
-
 public:
-    void render_at_time(double time);
+    void Open(QString & filename);
+    void run_command_line(QStringList & data_files, QString & model_file, string minimizer_id, string save_directory, bool close_simtoi);
 
-public:
-    void SetOutputDir(string folder_name);
-    void TreeCheck();
 
 private slots:
-
 	void on_actionNew_triggered(void);
     void on_actionExport_triggered();
     void on_actionOpen_triggered();

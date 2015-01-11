@@ -75,44 +75,7 @@ gui_main::gui_main(QWidget *parent_widget)
 
 gui_main::~gui_main()
 {
-	close();
-}
 
-void gui_main::AddData(QStringList & filenames)
-{
-//	string tmp;
-//	int dir_size = 0;
-//	stringstream time_str;
-//	time_str.precision(4);
-//	time_str.setf(ios::fixed,ios::floatfield);
-//
-//    // Get access to the current widget and QStandardItemModel:
-//	QList<QStandardItem *> items;
-//
-//	// Now pull out the data directory (to make file display cleaner)
-//	if(filenames.size() > 0)
-//		mOpenDataDir = QFileInfo(filenames[0]).absolutePath().toStdString();
-//
-//	for(int i = 0; i < filenames.size(); i++)
-//	{
-//		items.clear();
-//		// Tell the widget to load the data file and append a row to its file list:
-//		tmp = filenames[i].toStdString();
-//		dir_size = tmp.size() - mOpenDataDir.size();
-//		mGLWidget->OpenData(tmp);
-//
-//		// Filename
-//		items.append( new QStandardItem(QString::fromStdString( tmp.substr(mOpenDataDir.size() + 1, dir_size) )));
-//		// Mean JD
-//		time_str.str("");
-//		// TODO: Re-enable this (or something like it).
-////		time_str << widget->GetDataAveJD(widget->GetNDataSets() - 1);
-//		items.append( new QStandardItem(QString::fromStdString( time_str.str() )));
-//
-//		mOpenFileModel->appendRow(items);
-//	}
-//
-//	ButtonCheck();
 }
 
 void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
@@ -140,31 +103,6 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 	for(unsigned int i = 0; i < tabBottom->count(); i++)
 		tabBottom->setTabEnabled(i, true);
 
-}
-
-void gui_main::close()
-{
-    QMainWindow::close();
-}
-
-void gui_main::closeEvent(QCloseEvent *evt)
-{
-	close();
-    QMainWindow::closeEvent(evt);
-}
-
-/// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
-/// SIMTOI will automatically exit when all minimization engines have completed execution.
-void gui_main::run_command_line(QStringList & data_files, QString & model_file,
-		string minimizer_id, string save_directory, bool close_simtoi)
-{
-	Open(model_file);
-	wModelParameterEditor->updateModels();
-	wOpenDataEditor->openData(data_files);
-	wMinimizerWidget->startMinimizer(minimizer_id, save_directory);
-
-	if(close_simtoi)
-		connect(wMinimizerWidget, SIGNAL(finished()), this, SLOT(close()));
 }
 
 /// Runs initialization routines for the main this->
@@ -212,6 +150,20 @@ void gui_main::Open(QString & filename)
 
 	// If we opened the file successfully,
 	AddGLArea(widget);
+}
+
+/// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
+/// SIMTOI will automatically exit when all minimization engines have completed execution.
+void gui_main::run_command_line(QStringList & data_files, QString & model_file,
+		string minimizer_id, string save_directory, bool close_simtoi)
+{
+	Open(model_file);
+	wModelParameterEditor->updateModels();
+	wOpenDataEditor->openData(data_files);
+	wMinimizerWidget->startMinimizer(minimizer_id, save_directory);
+
+	if(close_simtoi)
+		connect(wMinimizerWidget, SIGNAL(finished()), this, SLOT(close()));
 }
 
 void gui_main::on_actionExport_triggered()
@@ -292,10 +244,5 @@ void gui_main::on_actionSave_triggered()
 
 		mGLWidget->Save(filename);
 	}
-
-}
-
-void gui_main::TreeCheck()
-{
 
 }
