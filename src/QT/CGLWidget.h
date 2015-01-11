@@ -38,7 +38,6 @@
 #include "liboi.hpp"
 #include "CModelList.h"
 //#include "CAnimator.h"
-#include "CMinimizerThread.h"
 #include "CWorkerThread.h"
 #include "CTreeModel.h"
 
@@ -58,9 +57,6 @@ protected:
 
     // Worker thread
     shared_ptr<CWorkerThread> mWorker;
-
-    // Minimizer
-    CMinimizerPtr mMinimizer;
 
     static QGLFormat mFormat;
 
@@ -92,8 +88,8 @@ public:
 public:
 
     QStringList GetFileFilters();
-    string GetMinimizerID();
-    bool GetMinimizerRunning();
+//    string GetMinimizerID();
+//    bool GetMinimizerRunning();
     double GetTime();
 
     unsigned int GetImageWidth() { return mWorker->GetImageWidth(); };
@@ -112,18 +108,18 @@ public:
     void Save(string filename);
     void SetScale(double scale);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
-    void SetMinimizer(CMinimizerPtr minimizer);
+//    void SetMinimizer(CMinimizerPtr minimizer);
     void SetSaveDirectory(string directory_path);
     void SetSize(unsigned int width, unsigned int height);
     void SetTime(double time);
-    void startMinimizer();
+//    void startMinimizer();
     void startRendering();
-    void stopMinimizer();
+//    void stopMinimizer();
     void stopRendering();
 
 private slots:
 
-	void on_minimizer_finished();
+//	void on_minimizer_finished();
 	void updateParameters();
 
 signals:

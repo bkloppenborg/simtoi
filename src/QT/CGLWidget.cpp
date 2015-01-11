@@ -63,7 +63,7 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 
 CGLWidget::~CGLWidget()
 {
-	stopMinimizer();
+//	stopMinimizer();
 	stopRendering();
 }
 
@@ -120,32 +120,9 @@ QStringList CGLWidget::GetFileFilters()
 	return mWorker->GetFileFilters();
 }
 
-/// Returns the Minimizer's ID if one is loaded, otherwise an empty string.
-string CGLWidget::GetMinimizerID()
-{
-	if(mMinimizer)
-		return mMinimizer->GetID();
-
-	return "";
-}
-
-bool CGLWidget::GetMinimizerRunning()
-{
-	if(!mMinimizer)
-		return false;
-
-	return mMinimizer->isRunning();
-}
-
 double CGLWidget::GetTime()
 {
 	return mWorker->GetTime();
-}
-
-void CGLWidget::on_minimizer_finished(void)
-{
-	emit modelUpdated();
-	emit minimizerFinished();
 }
 
 void CGLWidget::Open(string filename)
@@ -227,14 +204,6 @@ void CGLWidget::SetScale(double scale)
 	mWorker->SetScale(scale);
 }
 
-void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
-{
-	stopMinimizer();
-	mMinimizer = minimizer;
-	mMinimizer->Init(mWorker);
-	mMinimizer->SetSaveDirectory(mSaveDirectory);
-}
-
 void CGLWidget::SetSaveDirectory(string directory_path)
 {
 	mSaveDirectory = directory_path;
@@ -248,24 +217,6 @@ void CGLWidget::SetSize(unsigned int width, unsigned int height)
 void CGLWidget::SetTime(double time)
 {
 	mWorker->SetTime(time);
-}
-
-void CGLWidget::startMinimizer()
-{
-	if(!mMinimizer)
-		return;
-
-	mMinimizer->start();
-	connect(mMinimizer.get(), SIGNAL(finished()), this, SLOT(on_minimizer_finished(void)));
-}
-
-void CGLWidget::stopMinimizer()
-{
-	if(!mMinimizer)
-		return;
-
-	// Stop the thread. If it was running, join it.
-	mMinimizer->stop();
 }
 
 void CGLWidget::startRendering()

@@ -40,6 +40,7 @@ class CParameters;
 class CParameterItem;
 class CGLWidget;
 class wAnimation;
+class wMinimizer;
 
 typedef shared_ptr<CGLWidget> CGLWidgetPtr;
 
@@ -51,6 +52,7 @@ protected:
     CGLWidgetPtr mGLWidget;
 
 	wAnimation * wAnimationWidget; // pointer to animiation widget. Re-parented once created, don't delete.
+	wMinimizer * wMinimizerWidget; // pointer to the minimizer widget. Re-parented once created, don't delete.
 
     string mShaderSourceDir;
     string mKernelSourceDir;
@@ -81,7 +83,7 @@ public:
     void CommandLine(QStringList & data_files, QString & model_file, string minimizer, bool close_simtoi);
 
 protected:
-    void MinimizerRun(string MinimizerID);
+//    void MinimizerRun(string MinimizerID);
     void ModelOpen(QStringList & fileNames);
 
 public:
@@ -98,14 +100,14 @@ public:
     void TreeCheck();
 
 private slots:
-    void minimizerFinished();
+//    void minimizerFinished();
 
 	void on_actionNew_triggered(void);
     void on_actionExport_triggered();
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
 
-    void on_btnMinimizerStartStop_clicked();
+//    void on_btnMinimizerStartStop_clicked();
 //    void on_btnNewModelArea_clicked();
 
 };
