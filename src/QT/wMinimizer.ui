@@ -28,7 +28,7 @@
     <widget class="QLineEdit" name="textSaveFolder"/>
    </item>
    <item row="2" column="1">
-    <widget class="QPushButton" name="btnMinimizerStartStop">
+    <widget class="QPushButton" name="btnStartStop">
      <property name="enabled">
       <bool>true</bool>
      </property>

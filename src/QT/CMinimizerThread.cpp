@@ -125,6 +125,7 @@ void CMinimizerThread::GetResults(double * results, int n_params)
 /// \brief Initialization function.
 ///
 /// \param worker_thread A shared pointer to the worker thread
+/// \param save_directory
 void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 {
 	mWorkerThread = worker_thread;
@@ -158,18 +159,10 @@ void CMinimizerThread::OpenStatisticsFile(ofstream & file)
 	file.precision(8);
 }
 
-
-/// \brief Changes the default directory to which the minimizer saves files.
-///
-/// Some minimization engines may write out intermediate files during the
-/// minimization process. This function permits you to set an absolute path
-/// and filename prefix which is used by the minimizers.
-///
-/// \param filename An absolute path prefix for minimizer files.
-void CMinimizerThread::SetSaveDirectory(string folder_name)
+void CMinimizerThread::setSaveDirectory(string save_directory)
 {
-	if(folder_name.size() > 0)
-		mSaveDirectory = folder_name;
+	if(save_directory.size() > 0)
+		mSaveDirectory = save_directory;
 }
 
 /// \brief Stops the minimizer.

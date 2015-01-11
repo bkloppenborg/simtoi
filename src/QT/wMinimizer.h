@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "ui_wMinimizer.h"
+#include "CMinimizerThread.h"
 
 using namespace std;
 
@@ -27,21 +28,31 @@ class wMinimizer : public QWidget, public Ui::wMinimizer {
 
 protected:
 	CGLWidgetPtr mGLWidget;
-    CMinimizerPtr mMinimizer;
+	CMinimizerPtr mMinimizer;
 
-	string mDefaultSaveDir;
+	string mSaveDirectory;
 
 public:
 	wMinimizer(QWidget * parent = 0);
 	virtual ~wMinimizer();
 
+	void startMinimizer(string minimizer_id, string save_directory);
+
 	void setGLWidget(CGLWidgetPtr gl_widget);
 
 	void toggleButtons();
 
-
 signals:
-	void minimization_complete();
+	void finished();
+	void started();
+
+public slots:
+	void on_btnStartStop_clicked();
+
+protected slots:
+	void minimizerFinished();
+	void minimizerStarted();
+
 };
 
 #endif /* WMINIMIZER_H_ */

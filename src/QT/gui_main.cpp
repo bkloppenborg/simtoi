@@ -67,6 +67,10 @@ gui_main::gui_main(QWidget *parent_widget)
 
     wMinimizerWidget = new wMinimizer();
 	this->tabBottom->addTab(wMinimizerWidget, QString("Minimization"));
+
+	// establish cross-widget signal slot connections
+	// minimization finished -> update parameter values
+	connect(wMinimizerWidget, SIGNAL(finished()), wModelParameterEditor, SLOT(updateModels()));
 }
 
 gui_main::~gui_main()

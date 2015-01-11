@@ -63,7 +63,6 @@ CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string c
 
 CGLWidget::~CGLWidget()
 {
-//	stopMinimizer();
 	stopRendering();
 }
 
@@ -227,9 +226,12 @@ void CGLWidget::startRendering()
 
 void CGLWidget::stopRendering()
 {
-    mWorker->stop();
-}
+	if(!mWorker)
+		return;
 
+    mWorker->stop();
+    mWorker->wait();
+}
 
 //void CGLWidget::updateData(void)
 //{

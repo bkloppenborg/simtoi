@@ -47,6 +47,9 @@ class CParameters;
 class CModelList;
 typedef shared_ptr<CModelList> CModelListPtr;
 
+class CWorkerThread;
+typedef shared_ptr<CWorkerThread> CWorkerPtr;
+
 class CGLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -56,7 +59,7 @@ protected:
     string mSaveDirectory;
 
     // Worker thread
-    shared_ptr<CWorkerThread> mWorker;
+    CWorkerPtr mWorker;
 
     static QGLFormat mFormat;
 
@@ -71,9 +74,11 @@ public:
 	void removeModel(unsigned int model_index);
 
 	void addData(string filename);
+
+	int getNData() { return mWorker->GetDataSize(); };
+	int getNModels() { return mWorker->GetModelList()->size(); };
+
 	void removeData(unsigned int data_index);
-//	CDataPtr getData(unsigned int data_index);
-//	CDataListPtr getData() { return mWorker->
 
 protected:
     void closeEvent(QCloseEvent *evt);
@@ -88,19 +93,16 @@ public:
 public:
 
     QStringList GetFileFilters();
-//    string GetMinimizerID();
-//    bool GetMinimizerRunning();
     double GetTime();
+    CWorkerPtr getWorker() { return mWorker; };
+
 
     unsigned int GetImageWidth() { return mWorker->GetImageWidth(); };
     unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
     string GetSaveFolder() { return mSaveDirectory; };
 
-//    bool IsAnimating();
-
 public:
     void Open(string filename);
-//    void OpenData(string filename);
 
 public:
     void Render();
@@ -108,22 +110,17 @@ public:
     void Save(string filename);
     void SetScale(double scale);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
-//    void SetMinimizer(CMinimizerPtr minimizer);
     void SetSaveDirectory(string directory_path);
     void SetSize(unsigned int width, unsigned int height);
     void SetTime(double time);
-//    void startMinimizer();
     void startRendering();
-//    void stopMinimizer();
     void stopRendering();
 
 private slots:
 
-//	void on_minimizer_finished();
 	void updateParameters();
 
 signals:
-	void minimizerFinished();
 	void modelUpdated();
 //	void dataUpdated();
 	void dataAdded(CDataInfo info);
