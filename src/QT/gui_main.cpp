@@ -144,7 +144,6 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 
 void gui_main::close()
 {
-    mGLWidget->stopRendering();
     QMainWindow::close();
 }
 
