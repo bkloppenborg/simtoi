@@ -64,6 +64,12 @@ void wDataEditor::dataRemoved(unsigned int index)
 	mOpenFileModel.removeRow(index);
 }
 
+void wDataEditor::openData(QStringList & filenames)
+{
+	for(auto filename: filenames)
+		mGLWidget->addData(filename.toUtf8().constData());
+}
+
 void wDataEditor::on_btnAddData_clicked(void)
 {
 	// Ensure there is a selected widget, if not immediately return.
@@ -88,11 +94,8 @@ void wDataEditor::on_btnAddData_clicked(void)
 	{
 		// store the open data directory
 		mOpenDataDir = dialog.directory();
-
-		// get the files and tell the GLWidget to open them.
-		QStringList filenames = dialog.selectedFiles();
-		for(auto filename: filenames)
-			mGLWidget->addData(filename.toUtf8().constData());
+		QStringList files = dialog.selectedFiles();
+		openData(files);
 	}
 }
 

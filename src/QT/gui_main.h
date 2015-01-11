@@ -79,8 +79,9 @@ protected:
 
     void close();
     void closeEvent(QCloseEvent *evt);
+
 public:
-    void CommandLine(QStringList & data_files, QString & model_file, string minimizer, bool close_simtoi);
+    void run_command_line(QStringList & data_files, QString & model_file, string minimizer_id, string save_directory, bool close_simtoi);
 
 protected:
     void ModelOpen(QStringList & fileNames);

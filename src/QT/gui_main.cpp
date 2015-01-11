@@ -121,8 +121,6 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
 	if(mGLWidget != NULL)
 	{
 		this->topRightLayout->removeWidget(mGLWidget.get());
-		// TODO: Delete animation widget
-//		this->tabBottom->removeWidget(mAnimationWidget);
 	}
 
 	// Create a new GLWidget and start it rendering
@@ -137,13 +135,6 @@ void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
     this->wOpenDataEditor->setGLWidget(mGLWidget);
     this->wAnimationWidget->setGLWidget(mGLWidget);
     this->wMinimizerWidget->setGLWidget(mGLWidget);
-
-    // Connect signals/slots
-	// Now connect signals and slots
-//	connect(mGLWidget.get(), SIGNAL(minimizerFinished(void)), this, SLOT(minimizerFinished(void)));
-
-	// If the load data button isn't enabled, turn it on
-//	ButtonCheck();
 
 	// enable all of the tabs in the bottom
 	for(unsigned int i = 0; i < tabBottom->count(); i++)
@@ -165,15 +156,16 @@ void gui_main::closeEvent(QCloseEvent *evt)
 
 /// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
 /// SIMTOI will automatically exit when all minimization engines have completed execution.
-void gui_main::CommandLine(QStringList & data_files, QString & model_file, string minimizer, bool close_simtoi)
+void gui_main::run_command_line(QStringList & data_files, QString & model_file,
+		string minimizer_id, string save_directory, bool close_simtoi)
 {
-	// First open the model area and configure the UI.
 	Open(model_file);
+	wModelParameterEditor->updateModels();
+	wOpenDataEditor->openData(data_files);
+	wMinimizerWidget->startMinimizer(minimizer_id, save_directory);
 
-    // Now open data, run the minimizer and close (if needed)
-	AddData(data_files);
-//	MinimizerRun(minimizer);
-	mAutoClose = close_simtoi;
+	if(close_simtoi)
+		connect(wMinimizerWidget, SIGNAL(finished()), this, SLOT(close()));
 }
 
 /// Runs initialization routines for the main this->

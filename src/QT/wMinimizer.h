@@ -30,15 +30,15 @@ protected:
 	CGLWidgetPtr mGLWidget;
 	CMinimizerPtr mMinimizer;
 
-	string mSaveDirectory;
-
 public:
 	wMinimizer(QWidget * parent = 0);
 	virtual ~wMinimizer();
 
-	void startMinimizer(string minimizer_id, string save_directory);
+	void startMinimizer(const string & minimizer_id, const string & save_directory);
 
 	void setGLWidget(CGLWidgetPtr gl_widget);
+protected:
+	void setSaveDirectory(const string & save_directory);
 
 	void toggleButtons();
 

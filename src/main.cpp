@@ -90,36 +90,27 @@ int main(int argc, char *argv[])
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
     QStringList data_files;
-    QStringList model_files;
-    string minimizer = "";
-    string output_dir = "/tmp/model";
+    QString model_file;
+    string minimizer_id = "";
+    string save_directory = "/tmp/model";
     bool close_simtoi = false;
 
     // If there were command-line options, parse them
     if(args.size() > 0)
-    	ParseArgs(args, data_files, model_files, minimizer, close_simtoi, output_dir);
+    	ParseArgs(args, data_files, model_file, minimizer_id, save_directory, close_simtoi);
 
     // Startup the GUI:
     gui_main main_window;
     main_window.show();
 
-//    main_window.SetOutputDir(output_dir);
-
-    if(model_files.size() > 1)
-    {
-    	cout << "SIMTOI can only open one model file per invocation." << endl;
-    	return 1;
-    }
-
-
-    if(data_files.size() > 0 || model_files.size() > 0)
-    	main_window.CommandLine(data_files, model_files[0], minimizer, close_simtoi);
+    if(data_files.size() > 0 || model_file.size() > 0)
+    	main_window.run_command_line(data_files, model_file, minimizer_id, save_directory, close_simtoi);
 
     return app.exec();
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, string &  minimizer, bool & close_simtoi, string & output_dir)
+void ParseArgs(QStringList args, QStringList & filenames, QString & model_file, string &  minimizer, string & output_dir, bool & close_simtoi)
 {
 	unsigned int n_items = args.size();
 
@@ -146,7 +137,7 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 
 		// model file
 		if(value == "-m")
-			models.append(tmp.absoluteFilePath(args.at(i + 1)));
+			model_file =tmp.absoluteFilePath(args.at(i + 1));
 
 		if(value == "-o")
 			output_dir = tmp.absoluteFilePath(args.at(i + 1)).toStdString();

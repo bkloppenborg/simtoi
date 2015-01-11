@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QDir>
 #include <QStandardItemModel>
+#include <QStringList>
 #include <memory>
 
 #include "ui_wDataEditor.h"
@@ -36,6 +37,8 @@ public:
 	virtual ~wDataEditor();
 
 	void setGLWidget(CGLWidgetPtr gl_widget);
+
+	void openData(QStringList & filenames);
 
 	void toggleButtons();
 	void refreshTree();

@@ -24,27 +24,24 @@ wMinimizer::wMinimizer(QWidget * parent)
 	guiCommon::setOptions(this->cboMinimizers, minimizers.GetMinimizerList());
 
 	// Setup the text boxes
-	mSaveDirectory = "/tmp/model";
-	textSaveFolder->setText(mSaveDirectory.c_str());
+	textSaveFolder->setText("/tmp/model");
 
 	setEnabled(false);
 }
 
 wMinimizer::~wMinimizer()
 {
-//	mAnimator.stop();
-//	mAnimator.wait();
+	if(mMinimizer)
+	{
+		mMinimizer->stop();
+		mMinimizer->wait();
+	}
 }
-
-
 
 /// Sets the current widget. Connects necessary signals and slots.
 void wMinimizer::setGLWidget(CGLWidgetPtr gl_widget)
 {
 	mGLWidget = gl_widget;
-
-//	mAnimator.stop();
-//	mAnimator.setGLWidget(gl_widget);
 
 	toggleButtons();
 }
@@ -58,29 +55,21 @@ void wMinimizer::toggleButtons()
 	if(mGLWidget)
 		this->setEnabled(true);
 }
-//
-///// Checks to see which buttons can be enabled/disabled.
-//void gui_main::ButtonCheck()
-//{
-//	if(!mGLWidget)
-//		return;
-//
-//	// Buttons for minimizer area
-//	// Look up the minimizer's ID in the combo box, select it.
-//	int id = this->cboMinimizers->findText(QString::fromStdString(mGLWidget->GetMinimizerID()));
-//	if(id > -1)
-//		this->cboMinimizers->setCurrentIndex(id);
-//
-//	// Toggle minimizer start/stop button
-//	if(mGLWidget->GetMinimizerRunning())
-//		this->btnMinimizerStartStop->setText("Stop");
-//	else
-//		this->btnMinimizerStartStop->setText("Start");
-//
-//}
+
+void wMinimizer::setSaveDirectory(const string & save_directory)
+{
+	// verify the save directory exists, if not create it
+	QString q_save_directory = QString::fromStdString(save_directory);
+	if(!QDir(q_save_directory).exists())
+	{
+		QDir().mkdir(q_save_directory);
+	}
+
+	textSaveFolder->setText(q_save_directory);
+}
 
 
-void wMinimizer::startMinimizer(string minimizer_id, string save_directory)
+void wMinimizer::startMinimizer(const string & minimizer_id, const string & save_directory)
 {
 	// Look up the minimizer
 	auto minimizers = CMinimizerFactory::Instance();
@@ -111,6 +100,8 @@ void wMinimizer::startMinimizer(string minimizer_id, string save_directory)
 	// try to start the minimizer
 	try
 	{
+		setSaveDirectory(save_directory);
+
 		auto worker = mGLWidget->getWorker();
 
 		mMinimizer = minimizers.CreateMinimizer(minimizer_id);
@@ -119,7 +110,8 @@ void wMinimizer::startMinimizer(string minimizer_id, string save_directory)
 		mMinimizer->start();
 
 		// the minimizer started, update the minimizer ID combo box
-		int id = this->cboMinimizers->findText(QString::fromStdString(minimizer_id));
+		QString q_minimizer_id = QString::fromStdString(minimizer_id);
+		int id = this->cboMinimizers->findText(q_minimizer_id);
 		if(id > -1)
 			this->cboMinimizers->setCurrentIndex(id);
 		// signal that the minimization started.
@@ -160,7 +152,7 @@ void wMinimizer::on_btnStartStop_clicked()
 	if(!QDir(save_dir).exists())
 		QDir().mkdir(save_dir);
 
-	mSaveDirectory = save_dir.toStdString();
+	string save_directory = save_dir.toStdString();
 
 	// If the minimizer is running, stop it.
 	if(mMinimizer && mMinimizer->isRunning())
@@ -171,6 +163,6 @@ void wMinimizer::on_btnStartStop_clicked()
 	else // start a new minimizer.
 	{
 		string id = this->cboMinimizers->currentText().toStdString();
-		startMinimizer(id, mSaveDirectory);
+		startMinimizer(id, save_directory);
 	}
 }

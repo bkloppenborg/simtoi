@@ -51,6 +51,8 @@ private slots:
     void on_btnAddModel_clicked();
     void on_btnEditModel_clicked();
     void on_btnRemoveModel_clicked();
+
+public slots:
     void updateModels();
 };
 
