@@ -21,6 +21,8 @@ wParameterEditor::wParameterEditor(QWidget * parent)
 	: QWidget(parent)
 {
 	this->setupUi(this);
+
+	mGLWidget = NULL;
 }
 
 wParameterEditor::~wParameterEditor()
@@ -255,13 +257,13 @@ void wParameterEditor::on_btnEditModel_clicked()
 }
 
 /// Sets the current widget. Connects necessary signals and slots.
-void wParameterEditor::setGLWidget(CGLWidgetPtr gl_widget)
+void wParameterEditor::setGLWidget(CGLWidget * gl_widget)
 {
 	mGLWidget = gl_widget;
 
 	// connect any non-automatic signal/slots
-	connect(&mTreeModel, SIGNAL(parameterUpdated()), mGLWidget.get(), SLOT(updateParameters()));
-	connect(mGLWidget.get(), SIGNAL(modelUpdated()), this, SLOT(updateModels()));
+	connect(&mTreeModel, SIGNAL(parameterUpdated()), mGLWidget, SLOT(updateParameters()));
+	connect(mGLWidget, SIGNAL(modelUpdated()), this, SLOT(updateModels()));
 
 	toggleButtons();
 	refreshTree();

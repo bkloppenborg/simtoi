@@ -64,7 +64,7 @@ protected:
     static QGLFormat mFormat;
 
 public:
-    CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);
+    CGLWidget(QWidget *widget_parent);
     virtual ~CGLWidget();
 
     void addModel(shared_ptr<CModel> model);

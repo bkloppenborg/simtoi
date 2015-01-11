@@ -69,14 +69,13 @@ public:
     virtual ~gui_main();
 
 protected:
-    void AddGLArea(CGLWidgetPtr widget);
+    void toggleWidgets();
 
 protected:
     void Init();
 public:
     void Open(QString & filename);
     void run_command_line(QStringList & data_files, QString & model_file, string minimizer_id, string save_directory, bool close_simtoi);
-
 
 private slots:
 	void on_actionNew_triggered(void);

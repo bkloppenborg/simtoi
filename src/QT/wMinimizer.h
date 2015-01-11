@@ -14,11 +14,9 @@
 
 #include "ui_wMinimizer.h"
 #include "CMinimizerThread.h"
+#include "CGLWidget.h"
 
 using namespace std;
-
-class CGLWidget;
-typedef shared_ptr<CGLWidget> CGLWidgetPtr;
 
 class CMinimizerThread;
 typedef shared_ptr<CMinimizerThread> CMinimizerPtr;
@@ -27,7 +25,7 @@ class wMinimizer : public QWidget, public Ui::wMinimizer {
 	Q_OBJECT
 
 protected:
-	CGLWidgetPtr mGLWidget;
+	CGLWidget * mGLWidget;
 	CMinimizerPtr mMinimizer;
 
 public:
@@ -36,7 +34,7 @@ public:
 
 	void startMinimizer(const string & minimizer_id, const string & save_directory);
 
-	void setGLWidget(CGLWidgetPtr gl_widget);
+	void setGLWidget(CGLWidget * gl_widget);
 protected:
 	void setSaveDirectory(const string & save_directory);
 

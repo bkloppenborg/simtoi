@@ -14,6 +14,7 @@
 
 #include "ui_wAnimation.h"
 #include "CAnimator.h"
+#include "CGLWidget.h"
 
 using namespace std;
 
@@ -24,14 +25,14 @@ class wAnimation : public QWidget, public Ui::wAnimiation {
 	Q_OBJECT
 
 protected:
-	CGLWidgetPtr mGLWidget;
+	CGLWidget * mGLWidget;
     CAnimator mAnimator;
 
 public:
     wAnimation(QWidget * parent = 0);
 	virtual ~wAnimation();
 
-	void setGLWidget(CGLWidgetPtr gl_widget);
+	void setGLWidget(CGLWidget * gl_widget);
 
 	void toggleButtons();
 

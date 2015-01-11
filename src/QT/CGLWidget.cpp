@@ -48,7 +48,7 @@ using namespace std;
 
 extern string EXE_FOLDER;
 
-CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
+CGLWidget::CGLWidget(QWidget * widget_parent)
     : QGLWidget(widget_parent)
 { 
 	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context

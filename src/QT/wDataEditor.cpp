@@ -18,6 +18,8 @@ wDataEditor::wDataEditor(QWidget * parent)
 {
 	this->setupUi(this);
 
+	mGLWidget = NULL;
+
 	QStringList labels = QStringList();
 	labels << "Filename" << "Quantity" << "JD Start" << "JD End" << "Mean JD" << "chi2r";
 	mOpenFileModel.clear();
@@ -134,12 +136,12 @@ void wDataEditor::refreshTree()
 }
 
 /// Sets the current widget. Connects necessary signals and slots.
-void wDataEditor::setGLWidget(CGLWidgetPtr gl_widget)
+void wDataEditor::setGLWidget(CGLWidget * gl_widget)
 {
 	mGLWidget = gl_widget;
 
 	// connect any non-automatic signal/slots
-	connect(mGLWidget.get(), SIGNAL(dataAdded(CDataInfo)), this, SLOT(addData(CDataInfo)));
+	connect(mGLWidget, SIGNAL(dataAdded(CDataInfo)), this, SLOT(addData(CDataInfo)));
 
 	toggleButtons();
 	refreshTree();

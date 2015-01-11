@@ -18,6 +18,8 @@ CAnimator::CAnimator(QObject * parent)
 	mRun = false;
 	mTime = 0;
 	mStep = 0;
+
+	mGLWidget = NULL;
 }
 
 CAnimator::~CAnimator()
@@ -46,7 +48,7 @@ void CAnimator::run()
 }
 
 /// Sets the current widget. Connects necessary signals and slots.
-void CAnimator::setGLWidget(CGLWidgetPtr gl_widget)
+void CAnimator::setGLWidget(CGLWidget * gl_widget)
 {
 	mGLWidget = gl_widget;
 }

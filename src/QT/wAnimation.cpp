@@ -18,6 +18,8 @@ wAnimation::wAnimation(QWidget * parent)
 {
 	this->setupUi(this);
 
+	mGLWidget = NULL;
+
 	// connect any non-automatic signal/slots
 	connect(&mAnimator, SIGNAL(update_time(double)), this, SLOT(update_time(double)));
 	connect(this, SIGNAL(timestep_updated(double)), &mAnimator, SLOT(setStep(double)));
@@ -116,7 +118,7 @@ void wAnimation::on_doubleSpinBoxRate_valueChanged(double value)
 }
 
 /// Sets the current widget. Connects necessary signals and slots.
-void wAnimation::setGLWidget(CGLWidgetPtr gl_widget)
+void wAnimation::setGLWidget(CGLWidget * gl_widget)
 {
 	mGLWidget = gl_widget;
 

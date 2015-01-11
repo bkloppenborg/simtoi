@@ -14,10 +14,7 @@
 #include <QThread>
 #include <memory>
 #include <atomic>
-
-using namespace std;
-class CGLWidget;
-typedef shared_ptr<CGLWidget> CGLWidgetPtr;
+#include "CGLWidget.h"
 
 using namespace std;
 
@@ -25,7 +22,7 @@ class CAnimator : public QThread
 {
 	Q_OBJECT
 public:
-	CGLWidgetPtr mGLWidget;
+	CGLWidget * mGLWidget;
 
 protected:
 	atomic<bool> mRun;
@@ -37,7 +34,7 @@ public:
 	CAnimator(QObject * parent = 0);
 	~CAnimator();
 
-	void setGLWidget(CGLWidgetPtr gl_widget);
+	void setGLWidget(CGLWidget * gl_widget);
 	void stop();
 
 	void run();

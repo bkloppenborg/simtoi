@@ -68,40 +68,20 @@ gui_main::gui_main(QWidget *parent_widget)
     wMinimizerWidget = new wMinimizer();
 	this->tabBottom->addTab(wMinimizerWidget, QString("Minimization"));
 
+    this->wModelParameterEditor->setGLWidget(wGLWidget);
+    this->wOpenDataEditor->setGLWidget(wGLWidget);
+    this->wAnimationWidget->setGLWidget(wGLWidget);
+    this->wMinimizerWidget->setGLWidget(wGLWidget);
+
 	// establish cross-widget signal slot connections
 	// minimization finished -> update parameter values
 	connect(wMinimizerWidget, SIGNAL(finished()), wModelParameterEditor, SLOT(updateModels()));
+
+	toggleWidgets();
 }
 
 gui_main::~gui_main()
 {
-
-}
-
-void gui_main::AddGLArea(CGLWidgetPtr gl_widget)
-{
-	// TODO: Rework once GLWidgets are persistent.
-	if(mGLWidget != NULL)
-	{
-		this->topRightLayout->removeWidget(mGLWidget.get());
-	}
-
-	// Create a new GLWidget and start it rendering
-	mGLWidget = gl_widget;
-	this->topRightLayout->addWidget(mGLWidget.get());
-	mGLWidget->setFixedSize(mGLWidget->GetImageWidth(), gl_widget->GetImageHeight());
-	mGLWidget->show();
-    mGLWidget->startRendering();
-
-    // Set the GL widgets
-    this->wModelParameterEditor->setGLWidget(mGLWidget);
-    this->wOpenDataEditor->setGLWidget(mGLWidget);
-    this->wAnimationWidget->setGLWidget(mGLWidget);
-    this->wMinimizerWidget->setGLWidget(mGLWidget);
-
-	// enable all of the tabs in the bottom
-	for(unsigned int i = 0; i < tabBottom->count(); i++)
-		tabBottom->setTabEnabled(i, true);
 
 }
 
@@ -129,12 +109,10 @@ void gui_main::Init(void)
 /// Opens one saved model file.
 void gui_main::Open(QString & filename)
 {
-	CGLWidgetPtr widget = CGLWidgetPtr(new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir));
-
 	// Attempt to open the file.
 	try
 	{
-		widget->Open(filename.toStdString());
+		wGLWidget->Open(filename.toStdString());
 	}
 	catch(runtime_error e)
 	{
@@ -148,8 +126,8 @@ void gui_main::Open(QString & filename)
 		return;
 	}
 
-	// If we opened the file successfully,
-	AddGLArea(widget);
+	wGLWidget->startRendering();
+	toggleWidgets();
 }
 
 /// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
@@ -164,6 +142,13 @@ void gui_main::run_command_line(QStringList & data_files, QString & model_file,
 
 	if(close_simtoi)
 		connect(wMinimizerWidget, SIGNAL(finished()), this, SLOT(close()));
+}
+
+void gui_main::toggleWidgets()
+{
+	// enable all of the tabs in the bottom
+	for(unsigned int i = 0; i < tabBottom->count(); i++)
+		tabBottom->setTabEnabled(i, true);
 }
 
 void gui_main::on_actionExport_triggered()
@@ -214,10 +199,10 @@ void gui_main::on_actionNew_triggered(void)
 		unsigned int height = dialog.spinHeight->value();
 		double scale = dialog.spinScale->value();
 
-		CGLWidgetPtr widget = CGLWidgetPtr(new CGLWidget(NULL, mShaderSourceDir, mKernelSourceDir));
-		widget->SetSize(width, height);
-		widget->SetScale(scale);
-		AddGLArea(widget);
+		wGLWidget->SetSize(width, height);
+		wGLWidget->SetScale(scale);
+		wGLWidget->startRendering();
+		toggleWidgets();
 	}
 }
 

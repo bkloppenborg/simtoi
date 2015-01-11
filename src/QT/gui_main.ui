@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>930</width>
+    <width>950</width>
     <height>778</height>
    </rect>
   </property>
@@ -32,20 +32,38 @@
      </widget>
     </item>
     <item row="0" column="1">
-     <layout class="QHBoxLayout" name="topRightLayout">
-      <item>
-       <widget class="wDataEditor" name="wOpenDataEditor" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>256</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="wDataEditor" name="wOpenDataEditor" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>128</height>
+       </size>
+      </property>
+     </widget>
     </item>
-    <item row="1" column="1">
+    <item row="0" column="2">
+     <widget class="CGLWidget" name="wGLWidget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>128</width>
+        <height>128</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>128</width>
+        <height>128</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="2">
      <widget class="QWidget" name="widget" native="true">
       <property name="minimumSize">
        <size>
@@ -55,7 +73,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="2" column="1" colspan="2">
      <widget class="QTabWidget" name="tabBottom">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -97,7 +115,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>930</width>
+     <width>950</width>
      <height>23</height>
     </rect>
    </property>
@@ -144,6 +162,12 @@
    <class>wDataEditor</class>
    <extends>QWidget</extends>
    <header>wDataEditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CGLWidget</class>
+   <extends>QWidget</extends>
+   <header>CGLWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

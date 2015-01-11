@@ -8,19 +8,17 @@
 #ifndef WDATA_EDITOR_H_
 #define WDATA_EDITOR_H_
 
+#include "ui_wDataEditor.h"
 #include <QWidget>
 #include <QDir>
 #include <QStandardItemModel>
 #include <QStringList>
 #include <memory>
 
-#include "ui_wDataEditor.h"
+#include "CGLWidget.h"
 #include "CDataInfo.h"
 
 using namespace std;
-
-class CGLWidget;
-typedef shared_ptr<CGLWidget> CGLWidgetPtr;
 
 class CDataInfo;
 
@@ -28,7 +26,7 @@ class wDataEditor : public QWidget, public Ui::wDataEditor {
 	Q_OBJECT
 
 protected:
-	CGLWidgetPtr mGLWidget;
+	CGLWidget * mGLWidget;
 	QDir mOpenDataDir;
     QStandardItemModel mOpenFileModel;
 
@@ -36,7 +34,7 @@ public:
 	wDataEditor(QWidget * parent = 0);
 	virtual ~wDataEditor();
 
-	void setGLWidget(CGLWidgetPtr gl_widget);
+	void setGLWidget(CGLWidget * gl_widget);
 
 	void openData(QStringList & filenames);
 
