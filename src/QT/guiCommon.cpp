@@ -29,6 +29,7 @@ void setOptions(QComboBox * comboBox, const vector<string> & options)
 	}
 }
 
+/// Sets the combo box to the specified value if found.
 void setSelectedValue(QComboBox * comboBox, const QString & value)
 {
 	int index = comboBox->findText(value);
@@ -37,6 +38,7 @@ void setSelectedValue(QComboBox * comboBox, const QString & value)
 	}
 }
 
+/// Sets the combo box to the specified value if found.
 void setSelectedValue(QComboBox * comboBox, const QVariant & value)
 {
 	int index = comboBox->findData(value);

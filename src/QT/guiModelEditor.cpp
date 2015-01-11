@@ -105,6 +105,7 @@ CModelPtr guiModelEditor::getModel()
 	return mModel;
 }
 
+/// Initalizes the UI with values found elsewhere in SIMTOI.
 void guiModelEditor::initUi()
 {
 	auto models = CModelFactory::Instance();
@@ -118,12 +119,14 @@ void guiModelEditor::initUi()
 	guiCommon::setOptions(cboFeatures, features.GetFeatureList());
 }
 
+/// Adds a feature to the model
 void guiModelEditor::on_btnFeatureAdd_clicked()
 {
 	QString feature_id = cboFeatures->currentText();
 	listFeatures->addItem(feature_id);
 }
 
+/// Deletes all features from the model
 void guiModelEditor::on_btnFeatureRemove_clicked()
 {
 	qDeleteAll(listFeatures->selectedItems());

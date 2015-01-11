@@ -1,8 +1,10 @@
 /*
- * guiNew.h
+ * guiRegion.h
  *
  *  Created on: Aug 21, 2014
  *      Author: bkloppenborg
+ *
+ *  A wrapper class for an new model region dialog
  */
 
 #ifndef GUIREGION_H_
