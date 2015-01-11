@@ -30,6 +30,7 @@ wDataEditor::~wDataEditor()
 
 }
 
+/// Adds information related to the specified data to the text entry box
 void wDataEditor::addData(CDataInfo data_info)
 {
 	QList<QStandardItem *> items;
@@ -59,17 +60,22 @@ void wDataEditor::addData(CDataInfo data_info)
 	mOpenFileModel.appendRow(items);
 }
 
+/// Remove the specified data file
+///
+/// \param index The index of the data one wishes to remove
 void wDataEditor::dataRemoved(unsigned int index)
 {
 	mOpenFileModel.removeRow(index);
 }
 
+/// Opens several data files
 void wDataEditor::openData(QStringList & filenames)
 {
 	for(auto filename: filenames)
 		mGLWidget->addData(filename.toUtf8().constData());
 }
 
+/// Opens an add data dialog when btnAddData is clicked.
 void wDataEditor::on_btnAddData_clicked(void)
 {
 	// Ensure there is a selected widget, if not immediately return.
@@ -99,7 +105,8 @@ void wDataEditor::on_btnAddData_clicked(void)
 	}
 }
 
-/// Removes the current selected data set.
+/// Determines the selected files in the UI and removes them when btnRemoveData
+/// is clicked.
 void wDataEditor::on_btnRemoveData_clicked()
 {
 	if(!mGLWidget)
@@ -118,6 +125,7 @@ void wDataEditor::on_btnRemoveData_clicked()
     }
 }
 
+/// Refreshes the data displayed in treeOpenFiles
 void wDataEditor::refreshTree()
 {
 	this->treeOpenFiles->setHeaderHidden(false);
@@ -137,6 +145,7 @@ void wDataEditor::setGLWidget(CGLWidgetPtr gl_widget)
 	refreshTree();
 }
 
+/// Check the status of various UI elements and enable/disable buttons accordingly.
 void wDataEditor::toggleButtons()
 {
 	this->btnAddData->setEnabled(false);

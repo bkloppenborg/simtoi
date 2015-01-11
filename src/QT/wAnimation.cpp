@@ -31,6 +31,7 @@ wAnimation::~wAnimation()
 	mAnimator.wait();
 }
 
+/// Enqueues a render operation in the CGLWidget
 void wAnimation::enqueueRender(double time)
 {
 	mGLWidget->SetTime(time);
@@ -39,6 +40,7 @@ void wAnimation::enqueueRender(double time)
 	update_time(time);
 }
 
+/// Decrement the current time by 10 times the spinbox value, then enqueue a render
 void wAnimation::on_btnStepBackward2_clicked()
 {
 	double start_time = this->doubleSpinBoxJD->value();
@@ -47,6 +49,7 @@ void wAnimation::on_btnStepBackward2_clicked()
 	enqueueRender(start_time - 10 *step);
 }
 
+/// Decrement the time by spinbox value, then enqueue a render
 void wAnimation::on_btnStepBackward_clicked()
 {
 	double start_time = this->doubleSpinBoxJD->value();
@@ -55,6 +58,7 @@ void wAnimation::on_btnStepBackward_clicked()
 	enqueueRender(start_time - step);
 }
 
+/// Start / stop the animiation widget, update the play/pause button
 void wAnimation::on_btnPlayPause_clicked()
 {
 	if(mAnimator.isRunning())
@@ -77,6 +81,7 @@ void wAnimation::on_btnPlayPause_clicked()
 	}
 }
 
+/// Increment the time by spinbox value, then enqueue a render
 void wAnimation::on_btnStepForward_clicked()
 {
 	double start_time = this->doubleSpinBoxJD->value();
@@ -85,6 +90,7 @@ void wAnimation::on_btnStepForward_clicked()
 	enqueueRender(start_time + step);
 }
 
+/// Increment the time by 10 times the spinbox value, then enqueue a render
 void wAnimation::on_btnStepForward2_clicked()
 {
 	double start_time = this->doubleSpinBoxJD->value();
@@ -93,6 +99,8 @@ void wAnimation::on_btnStepForward2_clicked()
 	enqueueRender(start_time + 10 * step);
 }
 
+/// Update the current time to the value specified. Will do nothing if the
+/// animation widget is running.
 void wAnimation::on_doubleSpinBoxJD_valueChanged(double value)
 {
 	double start_time = this->doubleSpinBoxJD->value();
@@ -101,6 +109,7 @@ void wAnimation::on_doubleSpinBoxJD_valueChanged(double value)
 		enqueueRender(start_time);
 }
 
+/// Update the current timestep
 void wAnimation::on_doubleSpinBoxRate_valueChanged(double value)
 {
 	emit(timestep_updated(value));
@@ -127,6 +136,7 @@ void wAnimation::toggleButtons()
 		this->setEnabled(true);
 }
 
+/// Updates the current time stored in the animation widget.
 void wAnimation::update_time(double value)
 {
 	this->doubleSpinBoxJD->setValue(value);

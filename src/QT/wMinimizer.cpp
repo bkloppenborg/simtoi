@@ -56,6 +56,7 @@ void wMinimizer::toggleButtons()
 		this->setEnabled(true);
 }
 
+/// Sets the desired save directory. Creates the directory if it does not exist.
 void wMinimizer::setSaveDirectory(const string & save_directory)
 {
 	// verify the save directory exists, if not create it
@@ -68,7 +69,16 @@ void wMinimizer::setSaveDirectory(const string & save_directory)
 	textSaveFolder->setText(q_save_directory);
 }
 
-
+/// Starts a minimization
+///
+/// In order to start the minimization engine, the following must hold
+///  * At least one data file is loaded
+///	 * At least one model exists
+/// If one of these is not true, a dialog will be displayed to the user and
+/// no minimization engine will be started.
+///
+/// \param minimizer_id The desired minimizer. See CMinimizerFactory for string names
+/// \param save_directory The directory in which temporary output data should be saved.
 void wMinimizer::startMinimizer(const string & minimizer_id, const string & save_directory)
 {
 	// Look up the minimizer
@@ -127,19 +137,25 @@ void wMinimizer::startMinimizer(const string & minimizer_id, const string & save
 	}
 }
 
+/// \brief Run specific operations when a minimizer is started.
+///
+/// Toggles the start/stop button and emits the `started` signal.
 void wMinimizer::minimizerStarted()
 {
 	btnStartStop->setText(QString("Stop"));
 	emit started();
 }
 
+/// \brief Run specific operations when a minimizer has finished.
+///
+/// Toggles the start/stop button and emits the `finished` signal.
 void wMinimizer::minimizerFinished()
 {
 	btnStartStop->setText(QString("Start"));
 	emit finished();
 }
 
-/// Starts the minimizer
+///	\brief Start or stop the minimization engine when btnStartStop is clicked
 void wMinimizer::on_btnStartStop_clicked()
 {
 	/// TODO: Handle thread-execution exceptions that might be thrown.
