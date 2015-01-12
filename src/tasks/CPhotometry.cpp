@@ -70,6 +70,11 @@ CTaskPtr CPhotometry::Create(CWorkerThread * WorkerThread)
 	return CTaskPtr(new CPhotometry(WorkerThread));
 }
 
+void CPhotometry::clearData()
+{
+	mData.clear();
+}
+
 void CPhotometry::Export(string folder_name)
 {
 	InitBuffers();

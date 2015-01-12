@@ -74,6 +74,8 @@ public:
 
 	virtual void Export(string folder_name) = 0;
 
+	virtual void clearData() = 0;
+
 	virtual CDataInfo getDataInfo() = 0;
 
 	virtual void GetChi(double * chis, unsigned int size) = 0;

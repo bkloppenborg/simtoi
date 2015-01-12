@@ -38,6 +38,7 @@ public:
 protected:
 	void setSaveDirectory(const string & save_directory);
 
+public:
 	void toggleButtons();
 
 signals:

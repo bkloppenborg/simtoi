@@ -91,7 +91,7 @@ void wMinimizer::setGLWidget(CGLWidget * gl_widget)
 {
 	mGLWidget = gl_widget;
 
-	toggleButtons();
+//	toggleButtons();
 }
 
 

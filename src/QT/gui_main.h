@@ -56,12 +56,7 @@ protected:
 
     string mShaderSourceDir;
     string mKernelSourceDir;
-    bool mAnimating;
-    bool mAutoClose;
 
-    string mDefaultSaveDir; // Stores the default save path
-    int mNumMinimizations; // The number of minimization runs (used for automatic savefile naming).
-    string mOpenDataDir;	// Stores the previously opened directory for data files
     string mOpenModelDir; 	// Stores the previously opened directory for models
 
 public:

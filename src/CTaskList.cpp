@@ -38,6 +38,12 @@ void CTaskList::BootstrapNext(unsigned int maxBootstrapFailures)
 	}
 }
 
+void CTaskList::clearData()
+{
+	for(auto task: mTasks)
+		task->clearData();
+}
+
 void CTaskList::Export(string export_folder)
 {
 	// Each task can optionally write information to a summary file. Be sure

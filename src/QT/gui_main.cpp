@@ -76,8 +76,6 @@ gui_main::gui_main(QWidget *parent_widget)
 	// establish cross-widget signal slot connections
 	// minimization finished -> update parameter values
 	connect(wMinimizerWidget, SIGNAL(finished()), wModelParameterEditor, SLOT(updateModels()));
-
-	toggleWidgets();
 }
 
 gui_main::~gui_main()
@@ -92,17 +90,11 @@ void gui_main::Init(void)
 	this->setupUi(this);
 	this->setWindowTitle("SIMTOI");
 
-	// Now init variables:
-
-	mAnimating = false;
-	mAutoClose = false;
-
 	// Get the application path,
 	string app_path = QCoreApplication::applicationDirPath().toStdString();
 	mShaderSourceDir = app_path + "/shaders/";
 	mKernelSourceDir = app_path + "/kernels/";
 
-	mOpenDataDir = "./";
 	mOpenModelDir = "./";
 }
 
@@ -146,6 +138,11 @@ void gui_main::run_command_line(QStringList & data_files, QString & model_file,
 
 void gui_main::toggleWidgets()
 {
+    wModelParameterEditor->toggleButtons();
+    wOpenDataEditor->toggleButtons();
+    wAnimationWidget->toggleButtons();
+    wMinimizerWidget->toggleButtons();
+
 	// enable all of the tabs in the bottom
 	for(unsigned int i = 0; i < tabBottom->count(); i++)
 		tabBottom->setTabEnabled(i, true);
@@ -177,7 +174,7 @@ void gui_main::on_actionOpen_triggered()
 {
    // Open a dialog, get a list of file that the user selected:
 	QFileDialog dialog(this);
-	dialog.setDirectory(QString::fromStdString(mOpenDataDir));
+	dialog.setDirectory(QString::fromStdString(mOpenModelDir));
 	dialog.setNameFilter(tr("SIMTOI Model Files (*.json)"));
 	dialog.setFileMode(QFileDialog::ExistingFile);
 

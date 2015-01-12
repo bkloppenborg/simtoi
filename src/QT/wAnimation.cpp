@@ -124,8 +124,6 @@ void wAnimation::setGLWidget(CGLWidget * gl_widget)
 
 	mAnimator.stop();
 	mAnimator.setGLWidget(gl_widget);
-
-	toggleButtons();
 }
 
 /// Automatically (de)acitvate buttons depending on the status of various properties

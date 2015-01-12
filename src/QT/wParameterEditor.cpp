@@ -265,7 +265,6 @@ void wParameterEditor::setGLWidget(CGLWidget * gl_widget)
 	connect(&mTreeModel, SIGNAL(parameterUpdated()), mGLWidget, SLOT(updateParameters()));
 	connect(mGLWidget, SIGNAL(modelUpdated()), this, SLOT(updateModels()));
 
-	toggleButtons();
 	refreshTree();
 }
 

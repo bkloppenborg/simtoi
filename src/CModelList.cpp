@@ -58,6 +58,10 @@ void CModelList::AddModel(CModelPtr model)
 	mModels.push_back(model);
 }
 
+void CModelList::clear()
+{
+	mModels.clear();
+}
 
 /// \brief Returns the total number of free parameters in all models
 int CModelList::GetNFreeParameters()

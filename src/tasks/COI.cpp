@@ -140,6 +140,16 @@ CTaskPtr COI::Create(CWorkerThread * WorkerThread)
 	return CTaskPtr(new COI(WorkerThread));
 }
 
+void COI::clearData()
+{
+	unsigned int n_data_sets = mLibOI->GetNDataSets();
+
+	for(int i = n_data_sets - 1; i > -1; i--)
+	{
+		mLibOI->RemoveData(i);
+	}
+}
+
 void COI::Export(string folder_name)
 {
 	InitBuffers();

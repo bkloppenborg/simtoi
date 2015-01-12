@@ -51,10 +51,6 @@ extern string EXE_FOLDER;
 CGLWidget::CGLWidget(QWidget * widget_parent)
     : QGLWidget(widget_parent)
 { 
-	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context
-	setAutoBufferSwap(false);
-    this->doneCurrent();
-
     // Immediately initialize the worker thread. This will claim the OPenGL context.
 	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
 
@@ -161,9 +157,35 @@ void CGLWidget::Open(string filename)
 	emit modelUpdated();
 }
 
-void CGLWidget::paintEvent(QPaintEvent *)
+//void CGLWidget::paintEvent(QPaintEvent * )
+//{
+//	Render();
+//}
+
+/// Override the QGLWidget::glDraw function when the worker thread is running.
+void CGLWidget::glDraw()
 {
-    mWorker->Render();
+	// If the worker is not running, we render using the default glDraw function
+	// (which eventually calls paintGL).
+	if(!mWorker->isRunning())
+	{
+		QGLWidget::glDraw();
+	}
+	else
+	{
+		Render();
+	}
+}
+
+/// Renders to the default OpenGL framebuffer
+void CGLWidget::paintGL()
+{
+	// Until the worker thread is running, we render a blank gray window.
+	if(!mWorker->isRunning())
+	{
+		glClearColor(0.5, 0.5, 0.5, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
 }
 
 void CGLWidget::Render()
@@ -220,6 +242,10 @@ void CGLWidget::SetTime(double time)
 
 void CGLWidget::startRendering()
 {
+	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context
+	setAutoBufferSwap(false);
+    this->doneCurrent();
+
 	// Tell the thread to start.
     mWorker->start();
 }

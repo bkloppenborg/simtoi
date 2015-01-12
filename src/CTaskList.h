@@ -34,6 +34,8 @@ public:
 
 	void BootstrapNext(unsigned int maxBootstrapFailures);
 
+	void clearData();
+
 	void Export(string export_folder);
 
 	void GetChi(double * chis, unsigned int size);

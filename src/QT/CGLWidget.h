@@ -83,7 +83,9 @@ public:
 protected:
     void closeEvent(QCloseEvent *evt);
 
-	void paintEvent(QPaintEvent * );
+//	void paintEvent(QPaintEvent * );
+	void glDraw();	// override the QGLWidget::glDraw function
+	void paintGL();
 
     void resizeEvent(QResizeEvent *evt);
 

@@ -65,6 +65,7 @@ public:
 	virtual void BootstrapNext(unsigned int maxBootstrapFailures);
 
 	static CTaskPtr Create(CWorkerThread * worker);
+	void clearData();
 
 	void Export(string folder_name);
 

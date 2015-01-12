@@ -68,6 +68,8 @@ public:
 
 	void AddModel(CModelPtr model);
 
+	void clear();
+
 	int GetNFreeParameters();
 	void GetAllParameters(double * params, int n_params);
 	vector< pair<double, double> > GetFreeParamMinMaxes();

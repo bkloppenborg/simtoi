@@ -143,7 +143,6 @@ void wDataEditor::setGLWidget(CGLWidget * gl_widget)
 	// connect any non-automatic signal/slots
 	connect(mGLWidget, SIGNAL(dataAdded(CDataInfo)), this, SLOT(addData(CDataInfo)));
 
-	toggleButtons();
 	refreshTree();
 }
 
