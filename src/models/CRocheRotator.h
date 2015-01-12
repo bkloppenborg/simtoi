@@ -28,10 +28,6 @@ public:
 	CRocheRotator();
 	virtual ~CRocheRotator();
 
-private:
-	double lambda;
-	double mTime;
-
 public:
 
 	void Render(const glm::mat4 & view);

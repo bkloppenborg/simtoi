@@ -22,9 +22,6 @@ CRocheRotator::CRocheRotator() :
 	addParameter("omega_rot", 0.5, 0, 1, false, 0.1, "omega", "Fraction of critical rotational velocity [range: 0...1]");
 	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)");
 	addParameter("von_zeipel_beta", 0.5, 0.01, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
-
-	// TODO: Remove this variable
-	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 }
 
 CRocheRotator::~CRocheRotator()
@@ -141,7 +138,7 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 			max_temperature = mPixelTemperatures[i];
 	}
 	// Convert temperatures to fluxes.
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 
@@ -190,7 +187,7 @@ void CRocheRotator::Render(const glm::mat4 & view)
 			max_temperature = mPixelTemperatures[i];
 	}
 
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, mVBOData);
 

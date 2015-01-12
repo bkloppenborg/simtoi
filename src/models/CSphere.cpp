@@ -48,12 +48,13 @@ CSphere::CSphere()
 	id = "sphere";
 	name = "Sphere";
 
-	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective temperature (kelvin)");
 	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere");
 
 	mNumElements = 0;
 
 	mFluxTexture.resize(1);	// single element texture.
+	mPixelTemperatures.resize(1);
 
 	mModelReady = false;
 }
@@ -197,9 +198,11 @@ void CSphere::Render(const glm::mat4 & view)
 	double radius = float(mParams["diameter"].getValue() / 2);
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
-	// Set the color.
-	mFluxTexture[0].r = mParams["color"].getValue();
-	mFluxTexture[0].a = 1.0;
+	double max_temperature = float(mParams["T_eff"].getValue());
+
+	// Set the flux
+	mPixelTemperatures[0] = max_temperature;
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();

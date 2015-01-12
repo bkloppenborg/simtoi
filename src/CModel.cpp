@@ -58,6 +58,7 @@ CModel::CModel()
 	mShader = CShaderPtr();
 	mFluxTextureID = 0;
 	mTime = 0;
+	mWavelength = 1.65e-6;	// H-band (meters)
 	mZAxisRotationDelta = 0;
 	mModelReady = false;
 
@@ -662,6 +663,12 @@ void CModel::SetShader(string shader_id)
 void CModel::SetShader(CShaderPtr shader)
 {
 	mShader = shader;
+}
+
+void CModel::SetWavelength(double wavelength)
+{
+	assert(wavelength > 0);
+	mWavelength = wavelength;
 }
 
 /// Computes the flux for pixels given the input temperatures following Planck's

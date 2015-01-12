@@ -26,8 +26,6 @@ CRocheLobe::CRocheLobe() :
 	addParameter("separation", 4.0 , 0.1, 100.0, false, 0.01, "Separation", "Separation between components (mas)");
 	addParameter("mass_ratio", 3.0 , 0.001, 100.0, false, 0.01, "Mass ratio", "Mass ratio M2/M1) (unitless)");
 	addParameter("asynchronism_ratio", 1.0 , 0.01, 2.0, false, 0.01, "Async ratio", "Asynchronous ratio rotation/revolution (unitless)");
-
-	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 	//	omega_rot = 2.0 * PI / (orbital_period * 3600. * 24.); // in Hz
 }
 
@@ -195,7 +193,7 @@ void CRocheLobe::Render(const glm::mat4 & view)
 			max_temperature = mPixelTemperatures[i];
 	}
 
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, mVBOData);
 
@@ -277,7 +275,7 @@ void CRocheLobe::GenerateModel(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperatures to fluxes.
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 

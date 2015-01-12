@@ -92,7 +92,8 @@ class CModel: public CParameterMap
 
 protected:
 
-	double mTime;		///< The current time for this object.
+	double mTime;		///< The current time for this object (days)
+	double mWavelength; ///< The current wavelength of observation (meters)
 	double mZAxisRotationDelta; ///< A delta applied to the rotation about the z-axis, set by SetTime
 
 	CPositionPtr mPosition;	///< A shared pointer to the position object.
@@ -166,6 +167,7 @@ public:
 	virtual void SetShader(CShaderPtr shader);
 
 	virtual void SetTime(double time);
+	void SetWavelength(double wavelength);
 protected:
 	void SetupMatrix();
 
