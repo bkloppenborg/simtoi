@@ -240,6 +240,12 @@ void CGLWidget::SetTime(double time)
 	mWorker->SetTime(time);
 }
 
+/// Set the wavelength to the specified value (in meters)
+void CGLWidget::setWavelength(double wavelength)
+{
+	mWorker->SetWavelength(wavelength);
+}
+
 void CGLWidget::startRendering()
 {
 	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context

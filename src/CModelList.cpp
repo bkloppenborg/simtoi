@@ -280,6 +280,16 @@ void CModelList::SetTime(double t)
     }
 }
 
+/// Sets the wavelength for all of the models
+void CModelList::SetWavelength(double wavelength)
+{
+	mWavelength = wavelength;
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
+    {
+    	(*it)->SetWavelength(wavelength);
+    }
+}
+
 bool CModelList::SortByZ(const CModelPtr & A, const CModelPtr & B)
 {
 	double ax, ay, az;

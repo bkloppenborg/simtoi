@@ -60,7 +60,8 @@ protected:
 	vector<CModelPtr> mModels;
 
 protected:
-	double mTime;	///< The current time for the models in this list.
+	double mTime;	///< The current time for the models in this list (JD)
+	double mWavelength; ///< The current wavelength of observation (meters)
 
 public:
 	CModelList();
@@ -91,6 +92,7 @@ public:
 	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
 	void SetTime(double t);
 	void SetTimestep(double dt);
+	void SetWavelength(double wavelength);
 	unsigned int size() { return mModels.size(); };
 
 	static bool SortByZ(const CModelPtr & A, const CModelPtr & B);

@@ -117,6 +117,11 @@ void wAnimation::on_doubleSpinBoxRate_valueChanged(double value)
 	emit(timestep_updated(value));
 }
 
+void wAnimation::on_doubleSpinBoxWavelength_valueChanged(double value)
+{
+	mGLWidget->setWavelength(value);
+}
+
 /// Sets the current widget. Connects necessary signals and slots.
 void wAnimation::setGLWidget(CGLWidget * gl_widget)
 {
@@ -140,4 +145,10 @@ void wAnimation::toggleButtons()
 void wAnimation::update_time(double value)
 {
 	this->doubleSpinBoxJD->setValue(value);
+}
+
+/// Updates the current wavelength stored in the animation widget.
+void wAnimation::update_wavelength(double value)
+{
+	this->doubleSpinBoxWavelength->setValue(value);
 }

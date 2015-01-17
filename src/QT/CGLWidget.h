@@ -115,6 +115,7 @@ public:
     void SetSaveDirectory(string directory_path);
     void SetSize(unsigned int width, unsigned int height);
     void SetTime(double time);
+    void setWavelength(double wavelength);
     void startRendering();
     void stopRendering();
 

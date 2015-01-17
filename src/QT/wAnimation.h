@@ -52,9 +52,10 @@ public slots:
 
 	void on_doubleSpinBoxJD_valueChanged(double value);
 	void on_doubleSpinBoxRate_valueChanged(double value);
+	void on_doubleSpinBoxWavelength_valueChanged(double value);
 
 	void update_time(double new_time);
-
+	void update_wavelength(double new_wavelength);
 };
 
 #endif /* WANIMATION_H_ */

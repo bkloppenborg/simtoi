@@ -587,6 +587,10 @@ void CWorkerThread::run()
 			mModelList->SetTime(mTempDouble);
 			break;
 
+		case SET_WAVELENGTH:
+			mModelList->SetWavelength(mTempDouble);
+			break;
+
 		default:
 		case STOP:
 			ClearQueue();
@@ -632,6 +636,15 @@ void CWorkerThread::SetTime(double time)
 	Enqueue(RENDER);
 }
 
+void CWorkerThread::SetWavelength(double wavelength)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mTempDouble = wavelength;
+	Enqueue(SET_WAVELENGTH);
+	Enqueue(RENDER);
+}
 
 Json::Value CWorkerThread::Serialize()
 {

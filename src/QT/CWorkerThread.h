@@ -82,6 +82,7 @@ enum WorkerOperations
 	OPEN_DATA,
 	RENDER,
 	SET_TIME,
+	SET_WAVELENGTH,
 	STOP
 };
 
@@ -208,6 +209,7 @@ public:
     void SetScale(double scale);
     void SetSize(unsigned int width, unsigned int height);
     void SetTime(double time);
+    void SetWavelength(double wavelength);
     Json::Value Serialize();
     void stop();
 protected:
