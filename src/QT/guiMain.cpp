@@ -23,7 +23,7 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "gui_main.h"
+#include "guiMain.h"
 
 #include <QWidgetList>
 #include <QMdiArea>
@@ -56,7 +56,7 @@
 #include "CMinimizerFactory.h"
 
 
-gui_main::gui_main(QWidget *parent_widget)
+guiMain::guiMain(QWidget *parent_widget)
     : QMainWindow(parent_widget)
 {
 	Init();
@@ -78,13 +78,13 @@ gui_main::gui_main(QWidget *parent_widget)
 	connect(wMinimizerWidget, SIGNAL(finished()), wModelParameterEditor, SLOT(updateModels()));
 }
 
-gui_main::~gui_main()
+guiMain::~guiMain()
 {
 
 }
 
 /// Runs initialization routines for the main this->
-void gui_main::Init(void)
+void guiMain::Init(void)
 {
 	// Init the UI
 	this->setupUi(this);
@@ -99,13 +99,15 @@ void gui_main::Init(void)
 }
 
 /// Opens one saved model file.
-void gui_main::Open(QString & filename)
+void guiMain::Open(QString & filename)
 {
 	// Attempt to open the file.
 	try
 	{
 		wGLWidget->resetWidget();
 		wGLWidget->Open(filename.toStdString());
+		wGLWidget->startRendering();
+		wGLWidget->Render();
 	}
 	catch(runtime_error e)
 	{
@@ -119,13 +121,12 @@ void gui_main::Open(QString & filename)
 		return;
 	}
 
-	wGLWidget->startRendering();
 	toggleWidgets();
 }
 
 /// Create a new SIMTOI model area and runs the specified minimization engine on the data.  If close_simtoi is true
 /// SIMTOI will automatically exit when all minimization engines have completed execution.
-void gui_main::run_command_line(QStringList & data_files, QString & model_file,
+void guiMain::run_command_line(QStringList & data_files, QString & model_file,
 		string minimizer_id, string save_directory, bool close_simtoi)
 {
 	Open(model_file);
@@ -137,7 +138,7 @@ void gui_main::run_command_line(QStringList & data_files, QString & model_file,
 		connect(wMinimizerWidget, SIGNAL(finished()), this, SLOT(close()));
 }
 
-void gui_main::toggleWidgets()
+void guiMain::toggleWidgets()
 {
     wModelParameterEditor->toggleButtons();
     wOpenDataEditor->toggleButtons();
@@ -149,7 +150,7 @@ void gui_main::toggleWidgets()
 		tabBottom->setTabEnabled(i, true);
 }
 
-void gui_main::on_actionExport_triggered()
+void guiMain::on_actionExport_triggered()
 {
     // Open a dialog, get a list of file that the user selected:
  	QFileDialog dialog(this);
@@ -168,7 +169,7 @@ void gui_main::on_actionExport_triggered()
 	}
 }
 
-void gui_main::on_actionOpen_triggered()
+void guiMain::on_actionOpen_triggered()
 {
    // Open a dialog, get a list of file that the user selected:
 	QFileDialog dialog(this);
@@ -185,7 +186,7 @@ void gui_main::on_actionOpen_triggered()
 }
 
 /// Opens up a dialog for creating a new model region
-void gui_main::on_actionNew_triggered(void)
+void guiMain::on_actionNew_triggered(void)
 {
 	guiRegion dialog;
 	if(dialog.exec())
@@ -202,7 +203,7 @@ void gui_main::on_actionNew_triggered(void)
 	}
 }
 
-void gui_main::on_actionSave_triggered()
+void guiMain::on_actionSave_triggered()
 {
     string filename;
     QFileDialog dialog(this);

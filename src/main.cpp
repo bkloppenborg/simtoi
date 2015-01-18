@@ -53,7 +53,7 @@
 #include <iostream>
 
 #include "main.h"
-#include "gui_main.h"
+#include "QT/guiMain.h"
 
 using namespace std;
 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     	ParseArgs(args, data_files, model_file, minimizer_id, save_directory, close_simtoi);
 
     // Startup the GUI:
-    gui_main main_window;
+    guiMain main_window;
     main_window.show();
 
     if(data_files.size() > 0 || model_file.size() > 0)

@@ -23,10 +23,10 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef CMAINGUI_H
-#define CMAINGUI_H
+#ifndef CGUIMAIN_H
+#define CGUIMAIN_H
 
-#include "ui_gui_main.h"
+#include "ui_guiMain.h"
 
 #include <QtGui/QMainWindow>
 #include <QStandardItem>
@@ -44,7 +44,7 @@ class wMinimizer;
 
 typedef shared_ptr<CGLWidget> CGLWidgetPtr;
 
-class gui_main : public QMainWindow, private Ui::cmainguiClass
+class guiMain : public QMainWindow, private Ui::guiMain
 {
     Q_OBJECT
 
@@ -58,8 +58,8 @@ protected:
     string mOpenModelDir; 	// Stores the previously opened directory for models
 
 public:
-    gui_main(QWidget *parent = 0);
-    virtual ~gui_main();
+    guiMain(QWidget *parent = 0);
+    virtual ~guiMain();
 
 protected:
     void toggleWidgets();
@@ -77,4 +77,4 @@ private slots:
     void on_actionSave_triggered();
 };
 
-#endif // CMAINGUI_H
+#endif // CGUIMAIN_H
