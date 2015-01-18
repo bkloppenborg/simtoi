@@ -263,6 +263,8 @@ void CGLWidget::stopRendering()
 
     mWorker->stop();
     mWorker->wait();
+
+    this->makeCurrent();
 }
 
 //void CGLWidget::updateData(void)

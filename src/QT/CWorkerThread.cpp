@@ -480,7 +480,7 @@ void CWorkerThread::run()
 	// Immediately claim the OpenCL context
     mGLWidget->makeCurrent();
     // Create an OpenCL context
-	mOpenCL = COpenCLPtr(new COpenCL(CL_DEVICE_TYPE_GPU));
+    mOpenCL = make_shared<COpenCL>(CL_DEVICE_TYPE_GPU);
 
 	// ########
 	// OpenGL display initialization
@@ -599,6 +599,9 @@ void CWorkerThread::run()
 
 		}
 	}
+
+	// Release the OpenGL context
+	mGLWidget->doneCurrent();
 
 	emit finished();
 }
