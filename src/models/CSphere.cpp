@@ -48,8 +48,8 @@ CSphere::CSphere()
 	id = "sphere";
 	name = "Sphere";
 
-	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective temperature (kelvin)");
-	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)");
+	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere (mas)");
 
 	mNumElements = 0;
 
@@ -189,7 +189,15 @@ void CSphere::Init()
 	mModelReady = true;
 }
 
-void CSphere::Render(const glm::mat4 & view)
+
+void CSphere::preRender(double & max_flux)
+{
+	double temperature = float(mParams["T_eff"].getValue());
+	mPixelTemperatures[0] = temperature;
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
+}
+
+void CSphere::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
 	if(!mModelReady)
 		Init();
@@ -198,11 +206,7 @@ void CSphere::Render(const glm::mat4 & view)
 	double radius = float(mParams["diameter"].getValue() / 2);
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
-	double max_temperature = float(mParams["T_eff"].getValue());
-
-	// Set the flux
-	mPixelTemperatures[0] = max_temperature;
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
+	NormalizeFlux(max_flux);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
@@ -241,3 +245,4 @@ void CSphere::Render(const glm::mat4 & view)
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }
+

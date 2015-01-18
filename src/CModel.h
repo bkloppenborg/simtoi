@@ -153,8 +153,11 @@ protected:
 	virtual void InitShaderVariables();
 
 public:
-	virtual void Render(const glm::mat4 & view) = 0;
+	void NormalizeFlux(double max_flux);
+
 public:
+	virtual void preRender(double & max_flux) = 0;
+	virtual void Render(const glm::mat4 & view, const GLfloat & max_flux) = 0;
 	void Restore(Json::Value input);
 
 public:
@@ -173,9 +176,9 @@ protected:
 
 public:
 	static void TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
-			double wavelength, double max_temperature);
+			double wavelength, double & max_flux);
 	static void TemperatureToFlux(vector<double> temperatures, vector<vec4> & pixels,
-			double wavelength, double max_temperature);
+			double wavelength, double & max_flux);
 
 };
 

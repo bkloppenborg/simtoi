@@ -414,6 +414,12 @@ void CModel::InitTexture()
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to bind back to default buffer.");
 }
 
+void CModel::NormalizeFlux(double max_flux)
+{
+	for(int i = 0; i < mFluxTexture.size(); i++)
+		mFluxTexture[i] /= max_flux;
+}
+
 /// \brief Constructs the rotation matrix according to the set parameters.
 ///
 /// Note, if the position model is DYNAMIC (i.e. an orbit) the position angle
@@ -667,7 +673,7 @@ void CModel::SetShader(CShaderPtr shader)
 
 void CModel::SetWavelength(double wavelength)
 {
-	assert(wavelength > 0);
+	assert(wavelength >= 0);
 	mWavelength = wavelength;
 }
 
@@ -676,22 +682,31 @@ void CModel::SetWavelength(double wavelength)
 /// @param temperatures An array of temperatures of in Kelvin
 /// @param fluxes Array into which computed fluxes will be stored
 /// @param wavelength The wavelength of observation
-/// @param max_temperature The maximum temperature of all models (used for normalization)
+/// @param max_flux The maximum flux found in this model
 void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
-		double wavelength, double max_temperature)
+		double wavelength, double & max_flux)
 {
 	// The pixel and temperature buffers must be of the same size.
 	assert(fluxes.size() == temperatures.size());
 
 	// Planck's law:
-	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
-	// h*c/k = 0.0143877696 m K
-	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	// B(lambda, T) =  2*h*c^2 / lambda^5 * 1 / {exp[(h*c/k_b)/(lambda*T)] - 1}
+	// c1 = 2*h*c^2 / lambda^5
+	double c1 = 1.19104287E-16 / pow(wavelength, 5); // m-1 kg / s3
+	// c1 is not needed because the wavelength will be the same for all models
+	// c2 = h*c / k_b
+	double c2 = 0.0143877696;  // m K
+
+	double flux = 0;
 	for (unsigned int i = 0; i < temperatures.size(); i++)
 	{
-		fluxes[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+		flux = c1 / (exp(c2 / (wavelength * temperatures[i])) - 1.0);
 
-		fluxes[i] /= max_flux;
+		// update the maximum flux
+		if(flux > max_flux)
+			max_flux = flux;
+
+		fluxes[i] = flux;
 	}
 
 }
@@ -701,25 +716,33 @@ void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & flux
 /// @param temperatures An array of temperatures of in Kelvin
 /// @param pixels A vector of RGBA pixels into which the computes fluxes will be stored
 /// @param wavelength The wavelength of observation
-/// @param max_temperature The maximum temperature of all models (used for normalization)
+/// @param max_flux The maximum flux found in this model
 void CModel::TemperatureToFlux(vector<double> temperatures, vector<vec4> & fluxes,
-		double wavelength, double max_temperature)
+		double wavelength, double & max_flux)
 {
 	// The pixel and temperature buffers must be of the same size.
 	assert(fluxes.size() == temperatures.size());
 
 	// Planck's law:
-	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
-	// h*c/k = 0.0143877696 m K
-	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	// B(lambda, T) =  2*h*c^2 / lambda^5 * 1 / {exp[(h*c/k_b)/(lambda*T)] - 1}
+	// c1 = 2*h*c^2 / lambda^5
+	// double c1 = 1.19104287E-16 / pow(wavelength, 5); // m-1 kg / s3
+	// c1 is not needed because the wavelength will be the same for all models
+	// c2 = h*c / k_b
+	double c2 = 0.0143877696;  // m K
+
+	double flux = 0;
 	for (unsigned int i = 0; i < temperatures.size(); i++)
 	{
 		// fill in the Red component.
-		fluxes[i].r = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+		flux = 1.0 / (exp(c2 / (wavelength * temperatures[i])) - 1.0);
 
-		fluxes[i].r /= max_flux;
+		// update the maximum flux
+		if(flux > max_flux)
+			max_flux = flux;
+
+		fluxes[i].r = flux;
 	}
-
 }
 
 /// \brief Constructs the translation matrix from the position model.

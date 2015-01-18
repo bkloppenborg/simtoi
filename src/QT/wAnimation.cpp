@@ -119,6 +119,9 @@ void wAnimation::on_doubleSpinBoxRate_valueChanged(double value)
 
 void wAnimation::on_doubleSpinBoxWavelength_valueChanged(double value)
 {
+	// convert from a decimal number to micrometers
+	value *= 1E-6;
+	// set the wavelength
 	mGLWidget->setWavelength(value);
 }
 
