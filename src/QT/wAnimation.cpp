@@ -20,10 +20,16 @@ wAnimation::wAnimation(QWidget * parent)
 
 	mGLWidget = NULL;
 
-	// Set the  minimum and maximum values 0.1 -> 100 microns in 0.01 micron steps
+	// Set the  minimum and maximum wavelength values 0.1 -> 100 microns in 0.01 micron steps
 	mWavelengthSliderStep = 0.01;
-	slideWavelength->setMinimum(10);
-	slideWavelength->setMaximum(10000);
+	double minWavelength = 0.1;
+	double maxWavelength = 100;
+	doubleSpinBoxWavelength->setMinimum(minWavelength);
+	doubleSpinBoxWavelength->setMaximum(maxWavelength);
+	slideWavelength->setMinimum(int(minWavelength / mWavelengthSliderStep));
+	slideWavelength->setMaximum(int(maxWavelength / mWavelengthSliderStep));
+	// set the default wavelength to the center of H-band
+	doubleSpinBoxWavelength->setValue(1.65);
 
 	// connect any non-automatic signal/slots
 	connect(&mAnimator, SIGNAL(update_time(double)), this, SLOT(update_time(double)));
@@ -184,5 +190,6 @@ void wAnimation::update_time(double value)
 /// Updates the current wavelength stored in the animation widget.
 void wAnimation::update_wavelength(double value)
 {
+	// Updating one of the two widgets will
 	this->doubleSpinBoxWavelength->setValue(value);
 }
