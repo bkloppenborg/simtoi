@@ -107,6 +107,19 @@ void wDataEditor::on_btnAddData_clicked(void)
 	}
 }
 
+/// Handle click events on the tree region
+void wDataEditor::on_treeOpenFiles_clicked(const QModelIndex & index)
+{
+	// Columns are: filename, data_type, jd_start, jd_end, jd_mean, chi2r
+	int col = index.column();
+	if(col == 2 || col == 3 || col == 4)
+	{
+		QStandardItem *	item = mOpenFileModel.itemFromIndex (index);
+		double jd = item->data(Qt::DisplayRole).toDouble();
+		emit(timeSelected(jd));
+	}
+}
+
 /// Determines the selected files in the UI and removes them when btnRemoveData
 /// is clicked.
 void wDataEditor::on_btnRemoveData_clicked()

@@ -59,8 +59,8 @@ public slots:
 
 	void on_slideWavelength_valueChanged(int value);
 
-	void update_time(double new_time);
-	void update_wavelength(double new_wavelength);
+	void updateTime(double new_time);
+	void updateWavelength(double new_wavelength);
 };
 
 #endif /* WANIMATION_H_ */

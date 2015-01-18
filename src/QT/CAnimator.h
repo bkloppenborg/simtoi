@@ -39,12 +39,12 @@ public:
 
 	void run();
 
+signals:
+	void updateTime(double new_time);
+
 public slots:
 	void setTime(double time);
 	void setStep(double step);
-
-signals:
-	void update_time(double new_time);
 };
 
 #endif /* CANIMATOR_H_ */

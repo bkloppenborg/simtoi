@@ -76,6 +76,9 @@ guiMain::guiMain(QWidget *parent_widget)
 	// establish cross-widget signal slot connections
 	// minimization finished -> update parameter values
 	connect(wMinimizerWidget, SIGNAL(finished()), wModelParameterEditor, SLOT(updateModels()));
+	// data widget data selection ->
+	connect(wOpenDataEditor, SIGNAL(timeSelected(double)), wAnimationWidget, SLOT(updateTime(double)));
+	connect(wOpenDataEditor, SIGNAL(wavelengthSelected(double)), wAnimationWidget, SLOT(updateWavelength(double)));
 }
 
 guiMain::~guiMain()

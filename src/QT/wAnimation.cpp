@@ -32,7 +32,7 @@ wAnimation::wAnimation(QWidget * parent)
 	doubleSpinBoxWavelength->setValue(1.65);
 
 	// connect any non-automatic signal/slots
-	connect(&mAnimator, SIGNAL(update_time(double)), this, SLOT(update_time(double)));
+	connect(&mAnimator, SIGNAL(updateTime(double)), this, SLOT(updateTime(double)));
 	connect(this, SIGNAL(timestep_updated(double)), &mAnimator, SLOT(setStep(double)));;
 
 	setEnabled(false);
@@ -53,7 +53,7 @@ void wAnimation::enqueueRender(double time)
 	mGLWidget->SetTime(time);
 	mGLWidget->Render();
 
-	update_time(time);
+	updateTime(time);
 }
 
 /// Decrement the current time by 10 times the spinbox value, then enqueue a render
@@ -182,13 +182,14 @@ void wAnimation::toggleButtons()
 }
 
 /// Updates the current time stored in the animation widget.
-void wAnimation::update_time(double value)
+void wAnimation::updateTime(double value)
 {
-	this->doubleSpinBoxJD->setValue(value);
+	if(value > 0)
+		this->doubleSpinBoxJD->setValue(value);
 }
 
 /// Updates the current wavelength stored in the animation widget.
-void wAnimation::update_wavelength(double value)
+void wAnimation::updateWavelength(double value)
 {
 	// Updating one of the two widgets will
 	this->doubleSpinBoxWavelength->setValue(value);

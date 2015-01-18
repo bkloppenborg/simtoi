@@ -41,10 +41,15 @@ public:
 	void toggleButtons();
 	void refreshTree();
 
+signals:
+	void timeSelected(double JD);
+	void wavelengthSelected(double wavelength);
+
 private slots:
 
 	void on_btnAddData_clicked();
 	void on_btnRemoveData_clicked();
+	void on_treeOpenFiles_clicked(const QModelIndex & index);
 
 	void addData(CDataInfo data_info);
 	void dataRemoved(unsigned int index);

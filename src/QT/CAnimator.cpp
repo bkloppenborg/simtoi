@@ -43,7 +43,7 @@ void CAnimator::run()
 		this->msleep(50);
 		mTime += mStep;
 
-		emit(update_time(mTime));
+		emit(updateTime(mTime));
 	}
 }
 
