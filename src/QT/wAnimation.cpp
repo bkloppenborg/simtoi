@@ -20,9 +20,14 @@ wAnimation::wAnimation(QWidget * parent)
 
 	mGLWidget = NULL;
 
+	// Set the  minimum and maximum values 0.1 -> 100 microns in 0.01 micron steps
+	mWavelengthSliderStep = 0.01;
+	slideWavelength->setMinimum(10);
+	slideWavelength->setMaximum(10000);
+
 	// connect any non-automatic signal/slots
 	connect(&mAnimator, SIGNAL(update_time(double)), this, SLOT(update_time(double)));
-	connect(this, SIGNAL(timestep_updated(double)), &mAnimator, SLOT(setStep(double)));
+	connect(this, SIGNAL(timestep_updated(double)), &mAnimator, SLOT(setStep(double)));;
 
 	setEnabled(false);
 }
@@ -36,6 +41,9 @@ wAnimation::~wAnimation()
 /// Enqueues a render operation in the CGLWidget
 void wAnimation::enqueueRender(double time)
 {
+	if(!mGLWidget)
+		return;
+
 	mGLWidget->SetTime(time);
 	mGLWidget->Render();
 
@@ -119,10 +127,23 @@ void wAnimation::on_doubleSpinBoxRate_valueChanged(double value)
 
 void wAnimation::on_doubleSpinBoxWavelength_valueChanged(double value)
 {
-	// convert from a decimal number to micrometers
-	value *= 1E-6;
-	// set the wavelength
-	mGLWidget->setWavelength(value);
+	int i_wavelength = int(value / mWavelengthSliderStep);
+
+	slideWavelength->blockSignals(true);
+	slideWavelength->setValue(i_wavelength);
+	slideWavelength->blockSignals(false);
+
+	setWavelength(value);
+}
+
+void wAnimation::on_slideWavelength_valueChanged(int value)
+{
+	double wavelength = value * mWavelengthSliderStep;
+	doubleSpinBoxWavelength->blockSignals(true);
+	doubleSpinBoxWavelength->setValue(wavelength);
+	doubleSpinBoxWavelength->blockSignals(false);
+
+	setWavelength(wavelength);
 }
 
 /// Sets the current widget. Connects necessary signals and slots.
@@ -132,6 +153,16 @@ void wAnimation::setGLWidget(CGLWidget * gl_widget)
 
 	mAnimator.stop();
 	mAnimator.setGLWidget(gl_widget);
+}
+
+void wAnimation::setWavelength(double value)
+{
+	// set the wavelength only if the widget exists
+	if(mGLWidget)
+	{
+		value *= 1E-6;	// convert from micrometers to meters
+		mGLWidget->setWavelength(value);
+	}
 }
 
 /// Automatically (de)acitvate buttons depending on the status of various properties

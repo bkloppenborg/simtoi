@@ -28,6 +28,8 @@ protected:
 	CGLWidget * mGLWidget;
     CAnimator mAnimator;
 
+    double mWavelengthSliderStep;
+
 public:
     wAnimation(QWidget * parent = 0);
 	virtual ~wAnimation();
@@ -38,6 +40,7 @@ public:
 
 protected:
 	void enqueueRender(double time);
+	void setWavelength(double value);
 
 signals:
 	void timestep_updated(double new_step_size);
@@ -53,6 +56,8 @@ public slots:
 	void on_doubleSpinBoxJD_valueChanged(double value);
 	void on_doubleSpinBoxRate_valueChanged(double value);
 	void on_doubleSpinBoxWavelength_valueChanged(double value);
+
+	void on_slideWavelength_valueChanged(int value);
 
 	void update_time(double new_time);
 	void update_wavelength(double new_wavelength);
