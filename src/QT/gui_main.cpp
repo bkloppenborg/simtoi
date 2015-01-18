@@ -104,6 +104,7 @@ void gui_main::Open(QString & filename)
 	// Attempt to open the file.
 	try
 	{
+		wGLWidget->resetWidget();
 		wGLWidget->Open(filename.toStdString());
 	}
 	catch(runtime_error e)
@@ -150,9 +151,6 @@ void gui_main::toggleWidgets()
 
 void gui_main::on_actionExport_triggered()
 {
-    if(!mGLWidget)
-    	return;
-
     // Open a dialog, get a list of file that the user selected:
  	QFileDialog dialog(this);
  	dialog.setFileMode(QFileDialog::Directory);
@@ -166,7 +164,7 @@ void gui_main::on_actionExport_triggered()
 		if(!QDir(filenames[0]).exists())
 			QDir().mkdir(filenames[0]);
 
-		mGLWidget->Export(filenames[0]);
+		wGLWidget->Export(filenames[0]);
 	}
 }
 
@@ -196,6 +194,7 @@ void gui_main::on_actionNew_triggered(void)
 		unsigned int height = dialog.spinHeight->value();
 		double scale = dialog.spinScale->value();
 
+		wGLWidget->resetWidget();
 		wGLWidget->SetSize(width, height);
 		wGLWidget->SetScale(scale);
 		wGLWidget->startRendering();
@@ -205,9 +204,6 @@ void gui_main::on_actionNew_triggered(void)
 
 void gui_main::on_actionSave_triggered()
 {
-    if(!mGLWidget)
-    	return;
-
     string filename;
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::AnyFile);
@@ -224,7 +220,7 @@ void gui_main::on_actionSave_triggered()
 		if(filename.substr(filename.size() - 5, 5) != ".json")
 			filename += ".json";
 
-		mGLWidget->Save(filename);
+		wGLWidget->Save(filename);
 	}
 
 }

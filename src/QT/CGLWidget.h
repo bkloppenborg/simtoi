@@ -87,6 +87,9 @@ protected:
 	void glDraw();	// override the QGLWidget::glDraw function
 	void paintGL();
 
+public:
+	void resetWidget();
+protected:
     void resizeEvent(QResizeEvent *evt);
 
 public:

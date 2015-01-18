@@ -51,8 +51,8 @@ extern string EXE_FOLDER;
 CGLWidget::CGLWidget(QWidget * widget_parent)
     : QGLWidget(widget_parent)
 { 
-    // Immediately initialize the worker thread. This will claim the OPenGL context.
-	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
+	// Reset the worker thread
+	mWorker = make_shared<CWorkerThread>(this, QString::fromStdString(EXE_FOLDER));
 
 	mSaveDirectory = "";
 }
@@ -79,12 +79,6 @@ CModelPtr CGLWidget::getModel(unsigned int model_index)
 	return mWorker->getModel(model_index);
 }
 
-void CGLWidget::replaceModel(unsigned int model_index, CModelPtr new_model)
-{
-	mWorker->replaceModel(model_index, new_model);
-	emit modelUpdated();
-}
-
 void CGLWidget::removeData(unsigned int data_index)
 {
 //	mWorker->removeData(data_index);
@@ -95,6 +89,20 @@ void CGLWidget::removeModel(unsigned int model_index)
 {
 	mWorker->removeModel(model_index);
 	emit modelUpdated();
+}
+
+void CGLWidget::replaceModel(unsigned int model_index, CModelPtr new_model)
+{
+	mWorker->replaceModel(model_index, new_model);
+	emit modelUpdated();
+}
+
+void CGLWidget::resetWidget()
+{
+	mWorker = make_shared<CWorkerThread>(this, QString::fromStdString(EXE_FOLDER));
+
+	emit modelUpdated();
+	// TODO: emit something involving the data
 }
 
 void CGLWidget::closeEvent(QCloseEvent *evt)

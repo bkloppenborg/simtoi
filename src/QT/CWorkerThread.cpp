@@ -71,8 +71,11 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 CWorkerThread::~CWorkerThread()
 {
 	// Stop the thread if it is running. This is a blocking call.
-	if(mRun)
+	if(isRunning())
+	{
 		stop();
+		wait();
+	}
 
 	// Free local OpenGL objects.
 	if(mFBO_render) delete mFBO_render;

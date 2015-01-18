@@ -106,7 +106,7 @@ class CWorkerThread : public QThread
     Q_OBJECT
 protected:
     // OpenGL
-    CGLWidget * mGLWidget;
+    CGLWidget * mGLWidget;	///< Managed elsewhere, do not delete.
     unsigned int mImageDepth;
     unsigned int mImageHeight;
     double mImageScale;
@@ -136,7 +136,7 @@ protected:
 	QSemaphore mWorkerSemaphore;	// Acquire if a read/write operation is enqueued.
 
 	// Temporary storage locations
-	double * mTempArray;	// External memory. Don't allocate/deallocate.
+	double * mTempArray;	///< External memory. Don't allocate/deallocate.
 	unsigned int mTempArraySize;
 	string mTempString;
 	double mTempDouble;

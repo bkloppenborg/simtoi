@@ -49,10 +49,8 @@ class gui_main : public QMainWindow, private Ui::cmainguiClass
     Q_OBJECT
 
 protected:
-    CGLWidgetPtr mGLWidget;
-
-	wAnimation * wAnimationWidget; // pointer to animiation widget. Re-parented once created, don't delete.
-	wMinimizer * wMinimizerWidget; // pointer to the minimizer widget. Re-parented once created, don't delete.
+	wAnimation * wAnimationWidget; ///< pointer to animiation widget. Re-parented once created, don't delete.
+	wMinimizer * wMinimizerWidget; ///< pointer to the minimizer widget. Re-parented once created, don't delete.
 
     string mShaderSourceDir;
     string mKernelSourceDir;
