@@ -107,6 +107,7 @@ class CWorkerThread : public QThread
 protected:
     // OpenGL
     CGLWidget * mGLWidget;	///< Managed elsewhere, do not delete.
+    GLint mBufferFormat;
     unsigned int mImageDepth;
     unsigned int mImageHeight;
     double mImageScale;

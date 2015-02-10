@@ -62,6 +62,7 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageSamples = 4;
 
     mFBO_render = NULL;
+    mBufferFormat = GL_RGBA32F;
 
 	// Initialize the model and task lists:
     mModelList = CModelListPtr(new CModelList());
@@ -201,9 +202,10 @@ void CWorkerThread::BootstrapNext(unsigned int maxBootstrapFailures)
 /// Creates an RGBA32F MAA framebuffer
 QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
 {
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "A");
     // Create an RGBA32F MAA buffer
     QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
-    fbo_format.setInternalTextureFormat(GL_RGBA32F);
+    fbo_format.setInternalTextureFormat(mBufferFormat);
     fbo_format.setTextureTarget(GL_TEXTURE_2D);
 
     const QSize size(mImageWidth, mImageHeight);
@@ -265,7 +267,7 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 	glGenRenderbuffers(1, &FBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, FBO_texture);
 	// Create a 2D multisample texture
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA32F, width, height);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, mBufferFormat, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, FBO_texture);
 
 	glGenRenderbuffers(1, &FBO_depth);
