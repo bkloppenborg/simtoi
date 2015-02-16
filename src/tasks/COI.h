@@ -56,6 +56,9 @@ protected:
 
 	float * mTempFloat;
 
+	bool mIntegratedGPU;
+	GLfloat * mHostImage;
+
 	vector<OIDataList> mData;	/// A copy of the original data. Used when bootstrapping
 
 public:
@@ -66,6 +69,7 @@ public:
 
 	static CTaskPtr Create(CWorkerThread * worker);
 	void clearData();
+	void copyImage();
 
 	void Export(string folder_name);
 

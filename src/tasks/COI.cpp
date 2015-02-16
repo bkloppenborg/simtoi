@@ -34,7 +34,6 @@
 
 #include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
-
 #include <stdexcept>
 #include <fstream>
 #include "oi_tools.hpp"
@@ -56,6 +55,7 @@ COI::COI(CWorkerThread * WorkerThread)
 
 	mLibOI = NULL;
 	mLibOIInitialized = false;
+	mIntegratedGPU = false;
 
 	mTempFloat = NULL;
 
@@ -150,6 +150,26 @@ void COI::clearData()
 	}
 }
 
+void  COI::copyImage()
+{
+	// Intel integrated GPUs do not have cl_khr_gl_sharing on Linux, I don't know
+	// about AMD. Thus we explicitly copy the data from OpenGL to a host-side
+	// buffer, then copy the data back to the GPU. A total waste of resources
+	// but the only workaround which is reasonable at the present time.
+	if(mIntegratedGPU)
+	{
+		unsigned int width = mWorkerThread->GetImageWidth();
+		unsigned int height = mWorkerThread->GetImageHeight();
+		// something with mFBO_storage
+		glReadPixels(0, 0, width, height, GL_RED, GL_FLOAT, mHostImage);
+		mLibOI->CopyImageToBuffer(0);
+	}
+	else
+	{
+		mLibOI->CopyImageToBuffer(0);
+	}
+}
+
 void COI::Export(string folder_name)
 {
 	InitBuffers();
@@ -185,7 +205,7 @@ void COI::Export(string folder_name)
 		// Blit to the storage buffer (for liboi to use the image)
 		mWorkerThread->BlitToBuffer(mFBO_render, mFBO_storage);
 		mWorkerThread->BlitToScreen(mFBO_render);
-		mLibOI->CopyImageToBuffer(0);
+		copyImage();
 
 		// Now export the image, overwriting any image that already exists:
 		mLibOI->ExportImage("!" + folder_name + filename + "_model.fits");
@@ -260,7 +280,7 @@ void COI::GetChi(double * chis, unsigned int size)
 		// Blit to the screen (to show the user, not required, but nice.
 		mWorkerThread->BlitToScreen(mFBO_render);
 
-		mLibOI->CopyImageToBuffer(0);
+		copyImage();
 
 		// Notice, the ImageToChi expects a floating point array, not a valarray<float>.
 		// C++11 guarantees that storage is contiguous so we can do pointer math
@@ -347,7 +367,12 @@ void COI::InitBuffers()
 
 		// Initalize remaining OpenCL items.
 		mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
-		mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
+
+		if(mIntegratedGPU)
+			mLibOI->SetImageSource(mHostImage);
+		else
+			mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
+
 		mLibOI->SetImageInfo(width, height, depth, scale);
 
 		// Get LibOI up and running
@@ -369,7 +394,10 @@ void COI::InitGL()
 void COI::InitCL()
 {
 	// Initialize liboi using the worker thread's OpenCL+OpenGL context
-	mLibOI = new CLibOI(mWorkerThread->GetOpenCL());
+	COpenCLPtr OCL = mWorkerThread->GetOpenCL();
+	mLibOI = new CLibOI(OCL);
+	// detect if we have an integrated GPU
+	mIntegratedGPU = mLibOI->IsIntegratedDevice();
 }
 
 CDataInfo COI::OpenData(string filename)
