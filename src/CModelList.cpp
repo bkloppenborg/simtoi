@@ -169,7 +169,7 @@ void CModelList::Render(const mat4 & view)
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
-    double max_flux = 0;
+    double max_flux = 0.0;
     for(auto model : models)
     {
     	model->preRender(max_flux);

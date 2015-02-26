@@ -175,9 +175,9 @@ protected:
 	void SetupMatrix();
 
 public:
-	static void TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
+	static void TemperatureToFlux(const vector<double> & temperatures, vector<float> & fluxes,
 			double wavelength, double & max_flux);
-	static void TemperatureToFlux(vector<double> temperatures, vector<vec4> & pixels,
+	static void TemperatureToFlux(const vector<double> & temperatures, vector<vec4> & pixels,
 			double wavelength, double & max_flux);
 
 };

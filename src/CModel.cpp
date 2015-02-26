@@ -417,7 +417,7 @@ void CModel::InitTexture()
 void CModel::NormalizeFlux(double max_flux)
 {
 	for(int i = 0; i < mFluxTexture.size(); i++)
-		mFluxTexture[i] /= max_flux;
+		mFluxTexture[i].r /= max_flux;
 }
 
 /// \brief Constructs the rotation matrix according to the set parameters.
@@ -683,7 +683,7 @@ void CModel::SetWavelength(double wavelength)
 /// @param fluxes Array into which computed fluxes will be stored
 /// @param wavelength The wavelength of observation
 /// @param max_flux The maximum flux found in this model
-void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
+void CModel::TemperatureToFlux(const vector<double> & temperatures, vector<float> & fluxes,
 		double wavelength, double & max_flux)
 {
 	// The pixel and temperature buffers must be of the same size.
@@ -708,7 +708,6 @@ void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & flux
 
 		fluxes[i] = flux;
 	}
-
 }
 
 /// Computes the flux for pixels given the input temperatures following Planck's
@@ -717,7 +716,7 @@ void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & flux
 /// @param pixels A vector of RGBA pixels into which the computes fluxes will be stored
 /// @param wavelength The wavelength of observation
 /// @param max_flux The maximum flux found in this model
-void CModel::TemperatureToFlux(vector<double> temperatures, vector<vec4> & fluxes,
+void CModel::TemperatureToFlux(const vector<double> & temperatures, vector<vec4> & fluxes,
 		double wavelength, double & max_flux)
 {
 	// The pixel and temperature buffers must be of the same size.
