@@ -39,6 +39,7 @@ CTask::CTask(CWorkerThread * WorkerThread)
 	mJDStart = -1;
 	mJDEnd = -1;
 	mJDMean = -1;
+	mMeanWavelength = -1;
 
 	mFilename = "";
 	mFilenameShort = "";

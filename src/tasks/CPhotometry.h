@@ -47,13 +47,13 @@ public:
 	double jd;
 	double mag;
 	double mag_err;
+	double wavelength;
 };
 typedef shared_ptr<CPhotometricDataPoint> CPhotometricDataPointPtr;
 
 class CPhotometricDataFile
 {
 public:
-	double wavelength;
 	vector<CPhotometricDataPointPtr> data;
 
 	unsigned int GetNData() { return data.size(); };
@@ -89,6 +89,7 @@ public:
 	virtual CDataInfo getDataInfo();
 	virtual unsigned int GetNData();
 	virtual void GetUncertainties(double * residuals, unsigned int size);
+	double GetWavelength(const string & wavelength_or_band);
 
 	void InitBuffers();
 	virtual void InitGL();
@@ -96,7 +97,7 @@ public:
 
 	CDataInfo OpenData(string filename);
 
-	double SimulatePhotometry(CModelListPtr, double jd);
+	double SimulatePhotometry(CModelListPtr model_list, CPhotometricDataPointPtr data_point);
 };
 
 #endif /* CPHOTOMETRY_H_ */

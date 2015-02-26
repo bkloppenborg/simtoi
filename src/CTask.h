@@ -55,6 +55,7 @@ protected:
 	double mJDStart;
 	double mJDEnd;
 	double mJDMean;
+	double mMeanWavelength;
 
 	string mFilename;		///< The full filename including path and extension
 	string mFilenameShort;	///< The filename less the path and extension.

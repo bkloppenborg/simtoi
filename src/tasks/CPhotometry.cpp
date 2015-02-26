@@ -124,7 +124,7 @@ void CPhotometry::Export(string folder_name)
 			real_data << data_point->jd << "," << data_point->mag << "," << data_point->mag_err << endl;
 
 			// Simulate the photometry
-			sim_mag = SimulatePhotometry(model_list, data_point->jd);
+			sim_mag = SimulatePhotometry(model_list, data_point);
 			// Cache the t = 0 magnitude.
 			if(first_point)
 			{
@@ -176,9 +176,10 @@ void CPhotometry::GetChi(double * chi, unsigned int size)
 	// Iterate through the data, copying the mag_err into the uncertainties buffer
 	for(auto data_file: mData)
 	{
+
 		for(auto data_point: data_file->data)
 		{
-			sim_mag = SimulatePhotometry(model_list, data_point->jd);
+			sim_mag = SimulatePhotometry(model_list, data_point);
 
 			// Cache the t = 0 magnitude.
 			if(index == 0)
@@ -214,6 +215,7 @@ CDataInfo CPhotometry::getDataInfo()
 	info.mJDStart = mJDStart;
 	info.mJDEnd = mJDEnd;
 	info.mJDMean = mJDMean;
+	info.mWavelength = mMeanWavelength;
 
 	return info;
 }
@@ -227,6 +229,37 @@ unsigned int CPhotometry::GetNData()
 	}
 
 	return n_data;
+}
+
+/// Returns the wavelength, in meters, of the filter. If wavelength is
+/// numeric, it is expected that the units are in meters.
+double CPhotometry::GetWavelength(const string & wavelength_or_band)
+{
+	double wavelength = -1;
+	// Check the value is numeric, if so return that value
+	try{
+		wavelength = atof(wavelength_or_band.c_str());
+		return wavelength;
+	}
+	catch(...) {} // do nothing
+
+	// Otherwise use one of the standard astronomical filters.
+	// Remember, if you update these values make a change to the wiki
+	if(wavelength_or_band == "U") wavelength = 365.0E-9;
+	if(wavelength_or_band == "B") wavelength = 442.0E-9;
+	if(wavelength_or_band == "V") wavelength = 540.0E-9;
+	if(wavelength_or_band == "R") wavelength = 658.0E-9;
+	if(wavelength_or_band == "I") wavelength = 802.0E-9;
+	if(wavelength_or_band == "J") wavelength = 1.250E-6;
+	if(wavelength_or_band == "H") wavelength = 1.365E-6;
+	if(wavelength_or_band == "K") wavelength = 2.200E-6;
+	if(wavelength_or_band == "L") wavelength = 3.450E-6;
+	if(wavelength_or_band == "M") wavelength = 4.750E-6;
+	if(wavelength_or_band == "N") wavelength = 10.500E-6;
+	if(wavelength_or_band == "Q") wavelength = 21.000E-6;
+
+	assert(wavelength > 0);
+	return wavelength;
 }
 
 void CPhotometry::GetUncertainties(double * uncertainties, unsigned int size)
@@ -305,6 +338,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 	mJDStart = std::numeric_limits<double>::max();
 	mJDEnd = 0;
 	mJDMean = 0;
+	mMeanWavelength = 0;
 
 	// Create a new data file for storing input data.
 	CPhotometricDataFilePtr data_file = CPhotometricDataFilePtr(new CPhotometricDataFile());
@@ -333,6 +367,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 			t_data->jd = atof(t_line[0].c_str());
 			t_data->mag = atof(t_line[1].c_str());
 			t_data->mag_err = atof(t_line[2].c_str());
+			t_data->wavelength = GetWavelength(t_line[4]);
 
 			data_file->data.push_back(t_data);
 
@@ -343,6 +378,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 				mJDEnd = t_data->jd;
 
 			mJDMean += t_data->jd;
+			mMeanWavelength =+ t_data->wavelength;
 		}
 		catch(...)
 		{
@@ -351,6 +387,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 	}
 
 	mJDMean /= data_file->data.size();
+	mMeanWavelength /= data_file->data.size();
 
 	// The data was imported correctly, push it onto our data list
 	mData.push_back(data_file);
@@ -358,12 +395,13 @@ CDataInfo CPhotometry::OpenData(string filename)
 	return getDataInfo();
 }
 
-double CPhotometry::SimulatePhotometry(CModelListPtr model_list, double jd)
+double CPhotometry::SimulatePhotometry(CModelListPtr model_list, CPhotometricDataPointPtr data_point)
 {
 	double sim_flux = 0;
 
 	// Set the time, render the model
-	model_list->SetTime(jd);
+	model_list->SetTime(data_point->jd);
+	model_list->SetWavelength(data_point->jd);
 	mFBO_render->bind();
 	model_list->Render(mWorkerThread->GetView());
 	mFBO_render->release();

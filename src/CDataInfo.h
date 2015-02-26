@@ -23,6 +23,7 @@ public:
 	double mJDStart;
 	double mJDEnd;
 	double mJDMean;
+	double mWavelength;
 
 public:
 	string getFilename() { return mFilename; };
