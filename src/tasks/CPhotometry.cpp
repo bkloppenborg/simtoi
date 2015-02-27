@@ -236,29 +236,28 @@ unsigned int CPhotometry::GetNData()
 double CPhotometry::GetWavelength(const string & wavelength_or_band)
 {
 	double wavelength = -1;
-	// Check the value is numeric, if so return that value
-	try{
-		wavelength = atof(wavelength_or_band.c_str());
-		return wavelength;
-	}
-	catch(...) {} // do nothing
+
+	// First try to convert to a number directly
+	wavelength = atof(wavelength_or_band.c_str());
 
 	// Otherwise use one of the standard astronomical filters.
 	// Remember, if you update these values make a change to the wiki
 	if(wavelength_or_band == "U") wavelength = 365.0E-9;
-	if(wavelength_or_band == "B") wavelength = 442.0E-9;
-	if(wavelength_or_band == "V") wavelength = 540.0E-9;
+	if(wavelength_or_band == "B") wavelength = 445.0E-9;
+	if(wavelength_or_band == "V") wavelength = 551.0E-9;
 	if(wavelength_or_band == "R") wavelength = 658.0E-9;
-	if(wavelength_or_band == "I") wavelength = 802.0E-9;
+	if(wavelength_or_band == "I") wavelength = 806.0E-9;
 	if(wavelength_or_band == "J") wavelength = 1.250E-6;
-	if(wavelength_or_band == "H") wavelength = 1.365E-6;
+	if(wavelength_or_band == "H") wavelength = 1.635E-6;
 	if(wavelength_or_band == "K") wavelength = 2.200E-6;
 	if(wavelength_or_band == "L") wavelength = 3.450E-6;
 	if(wavelength_or_band == "M") wavelength = 4.750E-6;
 	if(wavelength_or_band == "N") wavelength = 10.500E-6;
 	if(wavelength_or_band == "Q") wavelength = 21.000E-6;
 
-	assert(wavelength > 0);
+	if(!(wavelength > 0))
+		throw runtime_error("Could not determine wavelength");
+
 	return wavelength;
 }
 
@@ -347,6 +346,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 	mFilenameNoExtension = StripExtension(mFilenameShort, mExtensions);
 
 	// Get a vector of the non-comment lines in the text file:
+	int lineCount = 0;
 	vector<string> lines = ReadFile(filename, "#/;!", "Could not read photometric data file " + filename + ".");
 	for(unsigned int i = 0; i < lines.size(); i++)
 	{
@@ -378,7 +378,8 @@ CDataInfo CPhotometry::OpenData(string filename)
 				mJDEnd = t_data->jd;
 
 			mJDMean += t_data->jd;
-			mMeanWavelength =+ t_data->wavelength;
+			mMeanWavelength += t_data->wavelength;
+			lineCount++;
 		}
 		catch(...)
 		{
@@ -386,8 +387,8 @@ CDataInfo CPhotometry::OpenData(string filename)
 		}
 	}
 
-	mJDMean /= data_file->data.size();
-	mMeanWavelength /= data_file->data.size();
+	mJDMean /= lineCount;
+	mMeanWavelength /= lineCount;
 
 	// The data was imported correctly, push it onto our data list
 	mData.push_back(data_file);

@@ -21,9 +21,9 @@ wDataEditor::wDataEditor(QWidget * parent)
 	mGLWidget = NULL;
 
 	QStringList labels = QStringList();
-	labels << "Filename" << "Quantity" << "JD Start" << "JD End" << "Mean JD" << "chi2r";
+	labels << "Filename" << "Quantity" << "JD Start" << "JD End" << "Mean JD" << QString::fromUtf8("Mean λ (μm)") << "chi2r";
 	mOpenFileModel.clear();
-	mOpenFileModel.setColumnCount(6);
+	mOpenFileModel.setColumnCount(7);
 	mOpenFileModel.setHorizontalHeaderLabels(labels);
 }
 
@@ -55,6 +55,10 @@ void wDataEditor::addData(CDataInfo data_info)
 	// mean julian date
 	temp = QString::number(data_info.mJDMean, 'f', precision);
 	items.append(new QStandardItem(temp));
+	// mean wavelength
+	temp = QString::number(data_info.mWavelength * 1E6, 'f', precision); // convert from meters to micrometers
+	items.append(new QStandardItem(temp));
+
 	// chi2 (when applicable)
 	temp = QString::fromUtf8("");
 	items.append(new QStandardItem(temp));
@@ -117,6 +121,12 @@ void wDataEditor::on_treeOpenFiles_clicked(const QModelIndex & index)
 		QStandardItem *	item = mOpenFileModel.itemFromIndex (index);
 		double jd = item->data(Qt::DisplayRole).toDouble();
 		emit(timeSelected(jd));
+	}
+	else if(col == 5)
+	{
+		QStandardItem *	item = mOpenFileModel.itemFromIndex (index);
+		double wavelength = item->data(Qt::DisplayRole).toDouble();
+		emit(wavelengthSelected(wavelength));
 	}
 }
 
