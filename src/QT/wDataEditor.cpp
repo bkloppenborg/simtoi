@@ -37,6 +37,7 @@ void wDataEditor::addData(CDataInfo data_info)
 {
 	QList<QStandardItem *> items;
 	QString temp;
+	double value;
 
 	unsigned int precision = 4;
 
@@ -47,11 +48,25 @@ void wDataEditor::addData(CDataInfo data_info)
 	temp = QString::fromUtf8(data_info.getQuantityDescription().c_str());
 	items.append(new QStandardItem(temp));
 	// starting julian date
-	temp = QString::number(data_info.mJDStart, 'f', precision);
-	items.append(new QStandardItem(temp));
+	value = data_info.mJDStart;
+	if(value > 0)
+	{
+		temp = QString::number(value, 'f', precision);
+		items.append(new QStandardItem(temp));
+	}
+	else
+		items.append(new QStandardItem(QString()));
+
 	// ending julian date
-	temp = QString::number(data_info.mJDEnd, 'f', precision);
-	items.append(new QStandardItem(temp));
+	value = data_info.mJDEnd;
+	if(value > 0)
+	{
+		temp = QString::number(value, 'f', precision);
+		items.append(new QStandardItem(temp));
+	}
+	else
+		items.append(new QStandardItem(QString()));
+
 	// mean julian date
 	temp = QString::number(data_info.mJDMean, 'f', precision);
 	items.append(new QStandardItem(temp));
@@ -120,13 +135,15 @@ void wDataEditor::on_treeOpenFiles_clicked(const QModelIndex & index)
 	{
 		QStandardItem *	item = mOpenFileModel.itemFromIndex (index);
 		double jd = item->data(Qt::DisplayRole).toDouble();
-		emit(timeSelected(jd));
+		if(jd > 0)
+			emit(timeSelected(jd));
 	}
 	else if(col == 5)
 	{
 		QStandardItem *	item = mOpenFileModel.itemFromIndex (index);
 		double wavelength = item->data(Qt::DisplayRole).toDouble();
-		emit(wavelengthSelected(wavelength));
+		if(wavelength > 0)
+			emit(wavelengthSelected(wavelength));
 	}
 }
 
