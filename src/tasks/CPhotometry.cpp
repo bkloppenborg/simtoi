@@ -215,7 +215,7 @@ CDataInfo CPhotometry::getDataInfo()
 	info.mJDStart = mJDStart;
 	info.mJDEnd = mJDEnd;
 	info.mJDMean = mJDMean;
-	info.mWavelength = mMeanWavelength;
+	info.mWavelength = mWavelengthMean;
 
 	return info;
 }
@@ -337,7 +337,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 	mJDStart = std::numeric_limits<double>::max();
 	mJDEnd = 0;
 	mJDMean = 0;
-	mMeanWavelength = 0;
+	mWavelengthMean = 0;
 
 	// Create a new data file for storing input data.
 	CPhotometricDataFilePtr data_file = CPhotometricDataFilePtr(new CPhotometricDataFile());
@@ -378,7 +378,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 				mJDEnd = t_data->jd;
 
 			mJDMean += t_data->jd;
-			mMeanWavelength += t_data->wavelength;
+			mWavelengthMean += t_data->wavelength;
 			lineCount++;
 		}
 		catch(...)
@@ -388,7 +388,7 @@ CDataInfo CPhotometry::OpenData(string filename)
 	}
 
 	mJDMean /= lineCount;
-	mMeanWavelength /= lineCount;
+	mWavelengthMean /= lineCount;
 
 	// The data was imported correctly, push it onto our data list
 	mData.push_back(data_file);

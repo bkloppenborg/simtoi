@@ -197,6 +197,7 @@ void COI::Export(string folder_name)
 
 		// Set the current JD, render the model.
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		model_list->SetWavelength(mLibOI->GetDataAveWavelength(data_set));
 		// render
 		mFBO_render->bind();
 		model_list->Render(mWorkerThread->GetView());
@@ -271,6 +272,7 @@ void COI::GetChi(double * chis, unsigned int size)
 	{
 		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		model_list->SetWavelength(mLibOI->GetDataAveWavelength(data_set));
 		mFBO_render->bind();
 		model_list->Render(mWorkerThread->GetView());
 		mFBO_render->release();
@@ -312,6 +314,7 @@ CDataInfo COI::getDataInfo()
 	info.mJDStart = mJDStart;
 	info.mJDEnd = mJDEnd;
 	info.mJDMean = mJDMean;
+	info.mWavelength = mWavelengthMean;
 
 	return info;
 }
@@ -410,6 +413,7 @@ CDataInfo COI::OpenData(string filename)
 	mNV2 = mLibOI->GetNV2(data_id);
 	mNT3 = mLibOI->GetNT3(data_id);
 	mJDMean = mLibOI->GetDataAveJD(data_id);
+	mWavelengthMean = mLibOI->GetDataAveWavelength(data_id);
 
 	return getDataInfo();
 }
