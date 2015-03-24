@@ -89,7 +89,7 @@ public:
 	void Restore(Json::Value input);
 
 	Json::Value Serialize();
-	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
+	void SetFreeParameters(const double * params, unsigned int n_params, bool scale_params);
 	void SetTime(double t);
 	void SetTimestep(double dt);
 	void SetWavelength(double wavelength);

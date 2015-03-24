@@ -51,23 +51,31 @@ using namespace std;
 #ifdef _ADD_MULTINEST
 #include "minimizers/CMultiNest.h"
 #endif // _ADD_MULTINEST
-
+#ifdef _ADD_NLOPT
+#include "minimizers/CNLopt.h"
+#endif // _ADD_NLOPT
 
 /// \brief Private constructor. Use `Instance()` instead.
 CMinimizerFactory::CMinimizerFactory()
 {
 	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
-	Register("benchmark", &CBenchmark::Create);
-	Register("gridsearch", &CGridSearch::Create);
+  Register("Benchmark - performance", &CBenchmark::Create);
+  Register("Grid Search - global over range", &CGridSearch::Create);
+
+#ifdef _ADD_NLOPT
+  Register("Nelder-Mead Simplex - local", &CNLopt::Create);
+#endif //_ADD_NLOPT
 
 #ifdef _ADD_LEVMAR
-	Register("levmar", &CLevmar::Create);
-	Register("bootstrap_levmar", &CBootstrap_Levmar::Create);
+  Register("Levmar (Levenberg-Marquart) - local", &CLevmar::Create);
+  Register("Bootstraped Levmar (Levenberg-Marquart) - local", &CBootstrap_Levmar::Create);
 #endif //_ADD_LEVMAR
 
 #ifdef _ADD_MULTINEST
-	Register("multinest", &CMultiNest::Create);
+  Register("Multinest (Nested Sampling) - global", &CMultiNest::Create);
 #endif // _ADD_MULTINEST
+
+
 }
 
 CMinimizerFactory::~CMinimizerFactory() \
@@ -115,6 +123,5 @@ void CMinimizerFactory::Register(string MinimizerID, CreateMinimizerFn CreateFun
 {
 	if(mFactory.find(MinimizerID) != mFactory.end())
 		throw runtime_error("A minimizer with ID '" + MinimizerID + "' is already registered with CMinimizerFactory");
-
 	mFactory[MinimizerID] = CreateFunction;
 }
