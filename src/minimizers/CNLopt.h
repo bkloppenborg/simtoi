@@ -1,6 +1,12 @@
-
-/* 
- * Copyright (c) 2012 Brian Kloppenborg
+/*
+ * Clevmar.h
+ *
+ *  Created on: Feb 13, 2015
+ *      Author: fbaron
+ */
+ 
+ /* 
+ * Copyright (c) 2015 Fabien Baron
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -23,47 +29,40 @@
  * You should have received a copy of the GNU Lesser General Public 
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-#ifndef GUI_ADDMODEL_H
-#define GUI_ADDMODEL_H
 
-#include "ui_gui_model.h"
-#include "gui_common.h"
-
-#include <QtGui/QWidget>
-#include <QDialog>
-#include <utility>
-#include <vector>
-#include <memory>
+#ifndef CNLOPT_H_
+#define CNLOPT_H_
 
 using namespace std;
 
-class CModel;
+#include "nlopt.h"
+#include "CMinimizerThread.h"
 
-class gui_model : public QDialog
+class CNLopt: public CMinimizerThread
 {
-    Q_OBJECT
-
-private:
-    Ui::gui_addmodelClass ui;
-
-protected:
-    string mShaderName;
-    string mModelName;
-    string mPositionName;
 
 public:
-    gui_model(QWidget *parent = 0);
-    gui_model(QWidget *parent, shared_ptr<CModel> model);
-    virtual ~gui_model();
+	CNLopt();
+	virtual ~CNLopt();
+	
+	unsigned int mEvals;
+	double* lb;
+	double* ub;
+	//	double* xopt;
+	nlopt_opt mOpt; // hack to store nlopt
+	nlopt_algorithm mAlgorithm; // algorithm used for minimization
 
-    shared_ptr<CModel> GetModel();
+	static CMinimizerPtr Create();
 
-public slots:
-    void on_btnFeatureAdd_clicked();
-	void on_btnFeatureRemove_clicked();
+	static double ErrorFunc(unsigned int nParams, const double* params, double* grad, void * misc);
+	string GetExitString(nlopt_result exit_num);
 
-    void SetupUI();
+	void printresult(double * x, int n_pars, int n_data, vector<string> names, double minf, nlopt_result result);
+
+	virtual void run();
+
+	int run(double (*error_func)(unsigned int nParams, const double* params, double* grad, void* misc));
+
 };
 
-#endif // GUI_ADDMODEL_H
+#endif /* CMINIMIZER_NLOPT_H_ */

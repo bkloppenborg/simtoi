@@ -38,6 +38,12 @@ void CTaskList::BootstrapNext(unsigned int maxBootstrapFailures)
 	}
 }
 
+void CTaskList::clearData()
+{
+	for(auto task: mTasks)
+		task->clearData();
+}
+
 void CTaskList::Export(string export_folder)
 {
 	// Each task can optionally write information to a summary file. Be sure
@@ -132,7 +138,7 @@ void CTaskList::GetUncertainties(double * uncertainties, unsigned int size)
 	}
 }
 
-void CTaskList::OpenData(string filename)
+CDataInfo CTaskList::OpenData(string filename)
 {
 	// TODO: Right now we identify the task object from the file extension.
 	// There is probably a better way of doing this.
@@ -148,8 +154,7 @@ void CTaskList::OpenData(string filename)
 		{
 			if(extension == datatype)
 			{
-				task->OpenData(filename);
-				return;
+				return task->OpenData(filename);
 			}
 		}
 	}

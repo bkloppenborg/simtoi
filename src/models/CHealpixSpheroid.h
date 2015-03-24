@@ -21,8 +21,6 @@ protected:
 	vector<vec3> mVBOData;
 	vector<unsigned int> mElements;
 
-	bool mModelReady;
-
 	// Quantities related to the pixel centroid and corners:
 	vector<double> pixel_theta;
 	vector<double> pixel_phi;
@@ -54,7 +52,8 @@ public:
 
 	virtual void GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> & elements) = 0;
 
-	virtual void Render(const glm::mat4 & view) = 0;
+	void preRender(double & max_flux) = 0;
+	void Render(const glm::mat4 & view, const GLfloat & max_flux) = 0;
 	virtual void Init();
 
 	void UploadVBO();

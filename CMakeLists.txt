@@ -24,9 +24,7 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/lib/fglrx)
 
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O0")
-#set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Wshadow")
-#set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O2 -march=native")
 
 # Set some CMake properties:
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
@@ -38,6 +36,11 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # We need to compile the following libraries
 # jsoncpp
+SET(JSONCPP_WITH_TESTS OFF CACHE BOOL "Enable JSONCPP unit tests")
+SET(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Run JSONCPP's unit tests post-build")
+SET(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "Build JSONCPP with PKGCONFIG support")
+SET(JSONCPP_LIB_BUILD_SHARED ON CACHE BOOL "Build JSONCPP's shared library")
+SET(JSONCPP_LIB_BUILD_STATIC OFF CACHE BOOL "Build JSONCPP's static library")
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib/jsoncpp EXCLUDE_FROM_ALL)
 include_directories(${CMAKE_SOURCE_DIR}/lib/jsoncpp/include)
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)

@@ -34,7 +34,6 @@
 
 #include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
-
 #include <stdexcept>
 #include <fstream>
 #include "oi_tools.hpp"
@@ -48,11 +47,15 @@ extern string EXE_FOLDER;
 COI::COI(CWorkerThread * WorkerThread)
 	: CTask(WorkerThread)
 {
+	mNV2 = 0;
+	mNT3 = 0;
+
 	mFBO_render = NULL;
 	mFBO_storage = NULL;
 
 	mLibOI = NULL;
 	mLibOIInitialized = false;
+	mIntegratedGPU = false;
 
 	mTempFloat = NULL;
 
@@ -137,6 +140,36 @@ CTaskPtr COI::Create(CWorkerThread * WorkerThread)
 	return CTaskPtr(new COI(WorkerThread));
 }
 
+void COI::clearData()
+{
+	unsigned int n_data_sets = mLibOI->GetNDataSets();
+
+	for(int i = n_data_sets - 1; i > -1; i--)
+	{
+		mLibOI->RemoveData(i);
+	}
+}
+
+void  COI::copyImage()
+{
+	// Intel integrated GPUs do not have cl_khr_gl_sharing on Linux, I don't know
+	// about AMD. Thus we explicitly copy the data from OpenGL to a host-side
+	// buffer, then copy the data back to the GPU. A total waste of resources
+	// but the only workaround which is reasonable at the present time.
+	if(mIntegratedGPU)
+	{
+		unsigned int width = mWorkerThread->GetImageWidth();
+		unsigned int height = mWorkerThread->GetImageHeight();
+		// something with mFBO_storage
+		glReadPixels(0, 0, width, height, GL_RED, GL_FLOAT, mHostImage);
+		mLibOI->CopyImageToBuffer(0);
+	}
+	else
+	{
+		mLibOI->CopyImageToBuffer(0);
+	}
+}
+
 void COI::Export(string folder_name)
 {
 	InitBuffers();
@@ -164,6 +197,7 @@ void COI::Export(string folder_name)
 
 		// Set the current JD, render the model.
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		model_list->SetWavelength(mLibOI->GetDataAveWavelength(data_set));
 		// render
 		mFBO_render->bind();
 		model_list->Render(mWorkerThread->GetView());
@@ -172,7 +206,7 @@ void COI::Export(string folder_name)
 		// Blit to the storage buffer (for liboi to use the image)
 		mWorkerThread->BlitToBuffer(mFBO_render, mFBO_storage);
 		mWorkerThread->BlitToScreen(mFBO_render);
-		mLibOI->CopyImageToBuffer(0);
+		copyImage();
 
 		// Now export the image, overwriting any image that already exists:
 		mLibOI->ExportImage("!" + folder_name + filename + "_model.fits");
@@ -238,6 +272,7 @@ void COI::GetChi(double * chis, unsigned int size)
 	{
 		n_data_alloc = mLibOI->GetNDataAllocated(data_set);
 		model_list->SetTime(mLibOI->GetDataAveJD(data_set));
+		model_list->SetWavelength(mLibOI->GetDataAveWavelength(data_set));
 		mFBO_render->bind();
 		model_list->Render(mWorkerThread->GetView());
 		mFBO_render->release();
@@ -247,7 +282,7 @@ void COI::GetChi(double * chis, unsigned int size)
 		// Blit to the screen (to show the user, not required, but nice.
 		mWorkerThread->BlitToScreen(mFBO_render);
 
-		mLibOI->CopyImageToBuffer(0);
+		copyImage();
 
 		// Notice, the ImageToChi expects a floating point array, not a valarray<float>.
 		// C++11 guarantees that storage is contiguous so we can do pointer math
@@ -263,6 +298,25 @@ void COI::GetChi(double * chis, unsigned int size)
 	{
 		chis[i] = double(mTempFloat[i]);
 	}
+}
+
+/// Kludge implementation of getDataInfo. Always reports on the last opened file.
+CDataInfo COI::getDataInfo()
+{
+	stringstream temp;
+
+	CDataInfo info;
+	info.mFilename = mFilenameShort;
+
+	temp << "V2: " << mNV2 << " T3: " << mNT3;
+	info.mQuantityDescription = temp.str();
+
+	info.mJDStart = mJDStart;
+	info.mJDEnd = mJDEnd;
+	info.mJDMean = mJDMean;
+	info.mWavelength = mWavelengthMean;
+
+	return info;
 }
 
 unsigned int COI::GetNData()
@@ -316,7 +370,12 @@ void COI::InitBuffers()
 
 		// Initalize remaining OpenCL items.
 		mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
-		mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
+
+		if(mIntegratedGPU)
+			mLibOI->SetImageSource(mHostImage);
+		else
+			mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
+
 		mLibOI->SetImageInfo(width, height, depth, scale);
 
 		// Get LibOI up and running
@@ -338,12 +397,25 @@ void COI::InitGL()
 void COI::InitCL()
 {
 	// Initialize liboi using the worker thread's OpenCL+OpenGL context
-	mLibOI = new CLibOI(mWorkerThread->GetOpenCL());
+	COpenCLPtr OCL = mWorkerThread->GetOpenCL();
+	mLibOI = new CLibOI(OCL);
+	// detect if we have an integrated GPU
+	mIntegratedGPU = mLibOI->IsIntegratedDevice();
 }
 
-void COI::OpenData(string filename)
+CDataInfo COI::OpenData(string filename)
 {
-	mLibOI->LoadData(filename);
+	mFilename = filename;
+	mFilenameShort = StripPath(filename);
+//	mFilenameNoExtension = StripExtension(mFilenameShort, mExtensions);
+
+	unsigned int data_id = mLibOI->LoadData(filename);
+	mNV2 = mLibOI->GetNV2(data_id);
+	mNT3 = mLibOI->GetNT3(data_id);
+	mJDMean = mLibOI->GetDataAveJD(data_id);
+	mWavelengthMean = mLibOI->GetDataAveWavelength(data_id);
+
+	return getDataInfo();
 }
 
 double COI::sum(vector<float> & values, unsigned int start, unsigned int end)

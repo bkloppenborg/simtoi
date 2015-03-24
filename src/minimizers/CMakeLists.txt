@@ -37,15 +37,28 @@ if(MULTINEST_FOUND)
 else(MULTINEST_FOUND)
     file(GLOB REMOVE_MULTINEST "CMultiNest.cpp")
     list(REMOVE_ITEM SOURCE ${REMOVE_MULTINEST})
-    
     message(STATUS "MultiNest NOT found")
     message(STATUS " SIMTOI will NOT include the MultiNest minimizer.")
     
 endif(MULTINEST_FOUND)
 
+find_package(NLopt)
+if(NLOPT_FOUND)
+    include_directories(${NLOPT_INCLUDE_DIRS})
+    LIST(APPEND OPTIONAL_LIBS ${NLOPT_LIBRARIES})
+    set(NLOPT_DEF -D_ADD_NLOPT)
+    message(STATUS "NLopt found")
+    message(STATUS " SIMTOI will include the NLopt minimizers.")
+else(NLOPT_FOUND)
+    file(GLOB REMOVE_NLOPT "CNLopt.cpp")
+    list(REMOVE_ITEM SOURCE ${REMOVE_NLOPT})
+    message(STATUS "NLopt NOT found")
+    message(STATUS " SIMTOI will NOT include the NLopt minimizers.")
+endif(NLOPT_FOUND)
+
 # Now add the library
 add_library(simtoi_minimizers ${SOURCE})
 target_link_libraries(simtoi_minimizers ${OPTIONAL_LIBS})
 
-set(MINIMIZER_INCLUDE_DIRS ${MULTINEST_INCLUDE_DIRS} PARENT_SCOPE)
-set(MINIMISER_DEFINITIONS ${LEVMAR_DEF} ${MULTINEST_DEF} PARENT_SCOPE)
+set(MINIMIZER_INCLUDE_DIRS ${MULTINEST_INCLUDE_DIRS} ${NLOPT_INCLUDE_DIRS} PARENT_SCOPE)
+set(MINIMISER_DEFINITIONS ${LEVMAR_DEF} ${MULTINEST_DEF} ${NLOPT_DEF} PARENT_SCOPE)

@@ -26,8 +26,6 @@ CRocheLobe::CRocheLobe() :
 	addParameter("separation", 4.0 , 0.1, 100.0, false, 0.01, "Separation", "Separation between components (mas)");
 	addParameter("mass_ratio", 3.0 , 0.001, 100.0, false, 0.01, "Mass ratio", "Mass ratio M2/M1) (unitless)");
 	addParameter("asynchronism_ratio", 1.0 , 0.01, 2.0, false, 0.01, "Async ratio", "Asynchronous ratio rotation/revolution (unitless)");
-
-	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 	//	omega_rot = 2.0 * PI / (orbital_period * 3600. * 24.); // in Hz
 }
 
@@ -43,8 +41,6 @@ shared_ptr<CModel> CRocheLobe::Create()
 
 void CRocheLobe::ComputeRadii(const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio)
 {
-
-
 	// Compute the radii for the pixels and corners:
 	for(unsigned int i = 0; i < pixel_radii.size(); i++)
 	  pixel_radii[i] = ComputeRadius(r_pole, separation, mass_ratio, asynchronism_ratio, pixel_theta[i], pixel_phi[i]);
@@ -152,11 +148,9 @@ double CRocheLobe::ComputeRadius(const double r_pole, const double separation, c
 	return radius;
 }
 
-void CRocheLobe::Render(const glm::mat4 & view)
-{
-	if (!mModelReady)
-		Init();
 
+void CRocheLobe::preRender(double & max_flux)
+{
 	// See if the user change the tesselation
 	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 	if(mParams["n_side_power"].isDirty())
@@ -188,16 +182,21 @@ void CRocheLobe::Render(const glm::mat4 & view)
 	for(auto feature: mFeatures)
 		feature->apply(this);
 
-	double max_temperature = 0;
-	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
-	{
-		if(mPixelTemperatures[i] > max_temperature)
-			max_temperature = mPixelTemperatures[i];
-	}
 
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
 
 	GenerateVBO(n_pixels, n_sides, mVBOData);
+
+}
+
+void CRocheLobe::Render(const glm::mat4 & view, const GLfloat & max_flux)
+{
+	if (!mModelReady)
+		Init();
+
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
+
+	NormalizeFlux(max_flux);
 
 	mat4 scale = glm::scale(mat4(), glm::vec3(1, 1, 1));
 
@@ -277,7 +276,7 @@ void CRocheLobe::GenerateModel(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperatures to fluxes.
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 

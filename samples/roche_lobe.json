@@ -1,36 +1,35 @@
-
 {
 	"_file_info" : "Save file from the SImulation and Modeling Tool for Optical Interferometry (SIMTOI). See https://github.com/bkloppenborg/simtoi for information about this format.",
-	"area_height" : 512,
-	"area_scale" : 0.010,
-	"area_width" : 512,
+	"area_height" : 128,
+	"area_scale" : 0.050000000000000003,
+	"area_width" : 128,
 	"model_0" : 
 	{
 		"base_data" : 
 		{
-			"T_eff_pole" : [ 5000.0, 2000.0, 1000000.0, false, 100.0 ],
-			"asynchronism_ratio" : [ 1.0, 0.010, 2.0, false, 0.010 ],
-			"g_pole" : [ 1.0, 0.010, 10000.0, false, 10.0 ],
-			"inclination" : [ 0.0, -180.0, 180.0, false, 1.0 ],
-			"mass_ratio" : [ 3.0, 0.0010, 100.0, false, 0.010 ],
-			"n_side_power" : [ 4.0, 1.0, 10.0, false, 1.0 ],
-			"position_angle" : [ 0.0, 0.0, 360.0, false, 0.10 ],
-			"r_pole" : [ 1.0, 1.0, 10.0, false, 1.0 ],
-			"separation" : [ 4.0, 0.10, 100.0, false, 0.010 ],
-			"von_zeipel_beta" : [ 0.250, 0.0, 1.0, false, 0.10 ],
-			"z_axis_rotation" : [ 0.0, 0.0, 360.0, false, 1.0 ],
-			"z_axis_rotational_period" : [ 0.0, 0.0, 100.0, false, 1.0 ]
+			"T_eff_pole" : [ 5000, 2000, 1000000, false, 100 ],
+			"asynchronism_ratio" : [ 1, 0.01, 2, false, 0.01 ],
+			"g_pole" : [ 1, 0.01, 10000, false, 10 ],
+			"inclination" : [ 90, -180, 180, false, 1 ],
+			"mass_ratio" : [ 3, 0.001, 100, false, 0.01 ],
+			"n_side_power" : [ 4, 1, 10, false, 1 ],
+			"position_angle" : [ 0, 0, 360, false, 0.10000000000000001 ],
+			"r_pole" : [ 1, 1, 10, false, 1 ],
+			"separation" : [ 4, 0.10000000000000001, 100, false, 0.01 ],
+			"von_zeipel_beta" : [ 0.25, 0, 1, false, 0.10000000000000001 ],
+			"z_axis_rotation" : [ 0, 0, 360, false, 1 ],
+			"z_axis_rotational_period" : [ 0, 0, 100, false, 1 ]
 		},
 		"base_id" : "roche_lobe",
 		"position_data" : 
 		{
-			"E" : [ 0.0, -1.0, 1.0, false, 0.10 ],
-			"N" : [ 0.0, -1.0, 1.0, false, 0.10 ]
+			"E" : [ 0, -1, 1, false, 0.10000000000000001 ],
+			"N" : [ 0, -1, 1, false, 0.10000000000000001 ]
 		},
 		"position_id" : "xy",
 		"shader_data" : 
 		{
-			"alpha" : [ 0.40, 0.10, 1.0, false, 0.090 ]
+			"alpha" : [ 0.5, 0.10000000000000001, 1, false, 0.089999999999999997 ]
 		},
 		"shader_id" : "ldl_power_law"
 	}

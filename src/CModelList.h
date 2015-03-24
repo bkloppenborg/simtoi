@@ -60,13 +60,16 @@ protected:
 	vector<CModelPtr> mModels;
 
 protected:
-	double mTime;	///< The current time for the models in this list.
+	double mTime;	///< The current time for the models in this list (JD)
+	double mWavelength; ///< The current wavelength of observation (meters)
 
 public:
 	CModelList();
 	virtual ~CModelList();
 
 	void AddModel(CModelPtr model);
+
+	void clear();
 
 	int GetNFreeParameters();
 	void GetAllParameters(double * params, int n_params);
@@ -81,12 +84,15 @@ public:
 	static vector<string> GetTypes(void);
 
 	void Render(const glm::mat4 & view);
+	void ReplaceModel(unsigned int model_index, CModelPtr model);
+	void RemoveModel(unsigned int model_index);
 	void Restore(Json::Value input);
 
 	Json::Value Serialize();
-	void SetFreeParameters(double * params, unsigned int n_params, bool scale_params);
+	void SetFreeParameters(const double * params, unsigned int n_params, bool scale_params);
 	void SetTime(double t);
 	void SetTimestep(double dt);
+	void SetWavelength(double wavelength);
 	unsigned int size() { return mModels.size(); };
 
 	static bool SortByZ(const CModelPtr & A, const CModelPtr & B);

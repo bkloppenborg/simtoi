@@ -41,15 +41,14 @@ class CDensityDisk: public CModel
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
-
 public:
 	CDensityDisk();
 	virtual ~CDensityDisk();
 
 	void Init();
 
-	void Render(const glm::mat4 & view);
+	void preRender(double & max_flux);
+	void Render(const glm::mat4 & view, const GLfloat & max_flux);
 
 	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
 

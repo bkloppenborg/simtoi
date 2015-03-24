@@ -102,14 +102,13 @@ public:
 	virtual void GetResults(double * results, int n_params);
 
 	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
-	bool IsRunning();
+	void setSaveDirectory(string save_directory);
+	bool isRunning() { return mIsRunning; };
 
 	void OpenStatisticsFile(ofstream & file);
 
 	// Pure virtual function, each minimizer must implement this.
 	virtual void run() = 0;
-
-	void SetSaveDirectory(string filename);
 	virtual void stop();
 
 	void WriteHeader(vector<string> & param_names, ofstream & outfile);

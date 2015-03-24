@@ -22,9 +22,6 @@ CRocheRotator::CRocheRotator() :
 	addParameter("omega_rot", 0.5, 0, 1, false, 0.1, "omega", "Fraction of critical rotational velocity [range: 0...1]");
 	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)");
 	addParameter("von_zeipel_beta", 0.5, 0.01, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
-
-	// TODO: Remove this variable
-	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
 }
 
 CRocheRotator::~CRocheRotator()
@@ -141,7 +138,7 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 			max_temperature = mPixelTemperatures[i];
 	}
 	// Convert temperatures to fluxes.
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 
@@ -149,11 +146,8 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 	GenerateHealpixVBOIndicies(n_pixels, elements);
 }
 
-void CRocheRotator::Render(const glm::mat4 & view)
+void CRocheRotator::preRender(double & max_flux)
 {
-	if (!mModelReady)
-		Init();
-
 	// See if the user change the tesselation
 	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 	if(mParams["n_side_power"].isDirty())
@@ -183,16 +177,19 @@ void CRocheRotator::Render(const glm::mat4 & view)
 	for(auto feature: mFeatures)
 		feature->apply(this);
 
-	double max_temperature = 0;
-	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
-	{
-		if(mPixelTemperatures[i] > max_temperature)
-			max_temperature = mPixelTemperatures[i];
-	}
-
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
 
 	GenerateVBO(n_pixels, n_sides, mVBOData);
+}
+
+void CRocheRotator::Render(const glm::mat4 & view, const GLfloat & max_flux)
+{
+	if (!mModelReady)
+		Init();
+
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
+
+	NormalizeFlux(max_flux);
 
 	mat4 scale = glm::scale(mat4(), glm::vec3(1, 1, 1));
 
