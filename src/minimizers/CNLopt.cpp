@@ -238,11 +238,6 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 
 	unsigned int n_data = mWorkerThread->GetDataSize();
         mOpt = nlopt_create(mAlgorithm, mNParams);
-	if(mAlgorithm == NLOPT_GN_CRS2_LM) // set local optimizer to be used with a global search
-	  {
-	    mOptSecondary = nlopt_create(mAlgorithmSecondary, mNParams);
-	    nlopt_set_local_optimizer(mOpt, mOptSecondary);
-	  }
 
 	//	xopt = new double [mNParams];
 	lb = new double [mNParams];
@@ -273,6 +268,18 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 	printf("Starting NLopt version %d.%d.%d\n", major, minor, bugfix);
 	printf("Algorithm = %s \n", nlopt_algorithm_name(mAlgorithm));
 
+
+	if(mAlgorithm == NLOPT_G_MLSL_LDS) // set local optimizer to be used with a global search
+	  {
+	    printf("Secondary Algorithm = %s \n", nlopt_algorithm_name(mAlgorithmSecondary));
+	    mOptSecondary = nlopt_create(mAlgorithmSecondary, mNParams);
+	    nlopt_set_lower_bounds(mOptSecondary,lb);
+	    nlopt_set_upper_bounds(mOptSecondary,ub);
+	    nlopt_set_ftol_rel(mOptSecondary, 1e-4); // stopping criterion = when chi2 changes by less than 0.1%
+	    nlopt_set_min_objective(mOptSecondary, error_func, (void*)this);
+	    nlopt_set_local_optimizer(mOpt, mOptSecondary);
+	  }
+
 	mIsRunning = true;
 	mEvals = 0;
 	double minf;	
@@ -286,7 +293,7 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 	delete(ub);
 
 	nlopt_destroy(mOpt);
-	if(mAlgorithm == NLOPT_GN_CRS2_LM) // also destroy local optimizer
+	if(mAlgorithm == NLOPT_G_MLSL_LDS) // also destroy local optimizer
 	  {
 	   nlopt_destroy(mOptSecondary);
 	  }
