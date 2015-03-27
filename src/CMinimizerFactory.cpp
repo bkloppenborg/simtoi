@@ -60,10 +60,22 @@ CMinimizerFactory::CMinimizerFactory()
 {
 	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
   Register("Benchmark - performance", &CBenchmark::Create);
-  Register("Grid Search - global over range", &CGridSearch::Create);
+  Register("Grid Search - global", &CGridSearch::Create);
 
 #ifdef _ADD_NLOPT
-  Register("Nelder-Mead Simplex - local", &CNLopt::Create);
+  Register("Amoeba (Nelder-Mead Simplex) - local", &CNLopt::CreateNELDERMEAD);
+  Register("DIviding RECTangles - global", &CNLopt::CreateDIRECTL);
+  Register("DIviding RECTangles Local - global/local", &CNLopt::CreateDIRECT);
+  Register("Controlled Random Search - global", &CNLopt::CreateCRS2);
+  Register("Multi-Level Single-Linkage + Amoeba - global/local", &CNLopt::CreateMLSLLDS);
+  Register("StoGO randomised - global", &CNLopt::CreateSTOGORAND);
+  Register("Improved Stochastic Ranking Evolution Strategy - global", &CNLopt::CreateISRES);
+  Register("ESCH evolutionary algorithm - global", &CNLopt::CreateESCH);
+  Register("Constrained Optimization BY Linear Approximations - local", &CNLopt::CreateCOBYLA);
+  Register("Powell's BOBYQA - local", &CNLopt::CreateBOBYQA);
+  Register("Powell's NEWUOA - local", &CNLopt::CreateNEWUOA); 
+  Register("PRincipal AXIS - local", &CNLopt::CreatePRAXIS);
+  Register("Subplex algorithm - local", &CNLopt::CreateSBPLX);
 #endif //_ADD_NLOPT
 
 #ifdef _ADD_LEVMAR

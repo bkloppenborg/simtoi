@@ -46,10 +46,98 @@ CNLopt::~CNLopt()
 
 }
 
-CMinimizerPtr CNLopt::Create()
-{
-	return CMinimizerPtr(new CNLopt());
+CMinimizerPtr CNLopt::CreateNELDERMEAD()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_LN_NELDERMEAD;
+  return CMinimizerPtr(nl);
 }
+
+CMinimizerPtr CNLopt::CreateDIRECTL()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_GN_DIRECT_L;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateDIRECT()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_GN_DIRECT;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateCRS2()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_GN_CRS2_LM; 
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateMLSLLDS()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_G_MLSL_LDS;
+  nl->mAlgorithmSecondary = NLOPT_LN_NELDERMEAD;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateSTOGORAND()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_GD_STOGO_RAND;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateISRES()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_GN_ISRES;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateESCH()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_GN_ESCH;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateCOBYLA()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_LN_COBYLA;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateBOBYQA()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_LN_BOBYQA;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateNEWUOA()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_LN_NEWUOA_BOUND;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreatePRAXIS()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_LN_PRAXIS;
+  return CMinimizerPtr(nl);
+}
+
+CMinimizerPtr CNLopt::CreateSBPLX()
+{ 
+  CNLopt* nl = new CNLopt(); 
+  nl->mAlgorithm = NLOPT_LN_SBPLX;
+  return CMinimizerPtr(nl);
+}
+
 
 double CNLopt::ErrorFunc(unsigned int nParams, const double* params, double* grad, void * misc)
 {
@@ -149,8 +237,12 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 	// Create a member function pointer
 
 	unsigned int n_data = mWorkerThread->GetDataSize();
-	mAlgorithm = NLOPT_LN_NELDERMEAD;
         mOpt = nlopt_create(mAlgorithm, mNParams);
+	if(mAlgorithm == NLOPT_GN_CRS2_LM) // set local optimizer to be used with a global search
+	  {
+	    mOptSecondary = nlopt_create(mAlgorithmSecondary, mNParams);
+	    nlopt_set_local_optimizer(mOpt, mOptSecondary);
+	  }
 
 	//	xopt = new double [mNParams];
 	lb = new double [mNParams];
@@ -192,7 +284,13 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 
 	delete(lb);
 	delete(ub);
-	//	delete(xopt);
+
 	nlopt_destroy(mOpt);
+	if(mAlgorithm == NLOPT_GN_CRS2_LM) // also destroy local optimizer
+	  {
+	   nlopt_destroy(mOptSecondary);
+	  }
+
+
 	return mEvals;
 }

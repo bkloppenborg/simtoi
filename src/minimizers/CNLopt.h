@@ -48,11 +48,24 @@ public:
 	unsigned int mEvals;
 	double* lb;
 	double* ub;
-	//	double* xopt;
-	nlopt_opt mOpt; // hack to store nlopt
+	nlopt_opt mOpt; // nlopt primary algorithm 
+	nlopt_opt mOptSecondary; // nlopt secondary algorithm
 	nlopt_algorithm mAlgorithm; // algorithm used for minimization
+	nlopt_algorithm mAlgorithmSecondary; // (optional) secondary algorithm 
 
-	static CMinimizerPtr Create();
+	static CMinimizerPtr CreateNELDERMEAD();
+	static CMinimizerPtr CreateDIRECTL();
+	static CMinimizerPtr CreateDIRECT();
+	static CMinimizerPtr CreateCRS2();
+	static CMinimizerPtr CreateMLSLLDS();
+	static CMinimizerPtr CreateSTOGORAND();
+	static CMinimizerPtr CreateISRES();
+	static CMinimizerPtr CreateESCH();
+	static CMinimizerPtr CreateCOBYLA();
+	static CMinimizerPtr CreateBOBYQA();
+	static CMinimizerPtr CreateNEWUOA();
+	static CMinimizerPtr CreatePRAXIS();
+	static CMinimizerPtr CreateSBPLX();
 
 	static double ErrorFunc(unsigned int nParams, const double* params, double* grad, void * misc);
 	string GetExitString(nlopt_result exit_num);
