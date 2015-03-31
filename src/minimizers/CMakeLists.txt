@@ -25,7 +25,7 @@ else(LAPACK_FOUND)
     message(STATUS " SIMTOI will NOT include the Levmar minimizer.")
 endif(LAPACK_FOUND)
 
-# See if levmar is installed on the system. If so, include it.
+# See if MultiNest is installed on the system. If so, include it.
 find_package(MultiNest)
 if(MULTINEST_FOUND)
     include_directories(${MULTINEST_INCLUDE_DIRS})
@@ -42,6 +42,7 @@ else(MULTINEST_FOUND)
     
 endif(MULTINEST_FOUND)
 
+# Check for NLOpt, include it if found
 find_package(NLopt)
 if(NLOPT_FOUND)
     include_directories(${NLOPT_INCLUDE_DIRS})
