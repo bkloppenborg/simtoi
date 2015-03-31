@@ -65,7 +65,6 @@ public:
 	shared_ptr<CMinimizerThread> CreateMinimizer(string MinimizerID);
 
 	static CMinimizerFactory Instance();
-
 	void Register(string MinimizerID, CreateMinimizerFn CreateFunction);
 
 	vector<string> GetMinimizerList();

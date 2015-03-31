@@ -248,7 +248,7 @@ Json::Value CModelList::Serialize()
 	Json::Value output;
 	stringstream name;
 
-    // Now call render on all of the models:
+
 	int i = 0;
     for(auto model: mModels)
     {
@@ -263,15 +263,13 @@ Json::Value CModelList::Serialize()
 }
 
 /// Sets all of the free parameter values
-void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool scale_params)
+void CModelList::SetFreeParameters(const double * params, unsigned int n_params, bool scale_params)
 {
-	unsigned int n = 0;
-
-    // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
+  unsigned int n = 0;
+  for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
-    	(*it)->SetFreeParameters(params + n, n_params - n, scale_params);
-    	n += (*it)->GetTotalFreeParameters();
+      (*it)->SetFreeParameters(const_cast<double *>(&params[n]), n_params - n, scale_params);
+      n += (*it)->GetTotalFreeParameters();
     }
 }
 
