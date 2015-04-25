@@ -80,7 +80,7 @@ double CMultiNest::ComputePriors(double * params, int n_params)
 double CMultiNest::ComputeLogZ(valarray<double> & chis, const valarray<double> & uncertainties)
 {
 	// We compute the log likelihood from the following formulation:
-	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp(chi^2_i / 2)]
+	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp( -chi^2_i / 2)]
 	//			= -N/2 log(2 pi) - sum_i( log(sigma_i) ) - 1/2 sum_i(chi^2_i)
 
 	// Form the chi squared
