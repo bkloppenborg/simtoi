@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8) 
+cmake_minimum_required(VERSION 2.8)
 project(simtoi)
 
 INCLUDE("${CMAKE_SOURCE_DIR}/CMakeModules/SetVersion.cmake")
@@ -30,7 +30,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O2 -march=native")
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     CACHE PATH "Single directory for all executable and dynamic libraries on Windows.")
-SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
+#SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules ${PROJECT_SOURCE_DIR}/lib/liboi/CMakeModules)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
@@ -93,8 +93,8 @@ SET(CPACK_PACKAGE_CONTACT "Brian Kloppenborg <bkloppenborg@gmail.com>")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SImulation and Modeling Tool for Optical Interferometry (https://github.com/bkloppenborg/simtoi)")
 
 # Debian-specific packaging options
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "liboi ( >= 1.0.0 ), 
-    libqtcore ( >= 4.8.0), libqt4-opengl ( >= 4.8.0 ), libqtgui4 ( >= 4.8.0 ), 
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "liboi ( >= 1.0.0 ),
+    libqtcore ( >= 4.8.0), libqt4-opengl ( >= 4.8.0 ), libqtgui4 ( >= 4.8.0 ),
     libglmdev ( >= 0.9.5 )")
- 
+
 INCLUDE(CPack)
