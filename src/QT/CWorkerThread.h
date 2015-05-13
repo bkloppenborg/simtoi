@@ -53,7 +53,7 @@
 #include <queue>
 #include "json/json.h"
 #include "CDataInfo.h"
-#include "CTask.h"
+//#include "CTask.h"
 
 #include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
@@ -64,8 +64,8 @@
 using namespace std;
 
 class CGLWidget;
-class CTaskList;
-typedef shared_ptr<CTaskList> CTaskListPtr;
+//class CTaskList;
+//typedef shared_ptr<CTaskList> CTaskListPtr;
 class CModel;
 typedef shared_ptr<CModel> CModelPtr;
 class CModelList;
@@ -123,7 +123,7 @@ protected:
     COpenCLPtr mOpenCL;
 
     // other data members:
-    shared_ptr<CTaskList> mTaskList;
+//    shared_ptr<CTaskList> mTaskList;
     shared_ptr<CModelList> mModelList;
     QString mExeFolder;
 
@@ -190,7 +190,7 @@ public:
     QStringList GetFileFilters();
     CModelListPtr GetModelList() { return mModelList; };
     WorkerOperations GetNextOperation(void);
-    CTaskListPtr GetTaskList() { return mTaskList; };
+//    CTaskListPtr GetTaskList() { return mTaskList; };
     void GetUncertainties(double * uncertainties, unsigned int size);
 
     unsigned int GetImageDepth() { return mImageDepth; };

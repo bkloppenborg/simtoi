@@ -39,10 +39,8 @@
 using namespace std;
 
 #include "CGLWidget.h"
-#include "CTaskList.h"
 #include "CModelList.h"
 #include "CDataInfo.h"
-#include "CTask.h"
 
 // X11 "Status" definition causes namespace issues. Include after any QT headers (https://bugreports.qt-project.org/browse/QTBUG-54)
 #include "COpenCL.hpp"
@@ -66,7 +64,6 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 
 	// Initialize the model and task lists:
     mModelList = CModelListPtr(new CModelList());
-	mTaskList = CTaskListPtr(new CTaskList(this));
 }
 
 CWorkerThread::~CWorkerThread()
@@ -402,7 +399,7 @@ unsigned int CWorkerThread::GetDataSize()
 	QMutexLocker lock(&mWorkerMutex);
 
 	// NOTE: this is a cross-thread call.
-	return mTaskList->GetDataSize();
+//	return mTaskList->GetDataSize();
 }
 
 /// Gets a list of file filters for use in a QFileDialog
@@ -413,7 +410,7 @@ QStringList CWorkerThread::GetFileFilters()
 	// Get exclusive access to the worker
 	QMutexLocker lock(&mWorkerMutex);
 
-	vector<string> filters = mTaskList->GetFileFilters();
+	vector<string> filters; // = mTaskList->GetFileFilters();
 	QStringList output;
 
 	for(auto filter: filters)
@@ -532,13 +529,13 @@ void CWorkerThread::run()
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create off-screen renderbuffer");
 
 	// Now have the workers initialize any OpenGL objects they need
-	mTaskList->InitGL();
+//	mTaskList->InitGL();
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to initialze task list OpenGL functions");
 
 	// ########
 	// Remaining OpenCL initialization (context done above)
 	// ########
-	mTaskList->InitCL();
+//	mTaskList->InitCL();
 
 	// ########
 	// Main thread.
@@ -551,31 +548,31 @@ void CWorkerThread::run()
 		{
 
 		case BOOTSTRAP_NEXT:
-			mTaskList->BootstrapNext(mTempUint);
+//			mTaskList->BootstrapNext(mTempUint);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case EXPORT:
 			// Instruct the worker to export data
-			mTaskList->Export(mTempString);
+//			mTaskList->Export(mTempString);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case GET_CHI:
 			// uses mTempArray
-			mTaskList->GetChi(mTempArray, mTempArraySize);
+//			mTaskList->GetChi(mTempArray, mTempArraySize);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case GET_UNCERTAINTIES:
 			// uses mTempArray
-			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
+//			mTaskList->GetUncertainties(mTempArray, mTempArraySize);
 			mWorkerSemaphore.release(1);
 			break;
 
 		case OPEN_DATA:
 			// Instruct the task list to open the file.
-			mTempDataInfo = mTaskList->OpenData(mTempString);
+//			mTempDataInfo = mTaskList->OpenData(mTempString);
 			mWorkerSemaphore.release(1);
 			break;
 
