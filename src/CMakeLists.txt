@@ -31,7 +31,7 @@ add_subdirectory(QT)
 add_definitions( -DQT_VERSION_MAJOR=${QT_VERSION_MAJOR} )
 add_definitions( -DQT_VERSION_MINOR=${QT_VERSION_MINOR} )
 
-add_subdirectory(scripts)
+add_subdirectory(data)
 add_subdirectory(models)
 add_subdirectory(features)
 add_subdirectory(minimizers)
@@ -43,6 +43,7 @@ positions/*.cpp tasks/*.cpp)
 # Now add the binary
 add_executable(simtoi ${SOURCE})
 target_link_libraries(simtoi simtoi_models simtoi_minimizers simtoi_features
+    simtoi_data_support
     QT_files jsoncpp_lib levmar oi textio chealpix 
     ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
 

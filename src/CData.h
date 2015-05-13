@@ -33,7 +33,7 @@ public:
 
 	virtual CDataInfo open(const string & filename) = 0;
 	virtual void saveAsText(const string & directory) = 0;
-//	virtual void save(const string & filename) = 0;
+	virtual void save(const string & filename) = 0;
 
 	virtual unsigned int size() = 0;
 
