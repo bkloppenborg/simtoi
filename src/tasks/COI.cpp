@@ -306,15 +306,15 @@ CDataInfo COI::getDataInfo()
 	stringstream temp;
 
 	CDataInfo info;
-	info.mFilename = mFilenameShort;
+	info.setFilename(mFilenameShort);
 
 	temp << "V2: " << mNV2 << " T3: " << mNT3;
-	info.mQuantityDescription = temp.str();
+	info.setDescription(temp.str());
 
-	info.mJDStart = mJDStart;
-	info.mJDEnd = mJDEnd;
-	info.mJDMean = mJDMean;
-	info.mWavelength = mWavelengthMean;
+	info.setJDMin(mJDStart);
+	info.setJDMax(mJDEnd);
+	info.setJDMean(mJDMean);
+	info.setWavelengthMean(mWavelengthMean);
 
 	return info;
 }

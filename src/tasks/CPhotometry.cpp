@@ -207,15 +207,15 @@ CDataInfo CPhotometry::getDataInfo()
 	stringstream temp;
 
 	CDataInfo info;
-	info.mFilename = mFilenameShort;
+	info.setFilename(mFilenameShort);
 
 	temp << "N: " << GetNData();
-	info.mQuantityDescription = temp.str();
+	info.setDescription(temp.str());
 
-	info.mJDStart = mJDStart;
-	info.mJDEnd = mJDEnd;
-	info.mJDMean = mJDMean;
-	info.mWavelength = mWavelengthMean;
+	info.setJDMin(mJDStart);
+	info.setJDMax(mJDEnd);
+	info.setJDMean(mJDMean);
+	info.setWavelengthMean(mWavelengthMean);
 
 	return info;
 }

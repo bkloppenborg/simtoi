@@ -16,7 +16,6 @@
 #include <memory>
 
 #include "CGLWidget.h"
-#include "CDataInfo.h"
 
 using namespace std;
 
@@ -51,7 +50,7 @@ private slots:
 	void on_btnRemoveData_clicked();
 	void on_treeOpenFiles_clicked(const QModelIndex & index);
 
-	void addData(CDataInfo data_info);
+	void addData(const CDataInfo & data_info);
 	void dataRemoved(unsigned int index);
 };
 

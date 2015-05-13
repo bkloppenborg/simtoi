@@ -12,6 +12,7 @@
 #include <QStandardItemModel>
 
 #include "CGLWidget.h"
+#include "CDataInfo.h"
 
 wDataEditor::wDataEditor(QWidget * parent)
 	: QWidget(parent)
@@ -33,7 +34,7 @@ wDataEditor::~wDataEditor()
 }
 
 /// Adds information related to the specified data to the text entry box
-void wDataEditor::addData(CDataInfo data_info)
+void wDataEditor::addData(const CDataInfo & data_info)
 {
 	QList<QStandardItem *> items;
 	QString temp;
@@ -42,13 +43,13 @@ void wDataEditor::addData(CDataInfo data_info)
 	unsigned int precision = 4;
 
 	// filename
-	temp = QString::fromUtf8(data_info.getFilename().c_str());
+	temp = QString::fromUtf8(data_info.filename().c_str());
 	items.append(new QStandardItem(temp));
 	// number of data
-	temp = QString::fromUtf8(data_info.getQuantityDescription().c_str());
+	temp = QString::fromUtf8(data_info.description().c_str());
 	items.append(new QStandardItem(temp));
 	// starting julian date
-	value = data_info.mJDStart;
+	value = data_info.JDMin();
 	if(value > 0)
 	{
 		temp = QString::number(value, 'f', precision);
@@ -58,7 +59,7 @@ void wDataEditor::addData(CDataInfo data_info)
 		items.append(new QStandardItem(QString()));
 
 	// ending julian date
-	value = data_info.mJDEnd;
+	value = data_info.JDMax();
 	if(value > 0)
 	{
 		temp = QString::number(value, 'f', precision);
@@ -68,10 +69,10 @@ void wDataEditor::addData(CDataInfo data_info)
 		items.append(new QStandardItem(QString()));
 
 	// mean julian date
-	temp = QString::number(data_info.mJDMean, 'f', precision);
+	temp = QString::number(data_info.JDMean(), 'f', precision);
 	items.append(new QStandardItem(temp));
 	// mean wavelength
-	temp = QString::number(data_info.mWavelength * 1E6, 'f', precision); // convert from meters to micrometers
+	temp = QString::number(data_info.wavelengthMean() * 1E6, 'f', precision); // convert from meters to micrometers
 	items.append(new QStandardItem(temp));
 
 	// chi2 (when applicable)
