@@ -46,7 +46,7 @@ void wDataEditor::addData(const CDataInfo & data_info)
 	temp = QString::fromUtf8(data_info.filename().c_str());
 	items.append(new QStandardItem(temp));
 	// number of data
-	temp = QString::fromUtf8(data_info.description().c_str());
+	temp = QString::fromUtf8(data_info.quantityInfo().c_str());
 	items.append(new QStandardItem(temp));
 	// starting julian date
 	value = data_info.JDMin();

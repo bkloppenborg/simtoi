@@ -31,7 +31,7 @@ public:
 	virtual ~CDataInfo();
 
 	string filename() const { return mFilename; };
-	string description() const { return mQuantityDescription; };
+	string quantityInfo() const { return mQuantityDescription; };
 	double JDMin() const { return mJDMin; };
 	double JDMax() const { return mJDMax; };
 	double JDMean() const { return mJDMean; };
