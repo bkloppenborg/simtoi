@@ -151,6 +151,9 @@ double CRocheLobe::ComputeRadius(const double r_pole, const double separation, c
 
 void CRocheLobe::preRender(double & max_flux)
 {
+	if (!mModelReady)
+		Init();
+
 	// See if the user change the tesselation
 	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 	if(mParams["n_side_power"].isDirty())
