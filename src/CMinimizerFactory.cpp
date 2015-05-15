@@ -68,7 +68,7 @@ CMinimizerFactory::CMinimizerFactory()
   Register("DIviding RECTangles Local - global/local", &CNLopt::CreateDIRECT);
   Register("Controlled Random Search - global", &CNLopt::CreateCRS2);
   Register("Multi-Level Single-Linkage + Amoeba - global/local", &CNLopt::CreateMLSLLDS);
-  Register("StoGO randomised - global", &CNLopt::CreateSTOGORAND);
+//  Register("StoGO randomised - global", &CNLopt::CreateSTOGORAND); // missing from Ubuntu's NLOpt library, disable
   Register("Improved Stochastic Ranking Evolution Strategy - global", &CNLopt::CreateISRES);
   Register("ESCH evolutionary algorithm - global", &CNLopt::CreateESCH);
   Register("Constrained Optimization BY Linear Approximations - local", &CNLopt::CreateCOBYLA);
