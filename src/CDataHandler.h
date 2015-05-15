@@ -29,8 +29,8 @@ public:
 
 public:
 
-	virtual void getChi(double * chis, unsigned int size) = 0;
-	virtual void getUncertainties(double * residuals, unsigned int size) = 0;
+	virtual void getChi(CDataPtr data, double * chis, unsigned int size) = 0;
+	virtual void getUncertainties(CDataPtr data, double * residuals, unsigned int size) = 0;
 
 	string description() const { return mDataDescription; };
 	vector<string> fileExtensions() const { return mExtensions; };

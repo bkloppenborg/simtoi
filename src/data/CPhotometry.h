@@ -10,7 +10,11 @@
 
 #include "CData.h"
 
+class CPhotometryHandler;
+
 class CPhotometry : public CData {
+	friend class CPhotometryHandler;	// provides access to protected variables
+
 protected:
 	vector<double> mJDs;
 	vector<double> mValues;
