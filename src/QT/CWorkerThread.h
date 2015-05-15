@@ -197,6 +197,7 @@ public:
     unsigned int GetImageHeight() { return mImageHeight; };
     unsigned int GetImageWidth() { return mImageWidth; };
     double GetImageScale() { return mImageScale; };
+    int GetNDataFiles();
     COpenCLPtr GetOpenCL() { return mOpenCL; };
     glm::mat4 GetView() { return mView; };
 

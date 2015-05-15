@@ -83,12 +83,15 @@ public:
 	virtual string GetDataDescription();
 	virtual vector<string> GetExtensions();
 	virtual unsigned int GetNData() = 0;
+	virtual int GetNDataFiles() = 0;
 	virtual void GetUncertainties(double * residuals, unsigned int size) = 0;
 
 	virtual void InitGL() {};
 	virtual void InitCL() {};
 
 	virtual CDataInfo OpenData(string filename) = 0;
+
+	virtual void RemoveData(unsigned int data_index) = 0;
 
 	static string StripPath(string filename);
 	static string StripExtension(string filename, vector<string> & valid_extensions);

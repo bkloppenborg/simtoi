@@ -324,6 +324,15 @@ unsigned int COI::GetNData()
 	mLibOI->GetNData();
 }
 
+int COI::GetNDataFiles()
+{
+	int n_data = 0;
+	if(mLibOI != NULL)
+		n_data = mLibOI->GetNDataSets();
+
+	return n_data;
+}
+
 void COI::GetUncertainties(double * uncertainties, unsigned int size)
 {
 	InitBuffers();
@@ -416,6 +425,14 @@ CDataInfo COI::OpenData(string filename)
 	mWavelengthMean = mLibOI->GetDataAveWavelength(data_id);
 
 	return getDataInfo();
+}
+
+void COI::RemoveData(unsigned int data_index)
+{
+	if(mLibOI != NULL)
+	{
+		mLibOI->RemoveData(data_index);
+	}
 }
 
 double COI::sum(vector<float> & values, unsigned int start, unsigned int end)

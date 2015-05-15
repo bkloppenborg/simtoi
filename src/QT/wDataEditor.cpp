@@ -85,8 +85,11 @@ void wDataEditor::addData(const CDataInfo & data_info)
 /// Remove the specified data file
 ///
 /// \param index The index of the data one wishes to remove
-void wDataEditor::dataRemoved(unsigned int index)
+void wDataEditor::dataRemoved(int index)
 {
+	if(index < 0)
+		return;
+
 	mOpenFileModel.removeRow(index);
 }
 
@@ -125,6 +128,8 @@ void wDataEditor::on_btnAddData_clicked(void)
 		QStringList files = dialog.selectedFiles();
 		openData(files);
 	}
+
+	toggleButtons();
 }
 
 /// Handle click events on the tree region
@@ -156,16 +161,15 @@ void wDataEditor::on_btnRemoveData_clicked()
 		return;
 
     // Get the selected indicies:
-    QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedIndexes();
+    QModelIndexList list = this->treeOpenFiles->selectionModel()->selectedRows();
 
-    QList<QModelIndex>::iterator it;
-    int id = 0;
-    for(it = --list.end(); it > list.begin(); it--)
+    for(int i = list.size() - 1; i > -1; i--)
     {
-    	id = (*it).row();
+    	int id = list[i].row();
     	mGLWidget->removeData(id);
-    	mOpenFileModel.removeRow(id, QModelIndex());
     }
+
+    toggleButtons();
 }
 
 /// Refreshes the data displayed in treeOpenFiles

@@ -51,7 +51,7 @@ private slots:
 	void on_treeOpenFiles_clicked(const QModelIndex & index);
 
 	void addData(const CDataInfo & data_info);
-	void dataRemoved(unsigned int index);
+	void dataRemoved(int index);
 };
 
 #endif /* WDATA_EDITOR_H_ */

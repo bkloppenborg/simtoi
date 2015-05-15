@@ -88,6 +88,7 @@ public:
 	virtual void GetChi(double * residuals, unsigned int size);
 	virtual CDataInfo getDataInfo();
 	virtual unsigned int GetNData();
+	virtual int GetNDataFiles();
 	virtual void GetUncertainties(double * residuals, unsigned int size);
 	double GetWavelength(const string & wavelength_or_band);
 
@@ -96,6 +97,8 @@ public:
 	virtual void InitCL();
 
 	CDataInfo OpenData(string filename);
+
+	void RemoveData(unsigned int data_index);
 
 	double SimulatePhotometry(CModelListPtr model_list, CPhotometricDataPointPtr data_point);
 };

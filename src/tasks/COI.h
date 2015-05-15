@@ -76,6 +76,7 @@ public:
 	virtual void GetChi(double * residuals, unsigned int size);
 	virtual CDataInfo getDataInfo();
 	virtual unsigned int GetNData();
+	virtual int GetNDataFiles();
 	virtual void GetUncertainties(double * residuals, unsigned int size);
 
 	void InitBuffers();
@@ -83,6 +84,8 @@ public:
 	virtual void InitCL();
 
 	CDataInfo OpenData(string filename);
+
+	void RemoveData(unsigned int data_index);
 
 	double sum(vector<float> & values, unsigned int start, unsigned int end);
 };

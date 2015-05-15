@@ -79,6 +79,8 @@ guiMain::guiMain(QWidget *parent_widget)
 	// data widget data selection ->
 	connect(wOpenDataEditor, SIGNAL(timeSelected(double)), wAnimationWidget, SLOT(updateTime(double)));
 	connect(wOpenDataEditor, SIGNAL(wavelengthSelected(double)), wAnimationWidget, SLOT(updateWavelength(double)));
+	// data removal
+	connect(wGLWidget, SIGNAL(dataRemoved(int)), wOpenDataEditor, SLOT(dataRemoved(int)));
 }
 
 guiMain::~guiMain()
@@ -198,10 +200,12 @@ void guiMain::on_actionNew_triggered(void)
 		unsigned int height = dialog.spinHeight->value();
 		double scale = dialog.spinScale->value();
 
+		// reset the GL widget
 		wGLWidget->resetWidget();
 		wGLWidget->SetSize(width, height);
 		wGLWidget->SetScale(scale);
 		wGLWidget->startRendering();
+
 		toggleWidgets();
 	}
 }

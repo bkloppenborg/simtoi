@@ -41,6 +41,7 @@ public:
 	void GetChi(double * chis, unsigned int size);
 	unsigned int GetDataSize();
 	vector<string> GetFileFilters();
+	int GetNDataFiles();
 	CTaskPtr getTask(unsigned int i) { return mTasks[i]; };
 	void GetUncertainties(double * uncertainties, unsigned int size);
 
@@ -48,6 +49,8 @@ public:
 
 	void InitCL();
 	void InitGL();
+
+	void RemoveData(unsigned int data_index);
 
 	unsigned int size() { return mTasks.size(); };
 };

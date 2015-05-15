@@ -231,6 +231,11 @@ unsigned int CPhotometry::GetNData()
 	return n_data;
 }
 
+int CPhotometry::GetNDataFiles()
+{
+	return mData.size();
+}
+
 /// Returns the wavelength, in meters, of the filter. If wavelength is
 /// numeric, it is expected that the units are in meters.
 double CPhotometry::GetWavelength(const string & wavelength_or_band)
@@ -394,6 +399,12 @@ CDataInfo CPhotometry::OpenData(string filename)
 	mData.push_back(data_file);
 
 	return getDataInfo();
+}
+
+void CPhotometry::RemoveData(unsigned int data_index)
+{
+	if(data_index < mData.size())
+		mData.erase(mData.begin() + data_index);
 }
 
 double CPhotometry::SimulatePhotometry(CModelListPtr model_list, CPhotometricDataPointPtr data_point)

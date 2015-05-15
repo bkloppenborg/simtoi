@@ -130,7 +130,10 @@ void CWorkerThread::removeModel(unsigned int model_index)
 
 void CWorkerThread::removeData(unsigned int data_id)
 {
+	// get exclusive access to the task list
+	QMutexLocker lock(&mTaskMutex);
 
+	mTaskList->RemoveData(data_id);
 }
 
 /// Blits the contents of the input buffer to the output buffer
@@ -420,6 +423,15 @@ QStringList CWorkerThread::GetFileFilters()
 		output.append(QString::fromStdString(filter));
 
 	return output;
+}
+
+/// returns the total number of data files that have been opened.
+int CWorkerThread::GetNDataFiles()
+{
+	// get exclusive access to the task list
+	QMutexLocker lock(&mTaskMutex);
+
+	return mTaskList->GetNDataFiles();
 }
 
 /// Get the next operation from the queue.  This is a blocking function.

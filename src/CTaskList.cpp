@@ -121,6 +121,15 @@ vector<string> CTaskList::GetFileFilters()
 	return output;
 }
 
+int CTaskList::GetNDataFiles()
+{
+	int n_data_files = -1;
+	for(auto task: mTasks)
+		n_data_files += task->GetNDataFiles();
+
+	return n_data_files;
+}
+
 void CTaskList::GetUncertainties(double * uncertainties, unsigned int size)
 {
 	unsigned int n_data;
@@ -160,6 +169,21 @@ CDataInfo CTaskList::OpenData(string filename)
 	}
 
 	throw runtime_error("The data type " + extension + " is not supported.");
+}
+
+void CTaskList::RemoveData(unsigned int data_index)
+{
+	int n_files = 0;
+	for(auto task: mTasks)
+	{
+		n_files = task->GetNDataFiles();
+		// instruct the task to remove the file if it falls within the range
+		// of files that are managed by this task.
+		if(data_index < n_files)
+			task->RemoveData(data_index);
+		else
+			data_index -= n_files;
+	}
 }
 
 void CTaskList::InitCL()

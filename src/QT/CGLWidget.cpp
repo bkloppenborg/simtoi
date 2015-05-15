@@ -81,8 +81,8 @@ CModelPtr CGLWidget::getModel(unsigned int model_index)
 
 void CGLWidget::removeData(unsigned int data_index)
 {
-//	mWorker->removeData(data_index);
-//	emit dataRemoved(data_index);
+	mWorker->removeData(data_index);
+	emit dataRemoved(data_index);
 }
 
 void CGLWidget::removeModel(unsigned int model_index)
@@ -99,10 +99,17 @@ void CGLWidget::replaceModel(unsigned int model_index, CModelPtr new_model)
 
 void CGLWidget::resetWidget()
 {
+	// remove the data from the GUI
+	for(int i = mWorker->GetNDataFiles(); i > -1; i--)
+	{
+		cout << "Instructing removal of " << i << endl;
+		emit dataRemoved(i);
+	}
+
 	mWorker = make_shared<CWorkerThread>(this, QString::fromStdString(EXE_FOLDER));
 
 	emit modelUpdated();
-	// TODO: emit something involving the data
+
 }
 
 void CGLWidget::closeEvent(QCloseEvent *evt)

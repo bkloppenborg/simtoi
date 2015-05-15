@@ -130,8 +130,7 @@ signals:
 	void modelUpdated();
 //	void dataUpdated();
 	void dataAdded(CDataInfo info);
-	void dataRemoved(unsigned int index);
-
+	void dataRemoved(int index);
 };
 
 #endif
