@@ -199,7 +199,6 @@ void CWorkerThread::BootstrapNext(unsigned int maxBootstrapFailures)
 /// Creates an RGBA32F MAA framebuffer
 QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
 {
-	CHECK_OPENGL_STATUS_ERROR(glGetError(), "A");
     // Create an RGBA32F MAA buffer
     QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
     fbo_format.setInternalTextureFormat(mBufferFormat);
