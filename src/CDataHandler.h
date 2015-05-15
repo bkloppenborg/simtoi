@@ -17,14 +17,18 @@ using namespace std;
 class CData;
 typedef shared_ptr<CData> CDataPtr;
 
+class CWorkerThread;
+
 class CDataHandler {
 
 protected:
+	CWorkerThread * mWorker;	///< Pointer to worker thread. This object is a child of the worker, do not delete.
+
 	string mDataDescription; 	///< A short few-word phrase to describe the data.
 	vector<string> mExtensions; ///< A list of valid extensions for this task.
 
 public:
-	CDataHandler();
+	CDataHandler(CWorkerThread * worker);
 	virtual ~CDataHandler();
 
 public:
