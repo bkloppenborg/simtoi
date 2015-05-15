@@ -311,8 +311,8 @@ CDataInfo COI::getDataInfo()
 	temp << "V2: " << mNV2 << " T3: " << mNT3;
 	info.setDescription(temp.str());
 
-	info.setJDMin(mJDStart);
-	info.setJDMax(mJDEnd);
+//	info.setJDMin(mJDStart);
+//	info.setJDMax(mJDEnd);
 	info.setJDMean(mJDMean);
 	info.setWavelengthMean(mWavelengthMean);
 
