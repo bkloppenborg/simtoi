@@ -13,6 +13,7 @@
 #include "CMinimizerFactory.h"
 #include "CMinimizerThread.h"
 #include "CGLWidget.h"
+#include "CModelList.h"
 
 wMinimizer::wMinimizer(QWidget * parent)
 	: QWidget(parent)
@@ -130,6 +131,7 @@ void wMinimizer::startMinimizer(const string & minimizer_id, const string & save
 		mMinimizer->wait();
 	}
 
+	// verify data is loaded
 	if(mGLWidget->getNData() == 0)
 	{
 		QMessageBox msgBox;
@@ -138,10 +140,20 @@ void wMinimizer::startMinimizer(const string & minimizer_id, const string & save
 		return;
 	}
 
+	// verify that there are models
 	if(mGLWidget->getNModels() == 0)
 	{
 		QMessageBox msgBox;
 		msgBox.setText(QString("You must define a model prior to starting a minimizer"));
+		msgBox.exec();
+		return;
+	}
+
+	// check that there is at least one free parameter
+	if(mGLWidget->getModels()->GetNFreeParameters() < 1)
+	{
+		QMessageBox msgBox;
+		msgBox.setText(QString("Your models must have at least 1 free parameter to start a minimizer"));
 		msgBox.exec();
 		return;
 	}
