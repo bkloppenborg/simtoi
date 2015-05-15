@@ -93,6 +93,9 @@ void CDensityDisk::Init()
 
 void CDensityDisk::preRender(double & max_flux)
 {
+	if (!mModelReady)
+		Init();
+
 	double temperature = float(mParams["T_eff"].getValue());
 	mPixelTemperatures[0] = temperature;
 	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
@@ -100,9 +103,6 @@ void CDensityDisk::preRender(double & max_flux)
 
 void CDensityDisk::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
-	if(!mModelReady)
-		Init();
-
 	// Look up the parameters:
 	const double r_in = mParams["r_in"].getValue();
 	const double r_cutoff  = mParams["r_cutoff"].getValue();

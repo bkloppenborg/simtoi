@@ -148,6 +148,9 @@ void CRocheRotator::GenerateModel(vector<vec3> & vbo_data, vector<unsigned int> 
 
 void CRocheRotator::preRender(double & max_flux)
 {
+	if (!mModelReady)
+		Init();
+
 	// See if the user change the tesselation
 	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 	if(mParams["n_side_power"].isDirty())
@@ -184,9 +187,6 @@ void CRocheRotator::preRender(double & max_flux)
 
 void CRocheRotator::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
-	if (!mModelReady)
-		Init();
-
 	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 
 	NormalizeFlux(max_flux);

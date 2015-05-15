@@ -241,6 +241,9 @@ void CCylinder::Init()
 
 void CCylinder::preRender(double & max_flux)
 {
+	if (!mModelReady)
+		Init();
+
 	double temperature = float(mParams["T_eff"].getValue());
 	mPixelTemperatures[0] = temperature;
 	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
@@ -248,9 +251,6 @@ void CCylinder::preRender(double & max_flux)
 
 void CCylinder::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
-	if(!mModelReady)
-		Init();
-
 	NormalizeFlux(max_flux);
 
 	// Look up the parameters:

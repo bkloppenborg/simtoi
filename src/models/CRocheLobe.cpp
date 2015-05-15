@@ -194,9 +194,6 @@ void CRocheLobe::preRender(double & max_flux)
 
 void CRocheLobe::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
-	if (!mModelReady)
-		Init();
-
 	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
 
 	NormalizeFlux(max_flux);

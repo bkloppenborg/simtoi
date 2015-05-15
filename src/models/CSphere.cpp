@@ -192,6 +192,9 @@ void CSphere::Init()
 
 void CSphere::preRender(double & max_flux)
 {
+	if (!mModelReady)
+		Init();
+
 	double temperature = float(mParams["T_eff"].getValue());
 	mPixelTemperatures[0] = temperature;
 	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
@@ -199,9 +202,6 @@ void CSphere::preRender(double & max_flux)
 
 void CSphere::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
-	if(!mModelReady)
-		Init();
-
 	// Rename a few variables for convenience:
 	double radius = float(mParams["diameter"].getValue() / 2);
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));

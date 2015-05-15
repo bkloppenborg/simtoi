@@ -96,6 +96,9 @@ void CDisk_ConcentricRings::Init()
 
 void CDisk_ConcentricRings::preRender(double & max_flux)
 {
+	if (!mModelReady)
+		Init();
+
 	double temperature = float(mParams["T_eff"].getValue());
 	mPixelTemperatures[0] = temperature;
 	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
@@ -103,9 +106,6 @@ void CDisk_ConcentricRings::preRender(double & max_flux)
 
 void CDisk_ConcentricRings::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
-	if(!mModelReady)
-		Init();
-
 	// Look up the parameters:
 	const double r_in = mParams["r_in"].getValue();
 	const double MaxRadius  = mParams["radius"].getValue();
