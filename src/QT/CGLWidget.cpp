@@ -241,6 +241,7 @@ void CGLWidget::SetSaveDirectory(string directory_path)
 void CGLWidget::SetSize(unsigned int width, unsigned int height)
 {
 	mWorker->SetSize(width, height);
+	this->setFixedSize(width, height);
 }
 
 void CGLWidget::SetTime(double time)
