@@ -153,7 +153,8 @@ void CPhotometry::Export(string folder_name)
 		chi2r /= chi_values.size();
 
 		// Write out the chi2r for this file:
-		summary << mFilenameNoExtension << ".phot," << mDataDescription << "," << chi2r << endl;
+		summary << mFilenameNoExtension << ".phot," << mDataDescription << "," << chi2r
+				<< "," << data_file->data.size() << endl;
 	}
 
 	// Close the statistics file.
