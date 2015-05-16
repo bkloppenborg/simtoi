@@ -29,10 +29,10 @@ public:
 
 	unsigned int addParameter(string internal_name, double value,
 			double min, double max, bool free, double step_size,
-			string human_name);
+			string human_name, unsigned int decimal_places=1);
 	unsigned int addParameter(string internal_name, double value,
 			double min, double max, bool free, double step_size,
-			string human_name, string help);
+			string human_name, string help, unsigned int decimal_places=1);
 
 	void clearFlags();
 

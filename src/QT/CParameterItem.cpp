@@ -51,7 +51,28 @@ CParameterItem::~CParameterItem()
 
 QVariant CParameterItem::data(int role) const
 {
-	return QStandardItem::data(role);
+	QVariant value = QStandardItem::data(role);
+
+	int col = column();
+
+	if(col > 1 && (role == Qt::EditRole || role == Qt::DisplayRole))
+	{
+		double temp = value.toDouble();
+		char format = 'f';
+
+		if(temp > 1E4)
+			format = 'e';
+
+		return QString("%1").arg(temp, 0, format, decimalPlaces());
+	}
+
+	return value;
+}
+
+unsigned int CParameterItem::decimalPlaces() const
+{
+	CParameter & parameter = mParentModel->getParameter(mStringID);
+	return parameter.getDecimalPlaces();
 }
 
 void CParameterItem::setData(const QVariant & value, int role)

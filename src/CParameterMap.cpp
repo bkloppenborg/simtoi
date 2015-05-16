@@ -21,14 +21,14 @@ CParameterMap::~CParameterMap()
 
 /// Adds an additional parameter for this model with no help text
 unsigned int CParameterMap::addParameter(string internal_name, double value, double min, double max, bool free, double step_size,
-		string human_name)
+		string human_name, unsigned int decimal_places)
 {
-	return addParameter(internal_name, value, min, max, free, step_size, human_name, string());
+	return addParameter(internal_name, value, min, max, free, step_size, human_name, string(), decimal_places);
 }
 
 /// Adds an additional parameter for this model
 unsigned int CParameterMap::addParameter(string internal_name, double value, double min, double max, bool free, double step_size,
-		string human_name, string help)
+		string human_name, string help, unsigned int decimal_places)
 {
 	// create the parameter, set some default values.
 	CParameter temp;
@@ -43,6 +43,7 @@ unsigned int CParameterMap::addParameter(string internal_name, double value, dou
 	temp.setStepSize(step_size);
 	temp.setHumanName(human_name);
 	temp.setHelpText(help);
+	temp.setDecimalPlaces(decimal_places);
 	// Enable bounds checking.
 	temp.toggleBoundsChecks(true);
 
@@ -210,6 +211,12 @@ void CParameterMap::restore(Json::Value input)
 		param.setFree(     bool  ( input[id][3u].asBool()   ));
 		param.setStepSize( double( input[id][4u].asDouble() ));
 
+		// attempt to restore the decimal places, this is an optional field.
+		try{
+			param.setDecimalPlaces( int (input[id][5u].asInt()  ));
+		}
+		catch(...) { }
+
 		// Enable bounds checking after values are restored.
 		param.toggleBoundsChecks(true);
 	}
@@ -237,6 +244,7 @@ Json::Value CParameterMap::serialize()
 		tmp.append(Json::Value(param.getMax()));
 		tmp.append(Json::Value(param.isFree()));
 		tmp.append(Json::Value(param.getStepSize()));
+		tmp.append(Json::Value(param.getDecimalPlaces()));
 		output[param.getID()] = tmp;
 	}
 

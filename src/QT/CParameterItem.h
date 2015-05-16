@@ -59,6 +59,7 @@ public:
 	virtual ~CParameterItem();
 
 	QVariant data(int role = Qt::UserRole + 1) const;
+	unsigned int decimalPlaces() const;
 	void setData(const QVariant & value, int role = Qt::UserRole + 1);
 };
 
