@@ -38,9 +38,9 @@ CCylinder::CCylinder()
 	id = "cylinder";
 	name = "Cylinder";
 
-	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)");
-	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter", "Diameter of the cylinder");
-	addParameter("height", 0.5, 0.1, 2.0, true, 0.1, "Height", "Total height of the cylinder");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter", "Diameter of the cylinder", 2);
+	addParameter("height", 0.5, 0.1, 2.0, true, 0.1, "Height", "Total height of the cylinder", 2);
 
 	mMidplaneStart = 0;
 	mMidplaneSize = 0;

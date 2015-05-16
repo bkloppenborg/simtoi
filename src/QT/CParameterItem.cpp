@@ -51,11 +51,11 @@ CParameterItem::~CParameterItem()
 
 QVariant CParameterItem::data(int role) const
 {
-	QVariant value = QStandardItem::data(role);
-
 	int col = column();
 
-	if(col > 1 && (role == Qt::EditRole || role == Qt::DisplayRole))
+	QVariant value = QStandardItem::data(role);
+	// Modify the number of decimal places displayed for the "value" column
+	if(col == 2 && (role == Qt::EditRole || role == Qt::DisplayRole))
 	{
 		double temp = value.toDouble();
 		char format = 'f';
@@ -63,7 +63,7 @@ QVariant CParameterItem::data(int role) const
 		if(temp > 1E4)
 			format = 'e';
 
-		return QString("%1").arg(temp, 0, format, decimalPlaces());
+		value = QString("%1").arg(temp, 0, format, decimalPlaces());
 	}
 
 	return value;

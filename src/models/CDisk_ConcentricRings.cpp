@@ -15,11 +15,11 @@ CDisk_ConcentricRings::CDisk_ConcentricRings()
 	id = "disk_concentric_rings";
 	name = "Concentric Ring Disk";
 
-	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)");
-	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius");
-	addParameter("radius", 20, 0.1, 20, false, 1.0, "Radius", "Radius of the disk");
-	addParameter("height", 5, 0.1, 10, false, 1.0, "Height", "Height of the disk");
-	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius", 2);
+	addParameter("radius", 20, 0.1, 20, false, 1.0, "Radius", "Radius of the disk", 2);
+	addParameter("height", 5, 0.1, 10, false, 1.0, "Height", "Height of the disk", 2);
+	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model", 0);
 
 	// We load the power-law shader by default.
 	auto shaders = CShaderFactory::Instance();

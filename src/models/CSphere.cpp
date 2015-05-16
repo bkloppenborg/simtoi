@@ -48,8 +48,8 @@ CSphere::CSphere()
 	id = "sphere";
 	name = "Sphere";
 
-	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)");
-	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere (mas)");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere (mas)", 2);
 
 	mNumElements = 0;
 

@@ -48,13 +48,13 @@ CPositionOrbit::CPositionOrbit()
 
 	mPositionType = DYNAMIC;
 
-	addParameter("Omega", 0, 0, 360, false, 1, "Omega", "Position angle of the ascending node (degrees).");
-	addParameter("inclination", 0, -180, 180, false, 1, "Inclination", "Inclination measured from the plane of the sky (degrees).");
-	addParameter("omega", 0, 0, 360, false, 1, "omega", "Argument of periapsis (degrees).");
-	addParameter("alpha", 0, 0, 10, false, 1, "alpha", "Orbital semi-major axis (mas)");
-	addParameter("e", 0, 0, 1, false, 0.1, "e", "Eccentricity");
-	addParameter("T", 0, 0, 1000, false, 10, "T", "Time of periastron (JD)");
-	addParameter("P", 1, 0, 360, false, 1, "P", "Orbital period (days)");
+	addParameter("Omega", 0, 0, 360, false, 1, "Omega", "Position angle of the ascending node (degrees).", 2);
+	addParameter("inclination", 0, -180, 180, false, 1, "Inclination", "Inclination measured from the plane of the sky (degrees).", 2);
+	addParameter("omega", 0, 0, 360, false, 1, "omega", "Argument of periapsis (degrees).", 2);
+	addParameter("alpha", 0, 0, 10, false, 1, "alpha", "Orbital semi-major axis (mas)", 2);
+	addParameter("e", 0, 0, 1, false, 0.1, "e", "Eccentricity", 4);
+	addParameter("T", 0, 0, 1000, false, 10, "T", "Time of periastron (JD)", 4);
+	addParameter("P", 1, 0, 360, false, 1, "P", "Orbital period (days)", 4);
 }
 
 CPositionOrbit::~CPositionOrbit()

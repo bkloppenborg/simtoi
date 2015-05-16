@@ -15,11 +15,11 @@ CDensityDisk::CDensityDisk()
 	id = "density_disk";
 	name = "Density disk base class";
 
-	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)");
-	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius");
-	addParameter("r_cutoff", 20, 0.1, 20, false, 1.0, "Radial cutoff", "Cutoff radius beyond which the model will not exist");
-	addParameter("h_cutoff", 5, 0.1, 10, false, 1.0, "Height cutoff", "Cutoff height beyond which the model will not exist");
-	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius", 2);
+	addParameter("r_cutoff", 20, 0.1, 20, false, 1.0, "Radial cutoff", "Cutoff radius beyond which the model will not exist", 2);
+	addParameter("h_cutoff", 5, 0.1, 10, false, 1.0, "Height cutoff", "Cutoff height beyond which the model will not exist", 2);
+	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model", 0);
 
 	// We load the default shader, but this should be replaced by something more
 	// specific later.
