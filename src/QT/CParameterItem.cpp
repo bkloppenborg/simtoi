@@ -60,9 +60,6 @@ QVariant CParameterItem::data(int role) const
 		double temp = value.toDouble();
 		char format = 'f';
 
-		if(temp > 1E4)
-			format = 'e';
-
 		value = QString("%1").arg(temp, 0, format, decimalPlaces());
 	}
 
