@@ -47,8 +47,8 @@
 
 CMultiNest::CMultiNest()
 {
-	mMinimizerID = "multinest";
-	mMinimizerName = "MultiNest";
+	mID = "multinest";
+	mName = "Multinest (Nested Sampling) - global";
 }
 
 CMultiNest::~CMultiNest()

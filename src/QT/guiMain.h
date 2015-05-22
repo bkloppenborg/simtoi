@@ -55,7 +55,7 @@ protected:
     string mShaderSourceDir;
     string mKernelSourceDir;
 
-    string mOpenModelDir; 	// Stores the previously opened directory for models
+    string mOpenSaveFileDir; 	// Stores the previously opened directory for models
 
 public:
     guiMain(QWidget *parent = 0);

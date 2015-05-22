@@ -76,6 +76,10 @@ public:
 
 	int run(double (*error_func)(unsigned int nParams, const double* params, double* grad, void* misc));
 
+private:
+	void setName(string name);
+	void setID(string id);
 };
+
 
 #endif /* CMINIMIZER_NLOPT_H_ */

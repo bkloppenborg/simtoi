@@ -45,8 +45,8 @@ CMinimizerThread::CMinimizerThread()
 	mRun = false;
 	mIsRunning = false;
 	mSaveDirectory = "/tmp/model";
-	mMinimizerName = "";
-	mMinimizerID = "";
+	mName = "";
+	mID = "";
 }
 
 CMinimizerThread::~CMinimizerThread()
@@ -102,9 +102,9 @@ void CMinimizerThread::ExportResults()
 }
 
 /// \brief Returns the unique ID assigned to this minimizer.
-string CMinimizerThread::GetID()
+string CMinimizerThread::ID()
 {
-	return mMinimizerID;
+	return mID;
 }
 
 /// \brief Returns the best-fit parameters after minimization has completed.
@@ -139,6 +139,12 @@ void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 	unsigned int n_data = mWorkerThread->GetDataSize();
 	mChis = valarray<double>(n_data);
 	mUncertainties = valarray<double>(n_data);
+}
+
+/// \brief Returns a human-readable name for this minimization engine
+string CMinimizerThread::name()
+{
+	return mName;
 }
 
 /// \brief Opens the statistics file and sets the properties for the ofstream

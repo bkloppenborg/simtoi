@@ -37,8 +37,8 @@
 
 CNLopt::CNLopt()
 {
-	mMinimizerID = "NLopt";
-	mMinimizerName = "NLopt";
+	mID = "NLopt";
+	mName = "NLopt";
 }
 
 CNLopt::~CNLopt()
@@ -48,94 +48,120 @@ CNLopt::~CNLopt()
 
 CMinimizerPtr CNLopt::CreateNELDERMEAD()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_LN_NELDERMEAD;
-  return CMinimizerPtr(nl);
+	CNLopt * nl = new CNLopt();
+	nl->setID("nlopt_amoeba");
+	nl->setName("Amoeba (Nelder-Mead Simplex) - local");
+	nl->mAlgorithm = NLOPT_LN_NELDERMEAD;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateDIRECTL()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_GN_DIRECT_L;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_directl");
+	nl->setName("DIviding RECTangles - global");
+	nl->mAlgorithm = NLOPT_GN_DIRECT_L;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateDIRECT()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_GN_DIRECT;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_direct");
+	nl->setName("DIviding RECTangles Local - global/local");
+	nl->mAlgorithm = NLOPT_GN_DIRECT;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateCRS2()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_GN_CRS2_LM; 
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_crs2");
+	nl->setName("Controlled Random Search - global");
+	nl->mAlgorithm = NLOPT_GN_CRS2_LM;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateMLSLLDS()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_G_MLSL_LDS;
-  nl->mAlgorithmSecondary = NLOPT_LN_NELDERMEAD;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_mlsl_lds");
+	nl->setName("Multi-Level Single-Linkage + Amoeba - global/local");
+	nl->mAlgorithm = NLOPT_G_MLSL_LDS;
+	nl->mAlgorithmSecondary = NLOPT_LN_NELDERMEAD;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateSTOGORAND()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_GD_STOGO_RAND;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_stogo_rand");
+	nl->setName("StoGO randomised - global");
+	nl->mAlgorithm = NLOPT_GD_STOGO_RAND;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateISRES()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_GN_ISRES;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_isres");
+	nl->setName("Improved Stochastic Ranking Evolution Strategy - global");
+	nl->mAlgorithm = NLOPT_GN_ISRES;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateESCH()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_GN_ESCH;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_esch");
+	nl->setName("ESCH evolutionary algorithm - global");
+	nl->mAlgorithm = NLOPT_GN_ESCH;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateCOBYLA()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_LN_COBYLA;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_cobyla");
+	nl->setName("Constrained Optimization BY Linear Approximations - local");
+	nl->mAlgorithm = NLOPT_LN_COBYLA;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateBOBYQA()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_LN_BOBYQA;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_bobyqa");
+	nl->setName("Powell's BOBYQA - local");
+	nl->mAlgorithm = NLOPT_LN_BOBYQA;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateNEWUOA()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_LN_NEWUOA_BOUND;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_newuoa");
+	nl->setName("Powell's NEWUOA - local");
+	nl->mAlgorithm = NLOPT_LN_NEWUOA_BOUND;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreatePRAXIS()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_LN_PRAXIS;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlolpt_praxis");
+	nl->setName("PRincipal AXIS - local");
+	nl->mAlgorithm = NLOPT_LN_PRAXIS;
+	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateSBPLX()
 { 
-  CNLopt* nl = new CNLopt(); 
-  nl->mAlgorithm = NLOPT_LN_SBPLX;
-  return CMinimizerPtr(nl);
+	CNLopt* nl = new CNLopt();
+	nl->setID("nlopt_sbplx");
+	nl->setName("Subplex algorithm - local");
+	nl->mAlgorithm = NLOPT_LN_SBPLX;
+	return CMinimizerPtr(nl);
 }
 
 
@@ -300,4 +326,16 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 
 
 	return mEvals;
+}
+
+/// \brief Set the human-readable name for this minimization engine
+void CNLopt::setName(string name)
+{
+	mName = name;
+}
+
+/// \brief Set the machine-readable ID for this minimization engine
+void CNLopt::setID(string id)
+{
+	mID = id;
 }

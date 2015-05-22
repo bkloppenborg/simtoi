@@ -100,7 +100,7 @@ void guiMain::Init(void)
 	mShaderSourceDir = app_path + "/shaders/";
 	mKernelSourceDir = app_path + "/kernels/";
 
-	mOpenModelDir = "./";
+	mOpenSaveFileDir = "./";
 }
 
 /// Opens one saved model file.
@@ -178,7 +178,7 @@ void guiMain::on_actionOpen_triggered()
 {
    // Open a dialog, get a list of file that the user selected:
 	QFileDialog dialog(this);
-	dialog.setDirectory(QString::fromStdString(mOpenModelDir));
+	dialog.setDirectory(QString::fromStdString(mOpenSaveFileDir));
 	dialog.setNameFilter(tr("SIMTOI Model Files (*.json)"));
 	dialog.setFileMode(QFileDialog::ExistingFile);
 

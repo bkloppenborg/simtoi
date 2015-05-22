@@ -19,8 +19,8 @@ using namespace std;
 
 CBootstrap_Levmar::CBootstrap_Levmar()
 {
-	mMinimizerID = "bootstrap_levmar";
-	mMinimizerName = "Bootstrap - Levmar";
+	mID = "bootstrap_levmar";
+	mName = "Bootstrap using Levmar (Levenberg-Marquart) - local";
 
 	mBootstrapFailures = 0;
 	mMaxBootstrapFailures = 20;

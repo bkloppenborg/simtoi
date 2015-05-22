@@ -34,9 +34,9 @@
 #include <stdexcept>
 #include <string>
 
-#include "CModel.h"
-
 using namespace std;
+
+#include "QT/CMinimizerThread.h"
 
 // TODO: Instead of loading them explicitly here, it would be better to load them using plugins
 
@@ -59,32 +59,32 @@ using namespace std;
 CMinimizerFactory::CMinimizerFactory()
 {
 	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
-  Register("Benchmark - performance", &CBenchmark::Create);
-  Register("Grid Search - global", &CGridSearch::Create);
+  Register(&CBenchmark::Create);
+  Register(&CGridSearch::Create);
 
 #ifdef _ADD_NLOPT
-  Register("Amoeba (Nelder-Mead Simplex) - local", &CNLopt::CreateNELDERMEAD);
-  Register("DIviding RECTangles - global", &CNLopt::CreateDIRECTL);
-  Register("DIviding RECTangles Local - global/local", &CNLopt::CreateDIRECT);
-  Register("Controlled Random Search - global", &CNLopt::CreateCRS2);
-  Register("Multi-Level Single-Linkage + Amoeba - global/local", &CNLopt::CreateMLSLLDS);
-//  Register("StoGO randomised - global", &CNLopt::CreateSTOGORAND); // missing from Ubuntu's NLOpt library, disable
-  Register("Improved Stochastic Ranking Evolution Strategy - global", &CNLopt::CreateISRES);
-  Register("ESCH evolutionary algorithm - global", &CNLopt::CreateESCH);
-  Register("Constrained Optimization BY Linear Approximations - local", &CNLopt::CreateCOBYLA);
-  Register("Powell's BOBYQA - local", &CNLopt::CreateBOBYQA);
-  Register("Powell's NEWUOA - local", &CNLopt::CreateNEWUOA); 
-  Register("PRincipal AXIS - local", &CNLopt::CreatePRAXIS);
-  Register("Subplex algorithm - local", &CNLopt::CreateSBPLX);
+  Register(&CNLopt::CreateNELDERMEAD);
+  Register(&CNLopt::CreateDIRECTL);
+  Register(&CNLopt::CreateDIRECT);
+  Register(&CNLopt::CreateCRS2);
+  Register(&CNLopt::CreateMLSLLDS);
+//  Register("&CNLopt::CreateSTOGORAND); // missing from Ubuntu's NLOpt library, disable
+  Register(&CNLopt::CreateISRES);
+  Register(&CNLopt::CreateESCH);
+  Register(&CNLopt::CreateCOBYLA);
+  Register(&CNLopt::CreateBOBYQA);
+  Register(&CNLopt::CreateNEWUOA);
+  Register(&CNLopt::CreatePRAXIS);
+  Register(&CNLopt::CreateSBPLX);
 #endif //_ADD_NLOPT
 
 #ifdef _ADD_LEVMAR
-  Register("Levmar (Levenberg-Marquart) - local", &CLevmar::Create);
-  Register("Bootstraped Levmar (Levenberg-Marquart) - local", &CBootstrap_Levmar::Create);
+  Register(&CLevmar::Create);
+  Register(&CBootstrap_Levmar::Create);
 #endif //_ADD_LEVMAR
 
 #ifdef _ADD_MULTINEST
-  Register("Multinest (Nested Sampling) - global", &CMultiNest::Create);
+  Register(&CMultiNest::Create);
 #endif // _ADD_MULTINEST
 
 
@@ -100,8 +100,8 @@ CMinimizerFactory::~CMinimizerFactory() \
 /// Returns a shared_ptr<CModel> to the object if found, or throws a runtime exception.
 shared_ptr<CMinimizerThread> CMinimizerFactory::CreateMinimizer(string MinimizerID)
 {
-	auto it = mFactory.find(MinimizerID);
-	if(it != mFactory.end())
+	auto it = mCreators.find(MinimizerID);
+	if(it != mCreators.end())
 		return it->second();
 
 	throw runtime_error("The minimizer with ID '" + MinimizerID + "' not registered with CMinimizerFactory");
@@ -109,15 +109,48 @@ shared_ptr<CMinimizerThread> CMinimizerFactory::CreateMinimizer(string Minimizer
 	return shared_ptr<CMinimizerThread>();
 }
 
-/// \brief Returns a vector of the minimizer ids that are loaded.
-vector<string> CMinimizerFactory::GetMinimizerList()
+/// \brief Returns a vector of the ids for the minimizer that are loaded
+vector<string> CMinimizerFactory::GetMinimizerIDs()
 {
 	vector<string> temp;
 
-	for(auto it: mFactory)
-		temp.push_back(it.first);
+	for(auto it: mCreators)
+	{
+		string id = it.first;
+		temp.push_back(id);
+	}
 
 	return temp;
+}
+
+/// \brief Returns a vector containing the names of the minimizers that are loaded.
+vector<string> CMinimizerFactory::GetMinimizerNames()
+{
+	vector<string> temp;
+
+	for(auto it: mNames)
+	{
+		string name = it.second;
+		temp.push_back(name);
+	}
+
+	return temp;
+}
+
+string CMinimizerFactory::idFromName(string name)
+{
+	string id = "";
+
+	for(auto it: mNames)
+	{
+		if(it.second == name)
+			id = it.first;
+	}
+
+	if(id.length() < 1)
+		throw runtime_error("A minimizer with name '" + name + "' is already registered with CMinimizerFactory");
+
+	return id;
 }
 
 /// \brief Returns a copy of the CMinimizerFactory instance
@@ -129,11 +162,20 @@ CMinimizerFactory CMinimizerFactory::Instance()
 
 /// \brief Registers a minimizer with the factory
 ///
-/// \param MinimizerID A unique string which identifies this minimizer.
+/// \param MinimizerID A unique string with no spaces that identifies this minimizer.
+///        This parameter may be used on the command line so keep it short.
 /// \param CreateFunction A pointer to a CMinimizer::Create
-void CMinimizerFactory::Register(string MinimizerID, CreateMinimizerFn CreateFunction)
+void CMinimizerFactory::Register(CreateMinimizerFn CreateFunction)
 {
-	if(mFactory.find(MinimizerID) != mFactory.end())
-		throw runtime_error("A minimizer with ID '" + MinimizerID + "' is already registered with CMinimizerFactory");
-	mFactory[MinimizerID] = CreateFunction;
+	// Create a temporary instance of the minimizer to get information from it
+	CMinimizerPtr minimizer = CreateFunction();
+	string ID = minimizer->ID();
+	string name = minimizer->name();
+
+	if(mCreators.find(ID) != mCreators.end())
+		throw runtime_error("A minimizer with ID '" + ID + "' is already registered with CMinimizerFactory");
+
+	// register the class
+	mCreators[ID] = CreateFunction;
+	mNames[ID] = name;
 }

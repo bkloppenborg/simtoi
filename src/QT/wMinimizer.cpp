@@ -24,7 +24,7 @@ wMinimizer::wMinimizer(QWidget * parent)
 
 	// Setup the combo boxes.
 	auto minimizers = CMinimizerFactory::Instance();
-	guiCommon::setOptions(this->cboMinimizers, minimizers.GetMinimizerList());
+	guiCommon::setOptions(this->cboMinimizers, minimizers.GetMinimizerNames());
 
 	// Setup the text boxes
 	textSaveFolder->setText("/tmp/model");
@@ -82,7 +82,12 @@ void wMinimizer::on_btnStartStop_clicked()
 	}
 	else // start a new minimizer.
 	{
-		string id = this->cboMinimizers->currentText().toStdString();
+		// find the ID for the minimizer
+		auto minimizers = CMinimizerFactory::Instance();
+		string name = this->cboMinimizers->currentText().toStdString();
+		string id = minimizers.idFromName(name);
+
+		// start the minimizer
 		startMinimizer(id, save_directory);
 	}
 }

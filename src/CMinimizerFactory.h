@@ -54,7 +54,8 @@ typedef CMinimizerPtr (*CreateMinimizerFn)(void);
 /// After the minimizer has been registered it will become available for use in SIMTOI.
 class CMinimizerFactory {
 private:
-	map<string, CreateMinimizerFn> mFactory; ///< Associates id -> minimizer create function
+	map<string, CreateMinimizerFn> mCreators; ///< Associates id -> minimizer create function
+	map<string, string> mNames; ///< Associates id -> minimizer create function
 
 	CMinimizerFactory();	///< Singleton class => private constructor.
 
@@ -64,10 +65,13 @@ public:
 public:
 	shared_ptr<CMinimizerThread> CreateMinimizer(string MinimizerID);
 
-	static CMinimizerFactory Instance();
-	void Register(string MinimizerID, CreateMinimizerFn CreateFunction);
+	string idFromName(string name);
 
-	vector<string> GetMinimizerList();
+	static CMinimizerFactory Instance();
+	void Register(CreateMinimizerFn CreateFunction);
+
+	vector<string> GetMinimizerIDs();
+	vector<string> GetMinimizerNames();
 };
 
 #endif /* CMINIMIZERFACTORY_H_ */
