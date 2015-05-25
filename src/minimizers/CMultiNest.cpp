@@ -146,7 +146,6 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 	// Now get the residuals and compute the chi values. Store these in the output double.
 	minimizer->mWorkerThread->GetChi(&minimizer->mChis[0], minimizer->mChis.size());
 	lnew = ComputeLogZ(minimizer->mChis, minimizer->mUncertainties);
-	double temp = lnew;
 
 	// Add in the priors:
 	lnew += minimizer->ComputePriors(params, npars);
