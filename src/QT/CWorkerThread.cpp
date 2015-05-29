@@ -617,8 +617,9 @@ void CWorkerThread::run()
 		}
 	}
 
-	// Release the OpenGL context
+	// Move the OpenGL context back to the main thread
 	mGLWidget->doneCurrent();
+	mGLWidget->context()->moveToThread(mGLWidget->thread());
 
 	emit finished();
 }

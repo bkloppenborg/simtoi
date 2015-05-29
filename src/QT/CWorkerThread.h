@@ -220,6 +220,7 @@ protected:
 // Signals and slots
 signals:
 	void dataAdded(CDataInfo info);
+	void finished();
 };
     
 #endif // C_WORKER_THREAD

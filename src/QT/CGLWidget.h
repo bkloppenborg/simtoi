@@ -91,6 +91,7 @@ public:
 	void resetWidget();
 protected:
     void resizeEvent(QResizeEvent *evt);
+    void paintEvent(QPaintEvent * event);
 
 public:
     void Export(QString save_folder);

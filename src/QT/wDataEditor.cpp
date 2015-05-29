@@ -177,7 +177,7 @@ void wDataEditor::refreshTree()
 {
 	this->treeOpenFiles->setHeaderHidden(false);
 	this->treeOpenFiles->setModel(&mOpenFileModel);
-	this->treeOpenFiles->header()->setResizeMode(QHeaderView::ResizeToContents);
+	this->treeOpenFiles->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 /// Sets the current widget. Connects necessary signals and slots.

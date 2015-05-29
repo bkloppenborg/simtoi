@@ -59,6 +59,7 @@ CGLWidget::CGLWidget(QWidget * widget_parent)
 
 CGLWidget::~CGLWidget()
 {
+	// stop the rendering thread, wait for it to complete, and reclaim the context
 	stopRendering();
 }
 
@@ -203,6 +204,16 @@ void CGLWidget::paintGL()
 	}
 }
 
+void CGLWidget::paintEvent(QPaintEvent * event)
+{
+	if(!mWorker->isRunning())
+		QGLWidget::paintEvent(event);
+	else
+	{
+		Render();
+	}
+}
+
 void CGLWidget::Render()
 {
 	mWorker->Render();
@@ -264,9 +275,11 @@ void CGLWidget::setWavelength(double wavelength)
 
 void CGLWidget::startRendering()
 {
-	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context
+	// Shut off auto-buffer swapping
 	setAutoBufferSwap(false);
+	// signal we are done with OpenGL, transfer the context to the worker
     this->doneCurrent();
+    context()->moveToThread(mWorker.get());
 
 	// Tell the thread to start.
     mWorker->start();
@@ -280,6 +293,7 @@ void CGLWidget::stopRendering()
     mWorker->stop();
     mWorker->wait();
 
+    // move the context back to the main thread, make it current
     this->makeCurrent();
 }
 

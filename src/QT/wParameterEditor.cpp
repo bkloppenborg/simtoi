@@ -293,7 +293,7 @@ void wParameterEditor::refreshTree()
 {
 	this->treeModels->setHeaderHidden(false);
 	this->treeModels->setModel(&mTreeModel);
-	this->treeModels->header()->setResizeMode(QHeaderView::ResizeToContents);
+	this->treeModels->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	// expand the tree fully
 	this->treeModels->expandAll();
 }

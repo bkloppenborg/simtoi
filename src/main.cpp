@@ -64,13 +64,13 @@ extern string EXE_FOLDER;
 int main(int argc, char *argv[])
 {
 	// X11 requires some special initialzation for threaded OpenGL rendering.
-#if QT_VERSION_MAJOR >= 4 && QT_VERSION_MINOR >= 8
+//#if QT_VERSION_MAJOR >= 4 && QT_VERSION_MINOR >= 8
 	// For QT >= 4.8, we have to set a global QT attribute
     QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
-#elif defined Q_WS_X11
-    // For all other versions of QT running on X11, the following (should) be sufficient.
-    XInitThreads();
-#endif
+//#elif defined Q_WS_X11
+//    // For all other versions of QT running on X11, the following (should) be sufficient.
+//    XInitThreads();
+//#endif
 
 	// Pass off to the GUI:
     QApplication app(argc, argv);

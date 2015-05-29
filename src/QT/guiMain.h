@@ -28,7 +28,7 @@
 
 #include "ui_guiMain.h"
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <string>
