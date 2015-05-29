@@ -49,7 +49,7 @@ CSphere::CSphere()
 	name = "Sphere";
 
 	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
-	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere (mas)", 2);
+	addParameter("radius", 0.5, 0, 1, true, 0.05, "Radius", "Radius of the sphere (mas)", 4);
 
 	mNumElements = 0;
 
@@ -203,7 +203,7 @@ void CSphere::preRender(double & max_flux)
 void CSphere::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
 	// Rename a few variables for convenience:
-	double radius = float(mParams["diameter"].getValue() / 2);
+	double radius = float(mParams["radius"].getValue());
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
 	NormalizeFlux(max_flux);
