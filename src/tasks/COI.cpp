@@ -55,7 +55,7 @@ COI::COI(CWorkerThread * WorkerThread)
 
 	mLibOI = NULL;
 	mLibOIInitialized = false;
-	mIntegratedGPU = false;
+	mInteropEnabled = false;
 
 	mTempFloat = NULL;
 
@@ -156,16 +156,16 @@ void  COI::copyImage()
 	// about AMD. Thus we explicitly copy the data from OpenGL to a host-side
 	// buffer, then copy the data back to the GPU. A total waste of resources
 	// but the only workaround which is reasonable at the present time.
-	if(mIntegratedGPU)
+	if(mInteropEnabled)
+	{
+		mLibOI->CopyImageToBuffer(0);
+	}
+	else
 	{
 		unsigned int width = mWorkerThread->GetImageWidth();
 		unsigned int height = mWorkerThread->GetImageHeight();
 		// something with mFBO_storage
 		glReadPixels(0, 0, width, height, GL_RED, GL_FLOAT, mHostImage);
-		mLibOI->CopyImageToBuffer(0);
-	}
-	else
-	{
 		mLibOI->CopyImageToBuffer(0);
 	}
 }
@@ -380,10 +380,13 @@ void COI::InitBuffers()
 		// Initalize remaining OpenCL items.
 		mLibOI->SetKernelSourcePath(EXE_FOLDER + "/kernels/");
 
-		if(mIntegratedGPU)
-			mLibOI->SetImageSource(mHostImage);
-		else
+		if(mInteropEnabled)
 			mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
+		else
+		{
+			mHostImage = new float(width * height);
+			mLibOI->SetImageSource(mHostImage);
+		}
 
 		mLibOI->SetImageInfo(width, height, depth, scale);
 
@@ -409,7 +412,7 @@ void COI::InitCL()
 	COpenCLPtr OCL = mWorkerThread->GetOpenCL();
 	mLibOI = new CLibOI(OCL);
 	// detect if we have an integrated GPU
-	mIntegratedGPU = mLibOI->IsIntegratedDevice();
+	mInteropEnabled = mLibOI->isInteropEnabled();
 }
 
 CDataInfo COI::OpenData(string filename)

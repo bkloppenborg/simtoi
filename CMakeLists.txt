@@ -28,10 +28,6 @@ endif()
 # If a library is in a non-standard location, add it to the search path here:
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/lib/fglrx)
 
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -D DEBUG -O2 -march=native")
-
 # Set some CMake properties:
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin

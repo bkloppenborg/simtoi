@@ -56,7 +56,7 @@ protected:
 
 	float * mTempFloat;
 
-	bool mIntegratedGPU;
+	bool mInteropEnabled;
 	GLfloat * mHostImage;
 
 	vector<OIDataList> mData;	/// A copy of the original data. Used when bootstrapping
