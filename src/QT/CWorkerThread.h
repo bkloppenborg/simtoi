@@ -105,9 +105,13 @@ class CWorkerThread : public QThread
 {
     Q_OBJECT
 protected:
-    // OpenGL
+    // Datamembers for the OpenGL context
     CGLWidget * mGLWidget;	///< Managed elsewhere, do not delete.
-    GLint mBufferFormat;
+    bool mGLFloatSupported;
+    GLint mGLRenderBufferFormat;
+    GLint mGLStorageBufferFormat;
+    GLenum mGLPixelDataType;
+
     unsigned int mImageDepth;
     unsigned int mImageHeight;
     double mImageScale;
@@ -201,6 +205,10 @@ public:
     COpenCLPtr GetOpenCL() { return mOpenCL; };
     glm::mat4 GetView() { return mView; };
 
+	GLint glRenderBufferFormat() { return mGLRenderBufferFormat; }
+	GLint glRenderStorageFormat() { return mGLStorageBufferFormat; }
+	GLenum glPixelDataFormat() { return mGLPixelDataType; }
+
 //    void OpenData(string filename);
 
     void Render();
@@ -220,6 +228,7 @@ protected:
 // Signals and slots
 signals:
 	void dataAdded(CDataInfo info);
+	void glContextWarning(string message);
 };
     
 #endif // C_WORKER_THREAD

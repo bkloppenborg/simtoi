@@ -55,6 +55,8 @@ CGLWidget::CGLWidget(QWidget * widget_parent)
 	mWorker = make_shared<CWorkerThread>(this, QString::fromStdString(EXE_FOLDER));
 
 	mSaveDirectory = "";
+
+	connect(mWorker.get(), SIGNAL(glContextWarning(string)), this, SLOT(receiveWarning(string)));
 }
 
 CGLWidget::~CGLWidget()
@@ -72,6 +74,31 @@ void CGLWidget::addModel(CModelPtr model)
 {
 	mWorker->addModel(model);
 	emit modelUpdated();
+}
+
+bool CGLWidget::checkExtensionAvailability(string ext_name)
+{
+    bool ret_val = false;
+
+    // get the total number of extensions
+    GLint num_extensions = 0;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+
+    // Now query for each extensions
+    for(int i = 0; i < num_extensions; i++)
+    {
+    	const GLubyte * gl_extension = glGetStringi(GL_EXTENSIONS, i);
+        const char * gl_extension_c = reinterpret_cast<const char*>(gl_extension);
+        string ext = string(gl_extension_c);
+
+        if(ext == ext_name)
+        {
+        	ret_val = true;
+        	break;
+        }
+    }
+
+    return ret_val;
 }
 
 CModelPtr CGLWidget::getModel(unsigned int model_index)
@@ -206,6 +233,11 @@ void CGLWidget::paintGL()
 void CGLWidget::Render()
 {
 	mWorker->Render();
+}
+
+void CGLWidget::receiveWarning(string message)
+{
+	emit warning(message);
 }
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)

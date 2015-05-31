@@ -67,17 +67,18 @@ public:
     CGLWidget(QWidget *widget_parent);
     virtual ~CGLWidget();
 
+	void addData(string filename);
     void addModel(shared_ptr<CModel> model);
+
+	static bool checkExtensionAvailability(std::string ext_name);
+
 	CModelPtr getModel(unsigned int model_index);
 	CModelListPtr getModels() { return mWorker->GetModelList(); };
+	int getNModels() { return mWorker->GetModelList()->size(); };
+	int getNData() { return mWorker->GetDataSize(); };
+
 	void replaceModel(unsigned int model_index, CModelPtr new_model);
 	void removeModel(unsigned int model_index);
-
-	void addData(string filename);
-
-	int getNData() { return mWorker->GetDataSize(); };
-	int getNModels() { return mWorker->GetModelList()->size(); };
-
 	void removeData(unsigned int data_index);
 
 protected:
@@ -123,14 +124,17 @@ public:
     void stopRendering();
 
 private slots:
-
 	void updateParameters();
+
+public slots:
+	void receiveWarning(string message);
 
 signals:
 	void modelUpdated();
 //	void dataUpdated();
 	void dataAdded(CDataInfo info);
 	void dataRemoved(int index);
+	void warning(string message);
 };
 
 #endif

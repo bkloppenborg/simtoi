@@ -71,6 +71,9 @@ public:
     void run_command_line(QStringList & data_files, QString & model_file, string minimizer_id, string save_directory, bool close_simtoi);
 
 private slots:
+
+	void displayWarning(string);
+
 	void on_actionNew_triggered(void);
     void on_actionExport_triggered();
     void on_actionOpen_triggered();
