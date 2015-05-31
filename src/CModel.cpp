@@ -345,6 +345,7 @@ void CModel::InitShaderVariables()
 	// First get the shader and activate it
 	GLuint shader_program = mShader->GetProgram();
 	glUseProgram(shader_program);
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to activate OpenGL shader");
 
 	// Define the storage format for the VBO. Each vertex is defined by
 	// three vec3s that are packed as follows:
