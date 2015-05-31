@@ -62,7 +62,12 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
     mImageSamples = 4;
 
     mFBO_render = NULL;
-    mBufferFormat = GL_RGBA32F;
+
+    // Assume the OpenGL context has 32-bit floating point support
+    mGLFloatSupported = true;
+	mGLRenderBufferFormat = GL_RGBA32F;
+	mGLStorageBufferFormat = GL_R32F;
+	mGLPixelDataType = GL_FLOAT;
 
 	// Initialize the model and task lists:
     mModelList = CModelListPtr(new CModelList());
@@ -207,14 +212,14 @@ QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
 {
     // Create an RGBA32F MAA buffer
     QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
-    fbo_format.setInternalTextureFormat(mBufferFormat);
+    fbo_format.setInternalTextureFormat(mGLRenderBufferFormat);
     fbo_format.setTextureTarget(GL_TEXTURE_2D);
 
     const QSize size(mImageWidth, mImageHeight);
 
     QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
 
-	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a RGBA32F MAA framebuffer");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a MAA rendering framebuffer");
 
     return FBO;
 }
@@ -224,14 +229,14 @@ QGLFramebufferObject * CWorkerThread::CreateStorageBuffer()
 {
     // Create an RGBA32F MAA buffer
     QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
-    fbo_format.setInternalTextureFormat(GL_R32F);
+    fbo_format.setInternalTextureFormat(mGLStorageBufferFormat);
     fbo_format.setSamples(0);
     fbo_format.setTextureTarget(GL_TEXTURE_2D);
 
     const QSize size(mImageWidth, mImageHeight);
 
     QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
-	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a R32F non-MAA framebuffer");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a non-MAA storage framebuffer");
     return FBO;
 }
 
@@ -269,7 +274,7 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 	glGenRenderbuffers(1, &FBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, FBO_texture);
 	// Create a 2D multisample texture
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, mBufferFormat, width, height);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, mGLRenderBufferFormat, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, FBO_texture);
 
 	glGenRenderbuffers(1, &FBO_depth);
@@ -309,7 +314,7 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R32F, width, height, depth, 0, GL_RED, GL_FLOAT, NULL);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, mGLStorageBufferFormat, width, height, depth, 0, GL_RED, mGLPixelDataType, NULL);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create storage buffer");
 
@@ -501,6 +506,25 @@ void CWorkerThread::run()
 	// ########
 	// OpenGL display initialization
 	// ########
+    mGLFloatSupported = mGLWidget->checkExtensionAvailability("GL_ARB_texture_float");
+    if(mGLFloatSupported)
+    {
+    	mGLRenderBufferFormat = GL_RGBA32F;
+    	mGLStorageBufferFormat = GL_R32F;
+		mGLPixelDataType = GL_FLOAT;
+    }
+    else
+    {
+//    	mGLRenderBufferFormat = GL_RGBA16;
+//    	mGLStorageBufferFormat = GL_R16;
+//    	mGLPixelDataType = GL_UNSIGNED_INT;
+
+    	mGLRenderBufferFormat = GL_RGB;
+    	mGLStorageBufferFormat = GL_R;
+    	mGLPixelDataType = GL_UNSIGNED_BYTE;
+
+    	cout << "WARNING: OpenGL version does not support floating point textures, falling back to 16-bit integer buffers!" << endl;
+    }
 
     // Setup the OpenGL context
     // Set the clear color to black:

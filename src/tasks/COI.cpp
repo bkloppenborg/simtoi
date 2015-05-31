@@ -163,10 +163,34 @@ void  COI::copyImage()
 	else
 	{
 		unsigned int width = mWorkerThread->GetImageWidth();
-		unsigned int height = mWorkerThread->GetImageHeight();
-		// something with mFBO_storage
-		glReadPixels(0, 0, width, height, GL_RED, GL_FLOAT, mHostImage);
-		mLibOI->CopyImageToBuffer(0);
+		unsigned int height = mWorkerThread->GetImageHeight();i
+
+		GLint buffer_format = this->mWorkerThread->glPixelDataFormat();
+		switch(buffer_format)
+		{
+		case GL_FLOAT:
+			// floating point buffer, simply copy the data directly
+			glReadPixels(0, 0, width, height, GL_RED, buffer_format, mHostImage);
+			mLibOI->CopyImageToBuffer(0);
+
+			break;
+
+		case GL_UNSIGNED_INT:
+			// unsigned integer buffer, copy and convert the data
+			unsigned int * temp = new unsigned int[width * height];
+			glReadPixels(0, 0, width, height, GL_RED, buffer_format, temp);
+
+			float sum = 0;
+			for(int i = 0; i < width * height; i++)
+			{
+				mHostImage[i] = float(temp[i]);
+			}
+
+			delete[] temp;
+			break;
+
+			mLibOI->CopyImageToBuffer(0);
+		}
 	}
 }
 
@@ -384,7 +408,7 @@ void COI::InitBuffers()
 			mLibOI->SetImageSource(mFBO_storage->handle(), LibOIEnums::OPENGL_TEXTUREBUFFER);
 		else
 		{
-			mHostImage = new float(width * height);
+			mHostImage = new float[width * height];
 			mLibOI->SetImageSource(mHostImage);
 		}
 
@@ -413,6 +437,8 @@ void COI::InitCL()
 	mLibOI = new CLibOI(OCL);
 	// detect if we have an integrated GPU
 	mInteropEnabled = mLibOI->isInteropEnabled();
+	if(!mInteropEnabled)
+		cout << "Warning: Your device does not support OpenCL-OpenGL interoperability, this will result in a significant performance degredation.";
 }
 
 CDataInfo COI::OpenData(string filename)

@@ -81,6 +81,7 @@ guiMain::guiMain(QWidget *parent_widget)
 	connect(wOpenDataEditor, SIGNAL(wavelengthSelected(double)), wAnimationWidget, SLOT(updateWavelength(double)));
 	// data removal
 	connect(wGLWidget, SIGNAL(dataRemoved(int)), wOpenDataEditor, SLOT(dataRemoved(int)));
+	connect(wGLWidget, SIGNAL(warning(string)), this, SLOT(displayWarning(string)));
 }
 
 guiMain::~guiMain()
@@ -153,6 +154,15 @@ void guiMain::toggleWidgets()
 	// enable all of the tabs in the bottom
 	for(unsigned int i = 0; i < tabBottom->count(); i++)
 		tabBottom->setTabEnabled(i, true);
+}
+
+void guiMain::displayWarning(string message)
+{
+	// An error was thrown. Display a message to the user
+	QMessageBox msgBox;
+	msgBox.setWindowTitle("SIMTOI Warning");
+	msgBox.setText(QString::fromStdString(message));
+	msgBox.exec();
 }
 
 void guiMain::on_actionExport_triggered()

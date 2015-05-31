@@ -4,39 +4,39 @@
  *  Created on: Jan 24, 2011
  *      Author: bkloppenborg
  */
- 
- /* 
+
+ /*
  * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
- * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling 
- * Tool for Optical Interferometry" (Version X). 
+ * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling
+ * Tool for Optical Interferometry" (Version X).
  * Available from  <https://github.com/bkloppenborg/simtoi>.
  *
- * This file is part of the SImulation and Modeling Tool for Optical 
+ * This file is part of the SImulation and Modeling Tool for Optical
  * Interferometry (SIMTOI).
- * 
+ *
  * SIMTOI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License 
+ * it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation version 3.
- * 
+ *
  * SIMTOI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
+ *
+ * You should have received a copy of the GNU Lesser General Public
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
  /*
  * A class to interface with the workers.
  * TODO: This uses QT 3x thread structure (i.e. inherit from QThread). This should be
  *       converted to QT 4x style where we use a moveToThread command instead. See
  *       docs here: http://qt-project.org/doc/qt-4.8/QThread.html
  */
- 
+
 #ifndef C_WORKER_THREAD
 #define C_WORKER_THREAD
 
@@ -105,9 +105,13 @@ class CWorkerThread : public QThread
 {
     Q_OBJECT
 protected:
-    // OpenGL
+    // Datamembers for the OpenGL context
     CGLWidget * mGLWidget;	///< Managed elsewhere, do not delete.
-    GLint mBufferFormat;
+    bool mGLFloatSupported;
+    GLint mGLRenderBufferFormat;
+    GLint mGLStorageBufferFormat;
+    GLenum mGLPixelDataType;
+
     unsigned int mImageDepth;
     unsigned int mImageHeight;
     double mImageScale;
@@ -201,6 +205,10 @@ public:
     COpenCLPtr GetOpenCL() { return mOpenCL; };
     glm::mat4 GetView() { return mView; };
 
+	GLint glRenderBufferFormat() { return mGLRenderBufferFormat; }
+	GLint glRenderStorageFormat() { return mGLStorageBufferFormat; }
+	GLenum glPixelDataFormat() { return mGLPixelDataType; }
+
 //    void OpenData(string filename);
 
     void Render();
@@ -221,6 +229,7 @@ protected:
 signals:
 	void dataAdded(CDataInfo info);
 	void finished();
+	void glContextWarning(string message);
 };
-    
+
 #endif // C_WORKER_THREAD
