@@ -60,7 +60,7 @@ CMultiNest::~CMultiNest()
 ///
 /// \param params current parameter values in MultiNest
 /// \param n_params the number of parameters in params.
-double CMultiNest::ComputePriors(double * params, int n_params)
+double CMultiNest::ComputeLogPrior(double * params, int n_params)
 {
 	double prior = 1;
 
@@ -74,10 +74,10 @@ double CMultiNest::ComputePriors(double * params, int n_params)
 		prior *= 1.0 / (min_max.second - min_max.first);
 	}
 
-	return prior;
+	return log(prior);
 }
 
-double CMultiNest::ComputeLogZ(valarray<double> & chis, const valarray<double> & uncertainties)
+double CMultiNest::ComputeLogLikelihood(valarray<double> & chis, const valarray<double> & uncertainties)
 {
 	// We compute the log likelihood from the following formulation:
 	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp( -chi^2_i / 2)]
@@ -145,10 +145,10 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 
 	// Now get the residuals and compute the chi values. Store these in the output double.
 	minimizer->mWorkerThread->GetChi(&minimizer->mChis[0], minimizer->mChis.size());
-	lnew = ComputeLogZ(minimizer->mChis, minimizer->mUncertainties);
+	lnew = ComputeLogLikelihood(minimizer->mChis, minimizer->mUncertainties);
 
 	// Add in the priors:
-	lnew += minimizer->ComputePriors(params, npars);
+	lnew += minimizer->ComputeLogPrior(params, npars);
 }
 
 /// Reads in the 'multinestsummary.txt' file and extracts the
