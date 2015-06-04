@@ -155,7 +155,7 @@ bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, 
 			int field_width = 20;
 			run_simtoi = false;
 
-			auto factory = CMinimizerFactory::instance();
+			auto factory = CMinimizerFactory::getInstance();
 			vector<string> ids = factory.getIDs();
 			vector<string> names = factory.getNames();
 

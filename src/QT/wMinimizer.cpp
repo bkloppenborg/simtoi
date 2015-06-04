@@ -23,7 +23,7 @@ wMinimizer::wMinimizer(QWidget * parent)
 	mGLWidget = NULL;
 
 	// Setup the combo boxes.
-	auto minimizers = CMinimizerFactory::instance();
+	auto minimizers = CMinimizerFactory::getInstance();
 	guiCommon::setOptions(this->cboMinimizers, minimizers.getNames());
 
 	// Setup the text boxes
@@ -83,7 +83,7 @@ void wMinimizer::on_btnStartStop_clicked()
 	else // start a new minimizer.
 	{
 		// find the ID for the minimizer
-		auto minimizers = CMinimizerFactory::instance();
+		auto minimizers = CMinimizerFactory::getInstance();
 		string name = this->cboMinimizers->currentText().toStdString();
 		string id = minimizers.idFromName(name);
 
@@ -127,7 +127,7 @@ void wMinimizer::setSaveDirectory(const string & save_directory)
 void wMinimizer::startMinimizer(const string & minimizer_id, const string & save_directory)
 {
 	// Look up the minimizer
-	auto minimizers = CMinimizerFactory::instance();
+	auto minimizers = CMinimizerFactory::getInstance();
 
 	// stop any presently running minimization engine.
 	if(mMinimizer && mMinimizer->isRunning())

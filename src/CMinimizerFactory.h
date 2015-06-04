@@ -67,8 +67,8 @@ public:
 
 	string idFromName(string name);
 
-	static CMinimizerFactory instance();
-	void register(CreateMinimizerFn CreateFunction);
+	static CMinimizerFactory getInstance();
+	void addItem(CreateMinimizerFn CreateFunction);
 
 	vector<string> getIDs();
 	vector<string> getNames();
