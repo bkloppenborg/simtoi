@@ -63,15 +63,15 @@ public:
 	virtual ~CMinimizerFactory();
 
 public:
-	shared_ptr<CMinimizerThread> CreateMinimizer(string MinimizerID);
+	shared_ptr<CMinimizerThread> create(string ID);
 
 	string idFromName(string name);
 
-	static CMinimizerFactory Instance();
-	void Register(CreateMinimizerFn CreateFunction);
+	static CMinimizerFactory instance();
+	void register(CreateMinimizerFn CreateFunction);
 
-	vector<string> GetMinimizerIDs();
-	vector<string> GetMinimizerNames();
+	vector<string> getIDs();
+	vector<string> getNames();
 };
 
 #endif /* CMINIMIZERFACTORY_H_ */

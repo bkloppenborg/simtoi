@@ -59,32 +59,32 @@ using namespace std;
 CMinimizerFactory::CMinimizerFactory()
 {
 	// TODO: For now we register minimizers explicitly. In the future, we should use plugins instead.
-  Register(&CBenchmark::Create);
-  Register(&CGridSearch::Create);
+  register(&CBenchmark::Create);
+  register(&CGridSearch::Create);
 
 #ifdef _ADD_NLOPT
-  Register(&CNLopt::CreateNELDERMEAD);
-  Register(&CNLopt::CreateDIRECTL);
-  Register(&CNLopt::CreateDIRECT);
-  Register(&CNLopt::CreateCRS2);
-  Register(&CNLopt::CreateMLSLLDS);
+  register(&CNLopt::CreateNELDERMEAD);
+  register(&CNLopt::CreateDIRECTL);
+  register(&CNLopt::CreateDIRECT);
+  register(&CNLopt::CreateCRS2);
+  register(&CNLopt::CreateMLSLLDS);
 //  Register("&CNLopt::CreateSTOGORAND); // missing from Ubuntu's NLOpt library, disable
-  Register(&CNLopt::CreateISRES);
-  Register(&CNLopt::CreateESCH);
-  Register(&CNLopt::CreateCOBYLA);
-  Register(&CNLopt::CreateBOBYQA);
-  Register(&CNLopt::CreateNEWUOA);
-  Register(&CNLopt::CreatePRAXIS);
-  Register(&CNLopt::CreateSBPLX);
+  register(&CNLopt::CreateISRES);
+  register(&CNLopt::CreateESCH);
+  register(&CNLopt::CreateCOBYLA);
+  register(&CNLopt::CreateBOBYQA);
+  register(&CNLopt::CreateNEWUOA);
+  register(&CNLopt::CreatePRAXIS);
+  register(&CNLopt::CreateSBPLX);
 #endif //_ADD_NLOPT
 
 #ifdef _ADD_LEVMAR
-  Register(&CLevmar::Create);
-  Register(&CBootstrap_Levmar::Create);
+  register(&CLevmar::Create);
+  register(&CBootstrap_Levmar::Create);
 #endif //_ADD_LEVMAR
 
 #ifdef _ADD_MULTINEST
-  Register(&CMultiNest::Create);
+  register(&CMultiNest::Create);
 #endif // _ADD_MULTINEST
 
 
@@ -110,7 +110,7 @@ shared_ptr<CMinimizerThread> CMinimizerFactory::CreateMinimizer(string Minimizer
 }
 
 /// \brief Returns a vector of the ids for the minimizer that are loaded
-vector<string> CMinimizerFactory::GetMinimizerIDs()
+vector<string> CMinimizerFactory::getIDs()
 {
 	vector<string> temp;
 
@@ -124,7 +124,7 @@ vector<string> CMinimizerFactory::GetMinimizerIDs()
 }
 
 /// \brief Returns a vector containing the names of the minimizers that are loaded.
-vector<string> CMinimizerFactory::GetMinimizerNames()
+vector<string> CMinimizerFactory::getNames()
 {
 	vector<string> temp;
 
@@ -154,7 +154,7 @@ string CMinimizerFactory::idFromName(string name)
 }
 
 /// \brief Returns a copy of the CMinimizerFactory instance
-CMinimizerFactory CMinimizerFactory::Instance()
+CMinimizerFactory CMinimizerFactory::instance()
 {
 	static CMinimizerFactory instance;
 	return instance;
@@ -165,7 +165,7 @@ CMinimizerFactory CMinimizerFactory::Instance()
 /// \param MinimizerID A unique string with no spaces that identifies this minimizer.
 ///        This parameter may be used on the command line so keep it short.
 /// \param CreateFunction A pointer to a CMinimizer::Create
-void CMinimizerFactory::Register(CreateMinimizerFn CreateFunction)
+void CMinimizerFactory::register(CreateMinimizerFn CreateFunction)
 {
 	// Create a temporary instance of the minimizer to get information from it
 	CMinimizerPtr minimizer = CreateFunction();

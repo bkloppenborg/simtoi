@@ -155,9 +155,9 @@ bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, 
 			int field_width = 20;
 			run_simtoi = false;
 
-			auto factory = CMinimizerFactory::Instance();
-			vector<string> ids = factory.GetMinimizerIDs();
-			vector<string> names = factory.GetMinimizerNames();
+			auto factory = CMinimizerFactory::instance();
+			vector<string> ids = factory.getIDs();
+			vector<string> names = factory.getNames();
 
 			cout << " " << std::left << std::setw(field_width + 1) << std::setfill(' ') << "Engine ID" << "Description" << endl;
 			cout << " " << string(field_width, '-') << " " << string(field_width, '-') << endl;
