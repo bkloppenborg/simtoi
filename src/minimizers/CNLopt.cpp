@@ -47,7 +47,7 @@ CNLopt::~CNLopt()
 }
 
 CMinimizerPtr CNLopt::CreateNELDERMEAD()
-{ 
+{
 	CNLopt * nl = new CNLopt();
 	nl->setID("nlopt_amoeba");
 	nl->setName("Amoeba (Nelder-Mead Simplex) - local");
@@ -56,7 +56,7 @@ CMinimizerPtr CNLopt::CreateNELDERMEAD()
 }
 
 CMinimizerPtr CNLopt::CreateDIRECTL()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_directl");
 	nl->setName("DIviding RECTangles - global");
@@ -65,7 +65,7 @@ CMinimizerPtr CNLopt::CreateDIRECTL()
 }
 
 CMinimizerPtr CNLopt::CreateDIRECT()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_direct");
 	nl->setName("DIviding RECTangles Local - global/local");
@@ -74,7 +74,7 @@ CMinimizerPtr CNLopt::CreateDIRECT()
 }
 
 CMinimizerPtr CNLopt::CreateCRS2()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_crs2");
 	nl->setName("Controlled Random Search - global");
@@ -83,7 +83,7 @@ CMinimizerPtr CNLopt::CreateCRS2()
 }
 
 CMinimizerPtr CNLopt::CreateMLSLLDS()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_mlsl_lds");
 	nl->setName("Multi-Level Single-Linkage + Amoeba - global/local");
@@ -93,7 +93,7 @@ CMinimizerPtr CNLopt::CreateMLSLLDS()
 }
 
 CMinimizerPtr CNLopt::CreateSTOGORAND()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_stogo_rand");
 	nl->setName("StoGO randomised - global");
@@ -102,7 +102,7 @@ CMinimizerPtr CNLopt::CreateSTOGORAND()
 }
 
 CMinimizerPtr CNLopt::CreateISRES()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_isres");
 	nl->setName("Improved Stochastic Ranking Evolution Strategy - global");
@@ -111,7 +111,7 @@ CMinimizerPtr CNLopt::CreateISRES()
 }
 
 CMinimizerPtr CNLopt::CreateESCH()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_esch");
 	nl->setName("ESCH evolutionary algorithm - global");
@@ -120,7 +120,7 @@ CMinimizerPtr CNLopt::CreateESCH()
 }
 
 CMinimizerPtr CNLopt::CreateCOBYLA()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_cobyla");
 	nl->setName("Constrained Optimization BY Linear Approximations - local");
@@ -129,7 +129,7 @@ CMinimizerPtr CNLopt::CreateCOBYLA()
 }
 
 CMinimizerPtr CNLopt::CreateBOBYQA()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_bobyqa");
 	nl->setName("Powell's BOBYQA - local");
@@ -138,7 +138,7 @@ CMinimizerPtr CNLopt::CreateBOBYQA()
 }
 
 CMinimizerPtr CNLopt::CreateNEWUOA()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_newuoa");
 	nl->setName("Powell's NEWUOA - local");
@@ -147,16 +147,16 @@ CMinimizerPtr CNLopt::CreateNEWUOA()
 }
 
 CMinimizerPtr CNLopt::CreatePRAXIS()
-{ 
+{
 	CNLopt* nl = new CNLopt();
-	nl->setID("nlolpt_praxis");
+	nl->setID("nlopt_praxis");
 	nl->setName("PRincipal AXIS - local");
 	nl->mAlgorithm = NLOPT_LN_PRAXIS;
 	return CMinimizerPtr(nl);
 }
 
 CMinimizerPtr CNLopt::CreateSBPLX()
-{ 
+{
 	CNLopt* nl = new CNLopt();
 	nl->setID("nlopt_sbplx");
 	nl->setName("Subplex algorithm - local");
@@ -179,7 +179,7 @@ double CNLopt::ErrorFunc(unsigned int nParams, const double* params, double* gra
 	// Set the free parameters to the current nominal values determined by the minimizer
 	CModelListPtr model_list = minimizer->mWorkerThread->GetModelList();
 	model_list->SetFreeParameters(params, nParams, false);
-	
+
 	minimizer->mWorkerThread->GetChi(&minimizer->mChis[0], minimizer->mChis.size());
 	return ComputeChi2r(minimizer->mChis, minimizer->mNParams);
 }
@@ -217,11 +217,11 @@ string CNLopt::GetExitString(nlopt_result exit_num)
 	case -3:
 	  tmp = "NLOPT_OUT_OF_MEMORY = -3, Ran out of memory.";
 	  break;
-	case -4: 
+	case -4:
 	  tmp="NLOPT_ROUNDOFF_LIMITED = -4, Halted because roundoff errors limited progress.";
 	  break;
 	case -5:
-	  tmp="NLOPT_FORCED_STOP = -5, Halted because of a forced termination"; 
+	  tmp="NLOPT_FORCED_STOP = -5, Halted because of a forced termination";
 	  break;
 	default:
 		tmp =  "Unknown Exit Condition!";
@@ -268,7 +268,7 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 	//	xopt = new double [mNParams];
 	lb = new double [mNParams];
 	ub = new double [mNParams];
-	
+
 	// Copy out the initial values for the parameters:
 	CModelListPtr model_list = mWorkerThread->GetModelList();
 	model_list->GetFreeParameters(mParams, mNParams, false);
@@ -285,7 +285,7 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 
 	nlopt_set_lower_bounds(mOpt,lb);
 	nlopt_set_upper_bounds(mOpt,ub);
-	
+
 	nlopt_set_ftol_rel(mOpt, 1e-4); // stopping criterion = when chi2 changes by less than 0.1%
 	nlopt_set_min_objective(mOpt, error_func, (void*)this);
 
@@ -308,10 +308,10 @@ int CNLopt::run(double (*error_func)(unsigned int nParams, const double* params,
 
 	mIsRunning = true;
 	mEvals = 0;
-	double minf;	
-	// Call NLopt.  Note, the results are saved in mParams upon completion.	
+	double minf;
+	// Call NLopt.  Note, the results are saved in mParams upon completion.
 	nlopt_result result = nlopt_optimize(mOpt, mParams, &minf);
-	
+
 	mIsRunning = false;
 	printresult(mParams, mNParams, n_data, names, minf, result);
 
