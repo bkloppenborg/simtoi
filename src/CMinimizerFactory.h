@@ -33,9 +33,7 @@
 #ifndef CMINIMIZERFACTORY_H_
 #define CMINIMIZERFACTORY_H_
 
-#include <map>
-#include <memory>
-#include <vector>
+#include "FactoryBase.h"
 
 using namespace std;
 
@@ -52,20 +50,14 @@ typedef CMinimizerPtr (*CreateMinimizerFn)(void);
 /// Before any minimizer may be used in SIMTOI, it must be registered with this class.
 /// Simply call `Register()` with a unique ID and `CMinimizerPtr` creation function.
 /// After the minimizer has been registered it will become available for use in SIMTOI.
-class CMinimizerFactory {
-private:
-	map<string, CreateMinimizerFn> mCreators; ///< Associates id -> minimizer create function
-	map<string, string> mNames; ///< Associates id -> minimizer create function
+class CMinimizerFactory : public FactoryBase<CMinimizerPtr, CreateMinimizerFn> {
 
+private:
 	CMinimizerFactory() {};
 	CMinimizerFactory(CMinimizerFactory const&) = delete;
 	void operator=(CMinimizerFactory const&)    = delete;
 
 public:
-	shared_ptr<CMinimizerThread> create(string ID);
-
-	string idFromName(string name);
-
 	/// \brief Returns a copy of the CMinimizerFactory instance
 	static CMinimizerFactory & getInstance()
 	{
@@ -73,10 +65,6 @@ public:
 		return instance;
 	}
 
-	void addItem(CreateMinimizerFn CreateFunction);
-
-	vector<string> getIDs();
-	vector<string> getNames();
 };
 
 #endif /* CMINIMIZERFACTORY_H_ */
