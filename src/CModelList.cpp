@@ -152,8 +152,7 @@ vector<string> CModelList::GetFreeParamNames()
 /// Returns a pair of model names, and their enumerated types
 vector<string> CModelList::GetTypes(void)
 {
-	auto factory = CModelFactory::Instance();
-	return factory.GetModelList();
+	return CModelFactory::getInstance().getIDs();
 }
 
 // Render the image to the specified OpenGL framebuffer object.
@@ -205,7 +204,6 @@ void CModelList::RemoveModel(unsigned int model_index)
 /// Restores the saved models
 void CModelList::Restore(Json::Value input)
 {
-	auto factory = CModelFactory::Instance();
 	CModelPtr model;
 
 	// Clear the model list:
@@ -227,7 +225,7 @@ void CModelList::Restore(Json::Value input)
 		{
 			// Look up the type of model and create an object of that type:
 			model_id = input[id]["base_id"].asString();
-			model = factory.CreateModel(model_id);
+			model = CModelFactory::getInstance().create(model_id);
 
 			// Now have the model restore the rest of itself, then push it onto the list.
 			model->Restore(input[id]);

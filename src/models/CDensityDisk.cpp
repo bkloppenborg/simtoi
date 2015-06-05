@@ -12,8 +12,8 @@ CDensityDisk::CDensityDisk()
 : 	CModel()
 {
 	// give this object a name
-	id = "density_disk";
-	name = "Density disk base class";
+	mID = "density_disk";
+	mName = "Density disk base class";
 
 	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
 	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius", 2);

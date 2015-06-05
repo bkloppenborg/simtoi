@@ -14,8 +14,8 @@
 CRocheRotator::CRocheRotator() :
 		CHealpixSpheroid()
 {
-	id = "roche_rotator";
-	name = "Roche Rotator";
+	mID = "roche_rotator";
+	mName = "Roche Rotator";
 
 	// Tesselation parameter for healpix, 4-6 is adequate for our uses.
 	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)", 2);

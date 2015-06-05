@@ -95,9 +95,9 @@ public:
 	void addItem(CreateFuncPtr CreateFunction)
 	{
 		// Create a temporary instance of the minimizer to get information from it
-		ObjectPtr minimizer = CreateFunction();
-		string ID = minimizer->ID();
-		string name = minimizer->name();
+		ObjectPtr object = CreateFunction();
+		string ID = object->ID();
+		string name = object->name();
 
 		if(mCreators.find(ID) != mCreators.end())
 			throw runtime_error("A minimizer with ID '" + ID + "' is already addItemed with CMinimizerFactory");

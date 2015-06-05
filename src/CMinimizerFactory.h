@@ -35,8 +35,6 @@
 
 #include "FactoryBase.h"
 
-using namespace std;
-
 class CMinimizerThread;
 typedef shared_ptr<CMinimizerThread> CMinimizerPtr;
 typedef CMinimizerPtr (*CreateMinimizerFn)(void);
@@ -44,12 +42,8 @@ typedef CMinimizerPtr (*CreateMinimizerFn)(void);
 /// \brief A factory class for creating minimizer objects
 ///
 /// This factory is used to register and create instances of minimizers in SIMTOI.
-/// As this class is a singleton, the constructor is private. Call the `Instance()`
+/// As this class is a singleton, the constructor is private. Call the `getInstance()`
 /// function to get a copy of this object.
-///
-/// Before any minimizer may be used in SIMTOI, it must be registered with this class.
-/// Simply call `Register()` with a unique ID and `CMinimizerPtr` creation function.
-/// After the minimizer has been registered it will become available for use in SIMTOI.
 class CMinimizerFactory : public FactoryBase<CMinimizerPtr, CreateMinimizerFn> {
 
 private:

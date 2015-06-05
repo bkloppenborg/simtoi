@@ -45,8 +45,8 @@ using namespace std;
 CSphere::CSphere()
 	: CModel()
 {
-	id = "sphere";
-	name = "Sphere";
+	mID = "sphere";
+	mName = "Sphere";
 
 	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
 	addParameter("radius", 0.5, 0, 1, true, 0.05, "Radius", "Radius of the sphere (mas)", 4);

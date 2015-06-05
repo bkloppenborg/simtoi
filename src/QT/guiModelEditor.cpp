@@ -55,8 +55,6 @@ guiModelEditor::~guiModelEditor() {
 /// Returns an instance of a CModelPtr as defined by the properties set on the GUI.
 CModelPtr guiModelEditor::getModel()
 {
-	auto factory = CModelFactory::Instance();
-
 	string model_id = cboModels->currentText().toStdString();
 	string position_id = cboPositions->currentText().toStdString();
 	string shader_id = cboShaders->currentText().toStdString();
@@ -71,7 +69,7 @@ CModelPtr guiModelEditor::getModel()
 			auto features = mModel->GetFeatures();
 
 			// create the model
-			mModel = factory.CreateModel(model_id);
+			mModel = CModelFactory::getInstance().create(model_id);
 			// restore the position, shader, and features.
 			mModel->SetPositionModel(position);
 			mModel->SetShader(shader);
@@ -87,7 +85,7 @@ CModelPtr guiModelEditor::getModel()
 	}
 	else	// construct a new model from scratch
 	{
-		mModel = factory.CreateModel(model_id);
+		mModel = CModelFactory::getInstance().create(model_id);
 		mModel->SetPositionModel(position_id);
 		mModel->SetShader(shader_id);
 
@@ -108,12 +106,11 @@ CModelPtr guiModelEditor::getModel()
 /// Initalizes the UI with values found elsewhere in SIMTOI.
 void guiModelEditor::initUi()
 {
-	auto models = CModelFactory::Instance();
 	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
 	auto features = CFeatureFactory::Instance();
 
-	guiCommon::setOptions(cboModels, models.GetModelList());
+	guiCommon::setOptions(cboModels, CModelFactory::getInstance().getNames());
 	guiCommon::setOptions(cboPositions, positions.GetPositionList());
 	guiCommon::setOptions(cboShaders, shaders.GetShaderList());
 	guiCommon::setOptions(cboFeatures, features.GetFeatureList());

@@ -34,6 +34,7 @@
 #define MAIN_H_
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -42,5 +43,7 @@ string EXE_FOLDER;
 int main(int argc, char** argv);
 bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, string &  minimizer, string & output_dir, bool & close_simtoi);
 void PrintHelp();
+
+void printFactoryDescription(const vector<string> & ids, const vector<string> & names, const string & title);
 
 #endif /* MAIN_H_ */

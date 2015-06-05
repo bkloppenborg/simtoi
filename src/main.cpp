@@ -55,6 +55,7 @@
 #include "main.h"
 #include "QT/guiMain.h"
 #include "minimizers/load_minimizers.h"
+#include "models/load_models.h"
 
 using namespace std;
 
@@ -90,6 +91,7 @@ int main(int argc, char *argv[])
 
     // Setup minimization engines:
     minimizers::load();
+    models::load();
 
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
@@ -155,23 +157,36 @@ bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, 
 
 		if(value == "--list-engines")
 		{
-			int field_width = 20;
 			run_simtoi = false;
 
 			vector<string> ids = CMinimizerFactory::getInstance().getIDs();
 			vector<string> names = CMinimizerFactory::getInstance().getNames();
+			printFactoryDescription(ids, names, "Engine ID");
+		}
 
-			cout << " " << std::left << std::setw(field_width + 1) << std::setfill(' ') << "Engine ID" << "Description" << endl;
-			cout << " " << string(field_width, '-') << " " << string(field_width, '-') << endl;
-			// print out a header
-			for(int i = 0; i < ids.size(); i++)
-			{
-				cout << " " << std::left << std::setw(field_width) << std::setfill(' ') << ids[i] << " " << names[i] << endl;
-			}
+		if(value == "--list-models")
+		{
+			run_simtoi = false;
+
+			vector<string> ids = CModelFactory::getInstance().getIDs();
+			vector<string> names = CModelFactory::getInstance().getNames();
+			printFactoryDescription(ids, names, "Engine ID");
 		}
 	}
 
 	return run_simtoi;
+}
+
+void printFactoryDescription(const vector<string> & ids, const vector<string> & names, const string & title)
+{
+	int field_width = 25;
+	cout << " " << std::left << std::setw(field_width + 1) << std::setfill(' ') << title << "Description" << endl;
+	cout << " " << string(field_width, '-') << " " << string(field_width, '-') << endl;
+	// print out a header
+	for(int i = 0; i < ids.size(); i++)
+	{
+		cout << " " << std::left << std::setw(field_width) << std::setfill(' ') << ids[i] << " " << names[i] << endl;
+	}
 }
 
 /// Prints the command line options and exits.
@@ -191,6 +206,7 @@ void PrintHelp()
 	cout << "  " << "-m             : " << "Model input file" << endl;
 	cout << "  " << "-o             : " << "Output directory" << endl;
 	cout << "  " << "--list-engines : " << "Lists all registered minimization engines" << endl;
+	cout << "  " << "--list-models  : " << "Lists all registered models" << endl;
 	cout << endl;
 	cout << "SIMTOI also supports QT commands. For instance you can run SIMTOI from a: " << endl;
 	cout << "remotely executed script (or from gnu screen) by adding: " << endl;

@@ -1,12 +1,12 @@
 /*
- * \file CMinimizerFactory.cpp
+ * \file load_minimizers.cpp
  *
  *  Created on: Feb 10, 2013
  *  \author bkloppenborg
  */
 
  /*
- * Copyright (c) 2012 Brian Kloppenborg
+ * Copyright (c) 2015 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -30,10 +30,27 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CMinimizerFactory.h"
-#include <stdexcept>
-#include <string>
+#include "load_models.h"
+#include "CSphere.h"
+#include "CCylinder.h"
+#include "CDisk_ConcentricRings.h"
+#include "CDisk_Pascucci2004.h"
+#include "CDisk_Andrews2009.h"
+#include "CRocheLobe.h"
+#include "CRocheRotator.h"
 
-using namespace std;
+namespace models {
 
-#include "QT/CMinimizerThread.h"
+void load()
+{
+	// TODO: For now we CMinimizerFactory::getInstance().addItem minimizers explicitly. In the future, we should use plugins instead.
+	CModelFactory::getInstance().addItem(&CSphere::Create);
+	CModelFactory::getInstance().addItem(&CCylinder::Create);
+	CModelFactory::getInstance().addItem(&CDisk_ConcentricRings::Create);
+	CModelFactory::getInstance().addItem(&CDisk_Pascucci2004::Create);
+	CModelFactory::getInstance().addItem(&CDisk_Andrews2009::Create);
+	CModelFactory::getInstance().addItem(&CRocheLobe::Create);
+	CModelFactory::getInstance().addItem(&CRocheRotator::Create);
+}
+
+} // namespace models

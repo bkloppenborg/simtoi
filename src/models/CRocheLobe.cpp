@@ -17,8 +17,8 @@ CRocheLobe::CRocheLobe() :
 	AU(1.496e11), rsun(6.955e8), G(6.67428e-11), parsec(3.08567758e16),
 	CHealpixSpheroid()
 {
-	id = "roche_lobe";
-	name = "Roche Lobe";
+	mID = "roche_lobe";
+	mName = "Roche Lobe";
 
 	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)", 0);
 	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)", 2);

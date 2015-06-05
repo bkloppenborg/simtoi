@@ -54,6 +54,9 @@ using namespace std;
 
 CModel::CModel()
 {
+	mName = "NOT_SET_BY_SUBCLASS";
+	mID = "NOT_SET_BY_SUBCLASS";
+
 	// Shader storage location, boolean if it is loaded:
 	mShader = CShaderPtr();
 	mFluxTextureID = 0;
@@ -333,6 +336,12 @@ int CModel::GetTotalFreeParameters()
 			this->GetNFeatureFreeParameters();
 }
 
+/// \brief Get the ID of the model.
+string CModel::ID()
+{
+	return mID;
+}
+
 /// Initalizes the shader variables `position`, `normal`, and `tex_coords`
 /// following the default packing scheme of:
 ///		[vec3(x,y,z), vec3(n_x, n_y, n_z), (t_x, t_y, t_z)]
@@ -419,6 +428,13 @@ void CModel::NormalizeFlux(double max_flux)
 {
 	for(int i = 0; i < mFluxTexture.size(); i++)
 		mFluxTexture[i].r /= max_flux;
+}
+
+
+/// \brief Returns a human-readable name for this model
+string CModel::name()
+{
+	return mName;
 }
 
 /// \brief Constructs the rotation matrix according to the set parameters.

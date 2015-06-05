@@ -91,6 +91,10 @@ class CModel: public CParameterMap
 {
 
 protected:
+	string mName;			///< Human-friendly name for the minimizer.
+	string mID;				///< Unique ID for the minimizer.
+
+protected:
 
 	double mTime;		///< The current time for this object (days)
 	double mWavelength; ///< The current wavelength of observation (meters)
@@ -129,6 +133,8 @@ public:
 
 	void SetFreeParameters(double * params, int n_params, bool scale_params);
 
+	string ID();
+	string name();
 
 public:
 	CModel();

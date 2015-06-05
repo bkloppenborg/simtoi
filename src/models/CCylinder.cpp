@@ -35,8 +35,8 @@
 CCylinder::CCylinder()
 	: CModel()
 {
-	id = "cylinder";
-	name = "Cylinder";
+	mID = "cylinder";
+	mName = "Cylinder";
 
 	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
 	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter", "Diameter of the cylinder", 2);
