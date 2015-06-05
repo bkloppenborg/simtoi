@@ -106,14 +106,12 @@ CModelPtr guiModelEditor::getModel()
 /// Initalizes the UI with values found elsewhere in SIMTOI.
 void guiModelEditor::initUi()
 {
-	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
-	auto features = CFeatureFactory::Instance();
 
 	guiCommon::setOptions(cboModels, CModelFactory::getInstance().getNames());
-	guiCommon::setOptions(cboPositions, positions.GetPositionList());
+	guiCommon::setOptions(cboPositions, CPositionFactory::getInstance().getNames());
 	guiCommon::setOptions(cboShaders, shaders.GetShaderList());
-	guiCommon::setOptions(cboFeatures, features.GetFeatureList());
+	guiCommon::setOptions(cboFeatures, CFeatureFactory::getInstance().getNames());
 }
 
 /// Adds a feature to the model

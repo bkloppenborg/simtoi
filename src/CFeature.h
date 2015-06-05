@@ -19,8 +19,8 @@ class CModel;
 class CFeature: public CParameterMap
 {
 protected:
-	string id;
-	string name;
+	string mName;			///< Human-friendly name for the minimizer.
+	string mID;				///< Unique ID for the minimizer.
 
 public:
 	CFeature();
@@ -28,8 +28,8 @@ public:
 
 	virtual void apply(CModel * model) = 0;
 
-	virtual string getID() const { return id; };
-	virtual string getName() const { return name; }
+	string ID() { return mID; };
+	string name() { return mName; }
 };
 
 #endif /* CFEATURE_H_ */

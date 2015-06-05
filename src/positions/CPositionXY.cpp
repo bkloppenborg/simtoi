@@ -34,8 +34,8 @@
 
 CPositionXY::CPositionXY()
 {
-	name = "XY";
-	id = "xy";
+	mName = "XY";
+	mID = "xy";
 	mPositionType = STATIC;
 
 	// Init the position variables, set them to be fixed.

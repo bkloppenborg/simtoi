@@ -88,8 +88,7 @@ CModel::~CModel()
 /// \breif Adds the feature with feature_id to the current model.
 void CModel::AddFeature(string feature_id)
 {
-	auto features = CFeatureFactory::Instance();
-	auto feature = features.CreateFeature(feature_id);
+	auto feature = CFeatureFactory::getInstance().create(feature_id);
 
 	if(feature != nullptr)
 		mFeatures.push_back(feature);
@@ -488,16 +487,14 @@ void CModel::Restore(Json::Value input)
 	// Restore the base parameters
 	CParameterMap::restore(input["base_data"]);
 
-	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
-	auto features = CFeatureFactory::Instance();
 
 	// Look up the name of the position model, if none is specified use "xy" by default.
 	string position_id = input["position_id"].asString();
 	if(position_id.size() == 0)
 		position_id = "xy";
 
-	auto position = positions.CreatePosition(position_id);
+	auto position = CPositionFactory::getInstance().create(position_id);
 	position->restore(input["position_data"]);
 	CModel::SetPositionModel(position);
 
@@ -530,7 +527,7 @@ void CModel::Restore(Json::Value input)
 				break;
 
 			// Find the feature
-			auto feature = features.CreateFeature(feature_id);
+			auto feature = CFeatureFactory::getInstance().create(feature_id);
 			// See if the feature was found, if not print out an error
 			if(feature == nullptr)
 			{
@@ -635,8 +632,7 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 /// \param position_id A registered position ID in `CPositionFactory`
 void CModel::SetPositionModel(string position_id)
 {
-	auto factory = CPositionFactory::Instance();
-	SetPositionModel( factory.CreatePosition(position_id));
+	SetPositionModel( CPositionFactory::getInstance().create(position_id) );
 }
 
 /// \brief Sets the position model for this objects.

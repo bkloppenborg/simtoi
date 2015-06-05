@@ -56,6 +56,8 @@ public:
 	};
 
 protected:
+	string mName;			///< Human-friendly name for the minimizer.
+	string mID;				///< Unique ID for the minimizer.
 
 	PositionTypes mPositionType;
 	double mTime;
@@ -63,6 +65,9 @@ protected:
 public:
 	CPosition();
 	virtual ~CPosition();
+
+	string ID() { return mID; }
+	string name() { return mName; }
 
 	PositionTypes GetPositionType() { return mPositionType; };
 

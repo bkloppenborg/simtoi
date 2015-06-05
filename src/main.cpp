@@ -56,6 +56,8 @@
 #include "QT/guiMain.h"
 #include "minimizers/load_minimizers.h"
 #include "models/load_models.h"
+#include "features/load_features.h"
+#include "positions/load_positions.h"
 
 using namespace std;
 
@@ -92,6 +94,8 @@ int main(int argc, char *argv[])
     // Setup minimization engines:
     minimizers::load();
     models::load();
+    features::load();
+    positions::load();
 
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
@@ -170,7 +174,16 @@ bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, 
 
 			vector<string> ids = CModelFactory::getInstance().getIDs();
 			vector<string> names = CModelFactory::getInstance().getNames();
-			printFactoryDescription(ids, names, "Engine ID");
+			printFactoryDescription(ids, names, "Model ID");
+		}
+
+		if(value == "--list-features")
+		{
+			run_simtoi = false;
+
+			vector<string> ids = CFeatureFactory::getInstance().getIDs();
+			vector<string> names = CFeatureFactory::getInstance().getNames();
+			printFactoryDescription(ids, names, "Feature ID");
 		}
 	}
 
@@ -198,15 +211,16 @@ void PrintHelp()
 	cout << "Command line usage: simtoi [...]" << endl;
 	cout << endl;
 	cout << "Options:" << endl;
-	cout << "  " << "-h, --help     : " << "Show this help message and exit" << endl;
-	cout << "  " << "-c             : " << "Close SIMTOI after minimization completes [default: off]" << endl;
-	cout << "  " << "-d             : " << "Input data file. Specify multiple -d to include " << endl;
-	cout << "  " << "                 " << "many data files." << endl;
-	cout << "  " << "-e             : " << "Minimization engine ID (see Wiki)" << endl;
-	cout << "  " << "-m             : " << "Model input file" << endl;
-	cout << "  " << "-o             : " << "Output directory" << endl;
-	cout << "  " << "--list-engines : " << "Lists all registered minimization engines" << endl;
-	cout << "  " << "--list-models  : " << "Lists all registered models" << endl;
+	cout << "  " << "-h, --help      : " << "Show this help message and exit" << endl;
+	cout << "  " << "-c              : " << "Close SIMTOI after minimization completes [default: off]" << endl;
+	cout << "  " << "-d              : " << "Input data file. Specify multiple -d to include " << endl;
+	cout << "  " << "                  " << "many data files." << endl;
+	cout << "  " << "-e              : " << "Minimization engine ID (see Wiki)" << endl;
+	cout << "  " << "-m              : " << "Model input file" << endl;
+	cout << "  " << "-o              : " << "Output directory" << endl;
+	cout << "  " << "--list-engines  : " << "Lists all registered minimization engines" << endl;
+	cout << "  " << "--list-models   : " << "Lists all registered models" << endl;
+	cout << "  " << "--list-features : " << "Lists all registered features" << endl;
 	cout << endl;
 	cout << "SIMTOI also supports QT commands. For instance you can run SIMTOI from a: " << endl;
 	cout << "remotely executed script (or from gnu screen) by adding: " << endl;

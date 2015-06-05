@@ -20,8 +20,8 @@
 CUniformSpot::CUniformSpot():
 	CFeature()
 {
-	id = "uniform_spot";
-	name = "Uniform Spot";
+	mID = "uniform_spot";
+	mName = "Uniform Spot";
 
 	addParameter("theta", 0, 0, 180, false, 0.1, "Theta", "Angular position of the spot on the surface (degrees).", 2);
 	addParameter("phi", 0, 0, 180, false, 0.1, "Phi", "Angular position of the spot on the surface (degrees).", 2);

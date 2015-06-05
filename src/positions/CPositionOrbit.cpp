@@ -43,8 +43,8 @@
 
 CPositionOrbit::CPositionOrbit()
 {
-	name = "Orbit";
-	id = "orbit_bound";
+	mName = "Keplerian Orbit";
+	mID = "orbit_bound";
 
 	mPositionType = DYNAMIC;
 

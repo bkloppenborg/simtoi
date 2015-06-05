@@ -10,8 +10,8 @@
 CFeature::CFeature()
 	: CParameterMap()
 {
-	id = "invalid_feature";
-	name = "Not set by developer";
+	mID = "invalid_feature";
+	mName = "Not set by developer";
 }
 
 CFeature::~CFeature()

@@ -1,12 +1,12 @@
 /*
- * CFeatureFactory.h
+ * \file load_features.cpp
  *
- *  Created on: Apr. 23, 2014
- *      Author: bkloppenborg
+ *  Created on: Feb 10, 2013
+ *  \author bkloppenborg
  */
 
  /*
- * Copyright (c) 2014 Brian Kloppenborg
+ * Copyright (c) 2015 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -30,30 +30,20 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CFEATUREFACTORY_H_
-#define CFEATUREFACTORY_H_
+#include "CPositionFactory.h"
 
-#include "FactoryBase.h"
+#include "CPositionXY.h"
+#include "CPositionXYZ.h"
+#include "CPositionOrbit.h"
 
-class CFeature;
-typedef shared_ptr<CFeature> CFeaturePtr;
-typedef shared_ptr<CFeature> (*CreateFeatureFn)(void);
+namespace positions {
 
-class CFeatureFactory : public FactoryBase<CFeaturePtr, CreateFeatureFn> {
+void load()
+{
+	// TODO: For now we CMinimizerFactory::getInstance().addItem minimizers explicitly. In the future, we should use plugins instead.
+	CPositionFactory::getInstance().addItem(&CPositionXY::Create);
+	CPositionFactory::getInstance().addItem(&CPositionXYZ::Create);
+	CPositionFactory::getInstance().addItem(&CPositionOrbit::Create);
+}
 
-private:
-	CFeatureFactory() {};
-	CFeatureFactory(CFeatureFactory const&) = delete;
-	void operator=(CFeatureFactory const&)    = delete;
-
-public:
-	/// \brief Returns a copy of the CMinimizerFactory instance
-	static CFeatureFactory & getInstance()
-	{
-		static CFeatureFactory instance;
-		return instance;
-	}
-};
-
-
-#endif /* CFEATUREFACTORY_H_ */
+} // namespace models

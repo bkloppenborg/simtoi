@@ -27,21 +27,36 @@ protected:
 	FactoryBase() {};
 
 public:
-	/// \brief Create an instance of the specified model.
+	/// \brief Create an instance of the specified object.
 	///
 	/// Returns a shared_ptr<CModel> to the object if found, or throws a runtime exception.
-	ObjectPtr create(string ID)
+	ObjectPtr create(const string & ID)
 	{
-		auto it = mCreators.find(ID);
-		if(it != mCreators.end())
-			return it->second();
+		// try looking up the model by ID
+		auto itCreators = mCreators.find(ID);
+		if(itCreators != mCreators.end())
+			return itCreators->second();
+
+		// If this fails try looking up the ID from the name
+		for(auto it: mNames)
+		{
+			if(it.second == ID)
+				return create(it.first);
+		}
 
 		throw runtime_error("The item with ID '" + ID + "' does not exist within the factory.");
 
 		return ObjectPtr();
 	}
 
-	/// \brief Returns a vector of the ids for the minimizer that are loaded
+	/// \brief Creates an instance of the specified object from its name.
+	ObjectPtr createFromName(const string & name)
+	{
+		string id = idFromName(name);
+		return create(id);
+	}
+
+	/// \brief Returns a vector of the ids for the objects that are loaded
 	vector<string> getIDs()
 	{
 		vector<string> temp;
@@ -55,7 +70,7 @@ public:
 		return temp;
 	}
 
-	/// \brief Returns a vector containing the names of the minimizers that are loaded.
+	/// \brief Returns a vector containing the names of the objects that are loaded.
 	vector<string> getNames()
 	{
 		vector<string> temp;
@@ -69,7 +84,7 @@ public:
 		return temp;
 	}
 
-	/// \brief Get the minimization engine ID from the name of the engine
+	/// \brief Get the objects engine ID from the name of the engine
 	string idFromName(const string & name)
 	{
 		string id = "";
@@ -87,11 +102,9 @@ public:
 	}
 
 
-	/// \brief Register a minimizer with the factory
+	/// \brief Register a objects with the factory
 	///
-	/// \param MinimizerID A unique string with no spaces that identifies this minimizer.
-	///        This parameter may be used on the command line so keep it short.
-	/// \param CreateFunction A pointer to a CMinimizer::Create
+	/// \param CreateFunction A pointer to the object's constructor
 	void addItem(CreateFuncPtr CreateFunction)
 	{
 		// Create a temporary instance of the minimizer to get information from it
@@ -106,8 +119,6 @@ public:
 		mCreators[ID] = CreateFunction;
 		mNames[ID] = name;
 	}
-
 };
-
 
 #endif /* SRC_FACTORYBASE_H_ */
