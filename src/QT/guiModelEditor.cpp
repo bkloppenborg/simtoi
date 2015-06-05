@@ -40,11 +40,11 @@ guiModelEditor::guiModelEditor(CModelPtr model)
 	guiCommon::setSelectedValue(cboPositions, position_name);
 	guiCommon::setSelectedValue(cboShaders, shader_id);
 
-	QString feature_id;
+	QString feature_name;
 	for(auto feature: features)
 	{
-		feature_id = QString::fromStdString(feature->getID());
-		listFeatures->addItem(feature_id);
+		feature_name = QString::fromStdString(feature->name());
+		listFeatures->addItem(feature_name);
 	}
 }
 
