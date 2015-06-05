@@ -57,17 +57,22 @@ private:
 	map<string, CreateMinimizerFn> mCreators; ///< Associates id -> minimizer create function
 	map<string, string> mNames; ///< Associates id -> minimizer create function
 
-	CMinimizerFactory();	///< Singleton class => private constructor.
-
-public:
-	virtual ~CMinimizerFactory();
+	CMinimizerFactory() {};
+	CMinimizerFactory(CMinimizerFactory const&) = delete;
+	void operator=(CMinimizerFactory const&)    = delete;
 
 public:
 	shared_ptr<CMinimizerThread> create(string ID);
 
 	string idFromName(string name);
 
-	static CMinimizerFactory getInstance();
+	/// \brief Returns a copy of the CMinimizerFactory instance
+	static CMinimizerFactory & getInstance()
+	{
+		static CMinimizerFactory instance;
+		return instance;
+	}
+
 	void addItem(CreateMinimizerFn CreateFunction);
 
 	vector<string> getIDs();

@@ -23,8 +23,7 @@ wMinimizer::wMinimizer(QWidget * parent)
 	mGLWidget = NULL;
 
 	// Setup the combo boxes.
-	auto minimizers = CMinimizerFactory::getInstance();
-	guiCommon::setOptions(this->cboMinimizers, minimizers.getNames());
+	guiCommon::setOptions(this->cboMinimizers, CMinimizerFactory::getInstance().getNames());
 
 	// Setup the text boxes
 	textSaveFolder->setText("/tmp/model");
@@ -83,9 +82,8 @@ void wMinimizer::on_btnStartStop_clicked()
 	else // start a new minimizer.
 	{
 		// find the ID for the minimizer
-		auto minimizers = CMinimizerFactory::getInstance();
 		string name = this->cboMinimizers->currentText().toStdString();
-		string id = minimizers.idFromName(name);
+		string id = CMinimizerFactory::getInstance().idFromName(name);
 
 		// start the minimizer
 		startMinimizer(id, save_directory);
@@ -126,9 +124,6 @@ void wMinimizer::setSaveDirectory(const string & save_directory)
 /// \param save_directory The directory in which temporary output data should be saved.
 void wMinimizer::startMinimizer(const string & minimizer_id, const string & save_directory)
 {
-	// Look up the minimizer
-	auto minimizers = CMinimizerFactory::getInstance();
-
 	// stop any presently running minimization engine.
 	if(mMinimizer && mMinimizer->isRunning())
 	{
@@ -170,7 +165,7 @@ void wMinimizer::startMinimizer(const string & minimizer_id, const string & save
 
 		auto worker = mGLWidget->getWorker();
 
-		mMinimizer = minimizers.create(minimizer_id);
+		mMinimizer = CMinimizerFactory::getInstance().create(minimizer_id);
 		mMinimizer->setSaveDirectory(save_directory);
 		mMinimizer->Init(worker);
 		mMinimizer->start();

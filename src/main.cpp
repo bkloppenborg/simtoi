@@ -54,7 +54,7 @@
 
 #include "main.h"
 #include "QT/guiMain.h"
-#include "CMinimizerFactory.h"
+#include "minimizers/load_minimizers.h"
 
 using namespace std;
 
@@ -87,6 +87,9 @@ int main(int argc, char *argv[])
 
     // determine the absolute directory from which SIMTOI is running
     EXE_FOLDER = app.applicationDirPath().toStdString();
+
+    // Setup minimization engines:
+    minimizers::load();
 
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
@@ -155,9 +158,8 @@ bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, 
 			int field_width = 20;
 			run_simtoi = false;
 
-			auto factory = CMinimizerFactory::getInstance();
-			vector<string> ids = factory.getIDs();
-			vector<string> names = factory.getNames();
+			vector<string> ids = CMinimizerFactory::getInstance().getIDs();
+			vector<string> names = CMinimizerFactory::getInstance().getNames();
 
 			cout << " " << std::left << std::setw(field_width + 1) << std::setfill(' ') << "Engine ID" << "Description" << endl;
 			cout << " " << string(field_width, '-') << " " << string(field_width, '-') << endl;

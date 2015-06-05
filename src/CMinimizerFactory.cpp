@@ -38,63 +38,6 @@ using namespace std;
 
 #include "QT/CMinimizerThread.h"
 
-// TODO: Instead of loading them explicitly here, it would be better to load them using plugins
-
-#include "minimizers/CBenchmark.h"
-#include "minimizers/CGridSearch.h"
-// Compiler directive to add support for levmar
-#ifdef _ADD_LEVMAR
-#include "minimizers/CLevmar.h"
-#include "minimizers/CBootstrap_Levmar.h"
-#endif //_ADD_LEVMAR
-// Compiler directive to add support for MultiNest
-#ifdef _ADD_MULTINEST
-#include "minimizers/CMultiNest.h"
-#endif // _ADD_MULTINEST
-#ifdef _ADD_NLOPT
-#include "minimizers/CNLopt.h"
-#endif // _ADD_NLOPT
-
-/// \brief Private constructor. Use `Instance()` instead.
-CMinimizerFactory::CMinimizerFactory()
-{
-	// TODO: For now we addItem minimizers explicitly. In the future, we should use plugins instead.
-  addItem(&CBenchmark::Create);
-  addItem(&CGridSearch::Create);
-
-#ifdef _ADD_NLOPT
-  addItem(&CNLopt::CreateNELDERMEAD);
-  addItem(&CNLopt::CreateDIRECTL);
-  addItem(&CNLopt::CreateDIRECT);
-  addItem(&CNLopt::CreateCRS2);
-  addItem(&CNLopt::CreateMLSLLDS);
-//  addItem("&CNLopt::CreateSTOGORAND); // missing from Ubuntu's NLOpt library, disable
-  addItem(&CNLopt::CreateISRES);
-  addItem(&CNLopt::CreateESCH);
-  addItem(&CNLopt::CreateCOBYLA);
-  addItem(&CNLopt::CreateBOBYQA);
-  addItem(&CNLopt::CreateNEWUOA);
-  addItem(&CNLopt::CreatePRAXIS);
-  addItem(&CNLopt::CreateSBPLX);
-#endif //_ADD_NLOPT
-
-#ifdef _ADD_LEVMAR
-  addItem(&CLevmar::Create);
-  addItem(&CBootstrap_Levmar::Create);
-#endif //_ADD_LEVMAR
-
-#ifdef _ADD_MULTINEST
-  addItem(&CMultiNest::Create);
-#endif // _ADD_MULTINEST
-
-
-}
-
-CMinimizerFactory::~CMinimizerFactory() \
-{
-
-}
-
 /// \brief Create an instance of the specified model.
 ///
 /// Returns a shared_ptr<CModel> to the object if found, or throws a runtime exception.
@@ -153,12 +96,6 @@ string CMinimizerFactory::idFromName(string name)
 	return id;
 }
 
-/// \brief Returns a copy of the CMinimizerFactory instance
-CMinimizerFactory CMinimizerFactory::getInstance()
-{
-	static CMinimizerFactory instance;
-	return instance;
-}
 
 /// \brief Register a minimizer with the factory
 ///

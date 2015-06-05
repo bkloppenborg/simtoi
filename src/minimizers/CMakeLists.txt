@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(simtoi_minimizers CXX)
 
 # Include the previous directory to insure we get CMinimizer.h
-INCLUDE(../)
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 # Assemble all of the model source
 file(GLOB SOURCE *.cpp)
@@ -13,7 +13,7 @@ if(LAPACK_FOUND)
     # Levmar does not export a LEVMAR_LIBRARIES variable, so we have to do it
     # ourselves. 
     LIST(APPEND OPTIONAL_LIBS levmar ${LAPACK_LIBRARIES})
-    set(LEVMAR_DEF -D_ADD_LEVMAR)
+    ADD_DEFINITIONS(-D_ADD_LEVMAR)
     
     message(STATUS "LAPACK and BLAS found")
     message(STATUS " SIMTOI will include the Levmar minimizer.")
@@ -30,7 +30,7 @@ find_package(MultiNest)
 if(MULTINEST_FOUND)
     include_directories(${MULTINEST_INCLUDE_DIRS})
     LIST(APPEND OPTIONAL_LIBS ${MULTINEST_LIBRARIES})
-    set(MULTINEST_DEF -D_ADD_MULTINEST)
+    ADD_DEFINITIONS(-D_ADD_MULTINEST)
     
     message(STATUS "MultiNest found")
     message(STATUS " SIMTOI will include the MultiNest minimizer.")
@@ -47,7 +47,7 @@ find_package(NLopt)
 if(NLOPT_FOUND)
     include_directories(${NLOPT_INCLUDE_DIRS})
     LIST(APPEND OPTIONAL_LIBS ${NLOPT_LIBRARIES})
-    set(NLOPT_DEF -D_ADD_NLOPT)
+    ADD_DEFINITIONS(-D_ADD_NLOPT)
     message(STATUS "NLopt found")
     message(STATUS " SIMTOI will include the NLopt minimizers.")
 else(NLOPT_FOUND)
