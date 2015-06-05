@@ -30,14 +30,14 @@ guiModelEditor::guiModelEditor(CModelPtr model)
 	mModel = model;
 
 	// get information about the model
-	QString model_id = QString::fromStdString(mModel->getID());
-	QString position_id = QString::fromStdString(mModel->GetPosition()->getID());
+	QString model_name = QString::fromStdString(mModel->name());
+	QString position_name = QString::fromStdString(mModel->GetPosition()->name());
 	QString shader_id = QString::fromStdString(mModel->GetShader()->getID());
 
 	const vector<CFeaturePtr> features = mModel->GetFeatures();
 
-	guiCommon::setSelectedValue(cboModels, model_id);
-	guiCommon::setSelectedValue(cboPositions, position_id);
+	guiCommon::setSelectedValue(cboModels, model_name);
+	guiCommon::setSelectedValue(cboPositions, position_name);
 	guiCommon::setSelectedValue(cboShaders, shader_id);
 
 	QString feature_id;
