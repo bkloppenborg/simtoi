@@ -4,32 +4,32 @@
  *  Created on: Nov 7, 2011
  *      Author: bkloppenborg
  */
- 
- /* 
+
+ /*
  * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
- * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling 
- * Tool for Optical Interferometry" (Version X). 
+ * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling
+ * Tool for Optical Interferometry" (Version X).
  * Available from  <https://github.com/bkloppenborg/simtoi>.
  *
- * This file is part of the SImulation and Modeling Tool for Optical 
+ * This file is part of the SImulation and Modeling Tool for Optical
  * Interferometry (SIMTOI).
- * 
+ *
  * SIMTOI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License 
+ * it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation version 3.
- * 
+ *
  * SIMTOI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
+ *
+ * You should have received a copy of the GNU Lesser General Public
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
  /*
  *  Base class for all models implementing a common set of functions to get/set
  *  parameters and use shaders.
@@ -565,10 +565,10 @@ void CModel::Restore(Json::Value input)
 Json::Value CModel::Serialize()
 {
 	Json::Value output;
-	output["base_id"] = getID();
+	output["base_id"] = ID();
 	output["base_data"] = CParameterMap::serialize();
 
-	output["position_id"] = mPosition->getID();
+	output["position_id"] = mPosition->ID();
 	output["position_data"] = mPosition->serialize();
 
 	output["shader_id"] = mShader->getID();
@@ -586,7 +586,7 @@ Json::Value CModel::Serialize()
 		temp.clear();
 		temp.str(std::string());
 		temp << "feature_" << i << "_id";
-		output[temp.str()] = feature->getID();
+		output[temp.str()] = feature->ID();
 		temp.clear();
 		temp.str(std::string());
 		temp << "feature_" << i << "_data";
