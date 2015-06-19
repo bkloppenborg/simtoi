@@ -20,8 +20,8 @@ class CParameterMap
 {
 protected:
 	map<string, CParameter> mParams; ///< The parameters used in this model.
-	string name;						///< A human-readable name for the object
-	string id;						///< An internal ID for this object
+	string mName;						///< A human-readable name for the object
+	string mID;						///< An internal ID for this object
 
 public:
 	CParameterMap();
@@ -44,8 +44,8 @@ public:
 	unsigned int getFreeParameterStepSizes(double * steps, unsigned int size);
 
 	const map<string, CParameter> & getParameterMap() { return mParams; };
-	virtual string getID() const { return id; };
-	virtual string getName() const { return name; };
+	virtual string ID() const { return mID; };
+	virtual string name() const { return mName; };
 	CParameter & getParameter(string id);
 
 	virtual bool isDirty();
@@ -54,7 +54,8 @@ public:
 
 	Json::Value serialize();
 
-	unsigned int setFreeParameterValues(double * values, unsigned int n_values, bool normalized_values = false);
+	virtual unsigned int setFreeParameterValues(double * values, unsigned int n_values, bool normalized_values = false);
+	void setParameter(const string & name, double value, bool is_normalized = false);
 };
 
 #endif /* CPARAMETERMAP_H_ */

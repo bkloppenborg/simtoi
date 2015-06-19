@@ -43,8 +43,8 @@ using namespace std;
 
 CShader::CShader(const CShader & other)
 {
-	id = other.id;
-	name = other.name;
+	mID = other.mID;
+	mName = other.mName;
 	mShader_dir = other.mShader_dir;
 	mVertShaderFileName = other.mVertShaderFileName;
 	mFragShaderFilename = other.mFragShaderFilename;
@@ -75,8 +75,8 @@ CShader::CShader(string json_config_file)
 	}
 
 	// Start to initalize this object. First get the ID and name
-	id = input["shader_id"].asString();
-	name = input["shader_name"].asString();
+	mID = input["shader_id"].asString();
+	mName = input["shader_name"].asString();
 
 	// Shaders and configuration files must be in the same directory.
 	size_t folder_end = json_config_file.find_last_of("/\\");

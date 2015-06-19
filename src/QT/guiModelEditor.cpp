@@ -32,7 +32,7 @@ guiModelEditor::guiModelEditor(CModelPtr model)
 	// get information about the model
 	QString model_name = QString::fromStdString(mModel->name());
 	QString position_name = QString::fromStdString(mModel->GetPosition()->name());
-	QString shader_id = QString::fromStdString(mModel->GetShader()->getID());
+	QString shader_id = QString::fromStdString(mModel->GetShader()->ID());
 
 	const vector<CFeaturePtr> features = mModel->GetFeatures();
 
@@ -61,7 +61,7 @@ CModelPtr guiModelEditor::getModel()
 
 	if(mModel)	// the model exists, update changes
 	{
-		if(model_id != mModel->getID())
+		if(model_id != mModel->ID())
 		{
 			// Save the position, shader, and features
 			CPositionPtr position = mModel->GetPosition();
@@ -76,10 +76,10 @@ CModelPtr guiModelEditor::getModel()
 			mModel->SetFeatures(features);
 		}
 
-		if(position_id != mModel->GetPosition()->getID())
+		if(position_id != mModel->GetPosition()->ID())
 			mModel->SetPositionModel(position_id);
 
-		if(shader_id != mModel->GetShader()->getID())
+		if(shader_id != mModel->GetShader()->ID())
 			mModel->SetShader(shader_id);
 
 	}

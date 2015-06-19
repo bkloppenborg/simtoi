@@ -170,7 +170,7 @@ QList<QStandardItem *> wParameterEditor::LoadParametersHeader(QString name, CPar
 	items << item;
 	item = new QStandardItem(QString(""));
 	items << item;
-	item = new QStandardItem(QString::fromStdString(param_map->getName()));
+	item = new QStandardItem(QString::fromStdString(param_map->name()));
 	items << item;
 
 	return items;

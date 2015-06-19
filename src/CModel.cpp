@@ -571,7 +571,7 @@ Json::Value CModel::Serialize()
 	output["position_id"] = mPosition->ID();
 	output["position_data"] = mPosition->serialize();
 
-	output["shader_id"] = mShader->getID();
+	output["shader_id"] = mShader->ID();
 	output["shader_data"] = mShader->serialize();
 
 	stringstream temp;

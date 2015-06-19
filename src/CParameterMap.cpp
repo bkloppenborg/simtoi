@@ -10,8 +10,8 @@
 
 CParameterMap::CParameterMap()
 {
-	// TODO Auto-generated constructor stub
-
+	mID = "NOT_IMPLEMENTED_BY_DEVELOPER";
+	mName = "NOT_IMPLEMENTED_BY_DEVELOPER";
 }
 
 CParameterMap::~CParameterMap()
@@ -158,7 +158,7 @@ vector<string> CParameterMap::getFreeParameterNames()
 	for(auto it: mParams)
 	{
 		if(it.second.isFree())
-			tmp.push_back(name + '.' + it.second.getHumanName());
+			tmp.push_back(mName + '.' + it.second.getHumanName());
 	}
 
 	return tmp;
@@ -273,4 +273,13 @@ unsigned int CParameterMap::setFreeParameterValues(double * values, unsigned int
 	}
 
 	return n;
+}
+
+/// \brief Sets the value of the specified parameter to the indicated value
+///        while performing bounds/error checking
+///
+void CParameterMap::setParameter(const string & name, double value, bool is_normalized)
+{
+	auto parameter = getParameter(name);
+	parameter.setValue(value, is_normalized);
 }

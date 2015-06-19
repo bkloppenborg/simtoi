@@ -89,11 +89,6 @@ typedef shared_ptr<CFeature> CFeaturePtr;
 /// values of model parameters.
 class CModel: public CParameterMap
 {
-
-protected:
-	string mName;			///< Human-friendly name for the minimizer.
-	string mID;				///< Unique ID for the minimizer.
-
 protected:
 
 	double mTime;		///< The current time for this object (days)
