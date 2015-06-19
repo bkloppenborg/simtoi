@@ -56,9 +56,6 @@ public:
 	};
 
 protected:
-	string mName;			///< Human-friendly name for the minimizer.
-	string mID;				///< Unique ID for the minimizer.
-
 	PositionTypes mPositionType;
 	double mTime;
 

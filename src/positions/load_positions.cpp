@@ -35,6 +35,7 @@
 #include "CPositionXY.h"
 #include "CPositionXYZ.h"
 #include "CPositionOrbit.h"
+#include "CBinaryOrbit.h"
 
 namespace positions {
 
@@ -44,6 +45,7 @@ void load()
 	CPositionFactory::getInstance().addItem(&CPositionXY::Create);
 	CPositionFactory::getInstance().addItem(&CPositionXYZ::Create);
 	CPositionFactory::getInstance().addItem(&CPositionOrbit::Create);
+	CPositionFactory::getInstance().addItem(&CBinaryOrbit::Create);
 }
 
 } // namespace models
