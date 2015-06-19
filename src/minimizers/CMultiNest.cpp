@@ -56,27 +56,6 @@ CMultiNest::~CMultiNest()
 	// TODO Auto-generated destructor stub
 }
 
-/// Computes the prior assuming uniform (uninformative) priors for each parameter
-///
-/// \param params current parameter values in MultiNest
-/// \param n_params the number of parameters in params.
-double CMultiNest::ComputeLogPrior(double * params, int n_params)
-{
-	double prior = 1;
-
-	// Get the parameter min/max values from the model list
-	CModelListPtr model_list = mWorkerThread->GetModelList();
-
-	// Compute the prior assuming P(x) = 1 / (x_max - x_min)
-	vector< pair<double, double> > min_maxes = model_list->GetFreeParamMinMaxes();
-	for(auto min_max : min_maxes)
-	{
-		prior *= 1.0 / (min_max.second - min_max.first);
-	}
-
-	return log(prior);
-}
-
 double CMultiNest::ComputeLogLikelihood(valarray<double> & chis, const valarray<double> & uncertainties)
 {
 	// We compute the log likelihood from the following formulation:
@@ -146,9 +125,6 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 	// Now get the residuals and compute the chi values. Store these in the output double.
 	minimizer->mWorkerThread->GetChi(&minimizer->mChis[0], minimizer->mChis.size());
 	lnew = ComputeLogLikelihood(minimizer->mChis, minimizer->mUncertainties);
-
-	// Add in the priors:
-	lnew += minimizer->ComputeLogPrior(params, npars);
 }
 
 /// Reads in the 'multinestsummary.txt' file and extracts the
