@@ -7,6 +7,7 @@
 
 #include "wMinimizer.h"
 #include <QDir>
+#include <QFileInfo>
 #include <QMessageBox>
 
 #include "guiCommon.h"
@@ -106,8 +107,13 @@ void wMinimizer::setSaveDirectory(const string & save_directory)
 	QString q_save_directory = QString::fromStdString(save_directory);
 	if(!QDir(q_save_directory).exists())
 	{
-		QDir().mkdir(q_save_directory);
+		QDir().mkpath(q_save_directory);
 	}
+
+	// verify that we can write to the directory
+	QFileInfo fi(q_save_directory);
+	if(!fi.isWritable())
+		throw runtime_error("The directory '" + save_directory + "' is not writable. Please check permissions.");
 
 	textSaveFolder->setText(q_save_directory);
 }
