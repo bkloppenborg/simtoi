@@ -108,7 +108,6 @@ void wMinimizer::setSaveDirectory(const string & save_directory)
 	if (q_save_directory.startsWith ("~/"))
 		q_save_directory.replace(0, 1, QDir::homePath());
 
-	qDebug() << q_save_directory;
 	// verify the save directory exists, if not create it
 	if(!QDir(q_save_directory).exists())
 	{
