@@ -23,9 +23,6 @@ public:
 	virtual ~CFeature();
 
 	virtual void apply(CModel * model) = 0;
-
-	string ID() { return mID; };
-	string name() { return mName; }
 };
 
 #endif /* CFEATURE_H_ */
