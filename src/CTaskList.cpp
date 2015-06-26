@@ -14,6 +14,7 @@
 #include "CTask.h"
 #include "CTaskFactory.h"
 #include "CWorkerThread.h"
+#include "version.h"
 
 using namespace std;
 
@@ -51,6 +52,7 @@ void CTaskList::Export(string export_folder)
 	ofstream summary;
 	summary.open(export_folder + "summary.txt", ios::trunc | ios::in | ios::out);
 	summary << "# SIMTOI export summary file." << endl;
+	summary << "# Created with SIMTOI version: " << SIMTOI_VERSION << " git commit " << SIMTOI_REVISION << endl;
 	summary << "# Each line contains the data file, type of data, and reduced chi2 for the data file in CSV format." << endl;
 	summary.close();
 

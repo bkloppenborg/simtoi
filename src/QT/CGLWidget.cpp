@@ -45,6 +45,7 @@ using namespace std;
 
 // Temporary includes while migrating code to wModels
 #include "wParameterEditor.h"
+#include "../version.h"
 
 extern string EXE_FOLDER;
 
@@ -253,10 +254,13 @@ void CGLWidget::Save(string filename)
 	// Serialize the mWorker object first
 	output = mWorker->Serialize();
 	// Add a comment that provides some information about what wrote the file.
-	output["_file_info"] = "Save file from the SImulation and Modeling Tool for "
-			"Optical Interferometry (SIMTOI). See "
-			"https://github.com/bkloppenborg/simtoi for information about this "
-			"format.";
+	stringstream header;
+	header << "Save file from the SImulation and Modeling Tool for Optical "
+		   << "Interferometry (SIMTOI) version " << SIMTOI_VERSION << " "
+		   << "commit " << SIMTOI_REVISION << ". "
+		   << "See https://github.com/bkloppenborg/simtoi for information about "
+		   << "this format";
+	output["_file_info"] = header.str();
 
 	// Now save the OpenGL area information.
 	output["area_width"] = mWorker->GetImageWidth();

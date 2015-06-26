@@ -36,6 +36,8 @@
 #include <QDir>
 #include <iomanip>
 
+#include "../version.h"
+
 using namespace std;
 
 CMinimizerThread::CMinimizerThread()
@@ -189,6 +191,8 @@ void CMinimizerThread::WriteRow(double * data, unsigned int size, double chi2r, 
 /// \brief Writes the parameter names
 void CMinimizerThread::WriteHeader(vector<string> & param_names, ofstream & outfile)
 {
+	outfile << "# SIMTOI minimization summary file." << endl;
+	outfile << "# Created with SIMTOI version: " << SIMTOI_VERSION << " git commit " << SIMTOI_REVISION << endl;
 	outfile << "# Parameter names in a column." << endl;
 	outfile << "# Param0, ..., ParamN" << endl;
 	WriteRow(param_names, outfile);
