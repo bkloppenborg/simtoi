@@ -27,7 +27,7 @@ wMinimizer::wMinimizer(QWidget * parent)
 	guiCommon::setOptions(this->cboMinimizers, CMinimizerFactory::getInstance().getNames());
 
 	// Setup the text boxes
-	textSaveFolder->setText("/tmp/model");
+	setSaveDirectory("/tmp/model");
 
 	setEnabled(false);
 }
@@ -103,8 +103,13 @@ void wMinimizer::setGLWidget(CGLWidget * gl_widget)
 /// Sets the desired save directory. Creates the directory if it does not exist.
 void wMinimizer::setSaveDirectory(const string & save_directory)
 {
-	// verify the save directory exists, if not create it
 	QString q_save_directory = QString::fromStdString(save_directory);
+	// Replace tilde with the user's home directory
+	if (q_save_directory.startsWith ("~/"))
+		q_save_directory.replace(0, 1, QDir::homePath());
+
+	qDebug() << q_save_directory;
+	// verify the save directory exists, if not create it
 	if(!QDir(q_save_directory).exists())
 	{
 		QDir().mkpath(q_save_directory);
@@ -116,6 +121,7 @@ void wMinimizer::setSaveDirectory(const string & save_directory)
 		throw runtime_error("The directory '" + save_directory + "' is not writable. Please check permissions.");
 
 	textSaveFolder->setText(q_save_directory);
+	mSaveDirectory = q_save_directory.toStdString();
 }
 
 /// Starts a minimization
@@ -172,7 +178,7 @@ void wMinimizer::startMinimizer(const string & minimizer_id, const string & save
 		auto worker = mGLWidget->getWorker();
 
 		mMinimizer = CMinimizerFactory::getInstance().create(minimizer_id);
-		mMinimizer->setSaveDirectory(save_directory);
+		mMinimizer->setSaveDirectory(mSaveDirectory);
 		mMinimizer->Init(worker);
 		mMinimizer->start();
 

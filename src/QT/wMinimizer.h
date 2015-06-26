@@ -27,6 +27,7 @@ class wMinimizer : public QWidget, public Ui::wMinimizer {
 protected:
 	CGLWidget * mGLWidget;
 	CMinimizerPtr mMinimizer;
+	string mSaveDirectory;
 
 public:
 	wMinimizer(QWidget * parent = 0);
