@@ -20,7 +20,7 @@ class CParameterMap
 {
 protected:
 	map<string, CParameter> mParams; ///< The parameters used in this model.
-	string mName;						///< A human-readable name for the object
+	string mName;					///< A human-readable name for the object. Try to limit to < 60 characters
 	string mID;						///< An internal ID for this object
 
 public:

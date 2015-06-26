@@ -202,12 +202,14 @@ bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, 
 void printFactoryDescription(const vector<string> & ids, const vector<string> & names, const string & title)
 {
 	int field_width = 25;
-	cout << " " << std::left << std::setw(field_width + 1) << std::setfill(' ') << title << "Description" << endl;
-	cout << " " << string(field_width, '-') << " " << string(field_width, '-') << endl;
+	cout << "| " << std::left << std::setw(field_width) << std::setfill(' ') << title
+		 << "| " << std::setw(60) << std::setfill(' ') << "Description" << "|" << endl;
+	cout << "|" << string(field_width+1, '-') << "|" << string(61, '-') << "|" << endl;
 	// print out a header
 	for(int i = 0; i < ids.size(); i++)
 	{
-		cout << " " << std::left << std::setw(field_width) << std::setfill(' ') << ids[i] << " " << names[i] << endl;
+		cout << "| " << std::left << std::setw(field_width) << std::setfill(' ') << ids[i] <<
+				"| " << std::left << std::setw(60) << std::setfill(' ') << names[i] << "|" << endl;
 	}
 }
 
