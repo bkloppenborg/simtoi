@@ -191,8 +191,9 @@ void CGLWidget::Open(string filename)
 	}
 
 	// Set the area scale and height
-	mWorker->SetSize(width, height);
-	mWorker->SetScale(scale);
+	resetWidget();
+	SetSize(width, height);
+	SetScale(scale);
 
 	// Now have the Worker thread open the remainder of the file.
 	mWorker->Restore(input);
