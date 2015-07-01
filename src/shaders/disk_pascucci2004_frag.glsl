@@ -30,10 +30,10 @@ in vec2 Tex_Coords;
 
 in vec3 ModelPosition;
 
-uniform float rho0;
+uniform float rho_0;
 uniform float kappa;
-uniform float r0;
-uniform float h0;
+uniform float r_d;
+uniform float z_d;
 uniform float alpha;
 uniform float beta;
 uniform float r_in;
@@ -45,12 +45,11 @@ void main(void)
 {
     // Compute the radius and height of this fragment
     float radius = sqrt(ModelPosition.x * ModelPosition.x + ModelPosition.y * ModelPosition.y);
-    float height = abs(ModelPosition.z);
+    float height = atan(abs(ModelPosition.z)/radius);
 
     // Compute the density:
-    float midplane_density = rho0 * pow(radius / r0, -alpha);
-    float height_scaling = -0.5 * pow(height / (h0 * pow(radius / r0, beta)), 2);
-    float rho = rho0 * pow(radius / r0, -alpha) * exp(height_scaling);
+    // pi = 3.141592741012573
+    float rho = rho0 * pow(radius/r_d, -alpha) * exp((-3.141592741012573/4.)*pow(height/z_d,2)*pow(radius/r_d,-2.*beta));
  
     // Compute the opacity:
     // Nothing to do - assume opacity is constant w.r.t. wavelength.

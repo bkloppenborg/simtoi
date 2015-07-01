@@ -32,12 +32,12 @@ in vec2 Tex_Coords;
 
 in vec3 ModelPosition;
 
-uniform float rho0;
+uniform float sigma_c;
 uniform float kappa;
-uniform float r0;
-uniform float h0;
+uniform float R_c;
+uniform float h_c;
 uniform float gamma;
-uniform float beta;
+uniform float psi;
 uniform float r_in;
 uniform sampler2DRect TexSampler;
 
@@ -47,14 +47,11 @@ void main(void)
 {
     // Compute the radius and height of this fragment
     float radius = sqrt(ModelPosition.x * ModelPosition.x + ModelPosition.y * ModelPosition.y);
-    float height = abs(ModelPosition.z);
+    float height = atan(abs(ModelPosition.z),radius);
 
     // Compute the density
-    float radius_ratio = radius / r0;
-    float midplane_density = rho0 * pow(radius_ratio, -gamma);
-    float height_scaling = -0.5 * pow(height / (h0 * pow(radius_ratio, beta)), 2);
-    float radial_taper = -1 * pow(radius_ratio, 2 - gamma);
-    float rho = rho0 * pow(radius_ratio, -gamma) * exp(height_scaling) * exp(radial_taper);
+    // (2 * pi)^0.5 = 2.506628274917603
+    float rho = (sigma_c/(2.506628274917603*radius*h_c))*pow(radius/R_c,-(psi+gamma))*exp(-(pow(radius/R_c,2-gamma)+0.5*pow(height/h_c,2)*pow(radius/R_c,-2*psi)));
 
     // Compute the transparency
     float transparency = 1 - exp(-1 * kappa * rho);
