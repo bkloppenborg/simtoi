@@ -2,7 +2,7 @@
 
 {
     "fragment_shader" : "disk_pascucci2004_frag.glsl",
-    "human_name" : "Pascucci 2004 Disk",
+    "shader_name" : "Pascucci 2004 Disk",
     "param_0":
     {
         "help" : "Characteristic density",
