@@ -5,16 +5,16 @@
     "shader_name" : "Andrews 2009 Disk",
     "param_0":
     {
-        "help_text": "Characteristic density",
-        "id" : "rho0",
-        "name" : "rho0",
+        "help": "Characteristic radial surface density profile",
+        "id" : "sigma_c",
+        "name" : "sigma_c",
         "min" : 0.1,
         "max" : 100,
         "value" : 1
     },
     "param_1":
     {
-        "help_text": "Opacity",
+        "help": "Opacity",
         "id" : "kappa",
         "name" : "kappa",
         "min" : 0.1,
@@ -23,25 +23,25 @@
     },
     "param_2":
     {
-        "help_text": "Scale radius (in native model units, normally mas)",
-        "id" : "r0",
-        "name" : "r0",
+        "help": "Characteristic radius (in native model units, normally mas)",
+        "id" : "R_c",
+        "name" : "R_c",
         "min" : 0.1,
         "max" : 6,
         "value" : 1
     },
     "param_3":
     {
-        "help_text": "Scale height (in native model units, normally mas)",
-        "id" : "h0",
-        "name" : "h0",
+        "help": "Scale height normalization (in native model units, normally mas)",
+        "id" : "h_c",
+        "name" : "h_c",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
     },
     "param_4":
     {
-        "help_text": "Value for the radial power law / exponential decay found in equation 4.",
+        "help": "Surface density gradient",
         "id" : "gamma",
         "name" : "gamma",
         "min" : 0.1,
@@ -50,9 +50,9 @@
     },
     "param_5":
     {
-        "help_text": "Value for height-dependent power law found in equation 2.",
-        "id" : "beta",
-        "name" : "beta",
+        "help": "Scale height gradient",
+        "id" : "psi",
+        "name" : "psi",
         "min" : 0.1,
         "max" : 10,
         "value" : 1

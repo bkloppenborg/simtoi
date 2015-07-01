@@ -55,6 +55,7 @@ CShaderFactory::CShaderFactory()
 	Register(EXE_FOLDER + "/shaders/disk_pascucci2004.json");
 	Register(EXE_FOLDER + "/shaders/disk_andrews2009.json");
 	Register(EXE_FOLDER + "/shaders/disk_power_law.json");
+        Register(EXE_FOLDER + "/shaders/disk_alpha1973.json");
 	Register(EXE_FOLDER + "/shaders/texture_2d.json");
 }
 
@@ -101,7 +102,7 @@ CShaderFactory CShaderFactory::Instance()
 void CShaderFactory::Register(string json_config_file)
 {
 	CShaderPtr temp(new CShader(json_config_file));
-	mFactory[temp->getID()] = temp;
+	mFactory[temp->ID()] = temp;
 }
 
 /// Registers a GLShader with the name "GLShaderID" and creation function "CreateFunction" with the factory.

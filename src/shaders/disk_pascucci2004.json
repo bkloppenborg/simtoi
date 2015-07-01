@@ -6,8 +6,8 @@
     "param_0":
     {
         "help" : "Characteristic density",
-        "id" : "rho0",
-        "name": "rho0",
+        "id" : "rho_0",
+        "name": "rho_0",
         "min" : 0.1,
         "max" : 100,
         "value" : 1
@@ -24,8 +24,8 @@
     "param_2":
     {
         "help" : "Scale radius (in native model units, normally mas)",
-        "id" : "r0",
-        "name": "r0",
+        "id" : "r_d",
+        "name": "r_d",
         "min" : 0.1,
         "max" : 6,
         "value" : 1
@@ -33,8 +33,8 @@
     "param_3":
     {
         "help" : "Scale height (in native model units, normally mas)",
-        "id" : "h0",
-        "name": "h0",
+        "id" : "z_d",
+        "name": "z_d",
         "min" : 0.1,
         "max" : 10,
         "value" : 1
