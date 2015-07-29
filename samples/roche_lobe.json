@@ -7,29 +7,29 @@
 	{
 		"base_data" : 
 		{
-			"T_eff_pole" : [ 5000, 2000, 1000000, false, 100 ],
-			"asynchronism_ratio" : [ 1, 0.01, 2, false, 0.01 ],
-			"g_pole" : [ 1, 0.01, 10000, false, 10 ],
-			"inclination" : [ 90, -180, 180, false, 1 ],
-			"mass_ratio" : [ 3, 0.001, 100, false, 0.01 ],
-			"n_side_power" : [ 4, 1, 10, false, 1 ],
-			"position_angle" : [ 0, 0, 360, false, 0.10000000000000001 ],
-			"r_pole" : [ 1, 1, 10, false, 1 ],
-			"separation" : [ 4, 0.10000000000000001, 100, false, 0.01 ],
-			"von_zeipel_beta" : [ 0.25, 0, 1, false, 0.10000000000000001 ],
-			"z_axis_rotation" : [ 0, 0, 360, false, 1 ],
-			"z_axis_rotational_period" : [ 0, 0, 100, false, 1 ]
+			"T_eff_pole" : [ 5000, 2000, 1000000, false, 100, 0 ],
+			"asynchronism_ratio" : [ 1, 0.01, 2, false, 0.01, 2 ],
+			"g_pole" : [ 1, 0.01, 10000, false, 10, 2 ],
+			"inclination" : [ 90, -180, 180, false, 1, 2 ],
+			"mass_ratio" : [ 3, 0.001, 100, false, 0.01, 2 ],
+			"n_side_power" : [ 4, 1, 10, false, 1, 0 ],
+			"position_angle" : [ 0, 0, 360, false, 0.10000000000000001, 2 ],
+			"r_pole" : [ 1, 1, 10, false, 1, 2 ],
+			"separation" : [ 4, 0.10000000000000001, 100, false, 0.01, 2 ],
+			"von_zeipel_beta" : [ 0.25, 0, 1, false, 0.10000000000000001, 2 ],
+			"z_axis_rotation" : [ 0, 0, 360, false, 1, 2 ],
+			"z_axis_rotational_period" : [ 0, 0, 100, false, 1, 4 ]
 		},
 		"base_id" : "roche_lobe",
 		"position_data" : 
 		{
-			"E" : [ 0, -1, 1, false, 0.10000000000000001 ],
-			"N" : [ 0, -1, 1, false, 0.10000000000000001 ]
+			"E" : [ 0, -1, 1, false, 0.10000000000000001, 2 ],
+			"N" : [ 0, -1, 1, false, 0.10000000000000001, 2 ]
 		},
 		"position_id" : "xy",
 		"shader_data" : 
 		{
-			"alpha" : [ 0.5, 0.10000000000000001, 1, false, 0.089999999999999997 ]
+			"alpha" : [ 0.5, 0.10000000000000001, 1, false, 0.089999999999999997, 4 ]
 		},
 		"shader_id" : "ldl_power_law"
 	}
