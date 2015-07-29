@@ -36,8 +36,10 @@
 #include "CDisk_ConcentricRings.h"
 #include "CDisk_Pascucci2004.h"
 #include "CDisk_Andrews2009.h"
+#include "CDisk_Alpha1973.h"
 #include "CRocheLobe.h"
 #include "CRocheRotator.h"
+
 
 namespace models {
 
@@ -49,6 +51,7 @@ void load()
 	CModelFactory::getInstance().addItem(&CDisk_ConcentricRings::Create);
 	CModelFactory::getInstance().addItem(&CDisk_Pascucci2004::Create);
 	CModelFactory::getInstance().addItem(&CDisk_Andrews2009::Create);
+        CModelFactory::getInstance().addItem(&CDisk_Alpha1973::Create);
 	CModelFactory::getInstance().addItem(&CRocheLobe::Create);
 	CModelFactory::getInstance().addItem(&CRocheRotator::Create);
 }
