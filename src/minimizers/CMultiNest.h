@@ -42,10 +42,9 @@ public:
 	CMultiNest();
 	virtual ~CMultiNest();
 
-	virtual double ComputePriors(double * params, int n_params);
 	static shared_ptr<CMinimizerThread> Create();
 
-	static double ComputeLogZ(valarray<double> & residuals, const valarray<double> & uncertainties);
+	static double ComputeLogLikelihood(valarray<double> & residuals, const valarray<double> & uncertainties);
 
 	static void dumper(int &nSamples, int &nlive, int &nPar, double **physLive, double **posterior,
 			double **paramConstr, double &maxLogLike, double &logZ, double &INSlogZ, double &logZerr,

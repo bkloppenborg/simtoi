@@ -33,43 +33,32 @@
 #ifndef CMODELFACTORY_H_
 #define CMODELFACTORY_H_
 
-#include <map>
-#include <memory>
-#include <vector>
-
-using namespace std;
+#include "FactoryBase.h"
 
 class CModel;
 typedef shared_ptr<CModel> CModelPtr;
-
 typedef shared_ptr<CModel> (*CreateModelFn)(void);
 
-/// \brief A factory class for creating/registering SIMTOI models
+/// \brief A factory class for creating model objects
 ///
 /// This factory is used to register and create instances of models in SIMTOI.
-/// As this class is a singleton, the constructor is private. Call the `Instance()`
+/// As this class is a singleton, the constructor is private. Call the `getInstance()`
 /// function to get a copy of this object.
-///
-/// Before any model may be used in SIMTOI, it must be registered with this class.
-/// Simply call `Register()` with a unique ID and `CModelPtr` creation function.
-/// After the model has been registered it will become available for use in SIMTOI.
-class CModelFactory {
+class CModelFactory : public FactoryBase<CModelPtr, CreateModelFn> {
+
 private:
-	map<string, CreateModelFn> mFactory;
-
-	CModelFactory();
-
-public:
-	virtual ~CModelFactory();
+	CModelFactory() {};
+	CModelFactory(CModelFactory const&) = delete;
+	void operator=(CModelFactory const&)    = delete;
 
 public:
-	shared_ptr<CModel> CreateModel(string ModelID);
+	/// \brief Returns a copy of the CMinimizerFactory instance
+	static CModelFactory & getInstance()
+	{
+		static CModelFactory instance;
+		return instance;
+	}
 
-	static CModelFactory Instance();
-
-	void Register(string ModelID, CreateModelFn CreateFunction);
-
-	vector<string> GetModelList();
 };
 
 #endif /* CMODELFACTORY_H_ */

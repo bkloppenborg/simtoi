@@ -33,35 +33,27 @@
 #ifndef CFEATUREFACTORY_H_
 #define CFEATUREFACTORY_H_
 
-#include <map>
-#include <memory>
-#include <vector>
-
-using namespace std;
+#include "FactoryBase.h"
 
 class CFeature;
-
+typedef shared_ptr<CFeature> CFeaturePtr;
 typedef shared_ptr<CFeature> (*CreateFeatureFn)(void);
 
+class CFeatureFactory : public FactoryBase<CFeaturePtr, CreateFeatureFn> {
 
-class CFeatureFactory {
 private:
-
-	map<string, CreateFeatureFn> mFactory;
-
-	CFeatureFactory();
-
-public:
-	virtual ~CFeatureFactory();
+	CFeatureFactory() {};
+	CFeatureFactory(CFeatureFactory const&) = delete;
+	void operator=(CFeatureFactory const&)    = delete;
 
 public:
-	shared_ptr<CFeature> CreateFeature(string PositionID);
-
-	static CFeatureFactory Instance();
-
-	void Register(string FeatureID, CreateFeatureFn CreateFunction);
-
-	vector<string> GetFeatureList();
+	/// \brief Returns a copy of the CMinimizerFactory instance
+	static CFeatureFactory & getInstance()
+	{
+		static CFeatureFactory instance;
+		return instance;
+	}
 };
+
 
 #endif /* CFEATUREFACTORY_H_ */

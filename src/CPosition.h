@@ -56,13 +56,15 @@ public:
 	};
 
 protected:
-
 	PositionTypes mPositionType;
 	double mTime;
 
 public:
 	CPosition();
 	virtual ~CPosition();
+
+	string ID() { return mID; }
+	string name() { return mName; }
 
 	PositionTypes GetPositionType() { return mPositionType; };
 

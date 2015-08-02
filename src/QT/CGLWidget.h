@@ -37,13 +37,18 @@
 
 #include "liboi.hpp"
 #include "CModelList.h"
-#include "CAnimator.h"
-#include "CMinimizerThread.h"
+//#include "CAnimator.h"
 #include "CWorkerThread.h"
 #include "CTreeModel.h"
 
 class CParameterMap;
 class CParameters;
+
+class CModelList;
+typedef shared_ptr<CModelList> CModelListPtr;
+
+class CWorkerThread;
+typedef shared_ptr<CWorkerThread> CWorkerPtr;
 
 class CGLWidget : public QGLWidget
 {
@@ -54,27 +59,38 @@ protected:
     string mSaveDirectory;
 
     // Worker thread
-    shared_ptr<CWorkerThread> mWorker;
-    // Animation thread
-    QThread mAnimationThread;
-    shared_ptr<CAnimator> mAnimator;
+    CWorkerPtr mWorker;
 
-    // Minimizer
-    CMinimizerPtr mMinimizer;
-    QStandardItemModel mOpenFileModel;
-    CTreeModel mTreeModel;
     static QGLFormat mFormat;
 
 public:
-    CGLWidget(QWidget *widget_parent, string shader_source_dir, string cl_kernel_dir);
+    CGLWidget(QWidget *widget_parent);
     virtual ~CGLWidget();
 
-    void AddModel(shared_ptr<CModel> model);
+	void addData(string filename);
+    void addModel(shared_ptr<CModel> model);
+
+	static bool checkExtensionAvailability(std::string ext_name);
+
+	CModelPtr getModel(unsigned int model_index);
+	CModelListPtr getModels() { return mWorker->GetModelList(); };
+	int getNModels() { return mWorker->GetModelList()->size(); };
+	int getNData() { return mWorker->GetDataSize(); };
+
+	void replaceModel(unsigned int model_index, CModelPtr new_model);
+	void removeModel(unsigned int model_index);
+	void removeData(unsigned int data_index);
+
 protected:
     void closeEvent(QCloseEvent *evt);
 
-	void paintEvent(QPaintEvent * );
+//	void paintEvent(QPaintEvent * );
+	void glDraw();	// override the QGLWidget::glDraw function
+	void paintGL();
 
+public:
+	void resetWidget();
+protected:
     void resizeEvent(QResizeEvent *evt);
 
 public:
@@ -83,60 +99,42 @@ public:
 public:
 
     QStringList GetFileFilters();
-    string GetMinimizerID();
-    bool GetMinimizerRunning();
     double GetTime();
+    CWorkerPtr getWorker() { return mWorker; };
 
-    QStandardItemModel * GetOpenFileModel() { return &mOpenFileModel; };
-    CTreeModel * GetTreeModel() { return &mTreeModel; };
+
     unsigned int GetImageWidth() { return mWorker->GetImageWidth(); };
     unsigned int GetImageHeight() { return mWorker->GetImageHeight(); };
     string GetSaveFolder() { return mSaveDirectory; };
 
-    bool IsAnimating();
-
-protected:
-    void LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map);
-//    void LoadParameters(QStandardItem * parent, CParameters * parameters);
-//    QList<QStandardItem *> LoadParametersHeader(QString name, CParameters * param_base);
-    QList<QStandardItem *> LoadParametersHeader(QString name, CParameterMap * param_map);
-
 public:
     void Open(string filename);
-    void OpenData(string filename);
 
-protected:
-    void RebuildTree();
 public:
     void Render();
 
     void Save(string filename);
     void SetScale(double scale);
     void SetFreeParameters(double * params, int n_params, bool scale_params);
-    void SetMinimizer(CMinimizerPtr minimizer);
     void SetSaveDirectory(string directory_path);
     void SetSize(unsigned int width, unsigned int height);
     void SetTime(double time);
-    void startMinimizer();
+    void setWavelength(double wavelength);
     void startRendering();
-    void stopMinimizer();
     void stopRendering();
 
-    void StartAnimation(double start_time, double time_step);
-    void StopAnimation();
-
 private slots:
+	void updateParameters();
 
-	void on_mTreeModel_parameterUpdated();
-
-	void on_minimizer_finished();
+public slots:
+	void receiveWarning(string message);
 
 signals:
-	void minimizerFinished();
-	void startAnimation(double start_time, double timestep);
-	void stopAnimation(void);
-
-
+	void modelUpdated();
+//	void dataUpdated();
+	void dataAdded(CDataInfo info);
+	void dataRemoved(int index);
+	void warning(string message);
 };
 
 #endif

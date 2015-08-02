@@ -28,13 +28,10 @@ public:
 	CRocheRotator();
 	virtual ~CRocheRotator();
 
-private:
-	double lambda;
-	double mTime;
-
 public:
 
-	void Render(const glm::mat4 & view);
+	void preRender(double & max_flux);
+	void Render(const glm::mat4 & view, const GLfloat & max_flux);
 
 	static shared_ptr<CModel> Create();
 

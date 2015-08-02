@@ -37,13 +37,13 @@
 
 CBenchmark::CBenchmark()
 {
-	mMinimizerID = "benchmark";
-	mMinimizerName = "Benchmark";
+	mID = "benchmark";
+	mName = "Benchmark (performance)";
 }
 
 CBenchmark::~CBenchmark()
 {
-	// TODO Auto-generated destructor stub
+
 }
 
 CMinimizerPtr CBenchmark::Create()

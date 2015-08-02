@@ -35,8 +35,8 @@
 CPosition::CPosition()
 	: CParameterMap()
 {
-	id = "position_base_invalid";
-	name = "not set by developer";
+	mID = "NOT_SET_BY_DEVELOPER";
+	mName = "NOT_SET_BY_DEVELOPER";
 	mPositionType = STATIC;
 	mTime = 0;
 }

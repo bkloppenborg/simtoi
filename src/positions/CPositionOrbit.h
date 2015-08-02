@@ -41,6 +41,7 @@ int const ORBIT_MAX_ITERATIONS = 50;
 
 class CPositionOrbit: public CPosition
 {
+	friend class CBinaryOrbit;
 
 public:
 	CPositionOrbit();

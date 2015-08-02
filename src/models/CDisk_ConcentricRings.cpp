@@ -12,14 +12,14 @@ CDisk_ConcentricRings::CDisk_ConcentricRings()
 : 	CModel()
 {
 	// give this object a name
-	id = "disk_concentric_rings";
-	name = "Concentric Ring Disk";
+	mID = "disk_concentric_rings";
+	mName = "Concentric Ring Disk";
 
-	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
-	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius");
-	addParameter("radius", 20, 0.1, 20, false, 1.0, "Radius", "Radius of the disk");
-	addParameter("height", 5, 0.1, 10, false, 1.0, "Height", "Height of the disk");
-	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius", 2);
+	addParameter("radius", 20, 0.1, 20, false, 1.0, "Radius", "Radius of the disk", 2);
+	addParameter("height", 5, 0.1, 10, false, 1.0, "Height", "Height of the disk", 2);
+	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model", 0);
 
 	// We load the power-law shader by default.
 	auto shaders = CShaderFactory::Instance();
@@ -27,6 +27,7 @@ CDisk_ConcentricRings::CDisk_ConcentricRings()
 
 	// Resize the texture, 1 element is sufficient.
 	mFluxTexture.resize(1);
+	mPixelTemperatures.resize(1);
 }
 
 CDisk_ConcentricRings::~CDisk_ConcentricRings()
@@ -93,20 +94,25 @@ void CDisk_ConcentricRings::Init()
 	mModelReady = true;
 }
 
-void CDisk_ConcentricRings::Render(const glm::mat4 & view)
+void CDisk_ConcentricRings::preRender(double & max_flux)
 {
-	if(!mModelReady)
+	if (!mModelReady)
 		Init();
 
+	double temperature = float(mParams["T_eff"].getValue());
+	mPixelTemperatures[0] = temperature;
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
+}
+
+void CDisk_ConcentricRings::Render(const glm::mat4 & view, const GLfloat & max_flux)
+{
 	// Look up the parameters:
 	const double r_in = mParams["r_in"].getValue();
 	const double MaxRadius  = mParams["radius"].getValue();
 	const double MaxHeight  = mParams["height"].getValue();
 	int n_rings  = ceil(mParams["n_rings"].getValue());
 
-	// Set the color
-	mFluxTexture[0].r = mParams["color"].getValue();
-	mFluxTexture[0].a = 1.0;
+	NormalizeFlux(max_flux);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();

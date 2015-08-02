@@ -12,14 +12,14 @@ CDensityDisk::CDensityDisk()
 : 	CModel()
 {
 	// give this object a name
-	id = "density_disk";
-	name = "Density disk base class";
+	mID = "density_disk";
+	mName = "Density disk base class";
 
-	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
-	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius");
-	addParameter("r_cutoff", 20, 0.1, 20, false, 1.0, "Radial cutoff", "Cutoff radius beyond which the model will not exist");
-	addParameter("h_cutoff", 5, 0.1, 10, false, 1.0, "Height cutoff", "Cutoff height beyond which the model will not exist");
-	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius", 2);
+	addParameter("r_cutoff", 20, 0.1, 20, false, 1.0, "Radial cutoff", "Cutoff radius beyond which the model will not exist", 2);
+	addParameter("h_cutoff", 5, 0.1, 10, false, 1.0, "Height cutoff", "Cutoff height beyond which the model will not exist", 2);
+	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model", 0);
 
 	// We load the default shader, but this should be replaced by something more
 	// specific later.
@@ -28,6 +28,7 @@ CDensityDisk::CDensityDisk()
 
 	// Resize the texture, 1 element is sufficient.
 	mFluxTexture.resize(1);
+	mPixelTemperatures.resize(1);
 }
 
 CDensityDisk::~CDensityDisk()
@@ -90,20 +91,25 @@ void CDensityDisk::Init()
 	mModelReady = true;
 }
 
-void CDensityDisk::Render(const glm::mat4 & view)
+void CDensityDisk::preRender(double & max_flux)
 {
-	if(!mModelReady)
+	if (!mModelReady)
 		Init();
 
+	double temperature = float(mParams["T_eff"].getValue());
+	mPixelTemperatures[0] = temperature;
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
+}
+
+void CDensityDisk::Render(const glm::mat4 & view, const GLfloat & max_flux)
+{
 	// Look up the parameters:
 	const double r_in = mParams["r_in"].getValue();
 	const double r_cutoff  = mParams["r_cutoff"].getValue();
 	const double h_cutoff  = mParams["h_cutoff"].getValue();
 	int n_rings  = ceil(mParams["n_rings"].getValue());
 
-	// Set the color
-	mFluxTexture[0].r = mParams["color"].getValue();
-	mFluxTexture[0].a = 1.0;
+	NormalizeFlux(max_flux);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();

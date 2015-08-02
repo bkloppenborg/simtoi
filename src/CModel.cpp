@@ -4,32 +4,32 @@
  *  Created on: Nov 7, 2011
  *      Author: bkloppenborg
  */
- 
- /* 
+
+ /*
  * Copyright (c) 2012 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
- * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling 
- * Tool for Optical Interferometry" (Version X). 
+ * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling
+ * Tool for Optical Interferometry" (Version X).
  * Available from  <https://github.com/bkloppenborg/simtoi>.
  *
- * This file is part of the SImulation and Modeling Tool for Optical 
+ * This file is part of the SImulation and Modeling Tool for Optical
  * Interferometry (SIMTOI).
- * 
+ *
  * SIMTOI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License 
+ * it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation version 3.
- * 
+ *
  * SIMTOI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
+ *
+ * You should have received a copy of the GNU Lesser General Public
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
  /*
  *  Base class for all models implementing a common set of functions to get/set
  *  parameters and use shaders.
@@ -54,20 +54,25 @@ using namespace std;
 
 CModel::CModel()
 {
+	mName = "NOT_SET_BY_SUBCLASS";
+	mID = "NOT_SET_BY_SUBCLASS";
+
 	// Shader storage location, boolean if it is loaded:
 	mShader = CShaderPtr();
 	mFluxTextureID = 0;
 	mTime = 0;
+	mWavelength = 1.65e-6;	// H-band (meters)
 	mZAxisRotationDelta = 0;
+	mModelReady = false;
 
 	addParameter("position_angle", 0, 0, 360, false, 0.1, "Position angle",
-			"Position Angle defined from North rotating East (degrees)");
+			"Position Angle defined from North rotating East (degrees)", 2);
 	addParameter("inclination", 0, -180, 180, false, 1.0, "Inclination",
-			"Inclination defined from the plane of the sky (degrees)");
+			"Inclination defined from the plane of the sky (degrees)", 2);
 	addParameter("z_axis_rotation", 0, 0, 360, false, 1.0, "Rotation zero point",
-			"Initial rotation angle about model's internal z-axis (degrees). Unless you have a specific reason, this should be zero.");
+			"Initial rotation angle about model's internal z-axis (degrees). Unless you have a specific reason, this should be zero.", 2);
 	addParameter("z_axis_rotational_period", 0, 0, 100, false, 1, "Rotational period",
-			"Rotational period about the model'z z-axis (days)");
+			"Rotational period about the model'z z-axis (days)", 4);
 }
 
 CModel::~CModel()
@@ -83,8 +88,7 @@ CModel::~CModel()
 /// \breif Adds the feature with feature_id to the current model.
 void CModel::AddFeature(string feature_id)
 {
-	auto features = CFeatureFactory::Instance();
-	auto feature = features.CreateFeature(feature_id);
+	auto feature = CFeatureFactory::getInstance().create(feature_id);
 
 	if(feature != nullptr)
 		mFeatures.push_back(feature);
@@ -331,6 +335,12 @@ int CModel::GetTotalFreeParameters()
 			this->GetNFeatureFreeParameters();
 }
 
+/// \brief Get the ID of the model.
+string CModel::ID()
+{
+	return mID;
+}
+
 /// Initalizes the shader variables `position`, `normal`, and `tex_coords`
 /// following the default packing scheme of:
 ///		[vec3(x,y,z), vec3(n_x, n_y, n_z), (t_x, t_y, t_z)]
@@ -343,6 +353,7 @@ void CModel::InitShaderVariables()
 	// First get the shader and activate it
 	GLuint shader_program = mShader->GetProgram();
 	glUseProgram(shader_program);
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to activate OpenGL shader");
 
 	// Define the storage format for the VBO. Each vertex is defined by
 	// three vec3s that are packed as follows:
@@ -412,6 +423,19 @@ void CModel::InitTexture()
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to bind back to default buffer.");
 }
 
+void CModel::NormalizeFlux(double max_flux)
+{
+	for(int i = 0; i < mFluxTexture.size(); i++)
+		mFluxTexture[i].r /= max_flux;
+}
+
+
+/// \brief Returns a human-readable name for this model
+string CModel::name()
+{
+	return mName;
+}
+
 /// \brief Constructs the rotation matrix according to the set parameters.
 ///
 /// Note, if the position model is DYNAMIC (i.e. an orbit) the position angle
@@ -463,16 +487,14 @@ void CModel::Restore(Json::Value input)
 	// Restore the base parameters
 	CParameterMap::restore(input["base_data"]);
 
-	auto positions = CPositionFactory::Instance();
 	auto shaders = CShaderFactory::Instance();
-	auto features = CFeatureFactory::Instance();
 
 	// Look up the name of the position model, if none is specified use "xy" by default.
 	string position_id = input["position_id"].asString();
 	if(position_id.size() == 0)
 		position_id = "xy";
 
-	auto position = positions.CreatePosition(position_id);
+	auto position = CPositionFactory::getInstance().create(position_id);
 	position->restore(input["position_data"]);
 	CModel::SetPositionModel(position);
 
@@ -505,7 +527,7 @@ void CModel::Restore(Json::Value input)
 				break;
 
 			// Find the feature
-			auto feature = features.CreateFeature(feature_id);
+			auto feature = CFeatureFactory::getInstance().create(feature_id);
 			// See if the feature was found, if not print out an error
 			if(feature == nullptr)
 			{
@@ -543,13 +565,13 @@ void CModel::Restore(Json::Value input)
 Json::Value CModel::Serialize()
 {
 	Json::Value output;
-	output["base_id"] = getID();
+	output["base_id"] = ID();
 	output["base_data"] = CParameterMap::serialize();
 
-	output["position_id"] = mPosition->getID();
+	output["position_id"] = mPosition->ID();
 	output["position_data"] = mPosition->serialize();
 
-	output["shader_id"] = mShader->getID();
+	output["shader_id"] = mShader->ID();
 	output["shader_data"] = mShader->serialize();
 
 	stringstream temp;
@@ -564,7 +586,7 @@ Json::Value CModel::Serialize()
 		temp.clear();
 		temp.str(std::string());
 		temp << "feature_" << i << "_id";
-		output[temp.str()] = feature->getID();
+		output[temp.str()] = feature->ID();
 		temp.clear();
 		temp.str(std::string());
 		temp << "feature_" << i << "_data";
@@ -572,6 +594,12 @@ Json::Value CModel::Serialize()
 	}
 
 	return output;
+}
+
+/// Sets the features used in this model.
+void CModel::SetFeatures(vector<CFeaturePtr> & features)
+{
+	mFeatures = features;
 }
 
 /// \brief Sets the free parameters for the model, position, and shader objects.
@@ -604,8 +632,7 @@ void CModel::SetFreeParameters(double * in_params, int n_params, bool scale_para
 /// \param position_id A registered position ID in `CPositionFactory`
 void CModel::SetPositionModel(string position_id)
 {
-	auto factory = CPositionFactory::Instance();
-	SetPositionModel( factory.CreatePosition(position_id));
+	SetPositionModel( CPositionFactory::getInstance().create(position_id) );
 }
 
 /// \brief Sets the position model for this objects.
@@ -646,6 +673,7 @@ void CModel::SetShader(string shader_id)
 {
 	auto shaders = CShaderFactory::Instance();
 	SetShader(shaders.CreateShader(shader_id));
+	mModelReady = false;
 }
 
 /// \brief Replaces the loaded shader with the specified shader
@@ -656,29 +684,43 @@ void CModel::SetShader(CShaderPtr shader)
 	mShader = shader;
 }
 
+void CModel::SetWavelength(double wavelength)
+{
+	assert(wavelength >= 0);
+	mWavelength = wavelength;
+}
+
 /// Computes the flux for pixels given the input temperatures following Planck's
 /// law.
 /// @param temperatures An array of temperatures of in Kelvin
 /// @param fluxes Array into which computed fluxes will be stored
 /// @param wavelength The wavelength of observation
-/// @param max_temperature The maximum temperature of all models (used for normalization)
-void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
-		double wavelength, double max_temperature)
+/// @param max_flux The maximum flux found in this model
+void CModel::TemperatureToFlux(const vector<double> & temperatures, vector<float> & fluxes,
+		double wavelength, double & max_flux)
 {
 	// The pixel and temperature buffers must be of the same size.
 	assert(fluxes.size() == temperatures.size());
 
 	// Planck's law:
-	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
-	// h*c/k = 0.0143877696 m K
-	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	// B(lambda, T) =  2*h*c^2 / lambda^5 * 1 / {exp[(h*c/k_b)/(lambda*T)] - 1}
+	// c1 = 2*h*c^2 / lambda^5
+	double c1 = 1.19104287E-16 / pow(wavelength, 5); // m-1 kg / s3
+	// c1 is not needed because the wavelength will be the same for all models
+	// c2 = h*c / k_b
+	double c2 = 0.0143877696;  // m K
+
+	double flux = 0;
 	for (unsigned int i = 0; i < temperatures.size(); i++)
 	{
-		fluxes[i] = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+		flux = c1 / (exp(c2 / (wavelength * temperatures[i])) - 1.0);
 
-		fluxes[i] /= max_flux;
+		// update the maximum flux
+		if(flux > max_flux)
+			max_flux = flux;
+
+		fluxes[i] = flux;
 	}
-
 }
 
 /// Computes the flux for pixels given the input temperatures following Planck's
@@ -686,25 +728,33 @@ void CModel::TemperatureToFlux(vector<double> temperatures, vector<float> & flux
 /// @param temperatures An array of temperatures of in Kelvin
 /// @param pixels A vector of RGBA pixels into which the computes fluxes will be stored
 /// @param wavelength The wavelength of observation
-/// @param max_temperature The maximum temperature of all models (used for normalization)
-void CModel::TemperatureToFlux(vector<double> temperatures, vector<vec4> & fluxes,
-		double wavelength, double max_temperature)
+/// @param max_flux The maximum flux found in this model
+void CModel::TemperatureToFlux(const vector<double> & temperatures, vector<vec4> & fluxes,
+		double wavelength, double & max_flux)
 {
 	// The pixel and temperature buffers must be of the same size.
 	assert(fluxes.size() == temperatures.size());
 
 	// Planck's law:
-	// B(lambda, T) propto  1 / {exp[(h*c/k)/(lambda*T)] - 1}
-	// h*c/k = 0.0143877696 m K
-	double max_flux = 1. / (exp(0.0143877696 / (wavelength * max_temperature)) - 1.);
+	// B(lambda, T) =  2*h*c^2 / lambda^5 * 1 / {exp[(h*c/k_b)/(lambda*T)] - 1}
+	// c1 = 2*h*c^2 / lambda^5
+	// double c1 = 1.19104287E-16 / pow(wavelength, 5); // m-1 kg / s3
+	// c1 is not needed because the wavelength will be the same for all models
+	// c2 = h*c / k_b
+	double c2 = 0.0143877696;  // m K
+
+	double flux = 0;
 	for (unsigned int i = 0; i < temperatures.size(); i++)
 	{
 		// fill in the Red component.
-		fluxes[i].r = 1. / (exp(0.0143877696 / (wavelength * temperatures[i])) - 1.);
+		flux = 1.0 / (exp(c2 / (wavelength * temperatures[i])) - 1.0);
 
-		fluxes[i].r /= max_flux;
+		// update the maximum flux
+		if(flux > max_flux)
+			max_flux = flux;
+
+		fluxes[i].r = flux;
 	}
-
 }
 
 /// \brief Constructs the translation matrix from the position model.

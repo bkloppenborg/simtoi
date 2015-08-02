@@ -1,14 +1,12 @@
 /*
- * gui_common.h
+ * \file load_features.cpp
  *
- *  Created on: Feb 12, 2013
- *      Author: bkloppen
- *
- *  Commonly used functions for GUIs that are not provided by QT.
+ *  Created on: Feb 10, 2013
+ *  \author bkloppenborg
  */
 
-/*
- * Copyright (c) 2012 Brian Kloppenborg
+ /*
+ * Copyright (c) 2015 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -32,43 +30,16 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GUI_COMMON_H_
-#define GUI_COMMON_H_
+#include "CFeatureFactory.h"
 
-#include <QComboBox>
-#include <QString>
-#include <vector>
-#include <QListWidget>
+#include "CUniformSpot.h"
 
-using namespace std;
+namespace features {
 
-class gui_common
+void load()
 {
-public:
-	gui_common();
-	virtual ~gui_common();
+	// TODO: For now we CMinimizerFactory::getInstance().addItem minimizers explicitly. In the future, we should use plugins instead.
+	CFeatureFactory::getInstance().addItem(&CUniformSpot::Create);
+}
 
-	static void SetupOptions(QComboBox * widget, vector<string> values)
-	{
-		QString tmp_str = "";
-
-		for(unsigned int i = 0; i < values.size(); i++)
-		{
-			tmp_str = QString::fromStdString(values[i]);
-			widget->addItem(tmp_str);
-		}
-	}
-
-	static void SetupOptions(QListWidget * widget, vector<string> values)
-	{
-		QString tmp_str = "";
-
-		for(unsigned int i = 0; i < values.size(); i++)
-		{
-			tmp_str = QString::fromStdString(values[i]);
-			widget->addItem(tmp_str);
-		}
-	}
-};
-
-#endif /* GUI_COMMON_H_ */
+} // namespace models

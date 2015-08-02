@@ -45,15 +45,16 @@ using namespace std;
 CSphere::CSphere()
 	: CModel()
 {
-	id = "sphere";
-	name = "Sphere";
+	mID = "sphere";
+	mName = "Sphere";
 
-	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
-	addParameter("diameter", 1, 0, 1, true, 0.05, "Diameter", "Diameter of the sphere");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("radius", 0.5, 0, 1, true, 0.05, "Radius", "Radius of the sphere (mas)", 4);
 
 	mNumElements = 0;
 
 	mFluxTexture.resize(1);	// single element texture.
+	mPixelTemperatures.resize(1);
 
 	mModelReady = false;
 }
@@ -188,18 +189,24 @@ void CSphere::Init()
 	mModelReady = true;
 }
 
-void CSphere::Render(const glm::mat4 & view)
+
+void CSphere::preRender(double & max_flux)
 {
-	if(!mModelReady)
+	if (!mModelReady)
 		Init();
 
+	double temperature = float(mParams["T_eff"].getValue());
+	mPixelTemperatures[0] = temperature;
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
+}
+
+void CSphere::Render(const glm::mat4 & view, const GLfloat & max_flux)
+{
 	// Rename a few variables for convenience:
-	double radius = float(mParams["diameter"].getValue() / 2);
+	double radius = float(mParams["radius"].getValue());
 	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
 
-	// Set the color.
-	mFluxTexture[0].r = mParams["color"].getValue();
-	mFluxTexture[0].a = 1.0;
+	NormalizeFlux(max_flux);
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();
@@ -238,3 +245,4 @@ void CSphere::Render(const glm::mat4 & view)
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Rendering failed");
 }
+

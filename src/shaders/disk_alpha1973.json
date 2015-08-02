@@ -1,0 +1,62 @@
+// SIMTOI shader configuration file in JSON format.
+
+{
+    "fragment_shader" : "disk_alpha1973_frag.glsl",
+    "shader_name" : "Alpha 1973 Disk",
+    "param_0":
+    {
+        "help": "Characteristic radial surface density profile",
+        "id" : "rho_0",
+        "name" : "rho_0",
+        "min" : 0.1,
+        "max" : 100,
+        "value" : 1
+    },
+    "param_1":
+    {
+        "help": "Opacity",
+        "id" : "kappa",
+        "name" : "kappa",
+        "min" : 0.1,
+        "max" : 10,
+        "value" : 1
+    },
+    "param_2":
+    {
+        "help": "Characteristic radius (in native model units, normally mas)",
+        "id" : "r_0",
+        "name" : "r_0",
+        "min" : 0.1,
+        "max" : 6,
+        "value" : 1
+    },
+    "param_3":
+    {
+        "help": "Scale height normalization (in native model units, normally mas)",
+        "id" : "h_0",
+        "name" : "h_0",
+        "min" : 0.1,
+        "max" : 10,
+        "value" : 1
+    },
+    "param_4":
+    {
+        "help": "Surface density gradient",
+        "id" : "alpha",
+        "name" : "alpha",
+        "min" : 0.1,
+        "max" : 10,
+        "value" : 1
+    },
+    "param_5":
+    {
+        "help": "Scale height gradient",
+        "id" : "beta",
+        "name" : "beta",
+        "min" : 0.1,
+        "max" : 10,
+        "value" : 1
+    },
+	"shader_id" : "disk_alpha1973",
+    "vertex_shader" : "default_vert.glsl"
+}

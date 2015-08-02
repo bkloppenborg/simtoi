@@ -33,36 +33,26 @@
 #ifndef CPOSITIONFACTORY_H_
 #define CPOSITIONFACTORY_H_
 
-#include <map>
-#include <memory>
-#include <vector>
-
-using namespace std;
+#include "FactoryBase.h"
 
 class CPosition;
-
+typedef shared_ptr<CPosition> CPositionPtr;
 typedef shared_ptr<CPosition> (*CreatePositionFn)(void);
 
+class CPositionFactory : public FactoryBase<CPositionPtr, CreatePositionFn> {
 
-class CPositionFactory {
 private:
-//	static CPositionFactory * mInstance;
-
-	map<string, CreatePositionFn> mFactory;
-
-	CPositionFactory();
+	CPositionFactory() {};
+	CPositionFactory(CPositionFactory const&) = delete;
+	void operator=(CPositionFactory const&)    = delete;
 
 public:
-	virtual ~CPositionFactory();
-
-public:
-	shared_ptr<CPosition> CreatePosition(string PositionID);
-
-	static CPositionFactory Instance();
-
-	void Register(string PositionID, CreatePositionFn CreateFunction);
-
-	vector<string> GetPositionList();
+	/// \brief Returns a copy of the CMinimizerFactory instance
+	static CPositionFactory & getInstance()
+	{
+		static CPositionFactory instance;
+		return instance;
+	}
 };
 
 #endif /* CPOSITIONFACTORY_H_ */

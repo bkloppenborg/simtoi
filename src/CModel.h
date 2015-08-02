@@ -89,10 +89,10 @@ typedef shared_ptr<CFeature> CFeaturePtr;
 /// values of model parameters.
 class CModel: public CParameterMap
 {
-
 protected:
 
-	double mTime;		///< The current time for this object.
+	double mTime;		///< The current time for this object (days)
+	double mWavelength; ///< The current wavelength of observation (meters)
 	double mZAxisRotationDelta; ///< A delta applied to the rotation about the z-axis, set by SetTime
 
 	CPositionPtr mPosition;	///< A shared pointer to the position object.
@@ -105,6 +105,8 @@ protected:
 	vector<vec4> mFluxTexture;
 
 	vector<CFeaturePtr> mFeatures;
+
+	bool mModelReady;
 
 protected:
 	glm::mat4 Rotate();
@@ -126,6 +128,8 @@ public:
 
 	void SetFreeParameters(double * params, int n_params, bool scale_params);
 
+	string ID();
+	string name();
 
 public:
 	CModel();
@@ -150,26 +154,32 @@ protected:
 	virtual void InitShaderVariables();
 
 public:
-	virtual void Render(const glm::mat4 & view) = 0;
+	void NormalizeFlux(double max_flux);
+
 public:
+	virtual void preRender(double & max_flux) = 0;
+	virtual void Render(const glm::mat4 & view, const GLfloat & max_flux) = 0;
 	void Restore(Json::Value input);
 
 public:
 	Json::Value Serialize();
+
+	virtual void SetFeatures(vector<CFeaturePtr> & features);
 	void SetPositionModel(string position_id);
 	void SetPositionModel(CPositionPtr position);
-
 	virtual void SetShader(string shader_id);
 	virtual void SetShader(CShaderPtr shader);
+
 	virtual void SetTime(double time);
+	void SetWavelength(double wavelength);
 protected:
 	void SetupMatrix();
 
 public:
-	static void TemperatureToFlux(vector<double> temperatures, vector<float> & fluxes,
-			double wavelength, double max_temperature);
-	static void TemperatureToFlux(vector<double> temperatures, vector<vec4> & pixels,
-			double wavelength, double max_temperature);
+	static void TemperatureToFlux(const vector<double> & temperatures, vector<float> & fluxes,
+			double wavelength, double & max_flux);
+	static void TemperatureToFlux(const vector<double> & temperatures, vector<vec4> & pixels,
+			double wavelength, double & max_flux);
 
 };
 

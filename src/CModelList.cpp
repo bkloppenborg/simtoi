@@ -58,6 +58,10 @@ void CModelList::AddModel(CModelPtr model)
 	mModels.push_back(model);
 }
 
+void CModelList::clear()
+{
+	mModels.clear();
+}
 
 /// \brief Returns the total number of free parameters in all models
 int CModelList::GetNFreeParameters()
@@ -148,8 +152,7 @@ vector<string> CModelList::GetFreeParamNames()
 /// Returns a pair of model names, and their enumerated types
 vector<string> CModelList::GetTypes(void)
 {
-	auto factory = CModelFactory::Instance();
-	return factory.GetModelList();
+	return CModelFactory::getInstance().getIDs();
 }
 
 // Render the image to the specified OpenGL framebuffer object.
@@ -165,10 +168,16 @@ void CModelList::Render(const mat4 & view)
     glClearColor (0.0f, 0.0f, 0.0f, 0.0f); // Set the clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear the depth and color buffers
 
+    double max_flux = 0.0;
+    for(auto model : models)
+    {
+    	model->preRender(max_flux);
+    }
+
     // Now call render on all of the models:
     for(auto model : models)
     {
-    	model->Render(view);
+    	model->Render(view, max_flux);
     	model->clearFlags();
     }
 
@@ -178,10 +187,23 @@ void CModelList::Render(const mat4 & view)
     glFinish();
 }
 
+/// Replaces the model at `model_index` with `model`
+void CModelList::ReplaceModel(unsigned int model_index, CModelPtr model)
+{
+	if(model_index < mModels.size())
+		mModels[model_index] = model;
+}
+
+/// Removes the model at the specified index
+void CModelList::RemoveModel(unsigned int model_index)
+{
+	if(model_index < mModels.size())
+		mModels.erase(mModels.begin() + model_index);
+}
+
 /// Restores the saved models
 void CModelList::Restore(Json::Value input)
 {
-	auto factory = CModelFactory::Instance();
 	CModelPtr model;
 
 	// Clear the model list:
@@ -203,7 +225,7 @@ void CModelList::Restore(Json::Value input)
 		{
 			// Look up the type of model and create an object of that type:
 			model_id = input[id]["base_id"].asString();
-			model = factory.CreateModel(model_id);
+			model = CModelFactory::getInstance().create(model_id);
 
 			// Now have the model restore the rest of itself, then push it onto the list.
 			model->Restore(input[id]);
@@ -224,7 +246,7 @@ Json::Value CModelList::Serialize()
 	Json::Value output;
 	stringstream name;
 
-    // Now call render on all of the models:
+
 	int i = 0;
     for(auto model: mModels)
     {
@@ -239,15 +261,13 @@ Json::Value CModelList::Serialize()
 }
 
 /// Sets all of the free parameter values
-void CModelList::SetFreeParameters(double * params, unsigned int n_params, bool scale_params)
+void CModelList::SetFreeParameters(const double * params, unsigned int n_params, bool scale_params)
 {
-	unsigned int n = 0;
-
-    // Now call render on all of the models:
-    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
+  unsigned int n = 0;
+  for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
-    	(*it)->SetFreeParameters(params + n, n_params - n, scale_params);
-    	n += (*it)->GetTotalFreeParameters();
+      (*it)->SetFreeParameters(const_cast<double *>(&params[n]), n_params - n, scale_params);
+      n += (*it)->GetTotalFreeParameters();
     }
 }
 
@@ -259,6 +279,16 @@ void CModelList::SetTime(double t)
     for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
     {
     	(*it)->SetTime(mTime);
+    }
+}
+
+/// Sets the wavelength for all of the models
+void CModelList::SetWavelength(double wavelength)
+{
+	mWavelength = wavelength;
+    for(vector<CModelPtr>::iterator it = mModels.begin(); it != mModels.end(); ++it)
+    {
+    	(*it)->SetWavelength(wavelength);
     }
 }
 

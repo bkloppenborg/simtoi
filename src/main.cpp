@@ -53,7 +53,11 @@
 #include <iostream>
 
 #include "main.h"
-#include "gui_main.h"
+#include "QT/guiMain.h"
+#include "minimizers/load_minimizers.h"
+#include "models/load_models.h"
+#include "features/load_features.h"
+#include "positions/load_positions.h"
 
 using namespace std;
 
@@ -87,37 +91,48 @@ int main(int argc, char *argv[])
     // determine the absolute directory from which SIMTOI is running
     EXE_FOLDER = app.applicationDirPath().toStdString();
 
+    // Setup minimization engines:
+    minimizers::load();
+    models::load();
+    features::load();
+    positions::load();
+
     // get the list of command line arguments and parse them.
     QStringList args = app.arguments();
     QStringList data_files;
-    QStringList model_files;
-    string minimizer = "";
-    string output_dir = "/tmp/model";
+    QString model_file;
+    string minimizer_id = "";
+    string save_directory = "/tmp/model";
     bool close_simtoi = false;
 
     // If there were command-line options, parse them
+    bool run_simtoi = false;
     if(args.size() > 0)
-    	ParseArgs(args, data_files, model_files, minimizer, close_simtoi, output_dir);
+    	run_simtoi = ParseArgs(args, data_files, model_file, minimizer_id, save_directory, close_simtoi);
 
-    // Startup the GUI:
-    gui_main main_window;
-    main_window.show();
+    if(run_simtoi)
+    {
+		// Startup the GUI:
+		guiMain main_window;
+		main_window.show();
 
-    main_window.SetOutputDir(output_dir);
+		if(data_files.size() > 0 || model_file.size() > 0)
+			main_window.run_command_line(data_files, model_file, minimizer_id, save_directory, close_simtoi);
 
-    if(data_files.size() > 0 || model_files.size() > 0)
-    	main_window.CommandLine(data_files, model_files, minimizer, close_simtoi);
+		return app.exec();
+    }
 
-    return app.exec();
+    return 0;
 }
 
 /// Parse the command line arguments splitting them into data files, model files, minimizer names, model area size and model area scale
-void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, string &  minimizer, bool & close_simtoi, string & output_dir)
+bool ParseArgs(QStringList args, QStringList & filenames, QString & model_file, string &  minimizer, string & output_dir, bool & close_simtoi)
 {
 	unsigned int n_items = args.size();
 
 	string value;
 	QDir tmp = QDir(".");
+	bool run_simtoi = true;
 
 	for(int i = 0; i < n_items; i++)
 	{
@@ -139,10 +154,62 @@ void ParseArgs(QStringList args, QStringList & filenames, QStringList & models, 
 
 		// model file
 		if(value == "-m")
-			models.append(tmp.absoluteFilePath(args.at(i + 1)));
+			model_file =tmp.absoluteFilePath(args.at(i + 1));
 
 		if(value == "-o")
 			output_dir = tmp.absoluteFilePath(args.at(i + 1)).toStdString();
+
+		if(value == "--list-engines")
+		{
+			run_simtoi = false;
+
+			vector<string> ids = CMinimizerFactory::getInstance().getIDs();
+			vector<string> names = CMinimizerFactory::getInstance().getNames();
+			printFactoryDescription(ids, names, "Engine ID");
+		}
+
+		if(value == "--list-models")
+		{
+			run_simtoi = false;
+
+			vector<string> ids = CModelFactory::getInstance().getIDs();
+			vector<string> names = CModelFactory::getInstance().getNames();
+			printFactoryDescription(ids, names, "Model ID");
+		}
+
+		if(value == "--list-features")
+		{
+			run_simtoi = false;
+
+			vector<string> ids = CFeatureFactory::getInstance().getIDs();
+			vector<string> names = CFeatureFactory::getInstance().getNames();
+			printFactoryDescription(ids, names, "Feature ID");
+		}
+
+		if(value == "--list-positions")
+		{
+			run_simtoi = false;
+
+			vector<string> ids = CPositionFactory::getInstance().getIDs();
+			vector<string> names = CPositionFactory::getInstance().getNames();
+			printFactoryDescription(ids, names, "Position ID");
+		}
+	}
+
+	return run_simtoi;
+}
+
+void printFactoryDescription(const vector<string> & ids, const vector<string> & names, const string & title)
+{
+	int field_width = 25;
+	cout << "| " << std::left << std::setw(field_width) << std::setfill(' ') << title
+		 << "| " << std::setw(60) << std::setfill(' ') << "Description" << "|" << endl;
+	cout << "|" << string(field_width+1, '-') << "|" << string(61, '-') << "|" << endl;
+	// print out a header
+	for(int i = 0; i < ids.size(); i++)
+	{
+		cout << "| " << std::left << std::setw(field_width) << std::setfill(' ') << ids[i] <<
+				"| " << std::left << std::setw(60) << std::setfill(' ') << names[i] << "|" << endl;
 	}
 }
 
@@ -155,13 +222,18 @@ void PrintHelp()
 	cout << "Command line usage: simtoi [...]" << endl;
 	cout << endl;
 	cout << "Options:" << endl;
-	cout << "  " << "-h, --help   : " << "Show this help message and exit" << endl;
-	cout << "  " << "-c           : " << "Close SIMTOI after minimization completes [default: off]" << endl;
-	cout << "  " << "-d           : " << "Input data file. Specify multiple -d to include " << endl;
-	cout << "  " << "               " << "many data files." << endl;
-	cout << "  " << "-e           : " << "Minimization engine ID (see Wiki)" << endl;
-	cout << "  " << "-m           : " << "Model input file" << endl;
-	cout << "  " << "-o           : " << "Output directory" << endl;
+	cout << "  " << "-h, --help       : " << "Show this help message and exit" << endl;
+	cout << "  " << "-c               : " << "Close SIMTOI after minimization completes [default: off]" << endl;
+	cout << "  " << "-d               : " << "Input data file. Specify multiple -d to include " << endl;
+	cout << "  " << "                   " << "many data files." << endl;
+	cout << "  " << "-e               : " << "Minimization engine ID (see Wiki)" << endl;
+	cout << "  " << "-m               : " << "Model input file" << endl;
+	cout << "  " << "-o               : " << "Output directory" << endl;
+	cout << "  " << "--list-engines   : " << "Lists all registered minimization engines" << endl;
+	cout << "  " << "--list-models    : " << "Lists all registered models" << endl;
+	cout << "  " << "--list-features  : " << "Lists all registered features" << endl;
+	cout << "  " << "--list-positions : " << "Lists all registered position options" << endl;
+
 	cout << endl;
 	cout << "SIMTOI also supports QT commands. For instance you can run SIMTOI from a: " << endl;
 	cout << "remotely executed script (or from gnu screen) by adding: " << endl;

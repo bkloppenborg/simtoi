@@ -47,8 +47,8 @@
 
 CMultiNest::CMultiNest()
 {
-	mMinimizerID = "multinest";
-	mMinimizerName = "MultiNest";
+	mID = "multinest";
+	mName = "Multinest (Nested Sampling) - global";
 }
 
 CMultiNest::~CMultiNest()
@@ -56,31 +56,10 @@ CMultiNest::~CMultiNest()
 	// TODO Auto-generated destructor stub
 }
 
-/// Computes the prior assuming uniform (uninformative) priors for each parameter
-///
-/// \param params current parameter values in MultiNest
-/// \param n_params the number of parameters in params.
-double CMultiNest::ComputePriors(double * params, int n_params)
-{
-	double prior = 1;
-
-	// Get the parameter min/max values from the model list
-	CModelListPtr model_list = mWorkerThread->GetModelList();
-
-	// Compute the prior assuming P(x) = 1 / (x_max - x_min)
-	vector< pair<double, double> > min_maxes = model_list->GetFreeParamMinMaxes();
-	for(auto min_max : min_maxes)
-	{
-		prior *= 1.0 / (min_max.second - min_max.first);
-	}
-
-	return prior;
-}
-
-double CMultiNest::ComputeLogZ(valarray<double> & chis, const valarray<double> & uncertainties)
+double CMultiNest::ComputeLogLikelihood(valarray<double> & chis, const valarray<double> & uncertainties)
 {
 	// We compute the log likelihood from the following formulation:
-	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp(chi^2_i / 2)]
+	//   log Z	= log [Product_i( 1/sqrt(1 pi sigma_i) exp( -chi^2_i / 2)]
 	//			= -N/2 log(2 pi) - sum_i( log(sigma_i) ) - 1/2 sum_i(chi^2_i)
 
 	// Form the chi squared
@@ -145,11 +124,7 @@ void CMultiNest::log_likelihood(double * params, int & ndim, int & npars, double
 
 	// Now get the residuals and compute the chi values. Store these in the output double.
 	minimizer->mWorkerThread->GetChi(&minimizer->mChis[0], minimizer->mChis.size());
-	lnew = ComputeLogZ(minimizer->mChis, minimizer->mUncertainties);
-	double temp = lnew;
-
-	// Add in the priors:
-	lnew += minimizer->ComputePriors(params, npars);
+	lnew = ComputeLogLikelihood(minimizer->mChis, minimizer->mUncertainties);
 }
 
 /// Reads in the 'multinestsummary.txt' file and extracts the

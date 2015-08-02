@@ -18,18 +18,11 @@ class CModel;
 
 class CFeature: public CParameterMap
 {
-protected:
-	string id;
-	string name;
-
 public:
 	CFeature();
 	virtual ~CFeature();
 
 	virtual void apply(CModel * model) = 0;
-
-	virtual string getID() const { return id; };
-	virtual string getName() const { return name; }
 };
 
 #endif /* CFEATURE_H_ */

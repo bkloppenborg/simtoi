@@ -35,12 +35,12 @@
 CCylinder::CCylinder()
 	: CModel()
 {
-	id = "cylinder";
-	name = "Cylinder";
+	mID = "cylinder";
+	mName = "Cylinder";
 
-	addParameter("color", 1, 0, 1, false, 0.01, "Color", "Brightness of the red channel normalized to unit intensity.");
-	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter", "Diameter of the cylinder");
-	addParameter("height", 0.5, 0.1, 2.0, true, 0.1, "Height", "Total height of the cylinder");
+	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
+	addParameter("diameter", 3.0, 0.1, 6.0, true, 0.1, "Diameter", "Diameter of the cylinder", 2);
+	addParameter("height", 0.5, 0.1, 2.0, true, 0.1, "Height", "Total height of the cylinder", 2);
 
 	mMidplaneStart = 0;
 	mMidplaneSize = 0;
@@ -48,6 +48,7 @@ CCylinder::CCylinder()
 	mRimSize = 0;
 
 	// Resize the texture. Single pixel is all that is required.
+	mPixelTemperatures.resize(1);
 	mFluxTexture.resize(1);
 }
 
@@ -238,18 +239,24 @@ void CCylinder::Init()
 	mModelReady = true;
 }
 
-void CCylinder::Render(const glm::mat4 & view)
+void CCylinder::preRender(double & max_flux)
 {
-	if(!mModelReady)
+	if (!mModelReady)
 		Init();
+
+	double temperature = float(mParams["T_eff"].getValue());
+	mPixelTemperatures[0] = temperature;
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
+}
+
+void CCylinder::Render(const glm::mat4 & view, const GLfloat & max_flux)
+{
+	NormalizeFlux(max_flux);
 
 	// Look up the parameters:
 	const double diameter = mParams["diameter"].getValue();
 	const double radius = diameter / 2;
 	const double height  = mParams["height"].getValue();
-
-	mFluxTexture[0].x = mParams["color"].getValue();
-	mFluxTexture[0].a = 1.0;
 
 	// Activate the shader
 	GLuint shader_program = mShader->GetProgram();

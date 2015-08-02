@@ -52,6 +52,8 @@
 #include <memory>
 #include <queue>
 #include "json/json.h"
+#include "CDataInfo.h"
+#include "CTask.h"
 
 #include "OpenGL.h" // OpenGL includes, plus several workarounds for various OSes
 
@@ -80,6 +82,7 @@ enum WorkerOperations
 	OPEN_DATA,
 	RENDER,
 	SET_TIME,
+	SET_WAVELENGTH,
 	STOP
 };
 
@@ -102,8 +105,13 @@ class CWorkerThread : public QThread
 {
     Q_OBJECT
 protected:
-    // OpenGL
-    CGLWidget * mGLWidget;
+    // Datamembers for the OpenGL context
+    CGLWidget * mGLWidget;	///< Managed elsewhere, do not delete.
+    bool mGLFloatSupported;
+    GLint mGLRenderBufferFormat;
+    GLint mGLStorageBufferFormat;
+    GLenum mGLPixelDataType;
+
     unsigned int mImageDepth;
     unsigned int mImageHeight;
     double mImageScale;
@@ -133,18 +141,26 @@ protected:
 	QSemaphore mWorkerSemaphore;	// Acquire if a read/write operation is enqueued.
 
 	// Temporary storage locations
-	double * mTempArray;	// External memory. Don't allocate/deallocate.
+	double * mTempArray;	///< External memory. Don't allocate/deallocate.
 	unsigned int mTempArraySize;
 	string mTempString;
 	double mTempDouble;
 	unsigned int mTempUint;
+	CDataInfo mTempDataInfo;
 
 public:
     CWorkerThread(CGLWidget * glWidget, QString exe_folder);
     virtual ~CWorkerThread();
 
 public:
-    void AddModel(CModelPtr model);
+	void addModel(CModelPtr model);
+	CModelPtr getModel(unsigned int model_index);
+	void replaceModel(unsigned int model_index, CModelPtr new_model);
+	void removeModel(unsigned int model_index);
+
+	CDataInfo addData(string filename);
+	void removeData(unsigned int data_id);
+
     void AllocateBuffer();
 
 public:
@@ -185,10 +201,15 @@ public:
     unsigned int GetImageHeight() { return mImageHeight; };
     unsigned int GetImageWidth() { return mImageWidth; };
     double GetImageScale() { return mImageScale; };
+    int GetNDataFiles();
     COpenCLPtr GetOpenCL() { return mOpenCL; };
     glm::mat4 GetView() { return mView; };
 
-    void OpenData(string filename);
+	GLint glRenderBufferFormat() { return mGLRenderBufferFormat; }
+	GLint glRenderStorageFormat() { return mGLStorageBufferFormat; }
+	GLenum glPixelDataFormat() { return mGLPixelDataType; }
+
+//    void OpenData(string filename);
 
     void Render();
 public:
@@ -198,10 +219,16 @@ public:
     void SetScale(double scale);
     void SetSize(unsigned int width, unsigned int height);
     void SetTime(double time);
+    void SetWavelength(double wavelength);
     Json::Value Serialize();
     void stop();
 protected:
     void SwapBuffers();
+
+// Signals and slots
+signals:
+	void dataAdded(CDataInfo info);
+	void glContextWarning(string message);
 };
     
 #endif // C_WORKER_THREAD

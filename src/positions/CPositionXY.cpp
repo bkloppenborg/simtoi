@@ -34,13 +34,13 @@
 
 CPositionXY::CPositionXY()
 {
-	name = "XY";
-	id = "xy";
+	mName = "XY";
+	mID = "xy";
 	mPositionType = STATIC;
 
 	// Init the position variables, set them to be fixed.
-	addParameter("N", 0, -1, 1, false, 0.1, "North", "North (positive is up on the screen)");
-	addParameter("E", 0, -1, 1, false, 0.1, "East", "East (positive is left on the screen)");
+	addParameter("N", 0, -1, 1, false, 0.1, "North", "North (mas) (positive is up on the screen)", 2);
+	addParameter("E", 0, -1, 1, false, 0.1, "East", "East (mas) (positive is left on the screen)", 2);
 }
 
 CPositionXY::~CPositionXY()

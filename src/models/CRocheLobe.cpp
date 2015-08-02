@@ -17,17 +17,15 @@ CRocheLobe::CRocheLobe() :
 	AU(1.496e11), rsun(6.955e8), G(6.67428e-11), parsec(3.08567758e16),
 	CHealpixSpheroid()
 {
-	id = "roche_lobe";
-	name = "Roche Lobe";
+	mID = "roche_lobe";
+	mName = "Roche Lobe";
 
-	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)");
-	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)");
-	addParameter("von_zeipel_beta", 0.25, 0.0, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)");
-	addParameter("separation", 4.0 , 0.1, 100.0, false, 0.01, "Separation", "Separation between components (mas)");
-	addParameter("mass_ratio", 3.0 , 0.001, 100.0, false, 0.01, "Mass ratio", "Mass ratio M2/M1) (unitless)");
-	addParameter("asynchronism_ratio", 1.0 , 0.01, 2.0, false, 0.01, "Async ratio", "Asynchronous ratio rotation/revolution (unitless)");
-
-	lambda = 1.65e-6; // m, wavelength of observation, used to convert temperatures to fluxes
+	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)", 0);
+	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)", 2);
+	addParameter("von_zeipel_beta", 0.25, 0.0, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)", 2);
+	addParameter("separation", 4.0 , 0.1, 100.0, false, 0.01, "Separation", "Separation between components (mas)", 2);
+	addParameter("mass_ratio", 3.0 , 0.001, 100.0, false, 0.01, "Mass ratio", "Mass ratio M2/M1) (unitless)", 2);
+	addParameter("asynchronism_ratio", 1.0 , 0.01, 2.0, false, 0.01, "Async ratio", "Asynchronous ratio rotation/revolution (unitless)", 2);
 	//	omega_rot = 2.0 * PI / (orbital_period * 3600. * 24.); // in Hz
 }
 
@@ -43,8 +41,6 @@ shared_ptr<CModel> CRocheLobe::Create()
 
 void CRocheLobe::ComputeRadii(const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio)
 {
-
-
 	// Compute the radii for the pixels and corners:
 	for(unsigned int i = 0; i < pixel_radii.size(); i++)
 	  pixel_radii[i] = ComputeRadius(r_pole, separation, mass_ratio, asynchronism_ratio, pixel_theta[i], pixel_phi[i]);
@@ -152,7 +148,8 @@ double CRocheLobe::ComputeRadius(const double r_pole, const double separation, c
 	return radius;
 }
 
-void CRocheLobe::Render(const glm::mat4 & view)
+
+void CRocheLobe::preRender(double & max_flux)
 {
 	if (!mModelReady)
 		Init();
@@ -188,16 +185,18 @@ void CRocheLobe::Render(const glm::mat4 & view)
 	for(auto feature: mFeatures)
 		feature->apply(this);
 
-	double max_temperature = 0;
-	for(unsigned int i = 0; i < mPixelTemperatures.size(); i++)
-	{
-		if(mPixelTemperatures[i] > max_temperature)
-			max_temperature = mPixelTemperatures[i];
-	}
 
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_flux);
 
 	GenerateVBO(n_pixels, n_sides, mVBOData);
+
+}
+
+void CRocheLobe::Render(const glm::mat4 & view, const GLfloat & max_flux)
+{
+	const unsigned int n_sides = pow(2, mParams["n_side_power"].getValue());
+
+	NormalizeFlux(max_flux);
 
 	mat4 scale = glm::scale(mat4(), glm::vec3(1, 1, 1));
 
@@ -277,7 +276,7 @@ void CRocheLobe::GenerateModel(vector<vec3> & vbo_data,
 	}
 
 	// Convert temperatures to fluxes.
-	TemperatureToFlux(mPixelTemperatures, mFluxTexture, lambda, max_temperature);
+	TemperatureToFlux(mPixelTemperatures, mFluxTexture, mWavelength, max_temperature);
 
 	GenerateVBO(n_pixels, n_sides, vbo_data);
 

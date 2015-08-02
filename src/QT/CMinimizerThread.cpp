@@ -36,6 +36,8 @@
 #include <QDir>
 #include <iomanip>
 
+#include "../version.h"
+
 using namespace std;
 
 CMinimizerThread::CMinimizerThread()
@@ -45,8 +47,8 @@ CMinimizerThread::CMinimizerThread()
 	mRun = false;
 	mIsRunning = false;
 	mSaveDirectory = "/tmp/model";
-	mMinimizerName = "";
-	mMinimizerID = "";
+	mName = "";
+	mID = "";
 }
 
 CMinimizerThread::~CMinimizerThread()
@@ -102,9 +104,9 @@ void CMinimizerThread::ExportResults()
 }
 
 /// \brief Returns the unique ID assigned to this minimizer.
-string CMinimizerThread::GetID()
+string CMinimizerThread::ID()
 {
-	return mMinimizerID;
+	return mID;
 }
 
 /// \brief Returns the best-fit parameters after minimization has completed.
@@ -125,6 +127,7 @@ void CMinimizerThread::GetResults(double * results, int n_params)
 /// \brief Initialization function.
 ///
 /// \param worker_thread A shared pointer to the worker thread
+/// \param save_directory
 void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 {
 	mWorkerThread = worker_thread;
@@ -138,6 +141,12 @@ void CMinimizerThread::Init(shared_ptr<CWorkerThread> worker_thread)
 	unsigned int n_data = mWorkerThread->GetDataSize();
 	mChis = valarray<double>(n_data);
 	mUncertainties = valarray<double>(n_data);
+}
+
+/// \brief Returns a human-readable name for this minimization engine
+string CMinimizerThread::name()
+{
+	return mName;
 }
 
 /// \brief Opens the statistics file and sets the properties for the ofstream
@@ -158,18 +167,10 @@ void CMinimizerThread::OpenStatisticsFile(ofstream & file)
 	file.precision(8);
 }
 
-
-/// \brief Changes the default directory to which the minimizer saves files.
-///
-/// Some minimization engines may write out intermediate files during the
-/// minimization process. This function permits you to set an absolute path
-/// and filename prefix which is used by the minimizers.
-///
-/// \param filename An absolute path prefix for minimizer files.
-void CMinimizerThread::SetSaveDirectory(string folder_name)
+void CMinimizerThread::setSaveDirectory(string save_directory)
 {
-	if(folder_name.size() > 0)
-		mSaveDirectory = folder_name;
+	if(save_directory.size() > 0)
+		mSaveDirectory = save_directory;
 }
 
 /// \brief Stops the minimizer.
@@ -190,6 +191,8 @@ void CMinimizerThread::WriteRow(double * data, unsigned int size, double chi2r, 
 /// \brief Writes the parameter names
 void CMinimizerThread::WriteHeader(vector<string> & param_names, ofstream & outfile)
 {
+	outfile << "# SIMTOI minimization summary file." << endl;
+	outfile << "# Created with SIMTOI version: " << SIMTOI_VERSION << " git commit " << SIMTOI_REVISION << endl;
 	outfile << "# Parameter names in a column." << endl;
 	outfile << "# Param0, ..., ParamN" << endl;
 	WriteRow(param_names, outfile);

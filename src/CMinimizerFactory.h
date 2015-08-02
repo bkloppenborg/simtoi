@@ -33,11 +33,7 @@
 #ifndef CMINIMIZERFACTORY_H_
 #define CMINIMIZERFACTORY_H_
 
-#include <map>
-#include <memory>
-#include <vector>
-
-using namespace std;
+#include "FactoryBase.h"
 
 class CMinimizerThread;
 typedef shared_ptr<CMinimizerThread> CMinimizerPtr;
@@ -46,29 +42,23 @@ typedef CMinimizerPtr (*CreateMinimizerFn)(void);
 /// \brief A factory class for creating minimizer objects
 ///
 /// This factory is used to register and create instances of minimizers in SIMTOI.
-/// As this class is a singleton, the constructor is private. Call the `Instance()`
+/// As this class is a singleton, the constructor is private. Call the `getInstance()`
 /// function to get a copy of this object.
-///
-/// Before any minimizer may be used in SIMTOI, it must be registered with this class.
-/// Simply call `Register()` with a unique ID and `CMinimizerPtr` creation function.
-/// After the minimizer has been registered it will become available for use in SIMTOI.
-class CMinimizerFactory {
+class CMinimizerFactory : public FactoryBase<CMinimizerPtr, CreateMinimizerFn> {
+
 private:
-	map<string, CreateMinimizerFn> mFactory; ///< Associates id -> minimizer create function
-
-	CMinimizerFactory();	///< Singleton class => private constructor.
-
-public:
-	virtual ~CMinimizerFactory();
+	CMinimizerFactory() {};
+	CMinimizerFactory(CMinimizerFactory const&) = delete;
+	void operator=(CMinimizerFactory const&)    = delete;
 
 public:
-	shared_ptr<CMinimizerThread> CreateMinimizer(string MinimizerID);
+	/// \brief Returns a copy of the CMinimizerFactory instance
+	static CMinimizerFactory & getInstance()
+	{
+		static CMinimizerFactory instance;
+		return instance;
+	}
 
-	static CMinimizerFactory Instance();
-
-	void Register(string MinimizerID, CreateMinimizerFn CreateFunction);
-
-	vector<string> GetMinimizerList();
 };
 
 #endif /* CMINIMIZERFACTORY_H_ */

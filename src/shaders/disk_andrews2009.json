@@ -5,7 +5,7 @@
     "shader_name" : "Andrews 2009 Disk",
     "param_0":
     {
-        "help_text": "Characteristic density",
+        "help": "Characteristic density",
         "id" : "rho0",
         "name" : "rho0",
         "min" : 0.1,
@@ -14,7 +14,7 @@
     },
     "param_1":
     {
-        "help_text": "Opacity",
+        "help": "Opacity",
         "id" : "kappa",
         "name" : "kappa",
         "min" : 0.1,
@@ -23,7 +23,7 @@
     },
     "param_2":
     {
-        "help_text": "Scale radius (in native model units, normally mas)",
+        "help": "Scale radius (in native model units, normally mas)",
         "id" : "r0",
         "name" : "r0",
         "min" : 0.1,
@@ -32,7 +32,7 @@
     },
     "param_3":
     {
-        "help_text": "Scale height (in native model units, normally mas)",
+        "help": "Scale height (in native model units, normally mas)",
         "id" : "h0",
         "name" : "h0",
         "min" : 0.1,
@@ -41,7 +41,7 @@
     },
     "param_4":
     {
-        "help_text": "Value for the radial power law / exponential decay found in equation 4.",
+        "help": "Value for the radial power law / exponential decay found in equation 4.",
         "id" : "gamma",
         "name" : "gamma",
         "min" : 0.1,
@@ -50,7 +50,7 @@
     },
     "param_5":
     {
-        "help_text": "Value for height-dependent power law found in equation 2.",
+        "help": "Value for height-dependent power law found in equation 2.",
         "id" : "beta",
         "name" : "beta",
         "min" : 0.1,

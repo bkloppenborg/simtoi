@@ -44,8 +44,8 @@ using namespace std;
 
 CGridSearch::CGridSearch()
 {
-	mMinimizerID = "gridsearch";
-	mMinimizerName = "Gridsearch";
+	mID = "gridsearch";
+	mName = "Grid Search - global";
 }
 
 CGridSearch::~CGridSearch() {

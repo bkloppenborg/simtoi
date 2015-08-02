@@ -70,6 +70,11 @@ CTaskPtr CPhotometry::Create(CWorkerThread * WorkerThread)
 	return CTaskPtr(new CPhotometry(WorkerThread));
 }
 
+void CPhotometry::clearData()
+{
+	mData.clear();
+}
+
 void CPhotometry::Export(string folder_name)
 {
 	InitBuffers();
@@ -95,7 +100,7 @@ void CPhotometry::Export(string folder_name)
 		vector<double> chi_values;
 
 		// Open the real data file:
-		real_data.open(folder_name + data_file->base_filename + ".phot");
+		real_data.open(folder_name + mFilenameNoExtension + ".phot");
 		real_data.width(15);
 		real_data.precision(8);
 
@@ -104,7 +109,7 @@ void CPhotometry::Export(string folder_name)
 
 		// Open the synthetic data file:
 		first_point = true;
-		sim_data.open(folder_name + data_file->base_filename + "_model.phot");
+		sim_data.open(folder_name + mFilenameNoExtension + "_model.phot");
 		sim_data.width(15);
 		sim_data.precision(8);
 		// Provide some information about the format
@@ -119,7 +124,7 @@ void CPhotometry::Export(string folder_name)
 			real_data << data_point->jd << "," << data_point->mag << "," << data_point->mag_err << endl;
 
 			// Simulate the photometry
-			sim_mag = SimulatePhotometry(model_list, data_point->jd);
+			sim_mag = SimulatePhotometry(model_list, data_point);
 			// Cache the t = 0 magnitude.
 			if(first_point)
 			{
@@ -148,7 +153,8 @@ void CPhotometry::Export(string folder_name)
 		chi2r /= chi_values.size();
 
 		// Write out the chi2r for this file:
-		summary << data_file->base_filename << ".phot," << mDataDescription << "," << chi2r << endl;
+		summary << mFilenameNoExtension << ".phot," << mDataDescription << "," << chi2r
+				<< "," << data_file->data.size() << endl;
 	}
 
 	// Close the statistics file.
@@ -171,9 +177,10 @@ void CPhotometry::GetChi(double * chi, unsigned int size)
 	// Iterate through the data, copying the mag_err into the uncertainties buffer
 	for(auto data_file: mData)
 	{
+
 		for(auto data_point: data_file->data)
 		{
-			sim_mag = SimulatePhotometry(model_list, data_point->jd);
+			sim_mag = SimulatePhotometry(model_list, data_point);
 
 			// Cache the t = 0 magnitude.
 			if(index == 0)
@@ -196,6 +203,24 @@ void CPhotometry::GetChi(double * chi, unsigned int size)
 //	cout << " Framerate (fps): " << double(size * 1000) / double(total_time) << endl;
 }
 
+CDataInfo CPhotometry::getDataInfo()
+{
+	stringstream temp;
+
+	CDataInfo info;
+	info.setFilename(mFilenameShort);
+
+	temp << "N: " << GetNData();
+	info.setDescription(temp.str());
+
+	info.setJDMin(mJDStart);
+	info.setJDMax(mJDEnd);
+	info.setJDMean(mJDMean);
+	info.setWavelengthMean(mWavelengthMean);
+
+	return info;
+}
+
 unsigned int CPhotometry::GetNData()
 {
 	unsigned int n_data = 0;
@@ -205,6 +230,41 @@ unsigned int CPhotometry::GetNData()
 	}
 
 	return n_data;
+}
+
+int CPhotometry::GetNDataFiles()
+{
+	return mData.size();
+}
+
+/// Returns the wavelength, in meters, of the filter. If wavelength is
+/// numeric, it is expected that the units are in meters.
+double CPhotometry::GetWavelength(const string & wavelength_or_band)
+{
+	double wavelength = -1;
+
+	// First try to convert to a number directly
+	wavelength = atof(wavelength_or_band.c_str());
+
+	// Otherwise use one of the standard astronomical filters.
+	// Remember, if you update these values make a change to the wiki
+	if(wavelength_or_band == "U") wavelength = 365.0E-9;
+	if(wavelength_or_band == "B") wavelength = 445.0E-9;
+	if(wavelength_or_band == "V") wavelength = 551.0E-9;
+	if(wavelength_or_band == "R") wavelength = 658.0E-9;
+	if(wavelength_or_band == "I") wavelength = 806.0E-9;
+	if(wavelength_or_band == "J") wavelength = 1.250E-6;
+	if(wavelength_or_band == "H") wavelength = 1.635E-6;
+	if(wavelength_or_band == "K") wavelength = 2.200E-6;
+	if(wavelength_or_band == "L") wavelength = 3.450E-6;
+	if(wavelength_or_band == "M") wavelength = 4.750E-6;
+	if(wavelength_or_band == "N") wavelength = 10.500E-6;
+	if(wavelength_or_band == "Q") wavelength = 21.000E-6;
+
+	if(!(wavelength > 0))
+		throw runtime_error("Could not determine wavelength");
+
+	return wavelength;
 }
 
 void CPhotometry::GetUncertainties(double * uncertainties, unsigned int size)
@@ -270,7 +330,7 @@ void CPhotometry::InitCL()
 	mLibOI = new CLibOI(mWorkerThread->GetOpenCL());
 }
 
-void CPhotometry::OpenData(string filename)
+CDataInfo CPhotometry::OpenData(string filename)
 {
 	// The photometric data files must conform to a very specific format
 	// foremost they MUST have the same extension as returned from
@@ -280,14 +340,19 @@ void CPhotometry::OpenData(string filename)
 	//	JD,mag,sig_mag,ANYTHING_ELSE
 
 	string line;
+	mJDStart = std::numeric_limits<double>::max();
+	mJDEnd = 0;
+	mJDMean = 0;
+	mWavelengthMean = 0;
 
 	// Create a new data file for storing input data.
 	CPhotometricDataFilePtr data_file = CPhotometricDataFilePtr(new CPhotometricDataFile());
-	string base_filename = StripPath(filename);
-	base_filename = StripExtension(base_filename, mExtensions);
-	data_file->base_filename = base_filename;
+	mFilename = filename;
+	mFilenameShort = StripPath(filename);
+	mFilenameNoExtension = StripExtension(mFilenameShort, mExtensions);
 
 	// Get a vector of the non-comment lines in the text file:
+	int lineCount = 0;
 	vector<string> lines = ReadFile(filename, "#/;!", "Could not read photometric data file " + filename + ".");
 	for(unsigned int i = 0; i < lines.size(); i++)
 	{
@@ -308,8 +373,19 @@ void CPhotometry::OpenData(string filename)
 			t_data->jd = atof(t_line[0].c_str());
 			t_data->mag = atof(t_line[1].c_str());
 			t_data->mag_err = atof(t_line[2].c_str());
+			t_data->wavelength = GetWavelength(t_line[4]);
 
 			data_file->data.push_back(t_data);
+
+			// find the start, end, and mean Julian dates.
+			if(t_data->jd < mJDStart)
+				mJDStart = t_data->jd;
+			if(t_data->jd > mJDEnd)
+				mJDEnd = t_data->jd;
+
+			mJDMean += t_data->jd;
+			mWavelengthMean += t_data->wavelength;
+			lineCount++;
 		}
 		catch(...)
 		{
@@ -317,16 +393,28 @@ void CPhotometry::OpenData(string filename)
 		}
 	}
 
+	mJDMean /= lineCount;
+	mWavelengthMean /= lineCount;
+
 	// The data was imported correctly, push it onto our data list
 	mData.push_back(data_file);
+
+	return getDataInfo();
 }
 
-double CPhotometry::SimulatePhotometry(CModelListPtr model_list, double jd)
+void CPhotometry::RemoveData(unsigned int data_index)
+{
+	if(data_index < mData.size())
+		mData.erase(mData.begin() + data_index);
+}
+
+double CPhotometry::SimulatePhotometry(CModelListPtr model_list, CPhotometricDataPointPtr data_point)
 {
 	double sim_flux = 0;
 
 	// Set the time, render the model
-	model_list->SetTime(jd);
+	model_list->SetTime(data_point->jd);
+	model_list->SetWavelength(data_point->jd);
 	mFBO_render->bind();
 	model_list->Render(mWorkerThread->GetView());
 	mFBO_render->release();

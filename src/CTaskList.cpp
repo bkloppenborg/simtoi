@@ -14,6 +14,7 @@
 #include "CTask.h"
 #include "CTaskFactory.h"
 #include "CWorkerThread.h"
+#include "version.h"
 
 using namespace std;
 
@@ -38,6 +39,12 @@ void CTaskList::BootstrapNext(unsigned int maxBootstrapFailures)
 	}
 }
 
+void CTaskList::clearData()
+{
+	for(auto task: mTasks)
+		task->clearData();
+}
+
 void CTaskList::Export(string export_folder)
 {
 	// Each task can optionally write information to a summary file. Be sure
@@ -45,6 +52,7 @@ void CTaskList::Export(string export_folder)
 	ofstream summary;
 	summary.open(export_folder + "summary.txt", ios::trunc | ios::in | ios::out);
 	summary << "# SIMTOI export summary file." << endl;
+	summary << "# Created with SIMTOI version: " << SIMTOI_VERSION << " git commit " << SIMTOI_REVISION << endl;
 	summary << "# Each line contains the data file, type of data, and reduced chi2 for the data file in CSV format." << endl;
 	summary.close();
 
@@ -115,6 +123,15 @@ vector<string> CTaskList::GetFileFilters()
 	return output;
 }
 
+int CTaskList::GetNDataFiles()
+{
+	int n_data_files = -1;
+	for(auto task: mTasks)
+		n_data_files += task->GetNDataFiles();
+
+	return n_data_files;
+}
+
 void CTaskList::GetUncertainties(double * uncertainties, unsigned int size)
 {
 	unsigned int n_data;
@@ -132,7 +149,7 @@ void CTaskList::GetUncertainties(double * uncertainties, unsigned int size)
 	}
 }
 
-void CTaskList::OpenData(string filename)
+CDataInfo CTaskList::OpenData(string filename)
 {
 	// TODO: Right now we identify the task object from the file extension.
 	// There is probably a better way of doing this.
@@ -148,13 +165,27 @@ void CTaskList::OpenData(string filename)
 		{
 			if(extension == datatype)
 			{
-				task->OpenData(filename);
-				return;
+				return task->OpenData(filename);
 			}
 		}
 	}
 
 	throw runtime_error("The data type " + extension + " is not supported.");
+}
+
+void CTaskList::RemoveData(unsigned int data_index)
+{
+	int n_files = 0;
+	for(auto task: mTasks)
+	{
+		n_files = task->GetNDataFiles();
+		// instruct the task to remove the file if it falls within the range
+		// of files that are managed by this task.
+		if(data_index < n_files)
+			task->RemoveData(data_index);
+		else
+			data_index -= n_files;
+	}
 }
 
 void CTaskList::InitCL()

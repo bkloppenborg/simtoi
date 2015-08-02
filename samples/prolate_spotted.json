@@ -8,35 +8,35 @@
 	{
 		"base_data" : 
 		{
-			"T_eff_pole" : [ 5000.0, 2000.0, 1000000.0, false, 100.0 ],
-			"g_pole" : [ 1.0, 0.010, 10000.0, false, 10.0 ],
-			"inclination" : [ 60.0, -180.0, 180.0, true, 1.0 ],
-			"n_side_power" : [ 5.0, 1.0, 10.0, false, 1.0 ],
-			"omega_rot" : [ 0.50, 0.0, 1.0, true, 0.10 ],
-			"position_angle" : [ 0.0, 0.0, 360.0, true, 0.10 ],
-			"r_pole" : [ 1.350, 1.0, 10.0, false, 1.0 ],
-			"von_zeipel_beta" : [ 0.0, 0.0, 1.0, false, 0.10 ],
-			"z_axis_rotation" : [ 0.0, 0.0, 360.0, true, 1.0 ],
-			"z_axis_rotational_period" : [ 14.0, 0.0, 100.0, false, 1.0 ]
+			"T_eff_pole" : [ 5000.0, 2000.0, 1000000.0, false, 100.0, 0 ],
+			"g_pole" : [ 1.0, 0.010, 10000.0, false, 10.0, 2 ],
+			"inclination" : [ 60.0, -180.0, 180.0, true, 1.0, 2 ],
+			"n_side_power" : [ 5.0, 1.0, 10.0, false, 1.0, 2 ],
+			"omega_rot" : [ 0.50, 0.0, 1.0, true, 0.10, 2 ],
+			"position_angle" : [ 0.0, 0.0, 360.0, true, 0.10, 2 ],
+			"r_pole" : [ 1.350, 1.0, 10.0, false, 1.0, 2 ],
+			"von_zeipel_beta" : [ 0.0, 0.0, 1.0, false, 0.10, 2 ],
+			"z_axis_rotation" : [ 0.0, 0.0, 360.0, true, 1.0, 2 ],
+			"z_axis_rotational_period" : [ 14.0, 0.0, 100.0, false, 1.0, 2 ]
 		},
 		"base_id" : "roche_rotator",
 		"feature_0_data" : 
 		{
-			"delta_T" : [ -1000.0, -1000.0, -100.0, true, 100.0 ],
-			"phi" : [ 0.0, 0.0, 180.0, true, 0.10 ],
-			"radius" : [ 20.0, 5.0, 25.0, true, 1.0 ],
-			"theta" : [ 0.0, 0.0, 180.0, true, 0.10 ]
+			"delta_T" : [ -1000.0, -1000.0, -100.0, true, 100.0, 0 ],
+			"phi" : [ 0.0, 0.0, 180.0, true, 0.10, 2 ],
+			"radius" : [ 20.0, 5.0, 25.0, true, 1.0, 2 ],
+			"theta" : [ 0.0, 0.0, 180.0, true, 0.10, 2 ]
 		},
 		"feature_0_id" : "uniform_spot",
 		"position_data" : 
 		{
-			"E" : [ 0.0, -1.0, 1.0, false, 0.10 ],
-			"N" : [ 0.0, -1.0, 1.0, false, 0.10 ]
+			"E" : [ 0.0, -1.0, 1.0, false, 0.10, 2 ],
+			"N" : [ 0.0, -1.0, 1.0, false, 0.10, 2 ]
 		},
 		"position_id" : "xy",
 		"shader_data" : 
 		{
-			"alpha" : [ 0.30, 0.10, 1.0, false, 0.090 ]
+			"alpha" : [ 0.30, 0.10, 1.0, false, 0.090, 4 ]
 		},
 		"shader_id" : "ldl_power_law"
 	}

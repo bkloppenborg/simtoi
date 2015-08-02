@@ -29,13 +29,10 @@ protected:
 	const double G;		// m3 kg-1 s-2
 	const double parsec;// m
 
-	// Main parameters
-	double lambda; // wavelength of observation
-	double mTime;
-
 public:
 
-	void Render(const glm::mat4 & view);
+	void preRender(double & max_flux);
+	void Render(const glm::mat4 & view, const GLfloat & max_flux);
 
 	static shared_ptr<CModel> Create();
 

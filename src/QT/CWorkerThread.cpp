@@ -1,26 +1,26 @@
-/* 
+/*
  * Copyright (c) 2012 Brian Kloppenborg
 
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
- * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling 
- * Tool for Optical Interferometry" (Version X). 
+ * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling
+ * Tool for Optical Interferometry" (Version X).
  * Available from  <https://github.com/bkloppenborg/simtoi>.
  *
- * This file is part of the SImulation and Modeling Tool for Optical 
+ * This file is part of the SImulation and Modeling Tool for Optical
  * Interferometry (SIMTOI).
- * 
+ *
  * SIMTOI is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License 
+ * it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation version 3.
- * 
+ *
  * SIMTOI is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
+ *
+ * You should have received a copy of the GNU Lesser General Public
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -41,6 +41,8 @@ using namespace std;
 #include "CGLWidget.h"
 #include "CTaskList.h"
 #include "CModelList.h"
+#include "CDataInfo.h"
+#include "CTask.h"
 
 // X11 "Status" definition causes namespace issues. Include after any QT headers (https://bugreports.qt-project.org/browse/QTBUG-54)
 #include "COpenCL.hpp"
@@ -61,6 +63,12 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 
     mFBO_render = NULL;
 
+    // Assume the OpenGL context has 32-bit floating point support
+    mGLFloatSupported = true;
+	mGLRenderBufferFormat = GL_RGBA32F;
+	mGLStorageBufferFormat = GL_R32F;
+	mGLPixelDataType = GL_FLOAT;
+
 	// Initialize the model and task lists:
     mModelList = CModelListPtr(new CModelList());
 	mTaskList = CTaskListPtr(new CTaskList(this));
@@ -69,22 +77,68 @@ CWorkerThread::CWorkerThread(CGLWidget *glWidget, QString exe_folder)
 CWorkerThread::~CWorkerThread()
 {
 	// Stop the thread if it is running. This is a blocking call.
-	if(mRun)
+	if(isRunning())
+	{
 		stop();
+		wait();
+	}
 
 	// Free local OpenGL objects.
 	if(mFBO_render) delete mFBO_render;
 }
 
+
 /// Appends a model to the list of models.
-void CWorkerThread::AddModel(CModelPtr model)
+void CWorkerThread::addModel(CModelPtr model)
+{
+	QMutexLocker lock(&mWorkerMutex);
+	mModelList->AddModel(model);
+	Enqueue(RENDER);
+}
+
+CDataInfo CWorkerThread::addData(string filename)
 {
 	// Get exclusive access to the worker
 	QMutexLocker lock(&mWorkerMutex);
 
-	// Modify the list of models:
-	mModelList->AddModel(model);
+	mTempString = filename;
+	Enqueue(OPEN_DATA);
+
+	// Wait for the operation to complete.
+	mWorkerSemaphore.acquire(1);
+
+	return mTempDataInfo;
+}
+
+/// Returns a shared pointer to the requested model.
+CModelPtr CWorkerThread::getModel(unsigned int model_index)
+{
+	QMutexLocker lock(&mWorkerMutex);
+	return mModelList->GetModel(model_index);
+}
+
+/// Replaces the model at `model_index` with `new_model`
+void CWorkerThread::replaceModel(unsigned int model_index, CModelPtr new_model)
+{
+	QMutexLocker lock(&mWorkerMutex);
+	mModelList->ReplaceModel(model_index, new_model);
 	Enqueue(RENDER);
+}
+
+/// Removes the model at the specified index
+void CWorkerThread::removeModel(unsigned int model_index)
+{
+	QMutexLocker lock(&mWorkerMutex);
+	mModelList->RemoveModel(model_index);
+	Enqueue(RENDER);
+}
+
+void CWorkerThread::removeData(unsigned int data_id)
+{
+	// get exclusive access to the task list
+	QMutexLocker lock(&mTaskMutex);
+
+	mTaskList->RemoveData(data_id);
 }
 
 /// Blits the contents of the input buffer to the output buffer
@@ -158,14 +212,14 @@ QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
 {
     // Create an RGBA32F MAA buffer
     QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
-    fbo_format.setInternalTextureFormat(GL_RGBA32F);
+    fbo_format.setInternalTextureFormat(mGLRenderBufferFormat);
     fbo_format.setTextureTarget(GL_TEXTURE_2D);
 
     const QSize size(mImageWidth, mImageHeight);
 
     QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
 
-	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a RGBA32F MAA framebuffer");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a MAA rendering framebuffer");
 
     return FBO;
 }
@@ -175,14 +229,14 @@ QGLFramebufferObject * CWorkerThread::CreateStorageBuffer()
 {
     // Create an RGBA32F MAA buffer
     QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
-    fbo_format.setInternalTextureFormat(GL_R32F);
+    fbo_format.setInternalTextureFormat(mGLStorageBufferFormat);
     fbo_format.setSamples(0);
     fbo_format.setTextureTarget(GL_TEXTURE_2D);
 
     const QSize size(mImageWidth, mImageHeight);
 
     QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
-	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a R32F non-MAA framebuffer");
+	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a non-MAA storage framebuffer");
     return FBO;
 }
 
@@ -220,7 +274,7 @@ void CWorkerThread::CreateGLMultisampleRenderBuffer(unsigned int width, unsigned
 	glGenRenderbuffers(1, &FBO_texture);
 	glBindRenderbuffer(GL_RENDERBUFFER, FBO_texture);
 	// Create a 2D multisample texture
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA32F, width, height);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, mGLRenderBufferFormat, width, height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, FBO_texture);
 
 	glGenRenderbuffers(1, &FBO_depth);
@@ -260,7 +314,7 @@ void CWorkerThread::CreateGLStorageBuffer(unsigned int width, unsigned int heigh
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R32F, width, height, depth, 0, GL_RED, GL_FLOAT, NULL);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, mGLStorageBufferFormat, width, height, depth, 0, GL_RED, mGLPixelDataType, NULL);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create storage buffer");
 
@@ -375,6 +429,15 @@ QStringList CWorkerThread::GetFileFilters()
 	return output;
 }
 
+/// returns the total number of data files that have been opened.
+int CWorkerThread::GetNDataFiles()
+{
+	// get exclusive access to the task list
+	QMutexLocker lock(&mTaskMutex);
+
+	return mTaskList->GetNDataFiles();
+}
+
 /// Get the next operation from the queue.  This is a blocking function.
 WorkerOperations CWorkerThread::GetNextOperation(void)
 {
@@ -412,18 +475,6 @@ void CWorkerThread::GetUncertainties(double * uncertainties, unsigned int size)
 	mWorkerSemaphore.acquire(1);
 }
 
-void CWorkerThread::OpenData(string filename)
-{
-	// Get exclusive access to the worker
-	QMutexLocker lock(&mWorkerMutex);
-
-	mTempString = filename;
-	Enqueue(OPEN_DATA);
-
-	// Wait for the operation to complete.
-	mWorkerSemaphore.acquire(1);
-}
-
 /// Instructs the thread to render to the default framebuffer.
 void CWorkerThread::Render()
 {
@@ -450,11 +501,30 @@ void CWorkerThread::run()
 	// Immediately claim the OpenCL context
     mGLWidget->makeCurrent();
     // Create an OpenCL context
-	mOpenCL = COpenCLPtr(new COpenCL(CL_DEVICE_TYPE_GPU));
+    mOpenCL = make_shared<COpenCL>(CL_DEVICE_TYPE_GPU);
 
 	// ########
 	// OpenGL display initialization
 	// ########
+    mGLFloatSupported = mGLWidget->checkExtensionAvailability("GL_ARB_texture_float");
+    if(mGLFloatSupported)
+    {
+    	mGLRenderBufferFormat = GL_RGBA32F;
+    	mGLStorageBufferFormat = GL_R32F;
+		mGLPixelDataType = GL_FLOAT;
+    }
+    else
+    {
+//    	mGLRenderBufferFormat = GL_RGBA16;
+//    	mGLStorageBufferFormat = GL_R16;
+//    	mGLPixelDataType = GL_UNSIGNED_INT;
+
+    	mGLRenderBufferFormat = GL_RGB;
+    	mGLStorageBufferFormat = GL_R;
+    	mGLPixelDataType = GL_UNSIGNED_BYTE;
+
+    	cout << "WARNING: OpenGL version does not support floating point textures, falling back to 16-bit integer buffers!" << endl;
+    }
 
     // Setup the OpenGL context
     // Set the clear color to black:
@@ -540,7 +610,7 @@ void CWorkerThread::run()
 
 		case OPEN_DATA:
 			// Instruct the task list to open the file.
-			mTaskList->OpenData(mTempString);
+			mTempDataInfo = mTaskList->OpenData(mTempString);
 			mWorkerSemaphore.release(1);
 			break;
 
@@ -557,6 +627,10 @@ void CWorkerThread::run()
 			mModelList->SetTime(mTempDouble);
 			break;
 
+		case SET_WAVELENGTH:
+			mModelList->SetWavelength(mTempDouble);
+			break;
+
 		default:
 		case STOP:
 			ClearQueue();
@@ -565,6 +639,9 @@ void CWorkerThread::run()
 
 		}
 	}
+
+	// Release the OpenGL context
+	mGLWidget->doneCurrent();
 
 	emit finished();
 }
@@ -602,6 +679,15 @@ void CWorkerThread::SetTime(double time)
 	Enqueue(RENDER);
 }
 
+void CWorkerThread::SetWavelength(double wavelength)
+{
+	// Get exclusive access to the worker
+	QMutexLocker lock(&mWorkerMutex);
+
+	mTempDouble = wavelength;
+	Enqueue(SET_WAVELENGTH);
+	Enqueue(RENDER);
+}
 
 Json::Value CWorkerThread::Serialize()
 {

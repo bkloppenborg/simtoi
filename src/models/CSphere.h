@@ -45,7 +45,6 @@ protected:
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
 
 public:
 	CSphere();
@@ -61,7 +60,9 @@ public:
 
 	void Init();
 
-	void Render(const glm::mat4 & view);
+	void preRender(double & max_flux);
+	void Render(const glm::mat4 & view, const GLfloat & max_flux);
+	void postRender();
 };
 
 #endif /* CSPHERE_H_ */

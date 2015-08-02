@@ -55,13 +55,15 @@ double 	CParameter::getValue(bool normalized) const
 	return value;
 }
 
+#include <iostream>
+
 /// Sets the number of decimal places / precision for this parameter
 ///
 /// @param n_decimal_places The minimum number of decimal places for this parameter
 void CParameter::setDecimalPlaces(unsigned int n_decimal_places)
 {
 	decimal_places = n_decimal_places;
-	precision = 1*pow(10, -decimal_places);
+	precision = 1*pow(10.0, -1.0 * decimal_places);
 }
 
 /// Sets the value

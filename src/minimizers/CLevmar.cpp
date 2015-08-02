@@ -41,8 +41,8 @@
 
 CLevmar::CLevmar()
 {
-	mMinimizerID = "levmar";
-	mMinimizerName = "Levmar";
+	mID = "levmar";
+	mName = "Levmar (Levenberg-Marquart) - local";
 }
 
 CLevmar::~CLevmar()

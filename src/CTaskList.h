@@ -15,6 +15,8 @@
 
 using namespace std;
 
+class CDataInfo;
+
 class CTask;
 typedef shared_ptr<CTask> CTaskPtr;
 
@@ -32,17 +34,25 @@ public:
 
 	void BootstrapNext(unsigned int maxBootstrapFailures);
 
+	void clearData();
+
 	void Export(string export_folder);
 
 	void GetChi(double * chis, unsigned int size);
 	unsigned int GetDataSize();
 	vector<string> GetFileFilters();
+	int GetNDataFiles();
+	CTaskPtr getTask(unsigned int i) { return mTasks[i]; };
 	void GetUncertainties(double * uncertainties, unsigned int size);
 
-	void OpenData(string filename);
+	CDataInfo OpenData(string filename);
 
 	void InitCL();
 	void InitGL();
+
+	void RemoveData(unsigned int data_index);
+
+	unsigned int size() { return mTasks.size(); };
 };
 
 #endif /* CTASKLIST_H_ */

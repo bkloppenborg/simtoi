@@ -41,55 +41,103 @@ using namespace std;
 #include "CTreeModel.h"
 #include "CParameterItem.h"
 #include "CFeature.h"
+#include "CDataInfo.h"
+
+// Temporary includes while migrating code to wModels
+#include "wParameterEditor.h"
+#include "../version.h"
 
 extern string EXE_FOLDER;
 
-CGLWidget::CGLWidget(QWidget * widget_parent, string shader_source_dir, string cl_kernel_dir)
+CGLWidget::CGLWidget(QWidget * widget_parent)
     : QGLWidget(widget_parent)
 { 
-	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context
-	setAutoBufferSwap(false);
-    this->doneCurrent();
-
-    // Immediately initialize the worker thread. This will claim the OPenGL context.
-	mWorker.reset(new CWorkerThread(this, QString::fromStdString(EXE_FOLDER)));
-
-	// Create the animation thread:
-	mAnimator.reset(new CAnimator(this));
-	mAnimator->moveToThread(&mAnimationThread);
-	connect(this, SIGNAL(startAnimation(double, double)), mAnimator.get(), SLOT(start_animation(double, double)));
-//	connect(this, SIGNAL(stopAnimation(void)), mAnimator.get(), SLOT(stop_animation(void)));
-	mAnimationThread.start();
-
-	QStringList labels = QStringList();
-	labels << "File" << "Mean JD";
-	mOpenFileModel.clear();
-	mOpenFileModel.setColumnCount(2);
-	mOpenFileModel.setHorizontalHeaderLabels(labels);
-
-	// This signal-slot would not connect automatically, so we do it explicitly here.
-	connect(&mTreeModel, SIGNAL(parameterUpdated()), this, SLOT(on_mTreeModel_parameterUpdated()));
+	// Reset the worker thread
+	mWorker = make_shared<CWorkerThread>(this, QString::fromStdString(EXE_FOLDER));
 
 	mSaveDirectory = "";
+
+	connect(mWorker.get(), SIGNAL(glContextWarning(string)), this, SLOT(receiveWarning(string)));
 }
 
 CGLWidget::~CGLWidget()
 {
-	// Stop any running threads
-	StopAnimation();
-	mAnimationThread.quit();
-	mAnimationThread.wait();
-
-	stopMinimizer();
 	stopRendering();
 }
 
-void CGLWidget::AddModel(shared_ptr<CModel> model)
+void CGLWidget::addData(string filename)
 {
-	// Instruct the thread to add the model to it's list:
-	mWorker->AddModel(model);
+	CDataInfo temp = mWorker->addData(filename);
+	emit dataAdded(temp);
+}
 
-	RebuildTree();
+void CGLWidget::addModel(CModelPtr model)
+{
+	mWorker->addModel(model);
+	emit modelUpdated();
+}
+
+bool CGLWidget::checkExtensionAvailability(string ext_name)
+{
+    bool ret_val = false;
+
+    // get the total number of extensions
+    GLint num_extensions = 0;
+    glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+
+    // Now query for each extensions
+    for(int i = 0; i < num_extensions; i++)
+    {
+    	const GLubyte * gl_extension = glGetStringi(GL_EXTENSIONS, i);
+        const char * gl_extension_c = reinterpret_cast<const char*>(gl_extension);
+        string ext = string(gl_extension_c);
+
+        if(ext == ext_name)
+        {
+        	ret_val = true;
+        	break;
+        }
+    }
+
+    return ret_val;
+}
+
+CModelPtr CGLWidget::getModel(unsigned int model_index)
+{
+	return mWorker->getModel(model_index);
+}
+
+void CGLWidget::removeData(unsigned int data_index)
+{
+	mWorker->removeData(data_index);
+	emit dataRemoved(data_index);
+}
+
+void CGLWidget::removeModel(unsigned int model_index)
+{
+	mWorker->removeModel(model_index);
+	emit modelUpdated();
+}
+
+void CGLWidget::replaceModel(unsigned int model_index, CModelPtr new_model)
+{
+	mWorker->replaceModel(model_index, new_model);
+	emit modelUpdated();
+}
+
+void CGLWidget::resetWidget()
+{
+	// remove the data from the GUI
+	for(int i = mWorker->GetNDataFiles(); i > -1; i--)
+	{
+		cout << "Instructing removal of " << i << endl;
+		emit dataRemoved(i);
+	}
+
+	mWorker = make_shared<CWorkerThread>(this, QString::fromStdString(EXE_FOLDER));
+
+	emit modelUpdated();
+
 }
 
 void CGLWidget::closeEvent(QCloseEvent *evt)
@@ -103,74 +151,6 @@ void CGLWidget::Export(QString save_folder)
 	mWorker->ExportResults(save_folder);
 }
 
-void CGLWidget::LoadParameters(QStandardItem * parent_widget, CParameterMap * param_map)
-{
-	// Get a reference to the map.
-	const map<string, CParameter> parameter_map = param_map->getParameterMap();
-
-	for(auto id_parameter: parameter_map)
-	{
-		const string parameter_id = id_parameter.first;
-		const CParameter parameter = id_parameter.second;
-
-		QList<QStandardItem *> items;
-		QStandardItem * item;
-
-		// First the name
-		item = new QStandardItem(QString::fromStdString( parameter.getHumanName() ));
-		items << item;
-
-		// Now the checkbox
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setCheckable(true);
-		if(parameter.isFree())
-			item->setCheckState(Qt::Checked);
-		else
-			item->setCheckState(Qt::Unchecked);
-		items << item;
-
-		// The Value
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getValue() ), Qt::DisplayRole);
-		items << item;
-
-		// Minimum parameter value
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getMin() ), Qt::DisplayRole);
-		items << item;
-
-		// Maximum parameter value
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getMax() ), Qt::DisplayRole);
-		items << item;
-
-		// Maximum step size
-		item = new CParameterItem(param_map, parameter_id);
-		item->setEditable(true);
-		item->setData(QVariant( parameter.getStepSize()), Qt::DisplayRole);
-		items << item;
-
-		parent_widget->appendRow(items);
-	}
-}
-
-QList<QStandardItem *> CGLWidget::LoadParametersHeader(QString name, CParameterMap * param_map)
-{
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	item = new QStandardItem(name);
-	items << item;
-	item = new QStandardItem(QString(""));
-	items << item;
-	item = new QStandardItem(QString::fromStdString(param_map->getName()));
-	items << item;
-
-	return items;
-}
 
 /// Returns a list of file filters for use in QFileDialog
 QStringList CGLWidget::GetFileFilters()
@@ -178,42 +158,9 @@ QStringList CGLWidget::GetFileFilters()
 	return mWorker->GetFileFilters();
 }
 
-/// Returns the Minimizer's ID if one is loaded, otherwise an empty string.
-string CGLWidget::GetMinimizerID()
-{
-	if(mMinimizer)
-		return mMinimizer->GetID();
-
-	return "";
-}
-
-bool CGLWidget::GetMinimizerRunning()
-{
-	if(!mMinimizer)
-		return false;
-
-	return mMinimizer->isRunning();
-}
-
 double CGLWidget::GetTime()
 {
 	return mWorker->GetTime();
-}
-
-bool CGLWidget::IsAnimating()
-{
-	return mAnimator->IsRunning();
-}
-
-void CGLWidget::on_mTreeModel_parameterUpdated()
-{
-	mWorker->Render();
-}
-
-void CGLWidget::on_minimizer_finished(void)
-{
-	emit minimizerFinished();
-	RebuildTree();
 }
 
 void CGLWidget::Open(string filename)
@@ -244,82 +191,55 @@ void CGLWidget::Open(string filename)
 	}
 
 	// Set the area scale and height
-	mWorker->SetSize(width, height);
-	mWorker->SetScale(scale);
+	resetWidget();
+	SetSize(width, height);
+	SetScale(scale);
 
 	// Now have the Worker thread open the remainder of the file.
 	mWorker->Restore(input);
 
-	RebuildTree();
+	emit modelUpdated();
 }
 
-void CGLWidget::OpenData(string filename)
+//void CGLWidget::paintEvent(QPaintEvent * )
+//{
+//	Render();
+//}
+
+/// Override the QGLWidget::glDraw function when the worker thread is running.
+void CGLWidget::glDraw()
 {
-	mWorker->OpenData(filename);
-}
-
-void CGLWidget::paintEvent(QPaintEvent *)
-{
-    mWorker->Render();
-}
-
-void CGLWidget::RebuildTree()
-{
-	QStringList labels = QStringList();
-	labels << "Name" << "Free" << "Value" << "Min" << "Max" << "Step";
-	mTreeModel.clear();
-	mTreeModel.setColumnCount(5);
-	mTreeModel.setHorizontalHeaderLabels(labels);
-	CModelListPtr model_list = mWorker->GetModelList();
-
-	QList<QStandardItem *> items;
-	QStandardItem * item;
-	QStandardItem * item_parent;
-	shared_ptr<CModel> model;
-	shared_ptr<CPosition> position;
-	CShader * shader;
-
-	// Now pull out the pertinent information
-	// NOTE: We drop the shared_ptrs here
-	// TODO: Propigate shared pointers
-	for(int i = 0; i < model_list->size(); i++)
+	// If the worker is not running, we render using the default glDraw function
+	// (which eventually calls paintGL).
+	if(!mWorker->isRunning())
 	{
-		// First pull out the model parameters
-		model = model_list->GetModel(i);
+		QGLWidget::glDraw();
+	}
+	else
+	{
+		Render();
+	}
+}
 
-		items = LoadParametersHeader(QString("Model"), model.get());
-		item_parent = items[0];
-		mTreeModel.appendRow(items);
-		LoadParameters(item_parent, model.get());
-
-		// Now for the Position Parameters
-		position = model->GetPosition();
-		items = LoadParametersHeader(QString("Position"), position.get());
-		item = items[0];
-		item_parent->appendRow(items);
-		LoadParameters(item, position.get());
-
-		// Lastly for the shader:
-		shader = model->GetShader().get();
-		items = LoadParametersHeader(QString("Shader"), shader);
-		item = items[0];
-		item_parent->appendRow(items);
-		LoadParameters(item, shader);
-
-		auto features = model->GetFeatures();
-		for(auto feature: features)
-		{
-			items = LoadParametersHeader(QString("Feature"), feature.get());
-			item = items[0];
-			item_parent->appendRow(items);
-			LoadParameters(item, feature.get());
-		}
+/// Renders to the default OpenGL framebuffer
+void CGLWidget::paintGL()
+{
+	// Until the worker thread is running, we render a blank gray window.
+	if(!mWorker->isRunning())
+	{
+		glClearColor(0.5, 0.5, 0.5, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 }
 
 void CGLWidget::Render()
 {
 	mWorker->Render();
+}
+
+void CGLWidget::receiveWarning(string message)
+{
+	emit warning(message);
 }
 
 void CGLWidget::resizeEvent(QResizeEvent *evt)
@@ -335,10 +255,13 @@ void CGLWidget::Save(string filename)
 	// Serialize the mWorker object first
 	output = mWorker->Serialize();
 	// Add a comment that provides some information about what wrote the file.
-	output["_file_info"] = "Save file from the SImulation and Modeling Tool for "
-			"Optical Interferometry (SIMTOI). See "
-			"https://github.com/bkloppenborg/simtoi for information about this "
-			"format.";
+	stringstream header;
+	header << "Save file from the SImulation and Modeling Tool for Optical "
+		   << "Interferometry (SIMTOI) version " << SIMTOI_VERSION << " "
+		   << "commit " << SIMTOI_REVISION << ". "
+		   << "See https://github.com/bkloppenborg/simtoi for information about "
+		   << "this format";
+	output["_file_info"] = header.str();
 
 	// Now save the OpenGL area information.
 	output["area_width"] = mWorker->GetImageWidth();
@@ -354,14 +277,6 @@ void CGLWidget::SetScale(double scale)
 	mWorker->SetScale(scale);
 }
 
-void CGLWidget::SetMinimizer(CMinimizerPtr minimizer)
-{
-	stopMinimizer();
-	mMinimizer = minimizer;
-	mMinimizer->Init(mWorker);
-	mMinimizer->SetSaveDirectory(mSaveDirectory);
-}
-
 void CGLWidget::SetSaveDirectory(string directory_path)
 {
 	mSaveDirectory = directory_path;
@@ -370,6 +285,7 @@ void CGLWidget::SetSaveDirectory(string directory_path)
 void CGLWidget::SetSize(unsigned int width, unsigned int height)
 {
 	mWorker->SetSize(width, height);
+	this->setFixedSize(width, height);
 }
 
 void CGLWidget::SetTime(double time)
@@ -377,45 +293,39 @@ void CGLWidget::SetTime(double time)
 	mWorker->SetTime(time);
 }
 
-void CGLWidget::StartAnimation(double start_time, double time_step)
+/// Set the wavelength to the specified value (in meters)
+void CGLWidget::setWavelength(double wavelength)
 {
-	emit(startAnimation(start_time, time_step));
-}
-
-void CGLWidget::StopAnimation()
-{
-	mAnimator->mRun = false;
-}
-
-void CGLWidget::startMinimizer()
-{
-	if(!mMinimizer)
-		return;
-
-	// Stop the animation, if it is running
-	StopAnimation();
-
-	mMinimizer->start();
-	connect(mMinimizer.get(), SIGNAL(finished()), this, SLOT(on_minimizer_finished(void)));
-}
-
-void CGLWidget::stopMinimizer()
-{
-	if(!mMinimizer)
-		return;
-
-	// Stop the thread. If it was running, join it.
-	mMinimizer->stop();
+	mWorker->SetWavelength(wavelength);
 }
 
 void CGLWidget::startRendering()
 {
+	// Shut off auto buffer swapping and call doneCurrent to release the OpenGL context
+	setAutoBufferSwap(false);
+    this->doneCurrent();
+
 	// Tell the thread to start.
     mWorker->start();
 }
 
 void CGLWidget::stopRendering()
 {
+	if(!mWorker)
+		return;
+
     mWorker->stop();
+    mWorker->wait();
+
+    this->makeCurrent();
 }
 
+//void CGLWidget::updateData(void)
+//{
+//	emit dataUpdated();
+//}
+
+void CGLWidget::updateParameters()
+{
+	mWorker->Render();
+}

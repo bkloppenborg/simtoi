@@ -24,8 +24,6 @@ class CDisk_ConcentricRings: public CModel
 	GLuint mVBO;
 	GLuint mEBO;
 
-	bool mModelReady;
-
 public:
 	CDisk_ConcentricRings();
 	virtual ~CDisk_ConcentricRings();
@@ -36,7 +34,8 @@ public:
 
 	void Init();
 
-	void Render(const glm::mat4 & view);
+	void preRender(double & max_flux);
+	void Render(const glm::mat4 & view, const GLfloat & max_flux);
 
 	virtual void SetShader(CShaderPtr shader); // Overrides CModel::SetShader
 

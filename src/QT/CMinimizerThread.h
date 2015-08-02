@@ -85,8 +85,8 @@ public:
 							///
 	string mSaveDirectory; ///< Directory to which minimizer save files and exported data are saved.
 
-	string mMinimizerName;	///< Human-friendly name for the minimizer.
-	string mMinimizerID;	///< Unique ID for the minimizer.
+	string mName;			///< Human-friendly name for the minimizer.
+	string mID;				///< Unique ID for the minimizer.
 
 	valarray<double> mChis;			///< Buffer for storing residuals
 	valarray<double> mUncertainties;		///< Buffer for storing uncertainties.
@@ -98,18 +98,20 @@ public:
 
 	virtual void ExportResults();
 
-	string GetID();
 	virtual void GetResults(double * results, int n_params);
 
+	string ID();
 	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
-	bool IsRunning();
+
+	string name();
+
+	void setSaveDirectory(string save_directory);
+	bool isRunning() { return mIsRunning; };
 
 	void OpenStatisticsFile(ofstream & file);
 
 	// Pure virtual function, each minimizer must implement this.
 	virtual void run() = 0;
-
-	void SetSaveDirectory(string filename);
 	virtual void stop();
 
 	void WriteHeader(vector<string> & param_names, ofstream & outfile);
