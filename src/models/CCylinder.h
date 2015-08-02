@@ -71,11 +71,11 @@ public:
 			unsigned int r_divisions, unsigned int phi_divisions);
 
 	/// Draws a unit cylindrical wall in the z-direction from (z = -0.5 ... 0.5, at r = 1)
-	static void GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+	static void GenerateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
 			unsigned int vertex_offset,
 			unsigned int z_divisions, unsigned int phi_divisions);
 
-	static void GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+	static void GenerateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
 			unsigned int z_divisions, unsigned int phi_divisions);
 
 	void Init();

@@ -124,15 +124,15 @@ void CCylinder::GenerateMidplane(vector<vec3> & vertices, vector<unsigned int> &
 	}
 }
 
-void CCylinder::GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+void CCylinder::GenerateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
 		unsigned int z_divisions, unsigned int phi_divisions)
 {
 	unsigned int element_offset = 0;
-	GenreateRim(vertices, elements, element_offset, z_divisions, phi_divisions);
+	GenerateRim(vertices, elements, element_offset, z_divisions, phi_divisions);
 }
 
 /// Draws a unit cylindrical wall in the z-direction from (z = -0.5 ... 0.5, at r = 1)
-void CCylinder::GenreateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
+void CCylinder::GenerateRim(vector<vec3> & vertices, vector<unsigned int> & elements,
 		unsigned int element_offset,
 		unsigned int z_divisions, unsigned int phi_divisions)
 {
@@ -196,7 +196,7 @@ void CCylinder::Init()
 	unsigned int r_divisions = 20;
 
 	mRimStart = 0;
-	CCylinder::GenreateRim(vbo_data, elements, z_divisions, phi_divisions);
+	CCylinder::GenerateRim(vbo_data, elements, z_divisions, phi_divisions);
 	mRimSize = elements.size();
 	// Calculate the offset in vertex indexes for the GenerateMidplane function
 	// to generate correct element indices.

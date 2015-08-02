@@ -48,7 +48,7 @@ void CDensityDisk::Init()
 	unsigned int r_divisions = 20;
 
 	mRimStart = 0;
-	CCylinder::GenreateRim(vbo_data, elements, z_divisions, phi_divisions);
+	CCylinder::GenerateRim(vbo_data, elements, z_divisions, phi_divisions);
 	mRimSize = elements.size();
 	// Calculate the offset in vertex indexes for the GenerateMidplane function
 	// to generate correct element indices.
