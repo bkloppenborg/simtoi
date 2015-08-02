@@ -32,6 +32,7 @@ in vec2 Tex_Coords;
 in vec3 ModelPosition;
 
 uniform bool use_r_trans;
+uniform float r_in;
 uniform float r_max;
 uniform float alpha_r;
 
@@ -60,6 +61,10 @@ void main(void)
     // Compute the transparency
     float transparency = r_trans * z_trans;
     
+    // compute the output color
     vec4 Color = texture(TexSampler, Tex_Coords);
-    out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
+    if(radius - r_in < 0)
+        out_color = vec4(0.0, 0.0, 0.0, 0.0);
+    else
+        out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
 }

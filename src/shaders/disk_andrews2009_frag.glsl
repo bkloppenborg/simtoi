@@ -58,12 +58,12 @@ void main(void)
 
     // Compute the transparency
     float transparency = 1 - exp(-1 * kappa * rho);
-    
+
+    // compute the output color
     vec4 Color = texture(TexSampler, Tex_Coords);
-    
-    // If we are inside the inner radius, everything is transparent.
-    if(radius - r_in < 1)
+    if(radius - r_in < 0)
         out_color = vec4(0.0, 0.0, 0.0, 0.0);
     else
         out_color = vec4(Color.r, 0.0, 0.0, Color.a * transparency);
+
 }

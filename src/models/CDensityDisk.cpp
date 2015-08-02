@@ -16,7 +16,7 @@ CDensityDisk::CDensityDisk()
 	mName = "Density disk base class";
 
 	addParameter("T_eff", 5000, 2E3, 1E6, false, 100, "T_eff", "Effective temperature (Kelvin)", 0);
-	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "Inner radius", 2);
+	addParameter("r_in", 0.1, 0.1, 10, false, 0.1, "Inner Radius", "A cutoff radius below which the model will not exist", 2);
 	addParameter("r_cutoff", 20, 0.1, 20, false, 1.0, "Radial cutoff", "Cutoff radius beyond which the model will not exist", 2);
 	addParameter("h_cutoff", 5, 0.1, 10, false, 1.0, "Height cutoff", "Cutoff height beyond which the model will not exist", 2);
 	addParameter("n_rings", 50, 1, 100, false, 1, "N Rings", "An integer number of rings used in the model", 0);
@@ -129,8 +129,11 @@ void CDensityDisk::Render(const glm::mat4 & view, const GLfloat & max_flux)
 	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
 
 	// Set the value for the inner radius.
+	// NOTE: In order to accelerate the rendering of the midplane and ensure
+	// the inner-most rim is rendered, we have elected to subtract a tiny
+	// amount off of the inner radius. This is noted on the wiki.
 	GLint uniInnerRadius = glGetUniformLocation(shader_program, "r_in");
-	glUniform1f(uniInnerRadius, r_in);
+	glUniform1f(uniInnerRadius, r_in - 0.01);
 
 	// Look up the scale variable location. We use it below.
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
@@ -171,8 +174,6 @@ void CDensityDisk::Render(const glm::mat4 & view, const GLfloat & max_flux)
 	// Render the midplane
 	r_scale = glm::scale(mat4(), glm::vec3(r_cutoff, r_cutoff, 1.0));
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
-
-	// Draw the midplane
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
 	glEnable(GL_CULL_FACE);
