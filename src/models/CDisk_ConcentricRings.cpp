@@ -128,10 +128,6 @@ void CDisk_ConcentricRings::Render(const glm::mat4 & view, const GLfloat & max_f
 	GLint uniMaxHeight = glGetUniformLocation(shader_program, "z_max");
 	glUniform1f(uniMaxHeight, MaxHeight);
 
-	// Set the value for the inner radius.
-	GLint uniInnerRadius = glGetUniformLocation(shader_program, "r_in");
-	glUniform1f(uniInnerRadius, r_in);
-
 	// Define the view:
 	GLint uniView = glGetUniformLocation(shader_program, "view");
 	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
@@ -151,7 +147,9 @@ void CDisk_ConcentricRings::Render(const glm::mat4 & view, const GLfloat & max_f
 	glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_RGBA, mFluxTexture.size(), 1, 0, GL_RGBA,
 			GL_FLOAT, &mFluxTexture[0]);
 
+	// Disable depth testing and face culling, we need both sides to render
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 
 	// Render each cylindrical wall:
 
@@ -179,11 +177,11 @@ void CDisk_ConcentricRings::Render(const glm::mat4 & view, const GLfloat & max_f
 	// Render the midplane
 	r_scale = glm::scale(mat4(), glm::vec3(MaxRadius, MaxRadius, 1.0));
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
-
-	// Draw the midplane
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
+	// Disable depth testing and face culling
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
 	// bind back to the default texture.
 	glBindTexture(GL_TEXTURE_RECTANGLE, 0);
