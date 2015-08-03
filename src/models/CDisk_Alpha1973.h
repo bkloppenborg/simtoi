@@ -5,7 +5,9 @@
  *      Author: j robert parks iv
  *
  *  A class implementing a disk model consisting of a power-law internal density
- *  profile and an exponential taper at larger radii
+ *  profile and an exponential taper at larger radii.
+ *  Based upon the work of Shakura, N. I.; Sunyaev, R. A. 1973
+ *  http://adsabs.harvard.edu/abs/1973A%26A....24..337S
  */
 
 #ifndef CDISK_ALPHA1973_H_

@@ -11,7 +11,7 @@
 CDisk_Alpha1973::CDisk_Alpha1973():CDensityDisk()
 {
 	mID = "disk_alpha1973";
-	mName = "Flared Disk (1973)";
+	mName = "Flared Disk (Shakura 1973)";
 
 	// This model ALWAYS uses the Andrews 2009 disk shader.
 	auto shaders = CShaderFactory::Instance();
