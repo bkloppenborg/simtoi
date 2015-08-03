@@ -78,8 +78,6 @@ void CParameterItem::setData(const QVariant & value, int role)
 	// we should find a different way of doing it?
 	int col = column();
 
-	bool exception_thrown = false;
-
 	CParameter & parameter = mParentModel->getParameter(mStringID);
 
 	try
@@ -94,17 +92,13 @@ void CParameterItem::setData(const QVariant & value, int role)
 			parameter.setMax( value.toDouble() );
 		if(col == 5)
 			parameter.setStepSize( value.toDouble() );
+
+		QStandardItem::setData(value, role);
 	}
 	catch(range_error & e)
 	{
 		QMessageBox msgBox;
 		msgBox.setText(QString(e.what()));
 		msgBox.exec();
-
-		exception_thrown = true;
 	}
-
-
-	if(!exception_thrown)
-		QStandardItem::setData(value, role);
 }
