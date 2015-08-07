@@ -1,3 +1,8 @@
+# Set bogus values to these variables in case the git execution
+# fails
+SET(${GIT_VERSION_TAG} "v0.0.0")
+SET(${GIT_VERSION_HASH} "000000")
+
 # Create a file containing version information
 EXECUTE_PROCESS(
     COMMAND git describe --abbrev=0 --tags
