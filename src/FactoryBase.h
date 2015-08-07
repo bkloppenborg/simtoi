@@ -14,6 +14,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
 
