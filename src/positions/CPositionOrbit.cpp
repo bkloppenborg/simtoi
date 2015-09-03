@@ -46,7 +46,7 @@ CPositionOrbit::CPositionOrbit()
 	mName = "Keplerian Orbit";
 	mID = "orbit_bound";
 
-	mPositionType = DYNAMIC;
+	mPositionType = ORBIT;
 
 	addParameter("Omega", 0, 0, 360, false, 1, "Omega", "Position angle of the ascending node (degrees).", 2);
 	addParameter("inclination", 0, -180, 180, false, 1, "Inclination", "Inclination measured from the plane of the sky (degrees).", 2);
@@ -153,9 +153,9 @@ void CPositionOrbit::Compute_xyz(double a, double beta, double e,
 		double cos_E, double sin_E,
 		double & x, double & y, double & z)
 {
-	double astro_north = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);;
-	double astro_east = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);;
-	double astro_z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);;
+	double astro_north = a * (l1 * cos_E + beta * l2 * sin_E - e * l1);
+	double astro_east = a * (m1 * cos_E + beta * m2 * sin_E - e * m1);
+	double astro_z = a * (n1 * cos_E + beta * n2 * sin_E - e * n1);
 
     x = -astro_east;
     y = astro_north;

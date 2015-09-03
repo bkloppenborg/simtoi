@@ -452,7 +452,7 @@ glm::mat4 CModel::Rotate()
 	double omega = 	Mod(mParams["z_axis_rotation"].getValue() + mZAxisRotationDelta, 360.0) * M_PI / 180;
 
 	// If we have a dynamic position, simply add the angles
-	if(mPosition->GetPositionType() == CPosition::DYNAMIC)
+	if(mPosition->GetPositionType() == CPosition::ORBIT)
 	{
 		double orbit_Omega = mPosition->getParameter("Omega").getValue() * M_PI / 180;
 		double orbit_inc = mPosition->getParameter("inclination").getValue() * M_PI / 180;

@@ -1,11 +1,10 @@
 /*
- * CPosition.h
+ * CLinearMotion.h
  *
- *  Created on: Nov 7, 2011
+ *  Created on: Sep 1 2015
  *      Author: bkloppenborg
  *
- *  A class serving as a base-class and lookup class for positions.
- *  If you add a new position type, create
+ *  An position class implementing 3D positioning.
  */
  
  /* 
@@ -33,46 +32,20 @@
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CPOSITION_H_
-#define CPOSITION_H_
+#ifndef CLINEAR_MOTION_H_
+#define CLINEAR_MOTION_H_
 
-#include <vector>
-#include <utility>
-#include <memory>
-using namespace std;
+#include "CPosition.h"
 
-#include "CParameterMap.h"
-
-class CPosition;
-typedef shared_ptr<CPosition> CPositionPtr;
-
-class CPosition : public CParameterMap
+class CLinearMotion: public CPosition
 {
 public:
-	enum PositionTypes
-	{
-		STATIC,	// not time dependent
-		ORBIT,	// IS time dependent and contains orbital elements (Omega, inclination, and omega)
-//		DYNAMIC	// IS time dependent, but does NOT contain orbital elements
-	};
+	CLinearMotion();
+	virtual ~CLinearMotion();
 
-protected:
-	PositionTypes mPositionType;
-	double mTime;
+	static CPositionPtr Create();
 
-public:
-	CPosition();
-	virtual ~CPosition();
-
-	string ID() { return mID; }
-	string name() { return mName; }
-
-	PositionTypes GetPositionType() { return mPositionType; };
-
-	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
 	virtual void GetXYZ(double & x, double & y, double & z);
-
-	virtual void SetTime(double time);
 };
 
-#endif /* CPOSITION_H_ */
+#endif /* CLINEAR_MOTION_H_ */
