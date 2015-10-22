@@ -442,6 +442,7 @@ string CModel::name()
 /// of the model is specified relative to the orbital plane.
 glm::mat4 CModel::Rotate()
 {
+
 	// Collect the model's rotation
 	double Omega = mParams["position_angle"].getValue() * M_PI / 180;
 	double inc = mParams["inclination"].getValue() * M_PI / 180;
@@ -454,13 +455,12 @@ glm::mat4 CModel::Rotate()
 	// If we have a dynamic position, simply add the angles
 	if(mPosition->GetPositionType() == CPosition::ORBIT)
 	{
-		double orbit_Omega = mPosition->getParameter("Omega").getValue() * M_PI / 180;
-		double orbit_inc = mPosition->getParameter("inclination").getValue() * M_PI / 180;
-		double orbit_omega = mPosition->getParameter("omega").getValue() * M_PI / 180;
+		double Omega_t, inc_t, omega_t;
+		mPosition->GetAngles(Omega_t, inc_t, omega_t);
 
-		Omega += orbit_Omega;
-		inc += orbit_inc;
-		omega += orbit_omega;
+		Omega += Omega_t;
+		inc += inc_t;
+		omega += omega_t;
 	}
 
 	glm::mat4 A = glm::rotate(mat4(), float(Omega), vec3(0.0, 0.0, 1.0));

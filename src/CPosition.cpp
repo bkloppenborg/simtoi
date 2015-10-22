@@ -56,6 +56,13 @@ void CPosition::GetXYZ(double & x, double & y, double & z)
 	z = 0;
 }
 
+void CPosition::GetAngles(double & Omega_t, double & inc_t, double & omega_t)
+{
+	Omega_t = 0;
+	inc_t = 0;
+	omega_t = 0;
+}
+
 void CPosition::SetTime(double time)
 {
 	mTime = time;

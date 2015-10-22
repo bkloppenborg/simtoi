@@ -71,6 +71,7 @@ public:
 
 	// Computes the (X,Y,Z) position of an object.  Z should be set to zero if not computed.
 	virtual void GetXYZ(double & x, double & y, double & z);
+	virtual void GetAngles(double & Omega_t, double & inc_t, double & omega_t);
 
 	virtual void SetTime(double time);
 };

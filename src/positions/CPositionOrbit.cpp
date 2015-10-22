@@ -167,6 +167,22 @@ CPositionPtr CPositionOrbit::Create()
 	return CPositionPtr(new CPositionOrbit());
 }
 
+void CPositionOrbit::GetAngles(double & Omega_t, double & inc_t, double & omega_t)
+{
+    double e = mParams["e"].getValue();	// eccentricy
+    double T = mParams["T"].getValue();	// time of periastron
+    double P = mParams["P"].getValue();	// orbital period
+    double t = mTime;
+
+    double n = ComputeN(P);
+    double M = ComputeM(T, n, t);
+    double E = ComputeE(M, e);
+
+    Omega_t = mParams["Omega"].getValue() * PI / 180.0;
+    inc_t = mParams["inclination"].getValue() * PI / 180.0;
+    omega_t = E;
+}
+
 void CPositionOrbit::GetXYZ(double & x, double & y, double & z)
 {
 	// Local variables (mostly renaming mParams variables for convenience).

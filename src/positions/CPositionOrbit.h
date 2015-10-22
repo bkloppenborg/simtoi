@@ -61,6 +61,7 @@ protected:
 public:
 	static CPositionPtr Create();
 
+	void GetAngles(double & Omega_t, double & inc_t, double & omega_t);
 	void GetXYZ(double & x, double & y, double & z);
 };
 
