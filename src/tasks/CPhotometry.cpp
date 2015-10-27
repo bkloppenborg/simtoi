@@ -102,7 +102,7 @@ void CPhotometry::Export(string folder_name)
 		// Open the real data file:
 		real_data.open(folder_name + mFilenameNoExtension + ".phot");
 		real_data.width(15);
-		real_data.precision(8);
+		real_data.precision(12);
 
 		real_data << "# Input photometric data file as parsed by SIMTOI.." << endl;
 		real_data << "# CSV format: JD, mag, mag_error " << endl;
@@ -111,7 +111,7 @@ void CPhotometry::Export(string folder_name)
 		first_point = true;
 		sim_data.open(folder_name + mFilenameNoExtension + "_model.phot");
 		sim_data.width(15);
-		sim_data.precision(8);
+		sim_data.precision(12);
 		// Provide some information about the format
 		sim_data << "# Simulated photometry from SIMTOI" << endl;
 		sim_data << "# The data is normalized to the first data point in the real data." << endl;
