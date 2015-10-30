@@ -36,6 +36,7 @@
 #include "CPositionXYZ.h"
 #include "CPositionOrbit.h"
 #include "CLinearMotion.h"
+#include "CPositionOrbitQuadratic.h"
 //#include "CBinaryOrbit.h"
 
 namespace positions {
@@ -47,6 +48,7 @@ void load()
 	CPositionFactory::getInstance().addItem(&CPositionXYZ::Create);
 	CPositionFactory::getInstance().addItem(&CPositionOrbit::Create);
 	CPositionFactory::getInstance().addItem(&CLinearMotion::Create);
+	CPositionFactory::getInstance().addItem(&CPositionOrbitQuadratic::Create);
 //	CPositionFactory::getInstance().addItem(&CBinaryOrbit::Create);
 }
 
