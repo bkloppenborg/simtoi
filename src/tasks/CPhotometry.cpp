@@ -435,7 +435,7 @@ double CPhotometry::SimulatePhotometry(CModelListPtr model_list, CPhotometricDat
 
 	// Set the time, render the model
 	model_list->SetTime(data_point->jd);
-	model_list->SetWavelength(data_point->jd);
+	model_list->SetWavelength(data_point->wavelength);
 	mFBO_render->bind();
 	model_list->Render(mWorkerThread->GetView());
 	mFBO_render->release();
