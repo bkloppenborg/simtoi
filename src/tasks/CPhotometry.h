@@ -54,6 +54,14 @@ typedef shared_ptr<CPhotometricDataPoint> CPhotometricDataPointPtr;
 class CPhotometricDataFile
 {
 public:
+	double mJDStart;
+	double mJDEnd;
+	double mJDMean;
+	double mWavelengthMean;
+
+	string mFilename;		///< The full filename including path and extension
+	string mFilenameShort;	///< The filename less the path and extension.
+
 	vector<CPhotometricDataPointPtr> data;
 
 	unsigned int GetNData() { return data.size(); };
@@ -86,7 +94,8 @@ public:
 	virtual void Export(string folder_name);
 
 	virtual void GetChi(double * residuals, unsigned int size);
-	virtual CDataInfo getDataInfo();
+	CDataInfo getDataInfo();
+	CDataInfo getDataInfo(CPhotometricDataFilePtr data_file);
 	virtual unsigned int GetNData();
 	virtual int GetNDataFiles();
 	virtual void GetUncertainties(double * residuals, unsigned int size);

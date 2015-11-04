@@ -49,6 +49,14 @@ CPhotometry::CPhotometry(CWorkerThread * WorkerThread)
 	// Describe the data and provide extensions
 	mDataDescription = "Photometric data";
 	mExtensions.push_back("phot");
+
+	// Init bogus values here, the real values are stored in the CPhotometricDataFilePtr
+	mJDStart = 0;
+	mJDEnd = 0;
+	mJDMean = 0;
+	mWavelengthMean = 0;
+	mFilename = "NO_FILE.phot";
+	mFilenameShort = "NO_FILE";
 }
 
 CPhotometry::~CPhotometry()
@@ -100,7 +108,7 @@ void CPhotometry::Export(string folder_name)
 		vector<double> chi_values;
 
 		// Open the real data file:
-		real_data.open(folder_name + mFilenameNoExtension + ".phot");
+		real_data.open(folder_name + data_file->mFilenameShort + ".phot");
 		real_data.width(15);
 		real_data.precision(12);
 
@@ -109,7 +117,7 @@ void CPhotometry::Export(string folder_name)
 
 		// Open the synthetic data file:
 		first_point = true;
-		sim_data.open(folder_name + mFilenameNoExtension + "_model.phot");
+		sim_data.open(folder_name + data_file->mFilenameShort + "_model.phot");
 		sim_data.width(15);
 		sim_data.precision(12);
 		// Provide some information about the format
@@ -205,22 +213,28 @@ void CPhotometry::GetChi(double * chi, unsigned int size)
 
 CDataInfo CPhotometry::getDataInfo()
 {
+	return CDataInfo();
+}
+
+CDataInfo CPhotometry::getDataInfo(CPhotometricDataFilePtr data_file)
+{
 	stringstream temp;
 
 	CDataInfo info;
-	info.setFilename(mFilenameShort);
+	info.setFilename(data_file->mFilenameShort);
 
-	temp << "N: " << GetNData();
+	temp << "N: " << data_file->GetNData();
 	info.setDescription(temp.str());
 
-	info.setJDMin(mJDStart);
-	info.setJDMax(mJDEnd);
-	info.setJDMean(mJDMean);
-	info.setWavelengthMean(mWavelengthMean);
+	info.setJDMin(data_file->mJDStart);
+	info.setJDMax(data_file->mJDEnd);
+	info.setJDMean(data_file->mJDMean);
+	info.setWavelengthMean(data_file->mWavelengthMean);
 
 	return info;
 }
 
+/// Return the total number of photometry points in ALL files
 unsigned int CPhotometry::GetNData()
 {
 	unsigned int n_data = 0;
@@ -232,6 +246,7 @@ unsigned int CPhotometry::GetNData()
 	return n_data;
 }
 
+/// Returns the total number of opened photometry files
 int CPhotometry::GetNDataFiles()
 {
 	return mData.size();
@@ -340,16 +355,15 @@ CDataInfo CPhotometry::OpenData(string filename)
 	//	JD,mag,sig_mag,ANYTHING_ELSE
 
 	string line;
-	mJDStart = std::numeric_limits<double>::max();
-	mJDEnd = 0;
-	mJDMean = 0;
-	mWavelengthMean = 0;
+	double JDStart = std::numeric_limits<double>::max();
+	double JDEnd = 0;
+	double JDMean = 0;
+	double WavelengthMean = 0;
 
 	// Create a new data file for storing input data.
 	CPhotometricDataFilePtr data_file = CPhotometricDataFilePtr(new CPhotometricDataFile());
-	mFilename = filename;
-	mFilenameShort = StripPath(filename);
-	mFilenameNoExtension = StripExtension(mFilenameShort, mExtensions);
+	data_file->mFilename = filename;
+	data_file->mFilenameShort = StripExtension(StripPath(filename), mExtensions);
 
 	// Get a vector of the non-comment lines in the text file:
 	int lineCount = 0;
@@ -378,13 +392,13 @@ CDataInfo CPhotometry::OpenData(string filename)
 			data_file->data.push_back(t_data);
 
 			// find the start, end, and mean Julian dates.
-			if(t_data->jd < mJDStart)
-				mJDStart = t_data->jd;
+			if(t_data->jd < JDStart)
+				JDStart = t_data->jd;
 			if(t_data->jd > mJDEnd)
-				mJDEnd = t_data->jd;
+				JDEnd = t_data->jd;
 
-			mJDMean += t_data->jd;
-			mWavelengthMean += t_data->wavelength;
+			JDMean += t_data->jd;
+			WavelengthMean += t_data->wavelength;
 			lineCount++;
 		}
 		catch(...)
@@ -393,13 +407,20 @@ CDataInfo CPhotometry::OpenData(string filename)
 		}
 	}
 
-	mJDMean /= lineCount;
-	mWavelengthMean /= lineCount;
+	// Calculate the mean wavelength
+	JDMean /= lineCount;
+	WavelengthMean /= lineCount;
+
+	// Assign some metadata
+	data_file->mJDStart = JDStart;
+	data_file->mJDEnd = JDEnd;
+	data_file->mJDMean = JDMean;
+	data_file->mWavelengthMean = WavelengthMean;
 
 	// The data was imported correctly, push it onto our data list
 	mData.push_back(data_file);
 
-	return getDataInfo();
+	return getDataInfo(data_file);
 }
 
 void CPhotometry::RemoveData(unsigned int data_index)
