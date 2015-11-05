@@ -432,12 +432,13 @@ void CPhotometry::RemoveData(unsigned int data_index)
 double CPhotometry::SimulatePhotometry(CModelListPtr model_list, CPhotometricDataPointPtr data_point)
 {
 	double sim_flux = 0;
+	double max_flux = 0;
 
 	// Set the time, render the model
 	model_list->SetTime(data_point->jd);
 	model_list->SetWavelength(data_point->wavelength);
 	mFBO_render->bind();
-	model_list->Render(mWorkerThread->GetView());
+	max_flux = model_list->Render(mWorkerThread->GetView());
 	mFBO_render->release();
 
 	// Blit to the storage buffer (for liboi to use the image)
@@ -450,6 +451,6 @@ double CPhotometry::SimulatePhotometry(CModelListPtr model_list, CPhotometricDat
 
 	// Get the simulated flux, convert it to a simulated magnitude using
 	// -2.5 * log(counts)
-	sim_flux = mLibOI->TotalFlux();
+	sim_flux = max_flux * mLibOI->TotalFlux();
 	return -2.5 * log10(sim_flux);
 }
