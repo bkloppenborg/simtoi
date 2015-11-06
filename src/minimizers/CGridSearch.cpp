@@ -78,45 +78,48 @@ void CGridSearch::ExportResults()
 /// the data are simulated and written to mOutputFile. Data are flushed to disk
 /// after a level %2 == 0 iteration completes.
 void CGridSearch::GridSearch(unsigned int level)
-{
+{ 
 	// If we just set the last parameter, get the chi2r
 	if(level == mNParams)
 	{
-		// Get the chi2r for the data set
-	    CModelListPtr model_list = mWorkerThread->GetModelList();
-		model_list->SetFreeParameters(mParams, mNParams, false);
-		mWorkerThread->GetChi(&mChis[0], mChis.size());
-		double chi2r = ComputeChi2r(mChis, mNParams);
-
-		// Save to the file
-		WriteRow(mParams, mNParams, chi2r, mOutputFile);
-
-		// If this set of parameters fits better, replace the best-fit params.
-		if(chi2r < mBestFit[mNParams])
-		{
-			for(int i = 0; i < mNParams; i++)
-				mBestFit[i] = mParams[i];
-
-			mBestFit[mNParams] = chi2r;
-		}
+	  // Get the chi2r for the data set
+	  CModelListPtr model_list = mWorkerThread->GetModelList();
+	  model_list->SetFreeParameters(mParams, mNParams, false);
+	  mWorkerThread->GetChi(&mChis[0], mChis.size());
+	  double chi2r = ComputeChi2r(mChis, mNParams);
+	  
+	  // Save to the file
+	  //	  WriteRow(mParams, mNParams, chi2r, mOutputFile);
+		
+	  // If this set of parameters fits better, replace the best-fit params.
+	  if(chi2r < mBestFit[mNParams])
+	    {
+	      for(int i = 0; i < mNParams; i++)
+		mBestFit[i] = mParams[i];
+	      
+	        mBestFit[mNParams] = chi2r;
+	    }
 	}
 	else	// Otherwise set the current parameter value and then recursively call the next level.
 	{
-		double step = mSteps[level];
-		double min = mMinMax[level].first;
-		double max = mMinMax[level].second;
-		for(double value = min; value < max; value += step)
-		{
-			if(!mRun)
-				break;
+	  
+	    
+	  double step = mSteps[level];
+	  double min = mMinMax[level].first;
+	  double max = mMinMax[level].second;
+	  for(double value = min; value < max; value += step)
+	    {
+	      if(!mRun)
+		break;
 
-			mParams[level] = value;
-			GridSearch(level + 1);
-		}
-
-		// If we are on an even level, flush the results to a file.
-		if(level % 2 == 0)
-			mOutputFile.flush();
+	      if(level ==0) printf("Top level steps: %d / %d \t--\t Current best chi2r %lf\n", (int)rint(fabs((value-min)/step)), (int)rint(fabs((max-min)/step))-1, mBestFit[mNParams]);
+	      mParams[level] = value;
+	      GridSearch(level + 1);
+	    }
+	  
+	  // If we are on an even level, flush the results to a file.
+	  if(level % 2 == 0)
+	    mOutputFile.flush();
 	}
 }
 
@@ -132,11 +135,12 @@ void CGridSearch::Init(shared_ptr<CWorkerThread> worker_thread)
 void CGridSearch::run()
 {
 	// Get the min/max ranges for the parameters:
-    CModelListPtr model_list = mWorkerThread->GetModelList();
-    model_list->GetFreeParameters(mParams, mNParams, true);
+        CModelListPtr model_list = mWorkerThread->GetModelList();
+        model_list->GetFreeParameters(mParams, mNParams, true);
 	mMinMax = model_list->GetFreeParamMinMaxes();
 	model_list->GetFreeParameterSteps(&mSteps[0], mSteps.size());
-
+	vector<string> names = model_list->GetFreeParamNames();
+ 
 	// Verify that all of the steps are > 0
 	for(double step: mSteps)
 	{
@@ -161,11 +165,20 @@ void CGridSearch::run()
 
 	// run the minimizer
 	mIsRunning = true;
+	cout << "\nGrid search minimization started\n";
 	GridSearch(0);
 	mIsRunning = false;
+       	mOutputFile.close();
 
-	mOutputFile.close();
-
+	// Print the actual parameters
+	cout << "\nGrid search results\n";
+	printf("Lowest chi2 achieved: %f\n", mBestFit[mNParams]);
+	printf("Best-fit parameters:\n");
+	for(int i=0; i < mNParams; i++)
+	{
+		printf("  P[%d] = %f (%s)\n", i, mBestFit[i], names[i].c_str());
+	}
+	
 	// Export the results.
 	ExportResults();
 }
