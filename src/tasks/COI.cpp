@@ -163,7 +163,7 @@ void  COI::copyImage()
 	else
 	{
 		unsigned int width = mWorkerThread->GetImageWidth();
-		unsigned int height = mWorkerThread->GetImageHeight();i
+		unsigned int height = mWorkerThread->GetImageHeight();
 
 		GLint buffer_format = this->mWorkerThread->glPixelDataFormat();
 		switch(buffer_format)
