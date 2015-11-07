@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8) 
 project(simtoi_minimizers CXX)
 
-# Include the previous directory to insure we get CMinimizer.h
-INCLUDE(../)
-
 # Assemble all of the model source
 file(GLOB SOURCE *.cpp)
 

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(simtoi CXX C)
 
 find_package(OpenGL REQUIRED)
-MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_LIBRARIES} )
+MESSAGE(STATUS "found OPENGL, lib = " ${OPENGL_gl_LIBRARY} )
 add_definitions(-DGL_GLEXT_PROTOTYPES )
 
 set(GL_PATH_SUFFIX "")
@@ -64,7 +64,11 @@ target_link_libraries(simtoi simtoi_models simtoi_minimizers simtoi_features
 # install step
 install(TARGETS simtoi DESTINATION bin)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 
 >>>>>>> 2ec7a39... Add custom paths for Linux/OSX.
+=======
+
+>>>>>>> 6601b03... Fix CMake files for building on OSX.
