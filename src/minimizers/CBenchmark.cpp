@@ -32,8 +32,11 @@
 
 #include "CBenchmark.h"
 #include <sys/timeb.h>
+#include <iostream>
 #include "CWorkerThread.h"
 #include "misc.h"
+
+using namespace std;
 
 CBenchmark::CBenchmark()
 {
