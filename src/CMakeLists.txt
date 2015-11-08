@@ -63,12 +63,3 @@ target_link_libraries(simtoi simtoi_models simtoi_minimizers simtoi_features
 
 # install step
 install(TARGETS simtoi DESTINATION bin)
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-
->>>>>>> 2ec7a39... Add custom paths for Linux/OSX.
-=======
-
->>>>>>> 6601b03... Fix CMake files for building on OSX.
