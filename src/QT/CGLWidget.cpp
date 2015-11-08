@@ -25,7 +25,7 @@
 
 #include "CGLWidget.h"
 
-#include <QMdiSubWindow>
+#include <QOpenGLContext>
 #include <stdexcept>
 #include "textio.hpp"
 #include "json/json.h"
@@ -49,7 +49,7 @@ using namespace std;
 extern string EXE_FOLDER;
 
 CGLWidget::CGLWidget(QWidget * widget_parent)
-    : QGLWidget(widget_parent)
+    : QOpenGLWidget(widget_parent)
 { 
 	// Reset the worker thread
 	mWorker = make_shared<CWorkerThread>(this, QString::fromStdString(EXE_FOLDER));
@@ -57,6 +57,7 @@ CGLWidget::CGLWidget(QWidget * widget_parent)
 	mSaveDirectory = "";
 
 	connect(mWorker.get(), SIGNAL(glContextWarning(string)), this, SLOT(receiveWarning(string)));
+	connect(mWorker.get(), SIGNAL(renderComplete()), this, SLOT(update()));
 }
 
 CGLWidget::~CGLWidget()
@@ -143,7 +144,7 @@ void CGLWidget::resetWidget()
 void CGLWidget::closeEvent(QCloseEvent *evt)
 {
     stopRendering();
-    QGLWidget::closeEvent(evt);
+    QOpenGLWidget::closeEvent(evt);
 }
 
 void CGLWidget::Export(QString save_folder)
@@ -200,26 +201,6 @@ void CGLWidget::Open(string filename)
 	emit modelUpdated();
 }
 
-//void CGLWidget::paintEvent(QPaintEvent * )
-//{
-//	Render();
-//}
-
-/// Override the QGLWidget::glDraw function when the worker thread is running.
-void CGLWidget::glDraw()
-{
-	// If the worker is not running, we render using the default glDraw function
-	// (which eventually calls paintGL).
-	if(!mWorker->isRunning())
-	{
-		QGLWidget::glDraw();
-	}
-	else
-	{
-		Render();
-	}
-}
-
 /// Renders to the default OpenGL framebuffer
 void CGLWidget::paintGL()
 {
@@ -234,7 +215,7 @@ void CGLWidget::paintGL()
 void CGLWidget::paintEvent(QPaintEvent * event)
 {
 	if(!mWorker->isRunning())
-		QGLWidget::paintEvent(event);
+		QOpenGLWidget::paintEvent(event);
 	else
 	{
 		Render();
@@ -307,8 +288,6 @@ void CGLWidget::setWavelength(double wavelength)
 
 void CGLWidget::startRendering()
 {
-	// Shut off auto-buffer swapping
-	setAutoBufferSwap(false);
 	// signal we are done with OpenGL, transfer the context to the worker
     this->doneCurrent();
     context()->moveToThread(mWorker.get());

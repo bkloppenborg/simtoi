@@ -26,6 +26,7 @@
 
 #include "CWorkerThread.h"
 #include <QMutexLocker>
+#include <QOpenGLContext>
 #include <QGLFramebufferObjectFormat>
 #include <QRect>
 #include <QImage>
@@ -712,6 +713,9 @@ void CWorkerThread::SwapBuffers()
 {
 	glFinish();
 
-    mGLWidget->swapBuffers();
-    CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to swap buffers");
+	emit renderComplete();
+
+// TODO: We might have to signal to the GUI to swap things now.
+//    mGLWidget->swapBuffers();
+//    CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to swap buffers");
 }

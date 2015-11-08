@@ -230,6 +230,7 @@ signals:
 	void dataAdded(CDataInfo info);
 	void finished();
 	void glContextWarning(string message);
+	void renderComplete();
 };
 
 #endif // C_WORKER_THREAD

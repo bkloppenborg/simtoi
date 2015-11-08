@@ -28,7 +28,7 @@
 
 #include <QObject>
 #include <QThread>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QResizeEvent>
 #include <QtDebug>
 #include <QStandardItemModel>
@@ -50,7 +50,7 @@ typedef shared_ptr<CModelList> CModelListPtr;
 class CWorkerThread;
 typedef shared_ptr<CWorkerThread> CWorkerPtr;
 
-class CGLWidget : public QGLWidget
+class CGLWidget : public QOpenGLWidget
 {
     Q_OBJECT
     
@@ -85,7 +85,6 @@ protected:
     void closeEvent(QCloseEvent *evt);
 
 //	void paintEvent(QPaintEvent * );
-	void glDraw();	// override the QGLWidget::glDraw function
 	void paintGL();
 
 public:
