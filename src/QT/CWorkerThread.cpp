@@ -524,7 +524,7 @@ void CWorkerThread::run()
     	mGLStorageBufferFormat = GL_R;
     	mGLPixelDataType = GL_UNSIGNED_BYTE;
 
-    	cout << "WARNING: OpenGL version does not support floating point textures, falling back to 16-bit integer buffers!" << endl;
+    	cout << "WARNING: OpenGL version does not support floating point textures, falling back to 8-bit integer buffers!" << endl;
     }
 
     // Setup the OpenGL context
@@ -561,11 +561,6 @@ void CWorkerThread::run()
 	mView = glm::ortho(-half_width, half_width, -half_height, half_height, -depth, depth);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to initalize OpenGL");
-
-
-	if(mFBO_render) delete mFBO_render;
-	mFBO_render = CreateMAARenderbuffer();
-	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create off-screen renderbuffer");
 
 	// Now have the workers initialize any OpenGL objects they need
 	mTaskList->InitGL();
@@ -616,11 +611,7 @@ void CWorkerThread::run()
 			break;
 
 		case RENDER:
-			mFBO_render->bind();
 			mModelList->Render(mView);
-		    mFBO_render->release();
-
-		    BlitToScreen(mFBO_render);
 
 			break;
 
