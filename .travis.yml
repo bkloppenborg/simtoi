@@ -1,10 +1,12 @@
+sudo: required
+dist: trusty
 language: cpp
 
 compiler:
   - gcc
 #  - clang
-  
-script: 
+
+script:
   - cd build
   - cmake ..
   - make
@@ -18,4 +20,5 @@ before_install:
   - sudo apt-get install -qq libglu1-mesa libglu1-mesa-dev
   - sudo apt-get install -qq opencl-headers nvidia-current nvidia-opencl-dev
   # SIMTOI prerequisites
-  - sudo apt-get install -qq libqt4-dev liblapack-dev libblas-dev libglm-dev
+  - sudo apt-get install -qq liblapack-dev libblas-dev libglm-dev
+  - sudo apt-get install -qq qt5-default
