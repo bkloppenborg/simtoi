@@ -75,15 +75,13 @@ int main(int argc, char *argv[])
 	// Pass off to the GUI:
     QApplication app(argc, argv);
 
-	// Set the default OpenGL format
-	QGLFormat fmt;
-	fmt.setVersion(3, 2);
-	fmt.setProfile(QGLFormat::CoreProfile);
-	fmt.setDoubleBuffer(true);
-	fmt.setSampleBuffers(true);
-	fmt.setSamples(4);
-	QGLFormat::setDefaultFormat(fmt);
-
+    // Set the format for surfaces globally
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setVersion(3, 2);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
 
     // determine the absolute directory from which SIMTOI is running
     EXE_FOLDER = app.applicationDirPath().toStdString();

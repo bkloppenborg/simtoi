@@ -48,8 +48,8 @@ protected:
 	unsigned int mNT3;
 
 protected:
-	QGLFramebufferObject * mFBO_render;
-	QGLFramebufferObject * mFBO_storage;
+	QOpenGLFramebufferObject * mFBO_render;
+	QOpenGLFramebufferObject * mFBO_storage;
 
 	CLibOI * mLibOI;
 	bool mLibOIInitialized;

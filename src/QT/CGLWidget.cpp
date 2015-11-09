@@ -222,6 +222,30 @@ void CGLWidget::paintEvent(QPaintEvent * event)
 	}
 }
 
+void CGLWidget::printContextInformation()
+{
+  QString glType;
+  QString glVersion;
+  QString glProfile;
+
+  // Get Version Information
+  glType = (context()->isOpenGLES()) ? "OpenGL ES" : "OpenGL";
+  glVersion = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+
+  // Get Profile Information
+#define CASE(c) case QSurfaceFormat::c: glProfile = #c; break
+  switch (format().profile())
+  {
+    CASE(NoProfile);
+    CASE(CoreProfile);
+    CASE(CompatibilityProfile);
+  }
+#undef CASE
+
+  // qPrintable() will print our QString w/o quotes around it.
+  qDebug() << qPrintable(glType) << qPrintable(glVersion) << "(" << qPrintable(glProfile) << ")";
+}
+
 void CGLWidget::Render()
 {
 	mWorker->Render();
@@ -289,7 +313,7 @@ void CGLWidget::setWavelength(double wavelength)
 void CGLWidget::startRendering()
 {
 	// signal we are done with OpenGL, transfer the context to the worker
-    this->doneCurrent();
+    doneCurrent();
     context()->moveToThread(mWorker.get());
 
 	// Tell the thread to start.

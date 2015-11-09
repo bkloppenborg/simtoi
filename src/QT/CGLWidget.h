@@ -30,6 +30,7 @@
 #include <QThread>
 #include <QOpenGLWidget>
 #include <QResizeEvent>
+#include <QGLFormat>
 #include <QtDebug>
 #include <QStandardItemModel>
 #include <utility>
@@ -111,6 +112,7 @@ public:
     void Open(string filename);
 
 public:
+    void printContextInformation();
     void Render();
 
     void Save(string filename);

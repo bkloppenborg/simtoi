@@ -27,7 +27,7 @@
 #include "CWorkerThread.h"
 #include <QMutexLocker>
 #include <QOpenGLContext>
-#include <QGLFramebufferObjectFormat>
+#include <QOpenGLFramebufferObjectFormat>
 #include <QRect>
 #include <QImage>
 #include <stdexcept>
@@ -143,15 +143,15 @@ void CWorkerThread::removeData(unsigned int data_id)
 }
 
 /// Blits the contents of the input buffer to the output buffer
-void CWorkerThread::BlitToBuffer(QGLFramebufferObject * source, QGLFramebufferObject * target)
+void CWorkerThread::BlitToBuffer(QOpenGLFramebufferObject * source, QOpenGLFramebufferObject * target)
 {
     QRect region(0, 0, mImageWidth, mImageHeight);
-    QGLFramebufferObject::blitFramebuffer (target, region, source, region);
+    QOpenGLFramebufferObject::blitFramebuffer (target, region, source, region);
     CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to blit buffer");
 }
 
 /// Blits the content of the intput buffer to screen.
-void CWorkerThread::BlitToScreen(QGLFramebufferObject * input)
+void CWorkerThread::BlitToScreen(QOpenGLFramebufferObject * input)
 {
 	BlitToBuffer(input, 0);
 
@@ -209,16 +209,16 @@ void CWorkerThread::BootstrapNext(unsigned int maxBootstrapFailures)
 }
 
 /// Creates an RGBA32F MAA framebuffer
-QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
+QOpenGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
 {
     // Create an RGBA32F MAA buffer
-    QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
+    QOpenGLFramebufferObjectFormat fbo_format = QOpenGLFramebufferObjectFormat();
     fbo_format.setInternalTextureFormat(mGLRenderBufferFormat);
     fbo_format.setTextureTarget(GL_TEXTURE_2D);
 
     const QSize size(mImageWidth, mImageHeight);
 
-    QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
+    QOpenGLFramebufferObject * FBO = new QOpenGLFramebufferObject(size, fbo_format);
 
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a MAA rendering framebuffer");
 
@@ -226,17 +226,17 @@ QGLFramebufferObject * CWorkerThread::CreateMAARenderbuffer()
 }
 
 /// Creates an R32F non-MAA framebuffer
-QGLFramebufferObject * CWorkerThread::CreateStorageBuffer()
+QOpenGLFramebufferObject * CWorkerThread::CreateStorageBuffer()
 {
     // Create an RGBA32F MAA buffer
-    QGLFramebufferObjectFormat fbo_format = QGLFramebufferObjectFormat();
+    QOpenGLFramebufferObjectFormat fbo_format = QOpenGLFramebufferObjectFormat();
     fbo_format.setInternalTextureFormat(mGLStorageBufferFormat);
     fbo_format.setSamples(0);
     fbo_format.setTextureTarget(GL_TEXTURE_2D);
 
     const QSize size(mImageWidth, mImageHeight);
 
-    QGLFramebufferObject * FBO = new QGLFramebufferObject(size, fbo_format);
+    QOpenGLFramebufferObject * FBO = new QOpenGLFramebufferObject(size, fbo_format);
 	CHECK_OPENGL_STATUS_ERROR(glGetError(), "Failed to create a non-MAA storage framebuffer");
     return FBO;
 }
@@ -500,7 +500,8 @@ void CWorkerThread::run()
 	// CL/GL context initialization
 	// ########
 	// Immediately claim the OpenCL context
-    mGLWidget->makeCurrent();
+    mGLWidget->context()->makeCurrent(mGLWidget->context()->surface());
+    mGLWidget->printContextInformation();
     // Create an OpenCL context
     mOpenCL = make_shared<COpenCL>(CL_DEVICE_TYPE_GPU);
 
