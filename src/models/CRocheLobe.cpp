@@ -21,7 +21,6 @@ CRocheLobe::CRocheLobe() :
 	mName = "Roche Lobe";
 
 	addParameter("T_eff_pole", 5000, 2E3, 1E6, false, 100, "T_pole", "Effective Polar temperature (kelvin)", 0);
-	addParameter("g_pole", 1, 0.01, 10000, false, 10, "Polar Gravity", "Gravity at the pole (units: m/s^2)", 2);
 	addParameter("von_zeipel_beta", 0.25, 0.0, 1.0, false, 0.1, "Beta", "Von Zeipel gravity darkening parameter (unitless)", 2);
 	addParameter("separation", 4.0 , 0.1, 100.0, false, 0.01, "Separation", "Separation between components (mas)", 2);
 	addParameter("mass_ratio", 3.0 , 0.001, 100.0, false, 0.01, "Mass ratio", "Mass ratio M2/M1) (unitless)", 2);
@@ -49,18 +48,12 @@ void CRocheLobe::ComputeRadii(const double r_pole, const double separation, cons
 	  corner_radii[i] = ComputeRadius(r_pole, separation, mass_ratio, asynchronism_ratio, corner_theta[i], corner_phi[i]);
 }
 
-void CRocheLobe::ComputeGravity(const double g_pole, const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio)
+void CRocheLobe::ComputeGravity(const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio)
 {
-	double gnorm, tempx, tempy, tempz;
-	ComputeGravity(1., r_pole, separation, mass_ratio, asynchronism_ratio, r_pole, 0., 0., tempx, tempy, tempz, gnorm);
-
-	// ensure gravity is positive (this model can have non-physical solutions).
-	assert(gnorm > 0);
-
-    // Compute the gravity vector for each pixel:
+	// Compute the gravity vector for each pixel:
 	for(unsigned int i = 0; i < gravity.size(); i++)
 	{
-		ComputeGravity(g_pole / gnorm, r_pole, separation, mass_ratio, asynchronism_ratio, pixel_radii[i], pixel_theta[i], pixel_phi[i], g_x[i], g_y[i], g_z[i], gravity[i]);
+		ComputeGravity(separation, mass_ratio, asynchronism_ratio, pixel_radii[i], pixel_theta[i], pixel_phi[i], g_x[i], g_y[i], g_z[i], gravity[i]);
 	}
 }
 
@@ -72,29 +65,25 @@ void CRocheLobe::VonZeipelTemperatures(double T_eff_pole, double g_pole, double 
 
 /// Computes the tangential components and magnitude of gravity at the
 /// specified (r, theta, phi) coordinates.
-void CRocheLobe::ComputeGravity(const double g_pole, const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio, const double radius, const double theta, const double phi, double & g_x, double & g_y, double & g_z, double & g_mag)
+void CRocheLobe::ComputeGravity(const double separation, const double mass_ratio, const double asynchronism_ratio, const double radius, const double theta, const double phi, double & g_x, double & g_y, double & g_z, double & g_mag)
 {
-
   double radius1 = radius / separation;  // dimensionless
   double l = cos(phi) * sin(theta);
   double mu = sin(phi) * sin(theta);
   double x = radius1 * l;
   double y = radius1 * mu;
   double z = radius1 * cos(theta);
-  double xc =  mass_ratio / (1. + mass_ratio);
   double radius2 = std::sqrt( (x - 1.0) * (x - 1.0) + y * y + z * z);
-
   double radius1_pow3 = radius1 * radius1 * radius1;
   double radius2_pow3 = radius2 * radius2 * radius2;
 
   // gx, gy, gz are the cartesian coordinates of the gravity vector
   // we need them in cartesian form to compute the vertices for limb-darkening
 
-   g_x =  x / radius1_pow3 + mass_ratio * (x - 1.0) / radius2_pow3 + (mass_ratio + 1.0) * (x-xc) + (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * x;
-   g_y =  y / radius1_pow3 + mass_ratio * y         / radius2_pow3 + (mass_ratio + 1.0) *  y     + (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * y;
-   g_z =  z / radius1_pow3 + mass_ratio * z         / radius2_pow3;
-
-   g_mag = g_pole * std::sqrt(g_x * g_x + g_y * g_y + g_z * g_z);
+	g_x = - x / radius1_pow3 + mass_ratio * (1.0 - x) / radius2_pow3 + asynchronism_ratio * asynchronism_ratio * (1 + mass_ratio) * x - mass_ratio;
+	g_y = - y / radius1_pow3 - mass_ratio * y / radius2_pow3 + asynchronism_ratio * asynchronism_ratio * (1 + mass_ratio) * y;
+	g_z = - z / radius1_pow3 - mass_ratio * z / radius2_pow3;
+  g_mag = std::sqrt(g_x * g_x + g_y * g_y + g_z * g_z);
 }
 
 
@@ -110,16 +99,15 @@ void CRocheLobe::ComputePotential(double & pot, double & dpot, const double radi
 	const double x = radius1 * l;
 	const double y = radius1 * mu;
 	const double z = radius1 * cos(theta);
-	const double xc =  mass_ratio / (1. + mass_ratio);
+	//const double xc =  mass_ratio / (1. + mass_ratio);
 	const double radius2 = std::sqrt( (x - 1.0) * (x - 1.0) + y * y + z * z);
 
-	pot = - 1.0 / radius1 - mass_ratio / radius2
-          - 0.5 * (mass_ratio + 1.0) * ( (x - xc) * (x - xc) + y * y)
-          - 0.5 * (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * (x * x + y * y );
+	pot = - 1.0 / radius1 - mass_ratio / radius2  + mass_ratio * x - 0.5 * (mass_ratio + 1.0) * asynchronism_ratio * asynchronism_ratio
+				* (x * x + y * y );
 
-	dpot =  1.0 / (radius1 * radius1) + mass_ratio / (radius2 * radius2 * radius2) * (radius1 - l)
-	        - (mass_ratio + 1.0) * (radius1 * (l * l + mu * mu)   - l * xc)
-            - (mass_ratio + 1.0) * (asynchronism_ratio * asynchronism_ratio -1.) * radius1 * ( l * l + mu * mu);
+	dpot =  1.0 / (radius1 * radius1) + mass_ratio / (radius2 * radius2 *radius2) * (radius1 - l)
+					+ mass_ratio * l - (mass_ratio + 1.0) * asynchronism_ratio * asynchronism_ratio * radius1 * ( l * l + mu * mu);
+
 }
 
 
@@ -161,7 +149,6 @@ void CRocheLobe::preRender(double & max_flux)
 		Init();
 	}
 
-	const double g_pole = mParams["g_pole"].getValue();
 	const double r_pole = mParams["r_pole"].getValue();
 	const double T_eff_pole = mParams["T_eff_pole"].getValue();
 	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
@@ -172,14 +159,15 @@ void CRocheLobe::preRender(double & max_flux)
 	//	if(mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
 	ComputeRadii(r_pole, separation, mass_ratio, asynchronism_ratio);
 
-			//if(mParams["g_pole"].isDirty() || mParams["r_pole"].isDirty() || mParams["omega_rot"].isDirty())
-	ComputeGravity(g_pole, r_pole, separation, mass_ratio, asynchronism_ratio);
+	double g_pole, tempx, tempy, tempz;
+	ComputeGravity(separation, mass_ratio, asynchronism_ratio, r_pole, 0.0, 0.0, tempx, tempy, tempz, g_pole);
+  ComputeGravity(r_pole, separation, mass_ratio, asynchronism_ratio);
 
 	bool feature_dirty = false;
 	for(auto feature: mFeatures)
 		feature_dirty |= feature->isDirty();
 
-	if(feature_dirty || mParams["T_eff_pole"].isDirty() || mParams["g_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
+	if(feature_dirty || mParams["T_eff_pole"].isDirty() || mParams["von_zeipel_beta"].isDirty())
 		VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
 	for(auto feature: mFeatures)
@@ -246,7 +234,6 @@ void CRocheLobe::Render(const glm::mat4 & view, const GLfloat & max_flux)
 void CRocheLobe::GenerateModel(vector<vec3> & vbo_data,
 		vector<unsigned int> & elements)
 {
-	const double g_pole = mParams["g_pole"].getValue();
 	const double r_pole = mParams["r_pole"].getValue();
 	const double T_eff_pole = mParams["T_eff_pole"].getValue();
 	const double von_zeipel_beta = mParams["von_zeipel_beta"].getValue();
@@ -260,8 +247,10 @@ void CRocheLobe::GenerateModel(vector<vec3> & vbo_data,
 
 	// recomputing the sphereoid is very expensive. Make use of the dirty flags
 	// to only compute that which is absolutely necessary.
-	ComputeRadii(r_pole, separation, mass_ratio, asynchronism_ratio);
-	ComputeGravity(g_pole, r_pole, separation, mass_ratio, asynchronism_ratio);
+  ComputeRadii(r_pole, separation, mass_ratio, asynchronism_ratio);
+	double g_pole, tempx, tempy, tempz;
+	ComputeGravity(separation, mass_ratio, asynchronism_ratio, r_pole, 0.0, 0.0, tempx, tempy, tempz, g_pole);
+	ComputeGravity(r_pole, separation, mass_ratio, asynchronism_ratio);
 	VonZeipelTemperatures(T_eff_pole, g_pole, von_zeipel_beta);
 
 	for(auto feature: mFeatures)
