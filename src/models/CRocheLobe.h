@@ -46,15 +46,15 @@ public:
 
 	void VonZeipelTemperatures(double T_eff_pole, double g_pole, double beta);
 
-	void ComputeGravity(const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio);
-	void ComputeGravity(const double separation, const double mass_ratio, const double asynchronism_ratio, 																		   const double radius, const double theta, const double phi, double & g_x, double & g_y, double & g_z, double & g_mag);
+	void ComputeGravity(const double r_pole, const double separation, const double q, const double P);
+	void ComputeGravity(const double separation, const double q, const double P, 																		   const double radius, const double theta, const double phi, double & g_x, double & g_y, double & g_z, double & g_mag);
 
-	void ComputeRadii(const double r_pole, const double separation, const double mass_ratio, const double asynchronism_ratio);
-	double ComputeRadius(const double polar_radius, const double separation, const double mass_ratio,
+	void ComputeRadii(const double r_pole, const double separation, const double q, const double P);
+	double ComputeRadius(const double polar_radius, const double separation, const double q,
 			     const double asynchronous_ratio, const double theta, const double phi);
 
 	void ComputePotential(double & pot, double & dpot, const double radius, const double theta, const double phi,
-			      const double separation, const double mass_ratio, const double asynchronous_ratio);
+			      const double separation, const double q, const double asynchronous_ratio);
 
 
 };
