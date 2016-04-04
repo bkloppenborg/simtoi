@@ -5,7 +5,7 @@
  *  \author bkloppenborg
  */
 
- /*
+/*
  * Copyright (c) 2015 Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
@@ -43,18 +43,18 @@
 
 namespace models {
 
-void load()
-{
-	// TODO: For now we CMinimizerFactory::getInstance().addItem minimizers explicitly. In the future, we should use plugins instead.
-	CModelFactory::getInstance().addItem(&CSphere::Create);
-	CModelFactory::getInstance().addItem(&CCylinder::Create);
-	CModelFactory::getInstance().addItem(&CDisk_ConcentricRings::Create);
-	CModelFactory::getInstance().addItem(&CDisk_Pascucci2004::Create);
-	CModelFactory::getInstance().addItem(&CDisk_Andrews2009::Create);
-  CModelFactory::getInstance().addItem(&CDisk_Alpha1973::Create);
-	CModelFactory::getInstance().addItem(&CRocheLobe::Create);
-	CModelFactory::getInstance().addItem(&CRocheLobe_FF::Create);
-	CModelFactory::getInstance().addItem(&CRocheRotator::Create);
-}
+    void load()
+    {
+        // TODO: For now we CMinimizerFactory::getInstance().addItem minimizers explicitly. In the future, we should use plugins instead.
+        CModelFactory::getInstance().addItem(&CSphere::Create);
+        CModelFactory::getInstance().addItem(&CCylinder::Create);
+        CModelFactory::getInstance().addItem(&CDisk_ConcentricRings::Create);
+        CModelFactory::getInstance().addItem(&CDisk_Pascucci2004::Create);
+        CModelFactory::getInstance().addItem(&CDisk_Andrews2009::Create);
+        CModelFactory::getInstance().addItem(&CDisk_Alpha1973::Create);
+        CModelFactory::getInstance().addItem(&CRocheLobe::Create);
+        CModelFactory::getInstance().addItem(&CRocheLobe_FF::Create);
+        CModelFactory::getInstance().addItem(&CRocheRotator::Create);
+    }
 
 } // namespace models

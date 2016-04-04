@@ -7,7 +7,7 @@
  *  Implementation of a basic grid-search minimizer.
  */
 
- /*
+/*
  * Copyright (c) 2012-2015 Fabien Baron, Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
@@ -39,26 +39,26 @@
 
 class CGridSearch: public CMinimizerThread
 {
-protected:
-	vector< pair<double, double> > mMinMax;
-	vector<double> mSteps;
-	ofstream mOutputFile;
+    protected:
+        vector< pair<double, double> > mMinMax;
+        vector<double> mSteps;
+        ofstream mOutputFile;
 
-	valarray<double> mBestFit;
+        valarray<double> mBestFit;
 
-public:
-	CGridSearch();
-	virtual ~CGridSearch();
+    public:
+        CGridSearch();
+        virtual ~CGridSearch();
 
-	static CMinimizerPtr Create();
+        static CMinimizerPtr Create();
 
-	void ExportResults();
+        void ExportResults();
 
-	void GridSearch(unsigned int level);
+        void GridSearch(unsigned int level);
 
-	virtual void Init(shared_ptr<CWorkerThread> worker_thread);
+        virtual void Init(shared_ptr<CWorkerThread> worker_thread);
 
-	void run();
+        void run();
 };
 
 #endif /* CMINIMIZER_GRIDSEARCH_H_ */
