@@ -1,12 +1,12 @@
 /*
  * CGridSearch.cpp
  *
- *  Created on: Oct 4, 2012
- *      Author: bkloppen
+ *  Created on: Oct 4, 2015
+ *      Author: fbaron
  */
 
  /*
- * Copyright (c) 2012 Brian Kloppenborg
+ * Copyright (c) 2012-2015 Fabien Baron, Brian Kloppenborg
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
@@ -78,7 +78,7 @@ void CGridSearch::ExportResults()
 /// the data are simulated and written to mOutputFile. Data are flushed to disk
 /// after a level %2 == 0 iteration completes.
 void CGridSearch::GridSearch(unsigned int level)
-{ 
+{
 	// If we just set the last parameter, get the chi2r
 	if(level == mNParams)
 	{
@@ -87,36 +87,44 @@ void CGridSearch::GridSearch(unsigned int level)
 	  model_list->SetFreeParameters(mParams, mNParams, false);
 	  mWorkerThread->GetChi(&mChis[0], mChis.size());
 	  double chi2r = ComputeChi2r(mChis, mNParams);
-	  
+
 	  // Save to the file
 	  //	  WriteRow(mParams, mNParams, chi2r, mOutputFile);
-		
+
 	  // If this set of parameters fits better, replace the best-fit params.
 	  if(chi2r < mBestFit[mNParams])
 	    {
 	      for(int i = 0; i < mNParams; i++)
-		mBestFit[i] = mParams[i];
-	      
+				mBestFit[i] = mParams[i];
+
 	        mBestFit[mNParams] = chi2r;
+
+					printf("\tNew best CHI2r: %lf Params ", chi2r);
+					for(int i=0; i < mNParams; i++)
+					{
+					printf("#%d: %f \t", i, mBestFit[i]);
+					}
+					printf("\n");
 	    }
 	}
 	else	// Otherwise set the current parameter value and then recursively call the next level.
 	{
-	  
-	    
 	  double step = mSteps[level];
 	  double min = mMinMax[level].first;
 	  double max = mMinMax[level].second;
 	  for(double value = min; value < max; value += step)
 	    {
 	      if(!mRun)
-		break;
+				break;
 
-	      if(level ==0) printf("Top level steps: %d / %d \t--\t Current best chi2r %lf\n", (int)rint(fabs((value-min)/step)), (int)rint(fabs((max-min)/step))-1, mBestFit[mNParams]);
+	      if(level ==0)
+				{
+					printf("Top level steps: %d/%d -- Top level param %lf\n", (int)rint(fabs((value-min)/step)), (int)rint(fabs((max-min)/step))-1, value);
+				}
 	      mParams[level] = value;
 	      GridSearch(level + 1);
 	    }
-	  
+
 	  // If we are on an even level, flush the results to a file.
 	  if(level % 2 == 0)
 	    mOutputFile.flush();
@@ -140,7 +148,7 @@ void CGridSearch::run()
 	mMinMax = model_list->GetFreeParamMinMaxes();
 	model_list->GetFreeParameterSteps(&mSteps[0], mSteps.size());
 	vector<string> names = model_list->GetFreeParamNames();
- 
+
 	// Verify that all of the steps are > 0
 	for(double step: mSteps)
 	{
@@ -151,7 +159,7 @@ void CGridSearch::run()
 	// Resize the best-fit parameter array to hold the best-fit parameters
 	// and their chi2r (as the last element)
 	mBestFit.resize(mNParams + 1);
-	mBestFit[mNParams] = 1E6;	// Init the best-fit chi2r to some bogus value.
+	mBestFit[mNParams] = std::numeric_limits<double>::infinity();	// Init the best-fit chi2r to some bogus value.
 
 	// Open the statistics file for writing:
 	stringstream filename;
@@ -178,7 +186,7 @@ void CGridSearch::run()
 	{
 		printf("  P[%d] = %f (%s)\n", i, mBestFit[i], names[i].c_str());
 	}
-	
+
 	// Export the results.
 	ExportResults();
 }
