@@ -8,7 +8,8 @@
  */
 
 /*
- * Copyright (c) 2012-2015 Fabien Baron, Brian Kloppenborg
+ * Copyright (c) 2012 Brian Kloppenborg
+ * Copyright (c) 2015 Fabien Baron
  *
  * If you use this software as part of a scientific publication, please cite as:
  *
