@@ -1,10 +1,32 @@
-/*
- * CRocheRotator.cpp
+ /*
+ * This file is part of the SImulation and Modeling Tool for Optical
+ * Interferometry (SIMTOI).
  *
- *  Created on: Apr. 21, 2014
- *      Author: bkloppenborg
- *      Description: Roche surface for rotating/oblate spheroids.
- * 
+ * SIMTOI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation version 3.
+ *
+ * SIMTOI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (c) 2014 Brian Kloppenborg
+ *
+ *  Description:
+ *  The following class implements the equations for the Roche surface of a
+ *  rapidly rotating star under the assumption that the mass is centrally
+ *  concentrated and uniformly rotating. This code follows the equations
+ *  originally specified in
+ *  	Cranmer, S. R., & Owocki, S. P. (1995)
+ *  	The Astrophysical Journal, 440, 308. doi:10.1086/175272
+ *  and
+ *  	Aufdenberg, J. P., Merand, A., Foresto, V. C. et al. (2006)
+ *  	The Astrophysical Journal, 645(1), 664–675. doi:10.1086/504149
+ *  to implement the gravity and temperature profiles respectively.
  */
 
 #include "CRocheRotator.h"

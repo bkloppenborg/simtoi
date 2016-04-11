@@ -1,9 +1,39 @@
-/* CDensityDisk.h
+ /*
+ * This file is part of the SImulation and Modeling Tool for Optical
+ * Interferometry (SIMTOI).
  *
- *  Created on: Nov. 5, 2013
- *      Author: bkloppenborg
- */
+ * SIMTOI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation version 3.
+ *
+ * SIMTOI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (c) 2013 Brian Kloppenborg
 
+ *  This is the base class for disk models which come from a physically
+ *  motivated density distribution (unlike those inheriting from CCylinder).
+ *
+ *  At present, models are rendered as a series of partially opaque concentric
+ *  rings oriented along the z-direction. The rings are connected at the
+ *  midplane by a triangle fan. This rendering method is suitable for disks
+ *  seen edge-on, but probably not for other inclinations.
+ *
+ *  This base class has four parameters:
+ *  	r_in : the disk model's inner radius
+ *  	r_cutoff : the radius at which rendering will stop
+ *  	h_cutoff : the height (z) at which rendering will stop
+ *  	n_rings : the number of rings in the model
+ *  The radial and height cutoffs should be defined to be sufficiently large
+ *  as to not cut off meaningful density distribution. This requires some
+ *  manual tweaking by the user.
+ *
+ */
 #include "CDensityDisk.h"
 #include "CShaderFactory.h"
 #include "CCylinder.h"

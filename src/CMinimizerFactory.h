@@ -1,20 +1,5 @@
-/*
- * \file CMinimizerFactory.h
- *
- *  Created on: Feb 10, 2013
- *  \author bkloppenborg
- */
-
  /*
- * Copyright (c) 2012 Brian Kloppenborg
- *
- * If you use this software as part of a scientific publication, please cite as:
- *
- * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Minimizering
- * Tool for Optical Interferometry" (Version X).
- * Available from  <https://github.com/bkloppenborg/simtoi>.
- *
- * This file is part of the SImulation and Minimizering Tool for Optical
+ * This file is part of the SImulation and Modeling Tool for Optical
  * Interferometry (SIMTOI).
  *
  * SIMTOI is free software: you can redistribute it and/or modify
@@ -28,6 +13,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (c) 2012 Brian Kloppenborg
  */
 
 #ifndef CMINIMIZERFACTORY_H_

@@ -1,25 +1,20 @@
-/*
- * CDisk_Pascucci2004.h
+ /*
+ * This file is part of the SImulation and Modeling Tool for Optical
+ * Interferometry (SIMTOI).
  *
- *  Created on: Dec 28, 2012
- *      Author: bkloppen
+ * SIMTOI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation version 3.
  *
- *  A class implementing a disk model consisting of a series of partially
- *  opaque concentric rings. Each ring has a scale height transparency which
- *  decays from the midplane transparency to 1 (completely transparent)
- *  following a Gaussian distribution.
+ * SIMTOI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
  *
- *  The model has the following parameters:
- *  	r_in : the inner radius (>= 0)
- *  	r_out: the outer radius (> 0)
- *  	midplane_trans : the transparency of the midplane (0...1), normally 0 (completely opaque)
- *  	beta : the Gaussian decay coefficient in the z-direction (> 0)
- *  	n_rings: the number of concentric rings between r_in and r_out (> 0)
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  NOTE: If beta is set outside of their specified bounds, the transparency
- *  in the corresponding direction will be set to zero (i.e. 100% opaque).
- *
- *  WARNING: This class explicitly overrides the default parameters in CModelDisk::InitMembers
+ *  Copyright (c) 2012 Brian Kloppenborg
  */
 
 #ifndef CDISK_PASCUCCI2004_H_

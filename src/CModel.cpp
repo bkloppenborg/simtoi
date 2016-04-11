@@ -1,19 +1,4 @@
-/*
- * CModel.cpp
- *
- *  Created on: Nov 7, 2011
- *      Author: bkloppenborg
- */
-
  /*
- * Copyright (c) 2012 Brian Kloppenborg
- *
- * If you use this software as part of a scientific publication, please cite as:
- *
- * Kloppenborg, B.; Baron, F. (2012), "SIMTOI: The SImulation and Modeling
- * Tool for Optical Interferometry" (Version X).
- * Available from  <https://github.com/bkloppenborg/simtoi>.
- *
  * This file is part of the SImulation and Modeling Tool for Optical
  * Interferometry (SIMTOI).
  *
@@ -28,14 +13,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with SIMTOI.  If not, see <http://www.gnu.org/licenses/>.
- */
-
- /*
- *  Base class for all models implementing a common set of functions to get/set
- *  parameters and use shaders.
  *
- *  NOTE: When deriving from this object the yaw, pitch, and roll occupy the first
- *  three values in mParameters.
+ * Copyright (c) 2012 Brian Kloppenborg
  */
 
 #include <sstream>
