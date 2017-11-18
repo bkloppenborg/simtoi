@@ -27,6 +27,7 @@
 #include "oi_tools.hpp"
 // TODO: Figure out how to pull in additional calibrator models
 #include "CUniformDisk.h"
+#include "CTask.h"
 
 #include "CModelList.h"
 
