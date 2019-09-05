@@ -336,7 +336,7 @@ CDataInfo COI::getDataInfo()
 
 unsigned int COI::GetNData()
 {
-	mLibOI->GetNData();
+	return mLibOI->GetNData();
 }
 
 int COI::GetNDataFiles()
