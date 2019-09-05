@@ -186,7 +186,7 @@ void CDensityDisk::Render(const glm::mat4 & view, const GLfloat & max_flux)
 
     glm::mat4 scale;
     glm::mat4 r_scale;
-    glm::mat4 h_scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, height));
+    glm::mat4 h_scale = glm::scale(mat4(1.0f), glm::vec3(1.0, 1.0, height));
 
     // Render each of the concentric rings
 	double dr = (r_cutoff - r_in) / (n_rings - 1);
@@ -194,7 +194,7 @@ void CDensityDisk::Render(const glm::mat4 & view, const GLfloat & max_flux)
 	{
 		// Scale the radius:
 		radius = r_in + i * dr;
-		r_scale = glm::scale(mat4(), glm::vec3(radius, radius, 1.0));
+		r_scale = glm::scale(mat4(1.0f), glm::vec3(radius, radius, 1.0));
 		scale = h_scale * r_scale;
 
 		glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
@@ -202,7 +202,7 @@ void CDensityDisk::Render(const glm::mat4 & view, const GLfloat & max_flux)
 	}
 
 	// Render the midplane
-	r_scale = glm::scale(mat4(), glm::vec3(r_cutoff, r_cutoff, 1.0));
+	r_scale = glm::scale(mat4(1.0f), glm::vec3(r_cutoff, r_cutoff, 1.0));
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 

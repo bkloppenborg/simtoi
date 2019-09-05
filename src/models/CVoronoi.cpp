@@ -182,7 +182,7 @@ void CVoronoi::Render(const glm::mat4 & view)
     GLint uniColor = glGetUniformLocation(shader_program, "uni_color");
 
     // Define zero rotation
-	glm::mat4 rotation = mat4();
+	glm::mat4 rotation = mat4(1.0f);
 	GLint uniRotation = glGetUniformLocation(shader_program, "rotation");
 	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(rotation));
 
@@ -194,7 +194,7 @@ void CVoronoi::Render(const glm::mat4 & view)
 	GLint uniTranslation = glGetUniformLocation(shader_program, "translation");
 
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
-	glm::mat4 scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, 1.0));
+	glm::mat4 scale = glm::scale(mat4(1.0f), glm::vec3(1.0, 1.0, 1.0));
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
 	float x = 0;
@@ -218,7 +218,7 @@ void CVoronoi::Render(const glm::mat4 & view)
 		color.x = mParams[flux_id.str()].getValue();
 
 		// define the position
-		location = glm::translate(mat4(), vec3(x, y, 0.0));
+		location = glm::translate(mat4(1.0f), vec3(x, y, 0.0));
 		glUniformMatrix4fv(uniTranslation, 1, GL_FALSE, glm::value_ptr(location));
 
 		// define the color

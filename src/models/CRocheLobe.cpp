@@ -195,7 +195,7 @@ void CRocheLobe::Render(const glm::mat4 & view, const GLfloat & max_flux)
 
     NormalizeFlux(max_flux);
 
-    mat4 scale = glm::scale(mat4(), glm::vec3(1, 1, 1));
+    mat4 scale = glm::scale(mat4(1.0f), glm::vec3(1, 1, 1));
 
     // Activate the shader
     GLuint shader_program = mShader->GetProgram();

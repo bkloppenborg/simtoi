@@ -190,7 +190,7 @@ void CSphere::Render(const glm::mat4 & view, const GLfloat & max_flux)
 {
 	// Rename a few variables for convenience:
 	double radius = float(mParams["radius"].getValue());
-	mat4 scale = glm::scale(mat4(), glm::vec3(radius, radius, radius));
+	mat4 scale = glm::scale(mat4(1.0f), glm::vec3(radius, radius, radius));
 
 	NormalizeFlux(max_flux);
 

@@ -270,8 +270,8 @@ void CCylinder::Render(const glm::mat4 & view, const GLfloat & max_flux)
 	glUniformMatrix4fv(uniRotation, 1, GL_FALSE, glm::value_ptr(Rotate()));
 
 	GLint uniScale = glGetUniformLocation(shader_program, "scale");
-    glm::mat4 r_scale = glm::scale(mat4(), glm::vec3(radius, radius, 1.0));
-    glm::mat4 h_scale = glm::scale(mat4(), glm::vec3(1.0, 1.0, height));
+    glm::mat4 r_scale = glm::scale(mat4(1.0f), glm::vec3(radius, radius, 1.0));
+    glm::mat4 h_scale = glm::scale(mat4(1.0f), glm::vec3(1.0, 1.0, height));
     glm::mat4 scale = r_scale * h_scale;
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 
@@ -288,13 +288,13 @@ void CCylinder::Render(const glm::mat4 & view, const GLfloat & max_flux)
 
 	// Draw the top
 	mat4 z_offset;
-	z_offset = glm::translate(mat4(), vec3(0, 0, 0.5));
+	z_offset = glm::translate(mat4(1.0f), vec3(0, 0, 0.5));
 	scale = r_scale * h_scale * z_offset;
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));
 
 	// Draw the bottom
-	z_offset = glm::translate(mat4(), vec3(0, 0, -0.5));
+	z_offset = glm::translate(mat4(1.0f), vec3(0, 0, -0.5));
 	scale = r_scale * h_scale * z_offset;
 	glUniformMatrix4fv(uniScale, 1, GL_FALSE, glm::value_ptr(scale));
 	glDrawElements(GL_TRIANGLE_STRIP, mMidplaneSize, GL_UNSIGNED_INT, (void*) (mMidplaneStart * sizeof(float)));

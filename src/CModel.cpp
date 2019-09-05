@@ -442,9 +442,9 @@ glm::mat4 CModel::Rotate()
 		omega += omega_t;
 	}
 
-	glm::mat4 A = glm::rotate(mat4(), float(Omega), vec3(0.0, 0.0, 1.0));
-	glm::mat4 B = glm::rotate(mat4(), float(inc),   vec3(1.0, 0.0, 0.0));
-	glm::mat4 C = glm::rotate(mat4(), float(omega), vec3(0.0, 0.0, 1.0));
+	glm::mat4 A = glm::rotate(mat4(1.0f), float(Omega), vec3(0.0, 0.0, 1.0));
+	glm::mat4 B = glm::rotate(mat4(1.0f), float(inc),   vec3(1.0, 0.0, 0.0));
+	glm::mat4 C = glm::rotate(mat4(1.0f), float(omega), vec3(0.0, 0.0, 1.0));
 	return A * B * C;
 }
 
@@ -742,5 +742,5 @@ glm::mat4 CModel::Translate()
 	double x, y, z;
 	mPosition->GetXYZ(x, y, z);
 
-	return glm::translate(mat4(), vec3(x, y, z));
+	return glm::translate(mat4(1.0f), vec3(x, y, z));
 }
