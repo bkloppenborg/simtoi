@@ -78,15 +78,15 @@ void COI::BootstrapNext(unsigned int maxBootstrapFailures)
 	}
 
 	// TODO: Calibrator information is hard-coded for eps Aur. This should be read in from elsewhere.
-	pair<double, double> old_cal_prop(0.419 * MAS_TO_RAD, 0.063 * MAS_TO_RAD);		// eta Aur MIRC calibrator size
-	pair<double, double> new_cal_prop(0.453 * MAS_TO_RAD, 0.012 * MAS_TO_RAD);		// eta Aur from Maestro et al 2013.
+//	pair<double, double> old_cal_prop(0.419 * MAS_TO_RAD, 0.063 * MAS_TO_RAD);		// eta Aur MIRC calibrator size
+//	pair<double, double> new_cal_prop(0.453 * MAS_TO_RAD, 0.012 * MAS_TO_RAD);		// eta Aur from Maestro et al 2013.
 
-	std::default_random_engine generator;
-	std::normal_distribution<double> new_cal_distribution(new_cal_prop.first, new_cal_prop.second);
+//	std::default_random_engine generator;
+//	std::normal_distribution<double> new_cal_distribution(new_cal_prop.first, new_cal_prop.second);
 
 	// Setup the old calibrator
-	OICalibratorPtr old_cal = OICalibratorPtr( new ccoifits::CUniformDisk(old_cal_prop.first) );
-	OICalibratorPtr new_cal = OICalibratorPtr( new ccoifits::CUniformDisk(new_cal_distribution(generator)) );
+//	OICalibratorPtr old_cal = OICalibratorPtr( new ccoifits::CUniformDisk(old_cal_prop.first) );
+//	OICalibratorPtr new_cal = OICalibratorPtr( new ccoifits::CUniformDisk(new_cal_distribution(generator)) );
 
 	// Recalibrate the data.
 	// TODO: Note this function assumes the SAME calibrator is used on ALL data sets. This probably isn't true.
@@ -96,8 +96,9 @@ void COI::BootstrapNext(unsigned int maxBootstrapFailures)
 		auto data = mData[i];
 
 		// Recalibrate, bootstrap, then push to the OpenCL device:
-		OIDataList t_data = Recalibrate(data, old_cal, new_cal);
-		t_data = Bootstrap_Spectral(t_data);
+//		OIDataList t_data = Recalibrate(data, old_cal, new_cal);
+//		t_data = Bootstrap_Spectral(t_data);
+		OIDataList t_data = Bootstrap_Spectral(data);
 
 		// Replace the 0th entry with temp.
 		// Due to a bug in ccoifits the total data size may not be preserved, so we need to
