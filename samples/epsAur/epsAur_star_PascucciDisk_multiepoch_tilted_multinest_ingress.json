@@ -1,0 +1,68 @@
+{
+	"_file_info" : "Save file from the SImulation and Modeling Tool for Optical Interferometry (SIMTOI). See https://github.com/bkloppenborg/simtoi for information about this format.",
+	"area_height" : 128,
+	"area_scale" : 0.025000000000000001,
+	"area_width" : 128,
+	"model_0" : 
+	{
+		"base_data" : 
+		{
+			"T_eff" : [ 7500, 2000, 1000000, false, 100 ],
+			"radius" : [ 1.155, 2, 3, true, 0 ],
+			"inclination" : [ 0, 0, 0, false, 0 ],
+			"position_angle" : [ 0, 0, 0, false, 0 ],
+			"z_axis_rotation" : [ 0, 0, 360, false, 1 ],
+			"z_axis_rotational_period" : [ 0, 0, 100, false, 1 ]
+		},
+		"base_id" : "sphere",
+		"position_data" : 
+		{
+			"E" : [ 0, 0, 0, false, 0 ],
+			"N" : [ 0, 0, 0, false, 0 ],
+			"Z" : [ 0, 0, 0, false, 0 ]
+		},
+		"position_id" : "xyz",
+		"shader_data" : 
+		{
+			"alpha" : [ 0.5, 0.10000000000000001, 1, true, 0 ]
+		},
+		"shader_id" : "ldl_power_law"
+	},
+	"model_1" : 
+	{
+		"base_data" : 
+		{
+			"T_eff" : [ 500, 0, 1000000, false, 100 ],
+			"h_cutoff" : [ 5, 0.0070000000000000001, 10, false, 0 ],
+			"inclination" : [ 2.98, -10, 10, false, 0 ],
+			"n_rings" : [ 600, 1, 100, false, 0 ],
+			"position_angle" : [ 89.980000000000004, 80, 100, false, 0 ],
+			"r_cutoff" : [ 30, 0.10000000000000001, 10, false, 0 ],
+			"r_in" : [ 0.10000000000000001, 0.10000000000000001, 10, false, 0 ],
+			"z_axis_rotation" : [ 0, 0, 360, false, 1 ],
+			"z_axis_rotational_period" : [ 0, 0, 100, false, 1 ]
+		},
+		"base_id" : "disk_pascucci2004",
+		"position_data" : 
+		{
+			"Omega" : [ 296.92000000000002, 295, 299, false, 0 ],
+			"P" : [ 9896, 0, 0, false, 0 ],
+			"T" : [ 2454515, 0, 0, false, 0 ],
+			"alpha" : [ 31.236999999999998, 20, 40, false, 5 ],
+			"e" : [ 0.22700000000000001, 0, 0, false, 0 ],
+			"inclination" : [ 88.891999999999996, 85, 95, false, 1 ],
+			"omega" : [ 220, 216, 222, false, 0 ]
+		},
+		"position_id" : "orbit_bound",
+		"shader_data" : 
+		{
+			"alpha" : [ 13.359999999999999, 5, 20, true, 0 ],
+			"beta" : [ 3.6299999999999999, 0.10000000000000001, 5, true, 0 ],
+			"h0" : [ 0.01, 0, 2, true, 0 ],
+			"kappa" : [ 6287, 3000, 10000, true, 0 ],
+			"r0" : [ 2.7000000000000002, 1, 4, true, 0 ],
+			"rho0" : [ 1, 0.10000000000000001, 100, false, 0 ]
+		},
+		"shader_id" : "disk_pascucci2004"
+	}
+}

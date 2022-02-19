@@ -1,0 +1,41 @@
+// Model save file from SIMTOI in JSON format.
+
+{
+	"area_height" : 64,
+	"area_scale" : 0.050,
+	"area_width" : 64,
+	"model_0" : 
+	{
+		"base_data" : 
+		{
+			"Color" : [ 1.0, 0.0, 0.0, false, 0.0 ],
+			"Inclination" : [ 166.50, 0.0, 180.0, true, 0.0 ],
+			"Omega_dot" : [ 0.44880, -1.0, 1.0, false, 0.0 ],
+			"Pos. Angle" : [ 174.170, 0.0, 360.0, true, 0.0 ],
+			"Rotation" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"T_eff_pole" : [ 5000.0, 2000.0, 1000000.0, false, 0.0 ],
+			"g_pole" : [ 1.0, 0.010, 10000.0, false, 0.0 ],
+			"n_side_power" : [ 4.0, 1.0, 10.0, false, 0.0 ],
+			"omega_rot" : [ 0.770, 0.010, 1.0, false, 0.0 ],
+			"r_pole" : [ 1.1270, 1.0, 1.50, true, 0.0 ],
+			"von_zeipel_beta" : [ 0.020, 0.010, 1.0, false, 0.0 ]
+		},
+		"base_id" : "roche_rotator",
+		"feature_0_data" : 
+		{
+			"phi" : [ 0.0, 0.0, 360.0, true, 0.0 ],
+			"radius" : [ 16.820, 5.0, 20.0, true, 0.0 ],
+			"spot_delta_temperature" : [ -800.0, -1000.0, -500.0, true, 0.0 ],
+			"theta" : [ 0.0, 0.0, 180.0, true, 0.0 ]
+		},
+		"feature_0_id" : "uniform_spot",
+		"position_data" : 
+		{
+			"E" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"N" : [ 0.0, 0.0, 0.0, false, 0.0 ]
+		},
+		"position_id" : "xy",
+		"shader_data" : null,
+		"shader_id" : "default"
+	}
+}

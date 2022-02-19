@@ -1,0 +1,57 @@
+// Model save file from SIMTOI in JSON format.
+
+{
+	"area_height" : 512,
+	"area_scale" : 0.050,
+	"area_width" : 512,
+	"model_0" : 
+	{
+		"base_data" : 
+		{
+			"Color" : [ 1.0, 0.0, 0.0, false, 0.0 ],
+			"Inclination" : [ 90.0, 0.0, 0.0, false, 0.0 ],
+			"Omega_dot" : [ 0.50, 0.010, 1.0, false, 0.0 ],
+			"Pos. Angle" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"Rotation" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"T_eff_pole" : [ 5000.0, 2000.0, 1000000.0, false, 0.0 ],
+			"g_pole" : [ 1.0, 0.010, 10000.0, false, 0.0 ],
+			"n_side_power" : [ 6.0, 1.0, 10.0, false, 0.0 ],
+			"omega_rot" : [ 0.8999999761581421, 0.010, 1.0, false, 0.0 ],
+			"r_pole" : [ 10.0, 1.0, 10.0, false, 0.0 ],
+			"von_zeipel_beta" : [ 0.2000000029802322, 0.010, 1.0, false, 0.0 ]
+		},
+		"base_id" : "roche_rotator",
+		"feature_0_data" : 
+		{
+			"phi" : [ 90.0, 0.0, 360.0, false, 0.0 ],
+			"radius" : [ 10.0, 0.10, 6.0, false, 0.0 ],
+			"spot_delta_temperature" : [ -2000.0, -5000.0, 5000.0, false, 0.0 ],
+			"theta" : [ 90.0, 0.10, 180.0, false, 0.0 ]
+		},
+		"feature_0_id" : "uniform_spot",
+		"feature_1_data" : 
+		{
+			"phi" : [ 0.0, 0.0, 360.0, false, 0.0 ],
+			"radius" : [ 10.0, 0.10, 6.0, false, 0.0 ],
+			"spot_delta_temperature" : [ -2000.0, -5000.0, 5000.0, false, 0.0 ],
+			"theta" : [ 0.0, 0.10, 180.0, false, 0.0 ]
+		},
+		"feature_1_id" : "uniform_spot",
+		"feature_2_data" : 
+		{
+			"phi" : [ 90.0, 0.0, 360.0, false, 0.0 ],
+			"radius" : [ 10.0, 0.10, 6.0, false, 0.0 ],
+			"spot_delta_temperature" : [ -2000.0, -5000.0, 5000.0, false, 0.0 ],
+			"theta" : [ 45.0, 0.10, 180.0, false, 0.0 ]
+		},
+		"feature_2_id" : "uniform_spot",
+		"position_data" : 
+		{
+			"E" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"N" : [ 0.0, 0.0, 0.0, false, 0.0 ]
+		},
+		"position_id" : "xy",
+		"shader_data" : null,
+		"shader_id" : "default"
+	}
+}

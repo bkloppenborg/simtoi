@@ -1,0 +1,32 @@
+// Model save file from SIMTOI in JSON format.
+
+{
+	"area_height" : 128,
+	"area_scale" : 0.03,
+	"area_width" : 128,
+	"model_0" : 
+	{
+		"base_data" : 
+		{
+			"Color" : [ 1.0, 0.0, 0.0, false, 0.0 ],
+			"Inclination" : [ 92.8, 0.0, 180.0, false, 4.0 ],
+			"Pos. Angle" : [ 78.82, 0.0, 180.0, false, 5.0 ],
+			"Rotation" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"T_eff_pole" : [ 5208, 1000.0, 10000.0, true, 0.0 ],
+			"g_pole" : [ 1.0, 0.010, 10000.0, false, 0.0 ],
+			"n_side_power" : [ 4.0, 1.0, 10.0, false, 0.0 ],
+			"omega_rot" : [ 0.113, 0.010, 1.0, true, 0.0 ],
+			"r_pole" : [ 1.32, 1.0, 2.5, true, 0.0 ],
+			"von_zeipel_beta" : [ 0.0, 0.010, 1.0, false, 0.0 ]
+		},
+		"base_id" : "roche_rotator",
+		"position_data" : 
+		{
+			"E" : [ 0.0, 0.0, 0.0, false, 0.0 ],
+			"N" : [ 0.0, 0.0, 0.0, false, 0.0 ]
+		},
+		"position_id" : "xy",
+		"shader_data" : null,
+		"shader_id" : "default"
+	}
+}
