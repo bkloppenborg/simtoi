@@ -24,18 +24,14 @@
 
 in vec3 Normal;
 in vec2 Tex_Coords;
-
 uniform float alpha;
 uniform sampler2DRect TexSampler;
-
 out vec4 out_color;
 
-void main()
+void main(void)
 {
     vec4 Color = texture(TexSampler, Tex_Coords);
-
     float mu = abs(dot(Normal, vec3(0.0, 0.0, 1.0)));
     float intensity = pow(mu, alpha);
-
     out_color = vec4(intensity * Color.r, 0, 0, Color.a);
 }
