@@ -142,7 +142,7 @@ def read_simtoi_photometry(filename):
     try:
         data = ascii.read(filename)
     except:
-        print "Could not parse photometric data file:\n " + filename
+        print("Could not parse photometric data file:\n " + filename)
         
         quit()
     

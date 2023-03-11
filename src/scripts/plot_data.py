@@ -377,6 +377,10 @@ def main():
             matplotlib.use(options.savefmt)
         except:
             pass
+            
+            
+    v2_filename = None
+    t3_filename = None
     
     # first generate data plots
     for filename in filenames:
@@ -397,6 +401,9 @@ def main():
             data_file = directory + re.sub('_model_t3.txt', '_t3.txt', filename)
             t3_plot(data_file, model_file, 
                 autosave=options.autosave, saveformat=options.savefmt)
+
+    if v2_filename and t3_filename:
+        plot_uv(v2_filename, t3_filename)
     
 
 if __name__ == "__main__":
